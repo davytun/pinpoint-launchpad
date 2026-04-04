@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "skills": {
+    "bencium-controlled-ux-designer": {
+      "source": "bencium/bencium-marketplace",
+      "sourceType": "github",
+      "computedHash": "0221b3cc4cbc393a8ecc823cce9eb07ed369fe38c45e65c42fde41b257c481b1"
+    },
+    "saas-ui-master": {
+      "source": "shovonsheikh/saas-ui-master",
+      "sourceType": "github",
+      "computedHash": "488e3baf512b04539094ee069584b082e5a6b6a8160ae5c62664b4380b86ed4f"
+    },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "77faba608ea949351d1757e29e6cb726f6ec5937f7595be0593038a7d2d76bb9"
+    },
+    "ui-ux-design-pro": {
+      "source": "saifyxpro/ui-ux-design-pro-skill",
+      "sourceType": "github",
+      "computedHash": "7d26b6431656036ad4c98b1e8bc1b8209cb2902ec77425c77597a19a020abc72"
+    }
+  }
+}

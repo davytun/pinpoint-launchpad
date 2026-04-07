@@ -34,24 +34,17 @@ export default function DiagnosticLayout({
     }, []);
 
     return (
-        <div className="relative min-h-screen overflow-x-hidden bg-background">
+        <div className="relative min-h-screen overflow-x-hidden bg-[#050505] antialiased text-white">
+            <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
+            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
+            <div className="waitlist-wireframe pointer-events-none absolute -left-[15%] top-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-40 mix-blend-overlay md:-left-[5%] md:top-[20%]" />
+            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none absolute -right-[15%] top-[40%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-30 mix-blend-overlay md:-right-[5%] md:top-[45%]" />
 
             {/* ── Ambient top glow ── */}
             <div
-                className="pointer-events-none absolute inset-x-0 top-0 h-80"
+                className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[400px]"
                 style={{
-                    background: `radial-gradient(ellipse 70% 45% at 50% 0%, ${glowColor}1C 0%, transparent 70%)`,
-                }}
-            />
-
-            {/* ── Subtle grid ── */}
-            <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                    backgroundImage:
-                        'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
-                    backgroundSize: '44px 44px',
-                    maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 75%)',
+                    background: `radial-gradient(ellipse 70% 45% at 50% 0%, ${glowColor}25 0%, transparent 70%)`,
                 }}
             />
 
@@ -60,12 +53,6 @@ export default function DiagnosticLayout({
                 <header className="relative z-10 flex items-center justify-between px-5 pt-8 sm:px-8">
                     <div className="flex items-center gap-3">
                         <PinpointLogo height={26} variant="dark" />
-                        <Badge
-                            variant="secondary"
-                            className="rounded-full text-[10px] uppercase tracking-widest"
-                        >
-                            Diagnostic
-                        </Badge>
                     </div>
                 </header>
             )}

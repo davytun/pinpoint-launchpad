@@ -74,9 +74,9 @@ function AxisTick({ x, y, payload, cx, cy }: {
 }) {
     if (!payload || x === undefined || y === undefined) return null;
 
-    // Push labels outward from center
-    const dx = (x - (cx ?? 0)) * 0.18;
-    const dy = (y - (cy ?? 0)) * 0.18;
+    // Gentle push so text doesn't hit SVG boundary on mobile
+    const dx = (x - (cx ?? 0)) * 0.05;
+    const dy = (y - (cy ?? 0)) * 0.05;
 
     return (
         <text
@@ -85,10 +85,10 @@ function AxisTick({ x, y, payload, cx, cy }: {
             textAnchor="middle"
             dominantBaseline="middle"
             fill="rgba(255,255,255,0.45)"
-            fontSize={11}
+            fontSize={10}
             fontFamily="Arial, sans-serif"
             fontWeight={500}
-            letterSpacing="0.04em"
+            letterSpacing="0.02em"
         >
             {payload.value}
         </text>
@@ -99,7 +99,7 @@ function AxisTick({ x, y, payload, cx, cy }: {
 
 function Legend({ active, onToggle }: { active: { verified: boolean; average: boolean }; onToggle: (key: 'verified' | 'average') => void }) {
     return (
-        <div className="mt-6 flex items-center justify-center gap-6">
+        <div className="-mt-8 mb-4 flex flex-wrap items-center justify-center gap-3 md:-mt-4 md:mb-0 md:gap-6">
             {(['verified', 'average'] as const).map((key) => {
                 const isVerified = key === 'verified';
                 const color = isVerified ? '#5ca336' : '#3c53a8';
@@ -138,9 +138,9 @@ export function ParagonRadarChart() {
 
     return (
         <div className="w-full">
-            <ChartContainer config={chartConfig} className="h-[380px] w-full">
+            <ChartContainer config={chartConfig} className="mx-auto h-[320px] w-full max-w-[400px] md:h-[400px] md:max-w-none">
                 <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={pillars} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+                    <RadarChart data={pillars} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
                         <PolarGrid
                             stroke="rgba(255,255,255,0.07)"
                             strokeDasharray="3 3"

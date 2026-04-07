@@ -71,35 +71,35 @@ const BAND_META: Record<string, {
     Icon: React.ElementType;
 }> = {
     low: {
-        color: '#DC2626',
-        border: 'rgba(220,38,38,0.5)',
-        bg: 'rgba(220,38,38,0.08)',
+        color: '#EF4444',
+        border: 'rgba(239,68,68,0.5)',
+        bg: 'rgba(239,68,68,0.08)',
         textColor: '#FCA5A5',
-        badgeLabel: 'Build Phase',
+        badgeLabel: 'High Risk Profile',
         Icon: AlertCircle,
     },
     mid_low: {
-        color: '#EA580C',
-        border: 'rgba(234,88,12,0.5)',
-        bg: 'rgba(234,88,12,0.08)',
+        color: '#F97316',
+        border: 'rgba(249,115,22,0.5)',
+        bg: 'rgba(249,115,22,0.08)',
         textColor: '#FDBA74',
-        badgeLabel: 'Developing',
+        badgeLabel: 'Development Required',
         Icon: AlertTriangle,
     },
     mid_high: {
-        color: '#2563EB',
-        border: 'rgba(37,99,235,0.5)',
-        bg: 'rgba(37,99,235,0.08)',
+        color: '#3C53A8',
+        border: 'rgba(60,83,168,0.6)',
+        bg: 'rgba(60,83,168,0.12)',
         textColor: '#93C5FD',
-        badgeLabel: 'Investment Ready',
+        badgeLabel: 'Investment Pipeline',
         Icon: TrendingUp,
     },
     high: {
-        color: '#059669',
-        border: 'rgba(5,150,105,0.5)',
-        bg: 'rgba(5,150,105,0.08)',
-        textColor: '#6EE7B7',
-        badgeLabel: 'High Velocity',
+        color: '#5CA336',
+        border: 'rgba(92,163,54,0.6)',
+        bg: 'rgba(92,163,54,0.12)',
+        textColor: '#86efac',
+        badgeLabel: 'Top Percentile',
         Icon: Zap,
     },
 };
@@ -174,8 +174,8 @@ export default function DiagnosticResult({
 
                     {/* ── Section 1: Score Hero ── */}
                     <FadeUp delay={0.1}>
-                        <Card className="mb-8 border-border/50 bg-card/60 text-center">
-                            <CardContent className="flex flex-col items-center py-10">
+                        <Card className="waitlist-panel mb-8 overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] p-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] text-center md:rounded-[1.75rem]">
+                            <CardContent className="flex flex-col items-center p-6 sm:p-10">
                                 {/* Band badge */}
                                 <Badge
                                     className="mb-5 rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em]"
@@ -185,15 +185,18 @@ export default function DiagnosticResult({
                                     {meta.badgeLabel}
                                 </Badge>
 
-                                {/* Animated score */}
+                                {/* Static score */}
                                 <div className="flex items-end gap-1 leading-none">
                                     <span
-                                        className="font-sans text-[6rem] font-black leading-none sm:text-[7.5rem]"
-                                        style={{ color: meta.color }}
+                                        className="font-display text-[6.5rem] font-black leading-none tracking-tighter sm:text-[8rem]"
+                                        style={{
+                                            color: meta.color,
+                                            textShadow: `0 0 40px ${meta.color}66`,
+                                        }}
                                     >
-                                        <CountUp target={score} duration={1500} />
+                                        {score}
                                     </span>
-                                    <span className="mb-3 text-2xl font-light text-muted-foreground sm:mb-4">
+                                    <span className="mb-3 font-display text-2xl font-light text-white/50 sm:mb-5">
                                         /100
                                     </span>
                                 </div>
@@ -213,15 +216,16 @@ export default function DiagnosticResult({
 
                         {/* Radar chart */}
                         <FadeUp delay={0.2}>
-                            <Card className="border-border/50 bg-card/40">
+                            <Card className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]">
                                 <CardHeader>
                                     <CardTitle className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
                                         Pillar Radar
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="relative">
+                                    <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[60px]" style={{ background: `radial-gradient(circle, ${meta.color}66, transparent 70%)` }} />
                                     <ResponsiveContainer width="100%" height={280}>
-                                        <RadarChart data={radarData} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
+                                        <RadarChart data={radarData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
                                             <PolarGrid stroke="rgba(255,255,255,0.07)" />
                                             <PolarAngleAxis
                                                 dataKey="subject"
@@ -229,10 +233,10 @@ export default function DiagnosticResult({
                                             />
                                             <Radar
                                                 dataKey="value"
-                                                stroke="#2563EB"
-                                                fill="rgba(37,99,235,0.15)"
+                                                stroke={meta.color}
+                                                fill={`${meta.color}25`}
                                                 strokeWidth={2}
-                                                dot={{ fill: '#2563EB', r: 3 }}
+                                                dot={{ fill: meta.color, r: 3 }}
                                             />
                                         </RadarChart>
                                     </ResponsiveContainer>
@@ -246,7 +250,7 @@ export default function DiagnosticResult({
                             {/* Section 3: Score band message */}
                             <FadeUp delay={0.25}>
                                 <Card
-                                    className="border-border/50 bg-card/40"
+                                    className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]"
                                     style={{ borderLeft: `3px solid ${meta.border}` }}
                                 >
                                     <CardHeader className="pb-2">
@@ -269,30 +273,30 @@ export default function DiagnosticResult({
                             {/* Section 4: CTA */}
                             <FadeUp delay={0.32}>
                                 {isReady ? (
-                                    <motion.div
-                                        animate={{ scale: [1, 1.015, 1] }}
-                                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                                    >
-                                        <Button
-                                            size="lg"
-                                            className="w-full font-bold uppercase tracking-[0.18em]"
+                                    <div>
+                                        <a
+                                            href="/checkout"
+                                            className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200"
                                             style={{
-                                                background: '#2563EB',
-                                                boxShadow: '0 0 28px rgba(37,99,235,0.35)',
+                                                background: meta.color,
+                                                boxShadow: `0 0 28px ${meta.color}66`,
                                             }}
-                                            asChild
+                                            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(1.1)'; }}
+                                            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.filter = ''; }}
                                         >
-                                            <a href="/checkout">Proceed to Application →</a>
-                                        </Button>
-                                    </motion.div>
+                                            <span className="waitlist-shimmer absolute inset-0 opacity-50 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
+                                            <span className="relative z-10 flex items-center gap-2">
+                                                Proceed to Application →
+                                            </span>
+                                        </a>
+                                    </div>
                                 ) : (
-                                    <Button
-                                        variant="outline"
-                                        size="lg"
-                                        className="w-full font-bold uppercase tracking-[0.18em] text-muted-foreground"
+                                    <button
+                                        type="button"
+                                        className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
                                     >
                                         View Your Readiness Checklist
-                                    </Button>
+                                    </button>
                                 )}
                                 {!isReady && (
                                     <p className="mt-2 text-center text-xs text-muted-foreground/60">
@@ -303,7 +307,7 @@ export default function DiagnosticResult({
 
                             {/* Pillar score breakdown */}
                             <FadeUp delay={0.38}>
-                                <Card className="border-border/50 bg-card/40">
+                                <Card className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]">
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
                                             Pillar Breakdown
@@ -320,15 +324,19 @@ export default function DiagnosticResult({
                                                         {pillar_scores[key]}%
                                                     </span>
                                                 </div>
-                                                <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
+                                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.5)]">
                                                     <motion.div
-                                                        className="h-full rounded-full bg-primary"
+                                                        className="h-full rounded-full"
                                                         initial={{ width: 0 }}
                                                         animate={{ width: `${pillar_scores[key]}%` }}
                                                         transition={{
                                                             duration: 0.7,
                                                             delay: 0.4 + i * 0.06,
                                                             ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+                                                        }}
+                                                        style={{
+                                                            background: `linear-gradient(90deg, #3C53A8 0%, #5CA336 100%)`,
+                                                            boxShadow: '0 0 10px rgba(92,163,54,0.5)',
                                                         }}
                                                     />
                                                 </div>

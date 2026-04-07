@@ -54,4 +54,19 @@ class DiagnosticSession extends Model
             default    => 'Unknown',
         };
     }
+
+    public function primaryGap(): string
+    {
+        $scores = $this->pillar_scores;
+        asort($scores);
+        return ucfirst((string) array_key_first($scores));
+    }
+
+    public function topTwoPillars(): string
+    {
+        $scores = $this->pillar_scores;
+        arsort($scores);
+        $top = array_slice(array_keys($scores), 0, 2);
+        return implode(' and ', array_map('ucfirst', $top));
+    }
 }

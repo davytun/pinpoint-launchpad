@@ -26,10 +26,6 @@ export function PinpointLogo({
                 height,
                 width: 'auto',
                 display: 'block',
-                // On dark backgrounds: invert colors so the logo reads as white
-                filter: variant === 'dark'
-                    ? 'brightness(0) invert(1)'
-                    : undefined,
             }}
             className={cn('select-none', className)}
         />

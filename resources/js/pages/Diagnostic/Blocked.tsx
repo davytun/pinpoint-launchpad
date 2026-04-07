@@ -28,24 +28,26 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
             <Head title="Checkpoint — Pinpoint Diagnostic" />
 
             <DiagnosticLayout>
-                <div className="flex min-h-[calc(100vh-72px)] flex-col items-center justify-between px-4 pt-8 pb-16">
-                    <div className="mx-auto w-full max-w-lg">
+                <div className="flex min-h-[calc(100vh-72px)] flex-col items-center justify-center px-4 py-12">
+                    <div className="waitlist-panel mx-auto w-full max-w-lg overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111]/80 p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-12 md:rounded-[1.75rem]">
                         {/* Compass icon — oscillating */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{
                                 opacity: 1,
                                 scale: 1,
-                                rotate: [-5, 5, -5],
+                                rotate: 0,
                             }}
                             transition={{
                                 opacity: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
                                 scale: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
-                                rotate: { duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.6 },
                             }}
                             className="mb-8 flex justify-center"
                         >
-                            <Compass className="text-primary size-20" strokeWidth={1.25} />
+                            <div className="relative">
+                                <div className="absolute inset-0 max-w-[80px] blur-[30px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(147,197,253,0.3), transparent 70%)' }} />
+                                <Compass className="size-20 relative z-10" color="#3C53A8" strokeWidth={1.25} />
+                            </div>
                         </motion.div>
 
                         {/* Headline */}
@@ -53,11 +55,11 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-                            className="text-foreground mb-5 text-center text-4xl leading-tight font-black"
+                            className="mb-6 font-display text-center text-4xl font-bold leading-tight tracking-tight text-white"
                         >
                             The Best Founders Don't Stop.
                             <br />
-                            <span className="text-primary">They Prepare.</span>
+                            <span className="bg-gradient-to-r from-[#93C5FD] to-[#3C53A8] bg-clip-text text-transparent">They Prepare.</span>
                         </motion.h1>
 
                         {/* Sub copy */}
@@ -65,7 +67,7 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.18 }}
-                            className="text-muted-foreground mb-8 text-center text-sm leading-relaxed"
+                            className="mb-8 text-center text-base leading-relaxed text-white/50"
                         >
                             Having most recently completed this assessment without reaching the threshold, you are ineligible to retake it
                             immediately. This isn't a dead end — it's a checkpoint. The founders who return stronger are the ones who make it.
@@ -77,26 +79,25 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                             animate={{
                                 opacity: 1,
                                 y: 0,
-                                scale: [1, 1.03, 1],
+                                scale: 1,
                             }}
                             transition={{
                                 opacity: { duration: 0.45, delay: 0.24 },
                                 y: { duration: 0.45, delay: 0.24 },
-                                scale: { duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 1 },
                             }}
-                            className="mb-8 flex justify-center"
+                            className="mb-8 flex justify-center w-full"
                         >
                             <Badge
-                                className="rounded-full px-5 py-2 text-sm font-semibold"
+                                className="inline-flex items-center justify-center rounded-full px-6 py-3 font-bold uppercase tracking-[0.1em]"
                                 style={{
-                                    borderColor: 'rgba(37,99,235,0.45)',
-                                    background: 'rgba(37,99,235,0.08)',
-                                    color: 'rgba(147,197,253,0.90)',
-                                    border: '1px solid rgba(37,99,235,0.45)',
+                                    border: '1px solid rgba(60,83,168,0.5)',
+                                    background: 'rgba(60,83,168,0.1)',
+                                    color: '#93C5FD',
+                                    boxShadow: '0 0 20px rgba(60,83,168,0.2)',
                                 }}
                             >
                                 Return in{' '}
-                                <strong className="text-foreground ml-1">
+                                <strong className="ml-1.5 font-display text-lg font-black text-white">
                                     {days_remaining} {days_remaining === 1 ? 'day' : 'days'}
                                 </strong>
                             </Badge>
@@ -110,8 +111,8 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                                 transition={{ delay: 0.28 }}
                                 className="mb-8 flex justify-center"
                             >
-                                <span className="text-muted-foreground/50 text-xs">
-                                    Last assessment: <span className="text-muted-foreground">{score_band_label}</span>
+                                <span className="text-xs uppercase tracking-[0.1em] text-white/30">
+                                    Last assessment: <span className="font-bold text-white/70">{score_band_label}</span>
                                 </span>
                             </motion.div>
                         )}
@@ -139,8 +140,8 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                                     }}
                                     className="flex items-start gap-3.5"
                                 >
-                                    <CheckCircle2 className="text-primary mt-0.5 size-5 shrink-0" />
-                                    <p className="text-muted-foreground text-sm leading-relaxed">{item}</p>
+                                    <CheckCircle2 color="#3C53A8" className="mt-0.5 size-5 shrink-0" />
+                                    <p className="text-sm leading-relaxed text-white/60">{item}</p>
                                 </motion.li>
                             ))}
                         </motion.ul>
@@ -153,8 +154,8 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                         transition={{ delay: 0.75 }}
                         className="relative mt-8 w-full max-w-lg text-center"
                     >
-                        <Separator className="mb-5 opacity-20" />
-                        <p className="text-muted-foreground/50 text-sm">Filtering for Quality. Solving for Success.</p>
+                        <Separator className="mb-5 border-white/10" />
+                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/30">Filtering for Quality. Solving for Success.</p>
                     </motion.footer>
                 </div>
             </DiagnosticLayout>

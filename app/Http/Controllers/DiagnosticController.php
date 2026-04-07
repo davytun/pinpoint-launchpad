@@ -2,12 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\DiagnosticResultAdminMail;
+use App\Mail\DiagnosticResultMail;
+use App\Mail\PathwayAMail;
+use App\Mail\PathwayBEmail1Mail;
+use App\Mail\PathwayBEmail2Mail;
+use App\Mail\PathwayBEmail3Mail;
+use App\Mail\PathwayCFounderMail;
+use App\Mail\UnicornAlertMail;
 use App\Models\DiagnosticQuestion;
 use App\Models\DiagnosticSession;
 use App\Models\Setting;
 use App\Services\ScoringService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,6 +31,16 @@ class DiagnosticController extends Controller
 
     public function index(Request $request): Response|RedirectResponse
     {
+        // If quiz was completed but email not yet submitted, send back to email gate
+        if ($request->session()->has('diagnostic_result')) {
+            return redirect()->route('diagnostic.email-gate');
+        }
+
+        // If full session already completed, send to results
+        if ($request->session()->has('diagnostic_session_id')) {
+            return redirect()->route('diagnostic.result');
+        }
+
         $email = $request->session()->get('diagnostic_email');
 
         if ($email) {
@@ -61,7 +80,12 @@ class DiagnosticController extends Controller
     public function emailGate(Request $request): Response|RedirectResponse
     {
         if (! $request->session()->has('diagnostic_result')) {
-            return redirect()->route('diagnostic.index');
+            // If result was already viewed, send back to result — not to index
+            if ($request->session()->has('result_viewed')) {
+                return redirect()->route('diagnostic.result');
+            }
+
+            return redirect()->route('diagnostic.index')->with('error', 'Please complete the quiz first.');
         }
 
         $result = $request->session()->get('diagnostic_result');
@@ -73,6 +97,10 @@ class DiagnosticController extends Controller
 
     public function captureEmail(Request $request): RedirectResponse
     {
+        if (! $request->session()->has('diagnostic_result')) {
+            return redirect()->route('diagnostic.index');
+        }
+
         $validated = $request->validate([
             'email' => ['required', 'email'],
         ]);
@@ -85,6 +113,7 @@ class DiagnosticController extends Controller
 
         if ($existing && $existing->isOnCooldown()) {
             $request->session()->put('diagnostic_email', $email);
+            $request->session()->forget('diagnostic_result');
 
             return redirect()->route('diagnostic.blocked');
         }
@@ -112,6 +141,24 @@ class DiagnosticController extends Controller
         $request->session()->put('diagnostic_session_id', $session->id);
         $request->session()->forget('diagnostic_result');
 
+        // 1. Always send the general result email first (queued — non-blocking)
+        Mail::to($session->email)->queue(new DiagnosticResultMail($session));
+
+        // 2. Fire the correct pathway based on score band
+        if ($session->score_band === 'low' || $session->score_band === 'mid_low') {
+            Mail::to($session->email)->queue(new PathwayAMail($session));
+        } elseif ($session->score_band === 'mid_high') {
+            Mail::to($session->email)->queue(new PathwayBEmail1Mail($session));
+            Mail::to($session->email)->later(now()->addDays(2), new PathwayBEmail2Mail($session));
+            Mail::to($session->email)->later(now()->addDays(5), new PathwayBEmail3Mail($session));
+        } elseif ($session->score_band === 'high') {
+            Mail::to($session->email)->queue(new PathwayCFounderMail($session));
+            Mail::to(config('mail.admin_address'))->queue(new UnicornAlertMail($session));
+        }
+
+        // 3. Always send admin notification
+        Mail::to(config('mail.admin_address'))->queue(new DiagnosticResultAdminMail($session));
+
         return redirect()->route('diagnostic.result');
     }
 
@@ -120,10 +167,12 @@ class DiagnosticController extends Controller
         $sessionId = $request->session()->get('diagnostic_session_id');
 
         if (! $sessionId) {
-            return redirect()->route('diagnostic.index');
+            return redirect()->route('diagnostic.index')->with('error', 'Please complete the quiz to see your results.');
         }
 
         $session = DiagnosticSession::findOrFail($sessionId);
+
+        $request->session()->put('result_viewed', true);
 
         return Inertia::render('Diagnostic/Result', [
             'score'              => $session->score,

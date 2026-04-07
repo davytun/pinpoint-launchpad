@@ -113,4 +113,8 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'admin_address' => env('ADMIN_NOTIFICATION_EMAIL', 'admin@pinpointlaunchpad.com'),
+    'analyst_name'  => env('ANALYST_NAME', 'The Pinpoint Team'),
+    'booking_link'  => env('BOOKING_LINK', '#'),
+
 ];

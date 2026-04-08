@@ -272,28 +272,21 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 type="button"
                                 onClick={goBack}
                                 disabled={currentIndex === 0}
-                                className="group flex items-center gap-1.5 rounded-lg py-2 text-xs font-bold tracking-widest text-white/30 uppercase transition-colors hover:text-white/80 disabled:pointer-events-none border border-white/10 px-4 disabled:opacity-20"
+                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-white/10 px-4 py-2 text-xs font-bold tracking-widest text-white/30 uppercase transition-colors hover:text-white/80 disabled:pointer-events-none disabled:opacity-20"
                             >
                                 <span className="transition-transform group-hover:-translate-x-1"><ChevronLeft /></span> Back
                             </button>
 
-                            <div className="flex items-center gap-2">
-                                {questions.map((q, i) => (
-                                    <div
-                                        key={q.id}
-                                        className="rounded-full transition-all duration-500 ease-out"
-                                        style={{
-                                            width: i === currentIndex ? 24 : 6,
-                                            height: 6,
-                                            background:
-                                                i === currentIndex ? '#5CA336' : answers[q.id] !== undefined ? '#3C53A8' : 'rgba(255,255,255,0.1)',
-                                            boxShadow: i === currentIndex ? '0 0 12px rgba(92,163,54,0.4)' : 'none',
-                                        }}
-                                    />
-                                ))}
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-sm font-bold tabular-nums" style={{ color: '#5CA336' }}>
+                                    {currentIndex + 1}
+                                </span>
+                                <span className="text-xs text-white/20">/</span>
+                                <span className="text-xs text-white/30 tabular-nums">{total_questions}</span>
                             </div>
 
-                            <div className="w-16" />
+                            <div className="w-16 shrink-0" />
+
                         </div>
                     )}
                 </div>

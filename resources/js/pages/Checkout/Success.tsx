@@ -200,7 +200,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
 
                         {/* Next steps Timeline */}
                         <motion.div initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.55, duration: 0.5, ease: [0.16, 1, 0.3, 1] }} className="mb-8">
-                            <h3 className="mb-5 text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Action Required</h3>
+                            <h2 className="mb-5 text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Action Required</h2>
                             <div className="pl-1">
                                 <Step
                                     n={1}

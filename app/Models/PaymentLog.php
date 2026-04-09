@@ -12,7 +12,7 @@ class PaymentLog extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'payment_id',
+        'payment_id', // nullable — preserved as NULL if parent payment is deleted
         'event',
         'metadata',
         'ip_address',

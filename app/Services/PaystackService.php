@@ -156,11 +156,7 @@ class PaystackService
 
     public function verifyWebhookSignature(Request $request): bool
     {
-        $hash = hash_hmac(
-            'sha512',
-            $request->getContent(),
-            config('services.paystack.secret_key')
-        );
+        $hash = hash_hmac('sha512', $request->getContent(), $this->secretKey);
 
         return hash_equals($hash, (string) $request->header('x-paystack-signature', ''));
     }
@@ -181,8 +177,9 @@ class PaystackService
         // Validate payload structure before processing
         if (! isset($payload['event'], $payload['data'])) {
             Log::warning('Paystack webhook malformed payload', [
-                'ip'      => $request->ip(),
-                'payload' => substr($request->getContent(), 0, 500),
+                'ip'             => $request->ip(),
+                'payload_length' => strlen($request->getContent()),
+                'payload_hash'   => hash('sha256', $request->getContent()),
             ]);
             abort(400, 'Malformed payload');
         }
@@ -226,7 +223,15 @@ class PaystackService
 
         try {
             Mail::to($payment->customer_email)->queue(new PaymentConfirmationMail($payment));
-            Mail::to(config('mail.admin_address'))->queue(new PaymentAdminNotificationMail($payment));
+
+            $adminAddress = config('mail.admin_address');
+            if ($adminAddress && filter_var($adminAddress, FILTER_VALIDATE_EMAIL)) {
+                Mail::to($adminAddress)->queue(new PaymentAdminNotificationMail($payment));
+            } else {
+                Log::warning('Admin notification skipped: invalid or missing mail.admin_address', [
+                    'payment_id' => $payment->id,
+                ]);
+            }
         } catch (\Throwable $e) {
             Log::error('Failed to queue payment emails after webhook', [
                 'payment_id' => $payment->id,
@@ -242,14 +247,14 @@ class PaystackService
             return;
         }
 
-        $updated = Payment::where('paystack_reference', $reference)
+        // Atomic update — only marks failed if still pending
+        $affected = Payment::where('paystack_reference', $reference)
             ->where('status', 'pending')
-            ->first();
+            ->update(['status' => 'failed']);
 
-        if ($updated) {
-            $updated->status = 'failed';
-            $updated->save();
-            $updated->log('failed');
+        if ($affected > 0) {
+            $failed = Payment::where('paystack_reference', $reference)->first();
+            $failed?->log('failed');
         }
     }
 }

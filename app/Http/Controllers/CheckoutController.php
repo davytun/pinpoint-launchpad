@@ -270,8 +270,17 @@ class CheckoutController extends Controller
 
     public function webhook(Request $request, PaystackService $paystack): \Illuminate\Http\JsonResponse
     {
-        $paystack->handleWebhook($request);
+        try {
+            $paystack->handleWebhook($request);
+        } catch (\Throwable $e) {
+            Log::error('Paystack webhook processing failed', [
+                'error'          => $e->getMessage(),
+                'ip'             => $request->ip(),
+                'payload_length' => strlen($request->getContent()),
+            ]);
+        }
 
+        // Always return 200 so Paystack does not retry indefinitely
         return response()->json(['status' => 'ok'], 200);
     }
 }

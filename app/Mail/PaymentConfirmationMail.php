@@ -27,7 +27,7 @@ class PaymentConfirmationMail extends Mailable
         return new Content(
             view: 'emails.payment.confirmation',
             with: [
-                'tier_label'   => ucfirst($this->payment->tier),
+                'tier_label'   => ucfirst((string) ($this->payment->tier ?? 'unknown')),
                 'total_amount' => $this->payment->total_amount,
                 'base_price'   => $this->payment->tier_base_amount,
                 'gate_fee'     => $this->payment->gate_fee,

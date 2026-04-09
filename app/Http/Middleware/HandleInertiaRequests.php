@@ -43,7 +43,7 @@ class HandleInertiaRequests extends Middleware
             'name'  => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth'               => ['user' => $request->user()],
-            'paystack_public_key' => config('services.paystack.public_key'),
+            'paystack_public_key' => config('services.paystack.public_key') ?: '',
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error'   => $request->session()->get('error'),

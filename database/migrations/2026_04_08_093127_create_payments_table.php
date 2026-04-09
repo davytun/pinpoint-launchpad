@@ -10,8 +10,9 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('diagnostic_session_id')->nullable()->constrained()->nullOnDelete();
+            // restrictOnDelete preserves payment records as financial audit trail
+            $table->foreignId('user_id')->nullable()->constrained()->restrictOnDelete();
+            $table->foreignId('diagnostic_session_id')->nullable()->constrained()->restrictOnDelete();
             // nullable: record is created before Paystack returns a reference
             $table->string('paystack_reference')->nullable()->unique();
             $table->string('paystack_access_code')->nullable();

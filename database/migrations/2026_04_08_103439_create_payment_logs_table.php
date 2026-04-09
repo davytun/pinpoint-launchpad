@@ -10,12 +10,17 @@ return new class extends Migration
     {
         Schema::create('payment_logs', function (Blueprint $table) {
             $table->id();
-            // No cascade delete — audit logs must be preserved even if the payment record is removed
-            $table->foreignId('payment_id')->constrained()->restrictOnDelete();
+            // nullOnDelete: sets payment_id to NULL when parent payment is deleted,
+            // preserving audit log rows for compliance/auditability
+            $table->foreignId('payment_id')->nullable()->constrained()->nullOnDelete();
             $table->string('event');
             $table->json('metadata')->nullable();
             $table->string('ip_address')->nullable();
             $table->timestamp('created_at')->useCurrent();
+
+            $table->index('payment_id');
+            $table->index('created_at');
+            $table->index('event');
         });
     }
 

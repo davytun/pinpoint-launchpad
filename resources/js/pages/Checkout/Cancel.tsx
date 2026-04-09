@@ -58,7 +58,7 @@ export default function CheckoutCancel() {
                         <div className="flex flex-col gap-3">
                             <Link
                                 href="/checkout"
-                                className="group relative block w-full overflow-hidden rounded-xl px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:brightness-110"
+                                className="group relative block w-full overflow-hidden rounded-xl px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white transition-all duration-200 hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
                                 style={{
                                     background: '#3C53A8',
                                     boxShadow: '0 0 28px rgba(60,83,168,0.3)',

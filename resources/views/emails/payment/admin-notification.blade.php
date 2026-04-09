@@ -32,7 +32,7 @@
               @elseif($paid_at)
                 {{ \Carbon\Carbon::parse($paid_at)->format('d M Y, H:i') }}
               @else
-                {{ now()->format('d M Y, H:i') }}
+                N/A
               @endif
             </td>
           </tr>

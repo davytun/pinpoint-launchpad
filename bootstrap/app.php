@@ -19,7 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\EnsureUserHasRole::class,
+            'role'             => \App\Http\Middleware\EnsureUserHasRole::class,
+            'payment.complete' => \App\Http\Middleware\EnsurePaymentComplete::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/paystack',
+            'webhooks/pandadoc',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

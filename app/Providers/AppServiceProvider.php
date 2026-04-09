@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\PaystackService;
 use App\Services\ScoringService;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,6 +13,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ScoringService::class);
+        $this->app->singleton(PaystackService::class);
     }
 
     /**

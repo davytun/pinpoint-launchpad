@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\WaitlistController as AdminWaitlistController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\WaitlistController;
 
@@ -31,11 +32,21 @@ Route::post('/waitlist/investors', [WaitlistController::class, 'storeInvestor'])
 
 Route::prefix('diagnostic')->name('diagnostic.')->group(function () {
     Route::get('/',              [DiagnosticController::class, 'index'])->name('index');
-    Route::post('/submit',       [DiagnosticController::class, 'submit'])->name('submit');
+    Route::post('/submit',       [DiagnosticController::class, 'submit'])->name('submit')->middleware('throttle:10,1');
     Route::get('/email-gate',    [DiagnosticController::class, 'emailGate'])->name('email-gate');
-    Route::post('/capture-email', [DiagnosticController::class, 'captureEmail'])->name('capture-email');
+    Route::post('/capture-email', [DiagnosticController::class, 'captureEmail'])->name('capture-email')->middleware('throttle:5,1');
     Route::get('/result',        [DiagnosticController::class, 'result'])->name('result');
     Route::get('/blocked',       [DiagnosticController::class, 'blocked'])->name('blocked');
 });
+
+Route::prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/',         [CheckoutController::class, 'index'])->name('index');
+    Route::post('/initiate',[CheckoutController::class, 'initiate'])->name('initiate')->middleware('throttle:5,1');
+    Route::get('/success',  [CheckoutController::class, 'success'])->name('success');
+    Route::get('/cancel',   [CheckoutController::class, 'cancel'])->name('cancel');
+});
+
+// Paystack webhook — CSRF excluded in bootstrap/app.php
+Route::post('/webhooks/paystack', [CheckoutController::class, 'webhook'])->name('webhooks.paystack');
 
 require __DIR__.'/auth.php';

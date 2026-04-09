@@ -16,6 +16,7 @@ use App\Models\Setting;
 use App\Services\ScoringService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -106,6 +107,30 @@ class DiagnosticController extends Controller
         ]);
 
         $email = $validated['email'];
+
+        // Block if this email already has a paid payment — no re-entry
+        $alreadyPaid = \App\Models\Payment::where('customer_email', $email)
+            ->where('status', 'paid')
+            ->exists();
+
+        if ($alreadyPaid) {
+            return redirect()->route('diagnostic.index')
+                ->with('error', 'An audit is already in progress for this email address.');
+        }
+
+        // IP-based cooldown — prevent email rotation abuse
+        $recentByIp = DiagnosticSession::where('ip_address', $request->ip())
+            ->where('created_at', '>=', now()->subHours(24))
+            ->count();
+
+        if ($recentByIp >= 3) {
+            \Illuminate\Support\Facades\Log::warning('Diagnostic IP abuse detected', [
+                'ip'    => $request->ip(),
+                'email' => $email,
+            ]);
+            return redirect()->route('diagnostic.index')
+                ->with('error', 'Too many attempts from your network. Please try again in 24 hours.');
+        }
 
         $existing = DiagnosticSession::byEmail($email)
             ->latest('completed_at')

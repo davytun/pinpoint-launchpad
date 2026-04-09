@@ -22,10 +22,13 @@
         <tr>
           <td style="padding:36px 36px 28px 36px;">
 
-            {{-- Logo (base64 inline so it renders in all email clients regardless of APP_URL) --}}
-            @php $logoPath = public_path('pinpoint-logo.png'); @endphp
-            @if(file_exists($logoPath))
-            <img src="data:image/png;base64,{{ base64_encode(file_get_contents($logoPath)) }}" alt="Pinpoint Launchpad" width="140" style="display:block;margin:0 0 28px 0;max-width:140px;height:auto;">
+            {{-- Logo: embed as base64 so it renders in all email clients regardless of APP_URL --}}
+            @php
+                $logoPath    = public_path('pinpoint-logo.png');
+                $logoContent = file_exists($logoPath) ? @file_get_contents($logoPath) : false;
+            @endphp
+            @if($logoContent !== false)
+            <img src="data:image/png;base64,{{ base64_encode($logoContent) }}" alt="Pinpoint Launchpad" width="140" style="display:block;margin:0 0 28px 0;max-width:140px;height:auto;">
             @else
             <img src="{{ config('app.url') }}/pinpoint-logo.png" alt="Pinpoint Launchpad" width="140" style="display:block;margin:0 0 28px 0;max-width:140px;height:auto;">
             @endif

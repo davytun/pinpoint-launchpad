@@ -223,29 +223,20 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
 
                         {/* CTA */}
                         <motion.div initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.65, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
-                            <Link href="/onboarding/sign" className="block outline-none">
-                                <button
-                                    className="group relative w-full overflow-hidden rounded-xl px-5 py-[18px] text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-300"
-                                    style={{
-                                        background: '#1A1A1A',
-                                        border: '1px solid rgba(110,190,68,0.4)',
-                                        boxShadow: '0 0 30px rgba(110,190,68,0.15), inset 0 2px 0 rgba(255,255,255,0.05)',
-                                    }}
-                                    onMouseEnter={e => { 
-                                        (e.currentTarget as HTMLButtonElement).style.background = 'rgba(110,190,68,0.1)';
-                                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#6EBE44';
-                                    }}
-                                    onMouseLeave={e => { 
-                                        (e.currentTarget as HTMLButtonElement).style.background = '#1A1A1A';
-                                        (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(110,190,68,0.4)';
-                                    }}
-                                >
-                                    <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
-                                        Proceed to Agreement
-                                        <ArrowRight className="h-4 w-4 text-[#6EBE44]" />
-                                    </span>
-                                </button>
+                            <Link
+                                href="/onboarding/sign"
+                                className="group relative block w-full overflow-hidden rounded-xl px-5 py-[18px] text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-300 hover:[background:rgba(110,190,68,0.1)] hover:[border-color:#6EBE44]"
+                                style={{
+                                    background: '#1A1A1A',
+                                    border: '1px solid rgba(110,190,68,0.4)',
+                                    boxShadow: '0 0 30px rgba(110,190,68,0.15), inset 0 2px 0 rgba(255,255,255,0.05)',
+                                }}
+                            >
+                                <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    Proceed to Agreement
+                                    <ArrowRight className="h-4 w-4 text-[#6EBE44]" />
+                                </span>
                             </Link>
                         </motion.div>
 

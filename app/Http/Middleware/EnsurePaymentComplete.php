@@ -22,6 +22,7 @@ class EnsurePaymentComplete
         }
 
         // 2. Session may have expired — recover via diagnostic_session_id (direct FK, not email)
+        // diagnostic_session_id comes only from the server-side session — never user input
         $diagnosticSessionId = $request->session()->get('diagnostic_session_id');
 
         if ($diagnosticSessionId) {
@@ -33,27 +34,32 @@ class EnsurePaymentComplete
                     ->latest()
                     ->first();
 
-                if ($payment) {
+                // Ownership check: only restore if payment belongs to the authenticated user (when logged in)
+                $ownershipOk = ! $request->user() || (int) $payment?->user_id === (int) $request->user()->id || $payment?->user_id === null;
+
+                if ($payment && $ownershipOk) {
                     $request->session()->put('payment_id', $payment->id);
                     return $next($request);
                 }
             }
         }
 
-        // 3. Authenticated user fallback — scoped to the current diagnostic session
+        // 3. Authenticated user fallback — requires a scoped diagnostic_session_id
         if ($request->user()) {
-            $scopedSessionId = $diagnosticSessionId
-                ?? $request->route('diagnostic_session_id')
-                ?? $request->input('diagnostic_session_id');
+            // Only use route param — never $request->input() to prevent user-supplied IDs
+            $scopedSessionId = $diagnosticSessionId ?? $request->route('diagnostic_session_id');
 
-            $query = Payment::where('user_id', $request->user()->id)
-                ->where('status', 'paid');
-
-            if ($scopedSessionId) {
-                $query->where('diagnostic_session_id', $scopedSessionId);
+            // Refuse to run a loose all-payments query without a scoped session ID
+            if (! $scopedSessionId) {
+                return redirect()->route('checkout.index')
+                    ->with('error', 'Please complete payment to continue.');
             }
 
-            $payment = $query->latest()->first();
+            $payment = Payment::where('user_id', $request->user()->id)
+                ->where('diagnostic_session_id', $scopedSessionId)
+                ->where('status', 'paid')
+                ->latest()
+                ->first();
 
             if ($payment) {
                 $request->session()->put('payment_id', $payment->id);

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Payment extends Model
 {
+    // 'status' and 'audit_status' are intentionally excluded from mass-assignment.
+    // Set them explicitly via model properties or dedicated methods.
     protected $fillable = [
         'user_id',
         'diagnostic_session_id',
@@ -19,8 +21,6 @@ class Payment extends Model
         'gate_fee',
         'total_amount',
         'currency',
-        'status',
-        'audit_status',
         'customer_email',
         'paid_at',
     ];

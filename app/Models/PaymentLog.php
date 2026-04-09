@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PaymentLog extends Model
 {
-    public $timestamps = false;
-
-    // Only manage created_at; no updated_at on audit log rows
+    // Only auto-manage created_at — no updated_at on immutable audit log rows
     const CREATED_AT = 'created_at';
     const UPDATED_AT = null;
 

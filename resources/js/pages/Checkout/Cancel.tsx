@@ -73,8 +73,6 @@ export default function CheckoutCancel() {
 
                             <Link
                                 href="/diagnostic/result"
-                                role="button"
-                                aria-label="Back to my diagnostic results"
                                 className="block w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
                             >
                                 Back to My Results

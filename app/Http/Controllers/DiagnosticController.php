@@ -115,7 +115,7 @@ class DiagnosticController extends Controller
 
         if ($alreadyPaid) {
             return redirect()->route('diagnostic.index')
-                ->with('error', 'An audit is already in progress for this email address.');
+                ->with('error', 'Unable to process this request. Please contact support if you believe this is an error.');
         }
 
         // IP-based cooldown — prevent email rotation abuse

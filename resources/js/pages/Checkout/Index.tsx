@@ -178,6 +178,8 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         {/* ── Error banner ── */}
                         {error && (
                             <motion.div
+                                role="alert"
+                                aria-live="assertive"
                                 initial={{ opacity: 0, y: -8 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"

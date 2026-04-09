@@ -17,7 +17,13 @@ class PaystackService
 
     public function __construct()
     {
-        $this->secretKey = config('services.paystack.secret_key');
+        $key = config('services.paystack.secret_key');
+
+        if (! is_string($key) || $key === '') {
+            throw new \InvalidArgumentException('Paystack secret key is not configured. Set PAYSTACK_SECRET_KEY in your .env file.');
+        }
+
+        $this->secretKey = $key;
     }
 
     public function initializeTransaction(array $data): array
@@ -43,6 +49,14 @@ class PaystackService
             ],
         ];
 
+        // Validate required keys before any access
+        $requiredKeys = ['tier', 'email', 'callback_url', 'diagnostic_session_id'];
+        $missing      = array_filter($requiredKeys, fn($k) => ! isset($data[$k]) || $data[$k] === '');
+
+        if (! empty($missing)) {
+            throw new \InvalidArgumentException('Missing required payment data keys: ' . implode(', ', $missing));
+        }
+
         $tier = $data['tier'];
 
         if (! isset($tierMap[$tier])) {
@@ -59,7 +73,7 @@ class PaystackService
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->secretKey,
                 'Content-Type'  => 'application/json',
-            ])->post('https://api.paystack.co/transaction/initialize', [
+            ])->timeout(10)->post('https://api.paystack.co/transaction/initialize', [
                 'email'        => $data['email'],
                 'amount'       => $amount,
                 'callback_url' => $data['callback_url'],
@@ -96,9 +110,12 @@ class PaystackService
             'total_amount'          => $totalAmount,
             'customer_email'        => $data['email'],
             'diagnostic_session_id' => $data['diagnostic_session_id'],
-            'status'                => 'pending',
             'currency'              => 'usd',
         ]);
+        // status and audit_status are not mass-assignable; defaults set by DB/model
+        $payment->status       = 'pending';
+        $payment->audit_status = 'pending';
+        $payment->save();
 
         $payment->log('initialized', [
             'tier'   => $tier,
@@ -117,7 +134,7 @@ class PaystackService
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->secretKey,
-            ])->get("https://api.paystack.co/transaction/verify/{$reference}")->json();
+            ])->timeout(10)->get('https://api.paystack.co/transaction/verify/' . rawurlencode($reference))->json();
         } catch (\Throwable $e) {
             Log::error('Paystack HTTP request failed during verification', [
                 'reference' => $reference,
@@ -191,19 +208,19 @@ class PaystackService
             return;
         }
 
-        // Idempotency — do not process twice
-        if ($payment->status === 'paid') {
+        // Atomic idempotent update — only proceeds if not already paid
+        $affected = Payment::where('id', $payment->id)
+            ->where('status', '!=', 'paid')
+            ->update(['status' => 'paid', 'paid_at' => now()]);
+
+        if ($affected === 0) {
             Log::info('Webhook received for already-paid payment', [
                 'reference' => $reference,
             ]);
             return;
         }
 
-        $payment->update([
-            'status'  => 'paid',
-            'paid_at' => now(),
-        ]);
-
+        $payment->refresh();
         $payment->log('webhook_received', ['event' => 'charge.success']);
         $payment->log('paid');
 
@@ -230,7 +247,8 @@ class PaystackService
             ->first();
 
         if ($updated) {
-            $updated->update(['status' => 'failed']);
+            $updated->status = 'failed';
+            $updated->save();
             $updated->log('failed');
         }
     }

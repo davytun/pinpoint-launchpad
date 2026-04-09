@@ -41,7 +41,15 @@
           </tr>
           <tr>
             <td style="padding:4px 0;font-size:13px;color:#374151;font-family:Arial,Helvetica,sans-serif;">Date</td>
-            <td style="padding:4px 0;font-size:13px;color:#111827;text-align:right;font-family:Arial,Helvetica,sans-serif;">{{ $paid_at ? $paid_at->format('d M Y, H:i') : now()->format('d M Y, H:i') }}</td>
+            <td style="padding:4px 0;font-size:13px;color:#111827;text-align:right;font-family:Arial,Helvetica,sans-serif;">
+              @if($paid_at instanceof \Illuminate\Support\Carbon || $paid_at instanceof \Carbon\Carbon)
+                {{ $paid_at->format('d M Y, H:i') }}
+              @elseif($paid_at)
+                {{ \Carbon\Carbon::parse($paid_at)->format('d M Y, H:i') }}
+              @else
+                N/A
+              @endif
+            </td>
           </tr>
           <tr>
             <td style="padding:4px 0;font-size:13px;color:#374151;font-family:Arial,Helvetica,sans-serif;">Status</td>

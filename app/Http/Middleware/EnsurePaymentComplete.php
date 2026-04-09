@@ -16,7 +16,12 @@ class EnsurePaymentComplete
         if ($request->session()->has('payment_id')) {
             $payment = Payment::find($request->session()->get('payment_id'));
 
-            if ($payment && $payment->status === 'paid') {
+            // Verify ownership when a user is authenticated
+            $ownerOk = ! $request->user()
+                || $payment?->user_id === null
+                || (int) $payment->user_id === (int) $request->user()->id;
+
+            if ($payment && $payment->status === 'paid' && $ownerOk) {
                 return $next($request);
             }
         }

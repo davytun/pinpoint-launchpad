@@ -101,6 +101,7 @@ class PaystackService
             throw new RuntimeException('Payment could not be initialized. Please try again.');
         }
 
+        // status='pending' and audit_status='pending' are set atomically by DB column defaults
         $payment = Payment::create([
             'paystack_reference'    => $response['data']['reference'],
             'paystack_access_code'  => $response['data']['access_code'],
@@ -112,10 +113,6 @@ class PaystackService
             'diagnostic_session_id' => $data['diagnostic_session_id'],
             'currency'              => 'usd',
         ]);
-        // status and audit_status are not mass-assignable; defaults set by DB/model
-        $payment->status       = 'pending';
-        $payment->audit_status = 'pending';
-        $payment->save();
 
         $payment->log('initialized', [
             'tier'   => $tier,

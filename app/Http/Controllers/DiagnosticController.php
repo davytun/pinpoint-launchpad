@@ -125,7 +125,7 @@ class DiagnosticController extends Controller
 
         if ($recentByIp >= 3) {
             \Illuminate\Support\Facades\Log::warning('Diagnostic IP abuse detected', [
-                'ip'         => $request->ip(),
+                'ip_hash'    => hash_hmac('sha256', (string) $request->ip(), config('app.key')),
                 'email_hash' => hash_hmac('sha256', $email, config('app.key')),
             ]);
             return redirect()->route('diagnostic.index')

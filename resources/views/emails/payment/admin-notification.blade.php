@@ -30,7 +30,10 @@
               @if($paid_at instanceof \Illuminate\Support\Carbon || $paid_at instanceof \Carbon\Carbon)
                 {{ $paid_at->format('d M Y, H:i') }}
               @elseif($paid_at)
-                {{ \Carbon\Carbon::parse($paid_at)->format('d M Y, H:i') }}
+                @php
+                  try { echo \Carbon\Carbon::parse($paid_at)->format('d M Y, H:i'); }
+                  catch (\Exception $e) { echo 'N/A'; }
+                @endphp
               @else
                 N/A
               @endif

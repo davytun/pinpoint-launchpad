@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -9,6 +10,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
+            // At least one of user_id or diagnostic_session_id must be present
+            // (enforced below via CHECK constraint after table creation)
             $table->id();
             // restrictOnDelete preserves payment records as financial audit trail
             $table->foreignId('user_id')->nullable()->constrained()->restrictOnDelete();
@@ -36,10 +39,15 @@ return new class extends Migration
             $table->index('customer_email');
             $table->index(['user_id', 'status']);
         });
+
+        // MySQL/MariaDB: enforce at least one of user_id / diagnostic_session_id is non-null
+        DB::statement('ALTER TABLE payments ADD CONSTRAINT chk_payments_owner
+            CHECK (user_id IS NOT NULL OR diagnostic_session_id IS NOT NULL)');
     }
 
     public function down(): void
     {
+        DB::statement('ALTER TABLE payments DROP CONSTRAINT IF EXISTS chk_payments_owner');
         Schema::dropIfExists('payments');
     }
 };

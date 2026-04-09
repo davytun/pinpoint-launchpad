@@ -21,32 +21,39 @@ class EnsurePaymentComplete
             }
         }
 
-        // 2. Session may have expired — recover via diagnostic session email
+        // 2. Session may have expired — recover via diagnostic_session_id (direct FK, not email)
         $diagnosticSessionId = $request->session()->get('diagnostic_session_id');
 
         if ($diagnosticSessionId) {
             $diagnosticSession = DiagnosticSession::find($diagnosticSessionId);
 
             if ($diagnosticSession) {
-                $payment = Payment::where('customer_email', $diagnosticSession->email)
+                $payment = Payment::where('diagnostic_session_id', $diagnosticSession->id)
                     ->where('status', 'paid')
                     ->latest()
                     ->first();
 
                 if ($payment) {
-                    // Restore payment to session
                     $request->session()->put('payment_id', $payment->id);
                     return $next($request);
                 }
             }
         }
 
-        // 3. Authenticated user fallback
+        // 3. Authenticated user fallback — scoped to the current diagnostic session
         if ($request->user()) {
-            $payment = Payment::where('user_id', $request->user()->id)
-                ->where('status', 'paid')
-                ->latest()
-                ->first();
+            $scopedSessionId = $diagnosticSessionId
+                ?? $request->route('diagnostic_session_id')
+                ?? $request->input('diagnostic_session_id');
+
+            $query = Payment::where('user_id', $request->user()->id)
+                ->where('status', 'paid');
+
+            if ($scopedSessionId) {
+                $query->where('diagnostic_session_id', $scopedSessionId);
+            }
+
+            $payment = $query->latest()->first();
 
             if ($payment) {
                 $request->session()->put('payment_id', $payment->id);

@@ -125,8 +125,8 @@ class DiagnosticController extends Controller
 
         if ($recentByIp >= 3) {
             \Illuminate\Support\Facades\Log::warning('Diagnostic IP abuse detected', [
-                'ip'    => $request->ip(),
-                'email' => $email,
+                'ip'         => $request->ip(),
+                'email_hash' => hash_hmac('sha256', $email, config('app.key')),
             ]);
             return redirect()->route('diagnostic.index')
                 ->with('error', 'Too many attempts from your network. Please try again in 24 hours.');

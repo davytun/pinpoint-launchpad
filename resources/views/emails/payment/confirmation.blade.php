@@ -8,7 +8,7 @@
     Hi there,
   </p>
   <p style="margin:0 0 24px 0;font-size:14px;color:#374151;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">
-    Your payment of <strong>${{ number_format($total_amount) }}</strong> has been received and your place in the PARAGON Certification programme has been secured.
+    Your payment of <strong>${{ number_format($total_amount, 2) }}</strong> has been received and your place in the PARAGON Certification programme has been secured.
   </p>
 
   {{-- Receipt box --}}
@@ -25,15 +25,15 @@
           </tr>
           <tr>
             <td style="padding:4px 0;font-size:13px;color:#374151;font-family:Arial,Helvetica,sans-serif;">Audit Fee</td>
-            <td style="padding:4px 0;font-size:13px;color:#111827;text-align:right;font-family:Arial,Helvetica,sans-serif;">${{ number_format($base_price) }}</td>
+            <td style="padding:4px 0;font-size:13px;color:#111827;text-align:right;font-family:Arial,Helvetica,sans-serif;">${{ number_format($base_price, 2) }}</td>
           </tr>
           <tr>
             <td style="padding:4px 0;font-size:13px;color:#374151;font-family:Arial,Helvetica,sans-serif;">Application Fee</td>
-            <td style="padding:4px 0;font-size:13px;color:#111827;text-align:right;font-family:Arial,Helvetica,sans-serif;">${{ number_format($gate_fee) }} (included)</td>
+            <td style="padding:4px 0;font-size:13px;color:#111827;text-align:right;font-family:Arial,Helvetica,sans-serif;">${{ number_format($gate_fee, 2) }} (included)</td>
           </tr>
           <tr>
             <td style="padding:4px 0;font-size:13px;font-weight:bold;color:#374151;font-family:Arial,Helvetica,sans-serif;">Total Charged</td>
-            <td style="padding:4px 0;font-size:13px;font-weight:bold;color:#111827;text-align:right;font-family:Arial,Helvetica,sans-serif;">${{ number_format($total_amount) }}</td>
+            <td style="padding:4px 0;font-size:13px;font-weight:bold;color:#111827;text-align:right;font-family:Arial,Helvetica,sans-serif;">${{ number_format($total_amount, 2) }}</td>
           </tr>
           <tr>
             <td style="padding:4px 0;font-size:13px;color:#374151;font-family:Arial,Helvetica,sans-serif;">Currency</td>

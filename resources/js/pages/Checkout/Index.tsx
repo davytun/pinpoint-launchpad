@@ -4,7 +4,6 @@ import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -112,10 +111,12 @@ const fadeUp = {
 export default function CheckoutIndex({ score, score_band, tiers, diagnostic_session_id }: PageProps) {
     const [selectedTier, setSelectedTier] = useState<string | null>(null);
     const [isLoading, setIsLoading]       = useState(false);
+    const [error, setError]               = useState<string | null>(null);
 
     const bandMeta = BAND_META[score_band] ?? BAND_META.mid_high;
 
     function handleSelectTier(tierKey: string) {
+        setError(null);
         setSelectedTier(tierKey);
         router.post(
             '/checkout/initiate',
@@ -123,6 +124,12 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
             {
                 onStart:  () => setIsLoading(true),
                 onFinish: () => setIsLoading(false),
+                onError:  (errors) => {
+                    setIsLoading(false);
+                    setSelectedTier(null);
+                    const first = Object.values(errors)[0];
+                    setError(typeof first === 'string' ? first : 'Something went wrong. Please try again.');
+                },
             },
         );
     }
@@ -167,6 +174,17 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                 qualifies you for the following credential programmes.
                             </p>
                         </motion.div>
+
+                        {/* ── Error banner ── */}
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+                            >
+                                {error}
+                            </motion.div>
+                        )}
 
                         {/* ── Pricing cards ── */}
                         <motion.div
@@ -238,7 +256,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                         </span>
                                                     </div>
                                                     <p className="mt-2 text-sm font-bold text-white">
-                                                        + $150 Gate Fee
+                                                        + ${tier.gate_fee} Gate Fee
                                                     </p>
                                                 </div>
 

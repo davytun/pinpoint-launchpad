@@ -22,7 +22,7 @@
           </tr>
           <tr>
             <td style="padding:5px 0;font-size:13px;color:#6B7280;font-family:Arial,Helvetica,sans-serif;">Amount</td>
-            <td style="padding:5px 0;font-size:13px;color:#111827;font-weight:bold;font-family:Arial,Helvetica,sans-serif;">${{ number_format($total_amount) }} USD</td>
+            <td style="padding:5px 0;font-size:13px;color:#111827;font-weight:bold;font-family:Arial,Helvetica,sans-serif;">${{ number_format($total_amount, 2) }} USD</td>
           </tr>
           <tr>
             <td style="padding:5px 0;font-size:13px;color:#6B7280;font-family:Arial,Helvetica,sans-serif;">Date</td>

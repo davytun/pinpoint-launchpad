@@ -52,12 +52,15 @@ class Payment extends Model
         return $this->hasMany(PaymentLog::class);
     }
 
-    public function log(string $event, array $metadata = []): void
+    public function log(string $event, array $metadata = [], ?string $ip = null): void
     {
+        // request() may not exist in queue/console context — coalesce safely
+        $resolvedIp = $ip ?? (app()->runningInConsole() ? null : (request()->ip() ?? null));
+
         $this->logs()->create([
             'event'      => $event,
             'metadata'   => $metadata ?: null,
-            'ip_address' => request()->ip(),
+            'ip_address' => $resolvedIp,
         ]);
     }
 

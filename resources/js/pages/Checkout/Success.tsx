@@ -169,7 +169,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                                 </div>
                                 <div className="divide-y divide-dashed divide-white/[0.06] px-5 py-2">
                                     <Row label="Tier">{tier_label} Audit</Row>
-                                    <Row label="Amount" isTotal>${Number(total_amount).toLocaleString('en-US')}.00</Row>
+                                    <Row label="Amount" isTotal>{Number(total_amount).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</Row>
                                     <Row label="Status">
                                         <Badge
                                             className="border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em]"

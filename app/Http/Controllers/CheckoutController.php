@@ -192,16 +192,19 @@ class CheckoutController extends Controller
                 ->with('error', 'Payment record not found.');
         }
 
-        // Cross-check against session pending reference
+        // Cross-check against session pending reference — must exist AND match
         $sessionReference = $request->session()->get('pending_payment_reference');
 
-        if ($sessionReference && $sessionReference !== $reference) {
-            Log::warning('Payment reference mismatch on success page', [
-                'session_ref' => $sessionReference,
+        // Allow webhook-first flow only when explicitly enabled via config
+        $allowWebhookFirst = config('checkout.allow_webhook_first', false);
+
+        if (! $allowWebhookFirst && (! $sessionReference || $sessionReference !== $reference)) {
+            Log::warning('Payment reference mismatch or missing session reference on success page', [
+                'session_ref' => $sessionReference ?? '(none)',
                 'url_ref'     => $reference,
                 'ip'          => $request->ip(),
             ]);
-            abort(403, 'Reference mismatch');
+            abort(403, 'Reference mismatch or missing session reference');
         }
 
         $payment->log('verification_attempted');
@@ -229,15 +232,16 @@ class CheckoutController extends Controller
                 ->with('error', 'Payment verification failed. Please contact support.');
         }
 
-        // Update payment if webhook has not fired yet — and send emails once
-        if ($payment->status !== 'paid') {
-            $payment->update([
-                'status'  => 'paid',
-                'paid_at' => now(),
-            ]);
+        // Atomic update — only proceeds if the row is still in non-paid state
+        // This prevents duplicate emails when the webhook fires concurrently
+        $affected = Payment::where('id', $payment->id)
+            ->where('status', '!=', 'paid')
+            ->update(['status' => 'paid', 'paid_at' => now()]);
+
+        if ($affected === 1) {
+            $payment->refresh();
             $payment->log('paid', ['source' => 'success_page']);
 
-            // Webhook may not have fired — send emails here as the primary path
             try {
                 Mail::to($payment->customer_email)->send(new PaymentConfirmationMail($payment));
                 Mail::to(config('mail.admin_address'))->send(new PaymentAdminNotificationMail($payment));

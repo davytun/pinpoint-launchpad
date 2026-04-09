@@ -9,6 +9,10 @@ class PaymentLog extends Model
 {
     public $timestamps = false;
 
+    // Only manage created_at; no updated_at on audit log rows
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'payment_id',
         'event',

@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { ArrowRight, RotateCcw } from 'lucide-react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
@@ -56,31 +56,28 @@ export default function CheckoutCancel() {
 
                         {/* Actions */}
                         <div className="flex flex-col gap-3">
-                            <Link href="/checkout" className="block outline-none">
-                                <button
-                                    className="group relative w-full overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200"
-                                    style={{
-                                        background: '#3C53A8',
-                                        boxShadow: '0 0 28px rgba(60,83,168,0.3)',
-                                    }}
-                                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)'; }}
-                                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; }}
-                                >
-                                    <span className="waitlist-shimmer absolute inset-0 opacity-50 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
-                                    <span className="relative z-10 flex items-center justify-center gap-2">
-                                        Return to Pricing
-                                        <ArrowLeft className="h-4 w-4 rotate-180" />
-                                    </span>
-                                </button>
+                            <Link
+                                href="/checkout"
+                                className="group relative block w-full overflow-hidden rounded-xl px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:brightness-110"
+                                style={{
+                                    background: '#3C53A8',
+                                    boxShadow: '0 0 28px rgba(60,83,168,0.3)',
+                                }}
+                            >
+                                <span className="waitlist-shimmer absolute inset-0 opacity-50 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    Return to Pricing
+                                    <ArrowRight className="h-4 w-4" />
+                                </span>
                             </Link>
 
-                            <Link href="/diagnostic/result" className="block outline-none">
-                                <button
-                                    type="button"
-                                    className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-                                >
-                                    Back to My Results
-                                </button>
+                            <Link
+                                href="/diagnostic/result"
+                                role="button"
+                                aria-label="Back to my diagnostic results"
+                                className="block w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                            >
+                                Back to My Results
                             </Link>
                         </div>
                     </div>

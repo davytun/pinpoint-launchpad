@@ -43,7 +43,12 @@ class PaystackService
             ],
         ];
 
-        $tier        = $data['tier'];
+        $tier = $data['tier'];
+
+        if (! isset($tierMap[$tier])) {
+            throw new \InvalidArgumentException("Invalid tier: '{$tier}'. Must be one of: " . implode(', ', array_keys($tierMap)));
+        }
+
         $tierData    = $tierMap[$tier];
         $amount      = $tierData['amount'];
         $baseAmount  = $tierData['base'];
@@ -67,9 +72,9 @@ class PaystackService
             ])->json();
         } catch (\Throwable $e) {
             Log::error('Paystack HTTP request failed during initialization', [
-                'error' => $e->getMessage(),
-                'tier'  => $tier,
-                'email' => $data['email'],
+                'error'      => $e->getMessage(),
+                'tier'       => $tier,
+                'email_hash' => hash('sha256', $data['email']),
             ]);
             throw new RuntimeException('Payment gateway unavailable. Please try again.');
         }
@@ -202,8 +207,15 @@ class PaystackService
         $payment->log('webhook_received', ['event' => 'charge.success']);
         $payment->log('paid');
 
-        Mail::to($payment->customer_email)->send(new PaymentConfirmationMail($payment));
-        Mail::to(config('mail.admin_address'))->send(new PaymentAdminNotificationMail($payment));
+        try {
+            Mail::to($payment->customer_email)->queue(new PaymentConfirmationMail($payment));
+            Mail::to(config('mail.admin_address'))->queue(new PaymentAdminNotificationMail($payment));
+        } catch (\Throwable $e) {
+            Log::error('Failed to queue payment emails after webhook', [
+                'payment_id' => $payment->id,
+                'error'      => $e->getMessage(),
+            ]);
+        }
     }
 
     private function handleChargeFailed(array $data): void

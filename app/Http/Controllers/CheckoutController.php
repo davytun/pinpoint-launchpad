@@ -192,13 +192,17 @@ class CheckoutController extends Controller
                 ->with('error', 'Payment record not found.');
         }
 
-        // Cross-check against session pending reference — must exist AND match
+        // Cross-check against session pending reference — must exist AND match.
+        // Skip this guard when:
+        //   (a) the payment is already marked paid (webhook fired before redirect landed), or
+        //   (b) the session already holds a matching payment_id (page refresh after success)
         $sessionReference = $request->session()->get('pending_payment_reference');
+        $sessionPaymentId = $request->session()->get('payment_id');
 
-        // Allow webhook-first flow only when explicitly enabled via config
-        $allowWebhookFirst = config('checkout.allow_webhook_first', false);
+        $alreadyVerified = $payment->status === 'paid'
+            || (int) $sessionPaymentId === (int) $payment->id;
 
-        if (! $allowWebhookFirst && (! $sessionReference || $sessionReference !== $reference)) {
+        if (! $alreadyVerified && (! $sessionReference || $sessionReference !== $reference)) {
             Log::warning('Payment reference mismatch or missing session reference on success page', [
                 'session_ref' => $sessionReference ?? '(none)',
                 'url_ref'     => $reference,

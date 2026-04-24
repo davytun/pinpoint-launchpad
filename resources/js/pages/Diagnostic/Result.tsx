@@ -149,8 +149,9 @@ export default function DiagnosticResult({
     pillar_scores,
     score_band_message,
 }: PageProps) {
-    const meta   = BAND_META[score_band] ?? BAND_META.mid_high;
+    const meta    = BAND_META[score_band] ?? BAND_META.mid_high;
     const isReady = score_band === 'mid_high' || score_band === 'high';
+    const [checklistClicked, setChecklistClicked] = useState(false);
 
     // Build Recharts data
     const radarData = PILLAR_KEYS.map(k => ({
@@ -291,17 +292,31 @@ export default function DiagnosticResult({
                                         </a>
                                     </div>
                                 ) : (
-                                    <button
-                                        type="button"
-                                        className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-                                    >
-                                        View Your Readiness Checklist
-                                    </button>
-                                )}
-                                {!isReady && (
-                                    <p className="mt-2 text-center text-xs text-muted-foreground/60">
-                                        Address these gaps, then retake.
-                                    </p>
+                                    <div className="space-y-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setChecklistClicked(true)}
+                                            className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                                        >
+                                            View Your Readiness Checklist
+                                        </button>
+
+                                        {checklistClicked && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -6 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                                                className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-center text-xs leading-relaxed text-amber-300/80"
+                                            >
+                                                Your Readiness Checklist was sent to the email you provided.
+                                                Check your inbox (and spam folder) for a message from Pinpoint Launchpad.
+                                            </motion.div>
+                                        )}
+
+                                        <p className="mt-1 text-center text-xs text-muted-foreground/60">
+                                            Address these gaps, then retake.
+                                        </p>
+                                    </div>
                                 )}
                             </FadeUp>
 

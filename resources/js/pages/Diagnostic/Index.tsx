@@ -73,6 +73,20 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
     }, []);
 
     const question = questions[currentIndex];
+
+    // Guard: no questions seeded yet — show a placeholder instead of crashing
+    if (! question) {
+        return (
+            <DiagnosticLayout>
+                <div className="flex min-h-screen items-center justify-center px-4">
+                    <p className="text-center text-sm text-white/50">
+                        No diagnostic questions are available yet. Please check back shortly.
+                    </p>
+                </div>
+            </DiagnosticLayout>
+        );
+    }
+
     const isLast = currentIndex === total_questions - 1;
     const progressPct = (currentIndex / total_questions) * 100;
     const pillarColor = PILLAR_COLORS[question.pillar] ?? '#64748B';

@@ -19,13 +19,15 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'role'             => \App\Http\Middleware\EnsureUserHasRole::class,
-            'payment.complete' => \App\Http\Middleware\EnsurePaymentComplete::class,
+            'role'               => \App\Http\Middleware\EnsureUserHasRole::class,
+            'payment.complete'   => \App\Http\Middleware\EnsurePaymentComplete::class,
+            'signature.complete' => \App\Http\Middleware\EnsureSignatureComplete::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [
             'webhooks/paystack',
             'webhooks/pandadoc',
+            'webhooks/boldsign',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

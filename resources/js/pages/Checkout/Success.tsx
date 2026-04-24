@@ -224,7 +224,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                         {/* CTA */}
                         <motion.div initial={{ y: 15, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.65, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
                             <Link
-                                href="/onboarding/sign"
+                                href={route('onboarding.sign')}
                                 className="group relative block w-full overflow-hidden rounded-xl px-5 py-[18px] text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-300 hover:[background:rgba(110,190,68,0.1)] hover:[border-color:#6EBE44]"
                                 style={{
                                     background: '#1A1A1A',

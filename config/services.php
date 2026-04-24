@@ -40,4 +40,11 @@ return [
         'secret_key' => env('PAYSTACK_SECRET_KEY'),
     ],
 
+    'boldsign' => [
+        'api_key'        => env('BOLDSIGN_API_KEY'),
+        'template_id'    => env('BOLDSIGN_TEMPLATE_ID'),
+        'base_url'       => env('BOLDSIGN_BASE_URL', 'https://api.boldsign.com'),
+        'webhook_secret' => env('BOLDSIGN_WEBHOOK_SECRET'),
+    ],
+
 ];

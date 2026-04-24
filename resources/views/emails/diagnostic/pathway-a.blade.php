@@ -1,42 +1,71 @@
-<x-email-layout :recipient-email="$session->email" preheader="Your score indicates you're in the Foundational Phase. Here's your roadmap." subject="Your PARAGON Roadmap">
+<x-email-layout
+    :recipient-email="$session->email"
+    subject="Your PARAGON Roadmap — 3 Steps to Investment Readiness"
+    badge="PARAGON Roadmap"
+    preheader="Your score indicates you're in the Foundational Phase. Here is your roadmap.">
 
-<p style="margin:0 0 4px 0;font-size:18px;font-weight:bold;color:#1E293B;font-family:Arial,Helvetica,sans-serif;">Your PARAGON Roadmap</p>
-<p style="margin:0 0 24px 0;font-size:14px;color:#64748B;font-family:Arial,Helvetica,sans-serif;">3 Steps to Investment Readiness</p>
+{{-- Greeting --}}
+<p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b6b6b;line-height:1.5;">
+    Hi there,
+</p>
 
-<p style="margin:0 0 14px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">Hi there,</p>
+{{-- Headline --}}
+<h1 style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:26px;font-weight:700;color:#f5f5f5;line-height:1.25;letter-spacing:-0.4px;">
+    Your PARAGON roadmap is ready.
+</h1>
 
-<p style="margin:0 0 14px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">Your preliminary PARAGON score of <strong style="color:#1E293B;">{{ $session->score }}/100</strong> indicates you are in the Foundational Phase. This is not a setback — it is the most critical time to get your structural house in order before talking to VCs.</p>
+<p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
+    Your preliminary PARAGON score of <span style="color:#f5f5f5;font-weight:600;">{{ $session->score }}/100</span> places you in the Foundational Phase. This is not a setback — it is the most critical time to get your structural house in order before any investor conversation.
+</p>
 
-<p style="margin:0 0 20px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">Instead of a pitch deck, you need a blueprint.</p>
-
-{{-- Checklist --}}
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;background-color:#EEF1FB;border-left:3px solid #3A54A5;border-radius:0 6px 6px 0;">
-  <tr>
-    <td style="padding:18px 20px;">
-      <p style="margin:0 0 10px 0;font-size:12px;font-weight:bold;color:#3A54A5;text-transform:uppercase;letter-spacing:0.8px;font-family:Arial,Helvetica,sans-serif;">The Founder Readiness Checklist</p>
-      <p style="margin:0 0 8px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">Your action plan before your next diagnostic:</p>
-      <p style="margin:0;font-size:13px;color:#1E293B;line-height:2;font-family:Arial,Helvetica,sans-serif;">
-        &#10003;&nbsp; Ensure your MVP is in the hands of at least 5–10 real users<br>
-        &#10003;&nbsp; Assign all IP, trademarks, and domain names to the company<br>
-        &#10003;&nbsp; Clean your cap table — founders should own &gt;80%<br>
-        &#10003;&nbsp; Document your CAC and LTV, even if estimates<br>
-        &#10003;&nbsp; Build a 12–18 month financial forecast<br>
-        &#10003;&nbsp; Secure at least one LOI, pilot contract, or $1k MRR
-      </p>
-    </td>
-  </tr>
+{{-- Checklist box --}}
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+    style="background-color:#161616;border-radius:8px;border:1px solid #1e1e1e;margin-bottom:28px;">
+    <tr>
+        <td style="padding:24px 28px;">
+            <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#5ca336;">
+                Founder Readiness Checklist
+            </p>
+            <p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b6b6b;">Your action plan before your next diagnostic:</p>
+            @php
+            $items = [
+                'Ensure your MVP is in the hands of at least 5–10 real users',
+                'Assign all IP, trademarks, and domain names to the company',
+                'Clean your cap table — founders should own >80%',
+                'Document your CAC and LTV, even if estimates',
+                'Build a 12–18 month financial forecast',
+                'Secure at least one LOI, pilot contract, or $1k MRR',
+            ];
+            @endphp
+            @foreach($items as $item)
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="{{ $loop->last ? '' : 'margin-bottom:12px;' }}">
+            <tr>
+                <td width="28" valign="top" style="padding-top:1px;">
+                    <span style="display:inline-block;width:18px;height:18px;background-color:#5ca336;border-radius:3px;text-align:center;line-height:18px;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;color:#ffffff;">✓</span>
+                </td>
+                <td style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#c8c8c8;line-height:1.55;">
+                    {{ $item }}
+                </td>
+            </tr>
+            </table>
+            @endforeach
+        </td>
+    </tr>
 </table>
 
-<p style="margin:0 0 14px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">Focus on your <strong style="color:#1E293B;">{{ $session->primaryGap() }}</strong> pillar first — that is where your score took the biggest hit. Fixing structural issues now costs $100. Fixing them during due diligence costs $10,000.</p>
+<p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
+    Focus on your <span style="color:#f5f5f5;font-weight:600;">{{ $session->primaryGap() }}</span> pillar first — that is where your score took the biggest hit. Fixing structural issues now costs $100. Fixing them during due diligence costs $10,000.
+</p>
 
-<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-  <tr>
-    <td><a href="#" style="display:inline-block;background-color:#3A54A5;color:#ffffff;padding:12px 24px;border-radius:6px;font-weight:bold;font-size:14px;text-decoration:none;font-family:Arial,Helvetica,sans-serif;">Download the Full Checklist</a></td>
-  </tr>
-</table>
+<p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
+    We have set a reminder to reach back out in <span style="color:#f5f5f5;font-weight:600;">{{ $session->daysRemainingOnCooldown() }} days</span>. When you return, you will know exactly what to fix.
+</p>
 
-<p style="margin:0 0 14px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">We have set a reminder to reach back out in <strong style="color:#1E293B;">{{ $session->daysRemainingOnCooldown() }} days</strong>. When you return, you will know exactly what to fix.</p>
-
-<p style="margin:0;font-size:14px;color:#475569;font-family:Arial,Helvetica,sans-serif;">The Pinpoint Team</p>
+{{-- Sign-off --}}
+<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b6b6b;line-height:1.6;">
+    Talk soon,<br>
+    <span style="color:#f5f5f5;font-weight:600;">The Pinpoint Team</span>
+</p>
 
 </x-email-layout>

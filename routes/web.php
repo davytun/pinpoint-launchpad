@@ -4,7 +4,9 @@ use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\WaitlistController as AdminWaitlistController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiagnosticController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\WaitlistController;
 
 Route::redirect('/', '/waitlist');
@@ -48,5 +50,16 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
 
 // Paystack webhook — CSRF excluded in bootstrap/app.php
 Route::post('/webhooks/paystack', [CheckoutController::class, 'webhook'])->name('webhooks.paystack');
+
+Route::prefix('onboarding')->name('onboarding.')->group(function () {
+    Route::get('/sign',            [OnboardingController::class, 'sign'])           ->name('sign')           ->middleware(['payment.complete', 'throttle:20,1']);
+    Route::post('/confirm-details',[OnboardingController::class, 'confirmDetails']) ->name('confirm-details')->middleware(['payment.complete', 'throttle:10,1']);
+    Route::get('/complete',        [OnboardingController::class, 'complete'])       ->name('complete')       ->middleware('throttle:30,1');
+});
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('signature.complete');
+
+// BoldSign webhook — CSRF excluded in bootstrap/app.php
+Route::post('/webhooks/boldsign', [OnboardingController::class, 'webhook'])->name('webhooks.boldsign');
 
 require __DIR__.'/auth.php';

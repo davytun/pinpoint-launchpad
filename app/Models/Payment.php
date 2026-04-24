@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Payment extends Model
 {
@@ -45,6 +46,11 @@ class Payment extends Model
     public function isRefundable(): bool
     {
         return $this->audit_status === 'pending' && $this->status === 'paid';
+    }
+
+    public function signature(): HasOne
+    {
+        return $this->hasOne(Signature::class);
     }
 
     public function logs(): HasMany

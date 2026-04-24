@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SettingsSeeder::class,
             DiagnosticQuestionSeeder::class,
+            AdminSeeder::class,
         ]);
     }
 }

@@ -1,13 +1,12 @@
 import { Head, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Lock, Loader2, Percent, ShieldCheck, XCircle } from 'lucide-react';
+import {
+    CheckCircle, Lock, Loader2, Percent,
+    RefreshCw, ShieldCheck, XCircle,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-
-import { PinpointLogo } from '@/components/pinpoint-logo';
-import { Badge } from '@/components/ui/badge';
-import DiagnosticLayout from '@/layouts/diagnostic-layout';
+import { cn } from '@/lib/utils';
 
 interface PageProps {
     embed_url:    string;
@@ -16,217 +15,296 @@ interface PageProps {
     document_id:  string;
 }
 
-interface TrustPoint {
-    icon:  React.ReactNode;
-    title: string;
-    body:  string;
-}
+const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
-function TrustItem({ icon, title, body }: TrustPoint) {
-    return (
-        <div className="flex items-start gap-3">
-            <div className="mt-0.5 shrink-0">{icon}</div>
-            <div>
-                <p className="text-[14px] font-semibold text-white/90">{title}</p>
-                <p className="mt-1 text-[13px] leading-relaxed text-white/45">{body}</p>
-            </div>
-        </div>
-    );
-}
+const STEPS = [
+    { n: '01', label: 'Confirmed your details', state: 'done'    },
+    { n: '02', label: 'Sign your agreement',    state: 'active'  },
+    { n: '03', label: 'Access the PIN Network', state: 'pending' },
+] as const;
 
-export default function OnboardingSign({ embed_url, signer_email, tier_label, document_id }: PageProps) {
-    const [iframeLoaded, setIframeLoaded] = useState(false);
-    const [signComplete, setSignComplete] = useState(false);
-    const [iframeError,  setIframeError]  = useState(false);
+const TRUST = [
+    {
+        icon:  <ShieldCheck className="size-[14px] text-emerald-400" />,
+        title: 'Why sign now?',
+        body:  'Protects your trade secrets and confirms 100% credit toward the success fee.',
+    },
+    {
+        icon:  <Percent className="size-[14px] text-blue-400" />,
+        title: 'The 2% Rule',
+        body:  'A standard advisory warrant aligning our team as your external Series A department.',
+    },
+    {
+        icon:  <Lock className="size-[14px] text-white/35" />,
+        title: 'Secure & Compliant',
+        body:  'Encrypted via BoldSign — SOC 2 Type II and eIDAS certified.',
+    },
+] as const;
 
-    // Listen for BoldSign postMessage events
+export default function OnboardingSign({
+    embed_url, signer_email, tier_label, document_id,
+}: PageProps) {
+    const [loaded,   setLoaded]   = useState(false);
+    const [complete, setComplete] = useState(false);
+    const [error,    setError]    = useState(false);
+
     useEffect(() => {
-        function handleMessage(event: MessageEvent) {
-            const data = event.data;
-            if (! data) return;
-
-            const action = typeof data === 'string' ? data : (data.action ?? data.event ?? '');
-
+        function onMessage(e: MessageEvent) {
+            const d = e.data;
+            if (!d) return;
+            const action = typeof d === 'string' ? d : (d.action ?? d.event ?? '');
             if (action === 'onDocumentSigned' || action === 'documentSigned') {
-                setSignComplete(true);
+                setComplete(true);
                 setTimeout(() => router.visit('/onboarding/complete'), 1200);
             }
-
             if (action === 'onDocumentDeclined' || action === 'documentDeclined') {
                 router.visit('/onboarding/sign');
             }
-
-            if (data?.type === 'boldsign' && data?.action === 'error') {
-                setIframeError(true);
-            }
+            if (d?.type === 'boldsign' && d?.action === 'error') setError(true);
         }
-
-        window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
+        window.addEventListener('message', onMessage);
+        return () => window.removeEventListener('message', onMessage);
     }, []);
 
-    // Auto-reload after 25 minutes to get a fresh embed URL before expiry
     useEffect(() => {
-        const timer = setTimeout(() => {
-            router.reload({ preserveUrl: true });
-        }, 25 * 60 * 1000);
-        return () => clearTimeout(timer);
+        const t = setTimeout(() => router.reload({ preserveUrl: true }), 25 * 60 * 1000);
+        return () => clearTimeout(t);
     }, []);
-
-    const trustPoints: TrustPoint[] = [
-        {
-            icon:  <ShieldCheck className="size-5 text-emerald-500" />,
-            title: 'Why sign now?',
-            body:  'This protects your trade secrets and confirms your 100% credit toward the success fee.',
-        },
-        {
-            icon:  <Percent className="size-5 text-blue-500" />,
-            title: 'The 2% Rule',
-            body:  'This is a standard strategic advisory warrant. It aligns our team to work as your external Series A department.',
-        },
-        {
-            icon:  <Lock className="size-5 text-slate-400" />,
-            title: 'Secure & Compliant',
-            body:  'Encrypted via BoldSign. SOC 2 Type II and eIDAS certified.',
-        },
-    ];
 
     return (
-        <DiagnosticLayout glowColor="#2563EB" hideWordmark>
+        // Root: full-viewport, no scroll, dark base
+        <div className="fixed inset-0 flex flex-col bg-[#050505] text-white antialiased">
             <Head title="Sign Your Agreement — PARAGON Certification" />
 
-            {/* ── Signing complete overlay ── */}
-            {signComplete && (
+            {/* Ambient background decorations */}
+            <div className="waitlist-shell pointer-events-none absolute inset-0 z-0" />
+            <div className="waitlist-grid  pointer-events-none absolute inset-0 z-0" />
+            <div
+                className="pointer-events-none absolute inset-x-0 top-0 z-0 h-64"
+                style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(37,99,235,0.16) 0%, transparent 100%)' }}
+            />
+
+            {/* ── Signed overlay ── */}
+            {complete && (
                 <motion.div
-                    className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-slate-950/95 backdrop-blur-md"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#050505]/95 backdrop-blur-xl"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
                 >
                     <motion.div
-                        initial={{ scale: 0.7, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1,   opacity: 1 }}
+                        transition={{ duration: 0.45, ease }}
+                        className="flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10"
+                        style={{ boxShadow: '0 0 48px rgba(16,185,129,0.18)' }}
                     >
-                        <CheckCircle className="size-16 text-emerald-400" strokeWidth={1.5} />
+                        <CheckCircle className="size-8 text-emerald-400" strokeWidth={1.5} />
                     </motion.div>
-                    <p className="text-[18px] font-semibold text-white">Agreement Signed</p>
-                    <p className="text-[13px] text-white/45">Confirming your signature...</p>
+                    <div className="text-center">
+                        <p className="font-display text-lg font-semibold text-white">Agreement Signed</p>
+                        <p className="mt-1 text-[12px] text-white/40">Confirming your signature…</p>
+                    </div>
                 </motion.div>
             )}
 
-            <div className="flex min-h-screen flex-col lg:flex-row">
+            {/* ════════════════════════════════════════
+                MOBILE header (shown below md)
+                A compact bar: logo + step pill + email
+            ════════════════════════════════════════ */}
+            <motion.header
+                className="relative z-10 flex shrink-0 items-center justify-between border-b border-white/[0.06] px-4 py-3 md:hidden"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease }}
+            >
+                <img
+                    src="/pinpoint-logo.png"
+                    alt="Pinpoint"
+                    className="block h-5 w-auto select-none"
+                    style={{ maxWidth: 120 }}
+                />
+                <div className="flex items-center gap-2">
+                    <span
+                        className="inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em]"
+                        style={{
+                            color:       '#60A5FA',
+                            borderColor: 'rgba(37,99,235,0.3)',
+                            background:  'rgba(37,99,235,0.08)',
+                        }}
+                    >
+                        Step 2 of 3
+                    </span>
+                    <span className="text-[11px] text-white/30 hidden sm:inline">{tier_label}</span>
+                </div>
+            </motion.header>
 
-                {/* ── Left: Trust Sidebar ── */}
+            {/* ════════════════════════════════════════
+                BODY: sidebar (md+) + iframe
+            ════════════════════════════════════════ */}
+            <div className="relative z-10 flex min-h-0 flex-1">
+
+                {/* ── Sidebar — hidden on mobile, fixed width on md+ ── */}
                 <motion.aside
-                    className="flex w-full flex-col justify-between px-6 py-10 lg:w-[40%] lg:px-12 lg:py-14"
-                    initial={{ opacity: 0, x: -24 }}
+                    className="hidden w-[280px] shrink-0 flex-col overflow-y-auto border-r border-white/[0.07] px-6 py-8 md:flex xl:w-[300px]"
+                    initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.5, ease }}
                 >
-                    {/* Wordmark */}
-                    <div className="mb-10">
-                        <PinpointLogo height={26} variant="dark" />
+                    {/* Logo — explicit max-width prevents stretching */}
+                    <img
+                        src="/pinpoint-logo.png"
+                        alt="Pinpoint"
+                        className="mb-9 block h-6 w-auto select-none"
+                        style={{ maxWidth: 140 }}
+                    />
+
+                    {/* Step tracker */}
+                    <div className="mb-7 flex flex-col gap-2">
+                        {STEPS.map((step) => (
+                            <div key={step.n} className="flex items-center gap-2.5">
+                                <span className={cn(
+                                    'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold tabular-nums',
+                                    step.state === 'done'
+                                        ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-400'
+                                        : step.state === 'active'
+                                            ? 'border-blue-500/50 bg-blue-600/10 text-blue-400'
+                                            : 'border-white/[0.07] bg-white/[0.02] text-white/20',
+                                )}>
+                                    {step.n}
+                                </span>
+                                <span className={cn(
+                                    'text-[12px] font-medium',
+                                    step.state === 'done'   ? 'text-white/30 line-through decoration-white/15' :
+                                    step.state === 'active' ? 'text-white/80' : 'text-white/22',
+                                )}>
+                                    {step.label}
+                                </span>
+                            </div>
+                        ))}
                     </div>
 
-                    <div className="flex-1">
-                        {/* Step label */}
-                        <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
-                            🛡️ Final Step
-                        </p>
+                    <div className="mb-6 h-px bg-white/[0.06]" />
 
-                        {/* Headline */}
-                        <h1 className="font-display mb-4 text-[28px] font-semibold leading-tight tracking-tight text-white lg:text-[32px]">
-                            Secure Your Position
+                    {/* Headline + sub */}
+                    <div className="mb-7">
+                        <h1 className="font-display text-[18px] font-semibold leading-snug tracking-tight text-white">
+                            Secure your position in the PIN&nbsp;Network.
                         </h1>
-
-                        {/* Sub */}
-                        <p className="mb-10 max-w-[360px] text-[14px] leading-relaxed text-white/50">
-                            To begin your analyst-led audit and secure your place in the PIN Network, please sign
-                            the Success Fee &amp; Confidentiality Agreement.
+                        <p className="mt-2 text-[12px] leading-relaxed text-white/40">
+                            Read and sign the Success Fee &amp; Confidentiality Agreement to begin your
+                            analyst-led audit.
                         </p>
-
-                        {/* Trust points */}
-                        <div className="space-y-7">
-                            {trustPoints.map((tp) => (
-                                <TrustItem key={tp.title} {...tp} />
-                            ))}
-                        </div>
                     </div>
 
-                    {/* Tier confirmation pill */}
-                    <div className="mt-12 hidden rounded-xl border border-white/[0.07] bg-white/[0.03] p-5 lg:block">
-                        <Badge
-                            className="mb-3 border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em]"
-                            style={{
-                                background:   'rgba(37,99,235,0.08)',
-                                borderColor:  'rgba(37,99,235,0.3)',
-                                color:        '#60A5FA',
-                            }}
-                        >
-                            {tier_label} Audit — Secured
-                        </Badge>
-                        <p className="text-[12px] text-white/35">{signer_email}</p>
+                    {/* Trust items */}
+                    <div className="flex flex-col gap-4">
+                        {TRUST.map((tp) => (
+                            <div key={tp.title} className="flex items-start gap-3">
+                                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.03]">
+                                    {tp.icon}
+                                </div>
+                                <div>
+                                    <p className="text-[12px] font-semibold text-white/80">{tp.title}</p>
+                                    <p className="mt-0.5 text-[11px] leading-relaxed text-white/35">{tp.body}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Push pill to bottom */}
+                    <div className="flex-1" />
+
+                    {/* Tier / email pill */}
+                    <div className="mt-8 rounded-xl border border-white/[0.07] bg-white/[0.03] p-3">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                            <span
+                                className="inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em]"
+                                style={{
+                                    color:       '#60A5FA',
+                                    borderColor: 'rgba(37,99,235,0.3)',
+                                    background:  'rgba(37,99,235,0.08)',
+                                }}
+                            >
+                                {tier_label}
+                            </span>
+                            <span className="min-w-0 truncate text-[11px] text-white/30">{signer_email}</span>
+                        </div>
+                        <p className="mt-1.5 font-mono text-[9px] text-white/15">ID: {document_id}</p>
                     </div>
                 </motion.aside>
 
-                {/* ── Right: BoldSign iframe ── */}
+                {/* ── iframe panel — fills all remaining space ── */}
                 <motion.section
-                    className="flex w-full flex-1 flex-col items-center justify-center px-4 pb-10 pt-4 lg:w-[60%] lg:px-10 lg:py-14"
-                    initial={{ opacity: 0, x: 24 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                    className="relative flex min-w-0 flex-1 flex-col"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.45, ease, delay: 0.12 }}
                 >
-                    <div className="relative w-full overflow-hidden rounded-xl border border-slate-700 bg-white shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)]">
+                    {/* Desktop sub-header above iframe */}
+                    <div className="hidden shrink-0 items-center justify-between border-b border-white/[0.06] px-5 py-2.5 md:flex">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/22">
+                            Pinpoint Investment Warrant
+                        </span>
+                        <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.16em] text-white/18">
+                            <Lock className="size-2.5" />
+                            <span>BoldSign · SOC 2</span>
+                        </div>
+                    </div>
+
+                    {/* iframe — absolutely fills its container */}
+                    <div className="relative min-h-0 flex-1">
 
                         {/* Loading overlay */}
-                        {!iframeLoaded && !iframeError && (
-                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white">
-                                <Loader2 className="size-10 animate-spin text-blue-600" />
-                                <p className="text-[13px] text-slate-500">Loading your agreement...</p>
+                        {!loaded && !error && (
+                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-[#080808]">
+                                <div
+                                    className="flex size-14 items-center justify-center rounded-full border"
+                                    style={{
+                                        borderColor: 'rgba(37,99,235,0.28)',
+                                        background:  'radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 70%)',
+                                    }}
+                                >
+                                    <Loader2 className="size-6 animate-spin text-blue-500" />
+                                </div>
+                                <p className="text-[12px] text-white/30">Loading your agreement…</p>
                             </div>
                         )}
 
-                        {/* Expiry / error state */}
-                        {iframeError ? (
-                            <div className="flex h-[500px] flex-col items-center justify-center gap-5 bg-slate-900 sm:h-[600px] lg:h-[700px]">
-                                <XCircle className="size-12 text-red-400" strokeWidth={1.5} />
-                                <div className="text-center">
-                                    <p className="mb-1 text-[16px] font-semibold text-white">
-                                        Your signing session has expired.
-                                    </p>
-                                    <p className="text-[13px] text-white/50">
-                                        This happens if the page has been open for too long.
-                                    </p>
+                        {/* Error overlay */}
+                        {error ? (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 bg-[#080808]">
+                                <div className="flex size-14 items-center justify-center rounded-full border border-red-500/20 bg-red-500/8">
+                                    <XCircle className="size-7 text-red-400" strokeWidth={1.5} />
                                 </div>
-                                <Button
+                                <div className="text-center">
+                                    <p className="text-[15px] font-semibold text-white">Session expired</p>
+                                    <p className="mt-1 text-[12px] text-white/35">The page was open too long.</p>
+                                </div>
+                                <button
                                     onClick={() => router.reload({ preserveUrl: true })}
-                                    className="bg-blue-600 hover:bg-blue-500"
+                                    className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-2.5 text-[12px] font-semibold text-white/60 transition-all hover:border-white/15 hover:bg-white/[0.08] hover:text-white"
                                 >
-                                    Refresh Agreement →
-                                </Button>
+                                    <RefreshCw className="size-3.5" />
+                                    Refresh Agreement
+                                </button>
                             </div>
                         ) : (
                             <iframe
                                 src={embed_url}
                                 title="Pinpoint Investment Warrant"
+                                className="absolute inset-0 bg-white"
                                 width="100%"
-                                className="block h-[500px] sm:h-[600px] lg:h-[700px]"
+                                height="100%"
                                 allow="encrypted-media"
-                                loading="lazy"
                                 referrerPolicy="strict-origin-when-cross-origin"
-                                onLoad={() => setIframeLoaded(true)}
+                                onLoad={() => setLoaded(true)}
                                 style={{ border: 'none', display: 'block' }}
                             />
                         )}
                     </div>
-
-                    <p className="mt-4 text-center text-[12px] text-white/25">
-                        Document ID: <span className="font-mono">{document_id}</span>
-                    </p>
                 </motion.section>
 
             </div>
-        </DiagnosticLayout>
+        </div>
     );
 }

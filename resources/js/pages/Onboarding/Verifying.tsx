@@ -1,131 +1,186 @@
 import { Head, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { Clock, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowRight, Clock, Mail } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import DiagnosticLayout from '@/layouts/diagnostic-layout';
+const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
+const MAX_ATTEMPTS = 40; // 40 × 3s = 2 min
 
-interface PageProps {
-    signature_verified: boolean;
+// Animated ring spinner — matches the brand, not a generic Lucide spinner
+function RingSpinner() {
+    return (
+        <div className="relative flex h-20 w-20 items-center justify-center">
+            {/* Outer slow ring */}
+            <motion.div
+                className="absolute inset-0 rounded-full border-2 border-transparent"
+                style={{ borderTopColor: 'rgba(37,99,235,0.6)', borderRightColor: 'rgba(37,99,235,0.15)' }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: 'linear' }}
+            />
+            {/* Inner fast ring */}
+            <motion.div
+                className="absolute inset-[6px] rounded-full border-2 border-transparent"
+                style={{ borderTopColor: 'rgba(92,163,54,0.7)', borderLeftColor: 'rgba(92,163,54,0.15)' }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }}
+            />
+            {/* Centre dot */}
+            <div
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ background: 'radial-gradient(circle, #60A5FA 0%, rgba(37,99,235,0.4) 100%)' }}
+            />
+        </div>
+    );
 }
 
-const MAX_ATTEMPTS = 40; // 40 × 3s = 2 minutes
+// Pulsing dot row — shows live activity
+function PulseRow({ attempts }: { attempts: number }) {
+    return (
+        <div className="flex items-center gap-1.5">
+            {[0, 1, 2].map((i) => (
+                <motion.div
+                    key={i}
+                    className="h-1 w-1 rounded-full bg-blue-500"
+                    animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.2, 0.8] }}
+                    transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2, ease: 'easeInOut' }}
+                />
+            ))}
+            <span className="ml-1 font-mono text-[10px] text-white/20">
+                {attempts > 0 ? `check ${attempts}` : 'waiting'}
+            </span>
+        </div>
+    );
+}
 
-export default function OnboardingVerifying({ signature_verified }: PageProps) {
-    const [attempts,  setAttempts]  = useState(0);
-    const [timedOut,  setTimedOut]  = useState(false);
+export default function OnboardingVerifying({ signature_verified }: { signature_verified: boolean }) {
+    const [attempts, setAttempts] = useState(0);
+    const [timedOut, setTimedOut] = useState(false);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     useEffect(() => {
         if (signature_verified) {
-            const t = setTimeout(() => router.visit('/dashboard'), 100);
-            return () => clearTimeout(t);
+            setTimeout(() => router.visit('/dashboard'), 100);
+            return;
         }
-
         if (attempts >= MAX_ATTEMPTS) {
             setTimedOut(true);
             return;
         }
-
-        const interval = setInterval(() => {
-            setAttempts(prev => prev + 1);
+        intervalRef.current = setInterval(() => {
+            setAttempts((p) => p + 1);
             router.reload({
                 only: ['signature_verified'],
                 onSuccess: (page) => {
-                    if ((page.props as unknown as PageProps).signature_verified) {
-                        clearInterval(interval);
+                    if ((page.props as unknown as { signature_verified: boolean }).signature_verified) {
+                        if (intervalRef.current) clearInterval(intervalRef.current);
                         router.visit('/dashboard');
                     }
                 },
             });
         }, 3000);
-
-        return () => clearInterval(interval);
+        return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
     }, [signature_verified, attempts]);
 
-    if (timedOut) {
-        return (
-            <DiagnosticLayout glowColor="#F59E0B" hideWordmark>
-                <Head title="Verifying Signature — PARAGON Certification" />
+    return (
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#050505] text-white antialiased">
+            <Head title="Verifying Signature — PARAGON Certification" />
 
-                <div className="flex min-h-screen items-center justify-center px-4">
-                    <motion.div
-                        className="w-full max-w-md overflow-hidden rounded-2xl border border-white/[0.07] bg-slate-800 p-10 text-center shadow-[0_24px_48px_-10px_rgba(0,0,0,0.5)]"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    >
-                        <div className="mb-6 flex justify-center">
-                            <Clock className="text-amber-400" style={{ width: 48, height: 48 }} strokeWidth={1.5} />
+            {/* Background */}
+            <div className="waitlist-shell pointer-events-none absolute inset-0 z-0" />
+            <div className="waitlist-grid  pointer-events-none absolute inset-0 z-0" />
+            <div
+                className="pointer-events-none absolute inset-x-0 top-0 z-0 h-72"
+                style={{ background: timedOut
+                    ? 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 100%)'
+                    : 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(37,99,235,0.14) 0%, transparent 100%)',
+                }}
+            />
+
+            <motion.div
+                key={timedOut ? 'timeout' : 'verifying'}
+                className="relative z-10 flex w-full max-w-sm flex-col items-center px-6 text-center"
+                initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 0.55, ease }}
+            >
+                {/* Logo */}
+                <img
+                    src="/pinpoint-logo.png"
+                    alt="Pinpoint"
+                    className="mb-12 block h-6 w-auto select-none opacity-60"
+                    style={{ maxWidth: 130 }}
+                />
+
+                {timedOut ? (
+                    /* ── Timed-out state ── */
+                    <>
+                        <div
+                            className="mb-7 flex h-16 w-16 items-center justify-center rounded-full border border-amber-500/25 bg-amber-500/8"
+                            style={{ boxShadow: '0 0 40px rgba(245,158,11,0.1)' }}
+                        >
+                            <Clock className="size-7 text-amber-400" strokeWidth={1.5} />
                         </div>
 
-                        <h1 className="font-display mb-3 text-[20px] font-semibold tracking-tight text-white">
+                        <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-500/60">
                             Taking longer than expected
+                        </p>
+                        <h1 className="font-display mb-3 text-xl font-semibold text-white">
+                            Still confirming
                         </h1>
-
-                        <p className="mb-7 text-[13px] leading-relaxed text-white/55">
-                            Your signature has been recorded by BoldSign. Our system is confirming it —
-                            this can occasionally take a few minutes.
+                        <p className="mb-8 text-[13px] leading-relaxed text-white/40">
+                            BoldSign has recorded your signature. Our system is catching up —
+                            this occasionally takes a few extra minutes.
                         </p>
 
-                        <div className="flex flex-col items-center gap-3">
-                            <Button
+                        <div className="flex w-full flex-col gap-3">
+                            <button
                                 onClick={() => { setTimedOut(false); setAttempts(0); }}
-                                className="w-full bg-blue-600 hover:bg-blue-500"
+                                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-[13px] font-bold uppercase tracking-[0.14em] text-white transition-all hover:bg-blue-500"
+                                style={{ boxShadow: '0 0 28px rgba(37,99,235,0.3)' }}
                             >
                                 Check Again
-                            </Button>
+                                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                            </button>
                             <a
                                 href="mailto:hello@pinpointlaunchpad.com"
-                                className="text-[13px] text-white/40 hover:text-white/60 transition-colors"
+                                className="flex items-center justify-center gap-1.5 py-2 text-[12px] text-white/30 transition-colors hover:text-white/55"
                             >
-                                Contact Support
+                                <Mail className="size-3.5" />
+                                Contact support
                             </a>
                         </div>
 
-                        <p className="mt-6 text-[11px] text-white/25">
-                            If this persists, email us with your payment reference and we'll confirm your signing manually.
+                        <p className="mt-7 text-[11px] leading-relaxed text-white/18">
+                            If this persists, email us your payment reference and we'll confirm manually.
                         </p>
-                    </motion.div>
-                </div>
-            </DiagnosticLayout>
-        );
-    }
+                    </>
+                ) : (
+                    /* ── Verifying state ── */
+                    <>
+                        <div className="mb-8">
+                            <RingSpinner />
+                        </div>
 
-    return (
-        <DiagnosticLayout glowColor="#2563EB" hideWordmark>
-            <Head title="Verifying Signature — PARAGON Certification" />
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.24em] text-blue-400/70">
+                            Processing
+                        </p>
+                        <h1 className="font-display mb-3 text-[22px] font-semibold tracking-tight text-white">
+                            Verifying your signature
+                        </h1>
+                        <p className="mb-6 text-[13px] leading-relaxed text-white/40">
+                            Confirming with BoldSign. This takes a few seconds —
+                            please keep this page open.
+                        </p>
 
-            <div className="flex min-h-screen items-center justify-center px-4">
-                <motion.div
-                    className="w-full max-w-md overflow-hidden rounded-2xl border border-white/[0.07] bg-slate-800 p-10 text-center shadow-[0_24px_48px_-10px_rgba(0,0,0,0.5)]"
-                    initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                >
-                    <div className="mb-7 flex justify-center">
-                        <Loader2
-                            className="animate-spin text-blue-500"
-                            style={{ width: 60, height: 60 }}
-                            strokeWidth={1.5}
-                        />
-                    </div>
+                        <PulseRow attempts={attempts} />
 
-                    <h1 className="font-display mb-3 text-[22px] font-semibold tracking-tight text-white">
-                        Verifying Your Signature...
-                    </h1>
-
-                    <p className="mb-5 text-[14px] leading-relaxed text-white/55">
-                        This usually takes just a few seconds.
-                        <br />
-                        Please don't close this page.
-                    </p>
-
-                    <p className="text-[12px] text-white/30">
-                        You'll be redirected automatically once confirmed.
-                    </p>
-                </motion.div>
-            </div>
-        </DiagnosticLayout>
+                        <div className="mt-10 h-px w-24 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+                        <p className="mt-4 text-[11px] text-white/20">
+                            You'll be redirected automatically once confirmed.
+                        </p>
+                    </>
+                )}
+            </motion.div>
+        </div>
     );
 }

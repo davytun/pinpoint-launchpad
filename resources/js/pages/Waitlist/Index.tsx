@@ -1,6 +1,6 @@
 import { ParagonRadarChart } from '@/components/ParagonRadarChart';
 import { cn } from '@/lib/utils';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { AnimatePresence, motion, useInView, useReducedMotion, useScroll, useSpring } from 'framer-motion';
 import {
     ArrowRight,
@@ -617,11 +617,13 @@ function SupportPanel({ config }: { config: AudienceConfig }) {
 
 // ─── Audience card (landing) ──────────────────────────────────────────────────
 
+const MotionLink = motion.create(Link);
+
 function AudienceCard({ config }: { config: AudienceConfig }) {
     const { Icon } = config;
 
     return (
-        <motion.a
+        <MotionLink
             variants={fadeUp}
             href={route('waitlist.index', { audience: config.slug })}
             className={cn(
@@ -678,7 +680,7 @@ function AudienceCard({ config }: { config: AudienceConfig }) {
                     <ArrowRight className="h-4 w-4 text-white" />
                 </div>
             </div>
-        </motion.a>
+        </MotionLink>
     );
 }
 
@@ -752,9 +754,9 @@ export default function Waitlist({ selectedAudience, founderStages, investorRole
                         transition={{ duration: 0.5 }}
                         className="mb-2 flex items-center gap-3"
                     >
-                        <a href={route('waitlist.index')} className="flex items-center outline-none">
+                        <Link href={route('waitlist.index')} className="flex items-center outline-none">
                             <img src="/pinpoint-logo.png" alt="Pinpoint" className="h-8 w-auto md:h-10" />
-                        </a>
+                        </Link>
                     </motion.div>
 
                     <AnimatePresence mode="wait">
@@ -827,13 +829,13 @@ export default function Waitlist({ selectedAudience, founderStages, investorRole
                                 className="pt-10 md:pt-14"
                             >
                                 {/* Single back link — no redundant "track selection" language */}
-                                <a
+                                <Link
                                     href={route('waitlist.index')}
                                     className="group mb-8 inline-flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-white/55 backdrop-blur-sm transition-all duration-200 hover:border-white/15 hover:bg-white/[0.06] hover:text-white/80"
                                 >
                                     <ChevronLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
                                     Back
-                                </a>
+                                </Link>
 
                                 <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
                                     <FormPanel config={config} founderStages={founderStages} investorRoles={investorRoles} status={status} />

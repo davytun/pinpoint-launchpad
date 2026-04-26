@@ -1,26 +1,55 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { Lock, Loader2 } from 'lucide-react';
+import { ArrowRight, Building2, Lock, Loader2, Mail, User } from 'lucide-react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
+import { cn } from '@/lib/utils';
 
 interface PageProps {
     email:      string;
     tier_label: string;
 }
 
-const fieldVariants = {
-    hidden:  { opacity: 0, y: 12 },
-    visible: (i: number) => ({
-        opacity: 1,
-        y:       0,
-        transition: { delay: i * 0.05 + 0.2, duration: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
-    }),
-};
+const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
+const fadeUp = (delay = 0) => ({
+    initial:    { opacity: 0, y: 16, filter: 'blur(4px)' },
+    animate:    { opacity: 1, y: 0,  filter: 'blur(0px)' },
+    transition: { duration: 0.5, ease, delay },
+});
+
+function Field({
+    label,
+    hint,
+    icon: Icon,
+    error,
+    children,
+    delay,
+}: {
+    label:    string;
+    hint?:    string;
+    icon:     React.ElementType;
+    error?:   string;
+    children: React.ReactNode;
+    delay:    number;
+}) {
+    return (
+        <motion.div {...fadeUp(delay)} className="space-y-2">
+            <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">
+                <Icon className="size-3 shrink-0" />
+                {label}
+            </label>
+            {children}
+            {hint && !error && (
+                <p className="ml-0.5 text-[11px] text-white/25">{hint}</p>
+            )}
+            {error && (
+                <p className="ml-0.5 text-[11px] text-rose-400">{error}</p>
+            )}
+        </motion.div>
+    );
+}
 
 export default function ConfirmDetails({ email, tier_label }: PageProps) {
     const { data, setData, post, processing, errors } = useForm({
@@ -37,125 +66,202 @@ export default function ConfirmDetails({ email, tier_label }: PageProps) {
         <DiagnosticLayout glowColor="#2563EB" hideWordmark>
             <Head title="Confirm Your Details — PARAGON Certification" />
 
-            <div className="flex min-h-screen items-center justify-center px-4 py-16">
-                <motion.div
-                    className="w-full max-w-md"
-                    initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            <div className="flex min-h-screen flex-col lg:flex-row">
+
+                {/* ── Left panel — context ── */}
+                <motion.aside
+                    {...fadeUp(0)}
+                    className="flex w-full flex-col justify-between border-b border-white/[0.06] px-6 py-10 lg:w-[42%] lg:border-b-0 lg:border-r lg:px-14 lg:py-16"
                 >
-                    {/* Wordmark */}
-                    <div className="mb-8 flex justify-center">
-                        <PinpointLogo height={24} variant="dark" />
+                    <div>
+                        <PinpointLogo height={26} variant="dark" />
+
+                        <div className="mt-14 hidden lg:block">
+                            {/* Step track */}
+                            <div className="mb-10 flex flex-col gap-3">
+                                {[
+                                    { n: '01', label: 'Confirm your details',   active: true  },
+                                    { n: '02', label: 'Sign your agreement',    active: false },
+                                    { n: '03', label: 'Access the PIN Network', active: false },
+                                ].map((step) => (
+                                    <div key={step.n} className="flex items-center gap-3">
+                                        <span
+                                            className={cn(
+                                                'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold tabular-nums',
+                                                step.active
+                                                    ? 'border-blue-500/60 bg-blue-500/15 text-blue-400'
+                                                    : 'border-white/[0.08] bg-white/[0.03] text-white/20',
+                                            )}
+                                        >
+                                            {step.n}
+                                        </span>
+                                        <span
+                                            className={cn(
+                                                'text-[13px] font-medium',
+                                                step.active ? 'text-white/80' : 'text-white/25',
+                                            )}
+                                        >
+                                            {step.label}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="space-y-5 border-t border-white/[0.06] pt-8">
+                                <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-white">
+                                    One step before your audit begins.
+                                </h1>
+                                <p className="text-[14px] leading-relaxed text-white/45">
+                                    Your name and entity will appear on the legally binding Pinpoint Investment
+                                    Warrant. This takes under a minute.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-slate-800 shadow-[0_24px_60px_-10px_rgba(0,0,0,0.6)]">
-                        <div className="px-8 pt-8 pb-2">
-                            {/* Step indicator */}
-                            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/35">
-                                Step 1 of 2 — Confirm Your Details
+                    {/* Tier pill — desktop only */}
+                    <motion.div
+                        {...fadeUp(0.25)}
+                        className="mt-12 hidden rounded-2xl border border-white/[0.07] bg-white/[0.03] px-5 py-4 lg:block"
+                    >
+                        <div className="flex items-center gap-2">
+                            <span
+                                className="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
+                                style={{
+                                    color:       '#60A5FA',
+                                    borderColor: 'rgba(37,99,235,0.3)',
+                                    background:  'rgba(37,99,235,0.08)',
+                                }}
+                            >
+                                {tier_label}
+                            </span>
+                            <span className="text-[12px] text-white/30">{email}</span>
+                        </div>
+                    </motion.div>
+                </motion.aside>
+
+                {/* ── Right panel — form ── */}
+                <div className="flex w-full flex-1 items-center justify-center px-6 py-12 lg:px-16 lg:py-0">
+                    <motion.div
+                        {...fadeUp(0.1)}
+                        className="w-full max-w-[440px]"
+                    >
+                        {/* Mobile header */}
+                        <div className="mb-8 lg:hidden">
+                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white/30">
+                                Step 1 of 2
                             </p>
-
-                            <h1 className="font-display mb-2 text-[24px] font-semibold leading-tight tracking-tight text-white">
-                                Almost There
+                            <h1 className="font-display text-2xl font-semibold text-white">
+                                Confirm Your Details
                             </h1>
+                        </div>
 
-                            <p className="mb-7 text-[13px] leading-relaxed text-white/50">
-                                We need a few details to prepare your agreement. This information will appear
-                                on your signed Pinpoint Investment Warrant.
+                        {/* Desktop heading */}
+                        <div className="mb-8 hidden lg:block">
+                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white/30">
+                                Step 1 of 2
+                            </p>
+                            <h2 className="font-display text-2xl font-semibold text-white">
+                                Confirm Your Details
+                            </h2>
+                            <p className="mt-2 text-[13px] leading-relaxed text-white/40">
+                                These details appear on your signed warrant — enter them exactly as they should read legally.
                             </p>
                         </div>
 
-                        <form onSubmit={submit} className="px-8 pb-8 space-y-5">
-                            {/* Full Name */}
-                            <motion.div custom={0} variants={fieldVariants} initial="hidden" animate="visible">
-                                <Label className="mb-1.5 block text-[13px] font-medium text-white/70">
-                                    Your Full Name
-                                </Label>
-                                <Input
+                        <form onSubmit={submit} className="space-y-5">
+                            <Field
+                                label="Full Name"
+                                hint="As it should appear on the legal document"
+                                icon={User}
+                                error={errors.full_name}
+                                delay={0.15}
+                            >
+                                <input
                                     type="text"
                                     value={data.full_name}
                                     onChange={e => setData('full_name', e.target.value)}
                                     placeholder="e.g. John Adeyemi"
-                                    className="border-white/10 bg-slate-700/60 text-white placeholder:text-white/25 focus:border-blue-500 focus:ring-blue-500/20"
                                     disabled={processing}
                                     autoFocus
+                                    className={cn(
+                                        'w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-[14px] text-white placeholder:text-white/20 outline-none transition-all duration-200',
+                                        errors.full_name
+                                            ? 'border-rose-500/50 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
+                                            : 'border-white/[0.08] focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/10',
+                                    )}
                                 />
-                                <p className="mt-1 text-[11px] text-white/35">
-                                    As it should appear on the legal document
-                                </p>
-                                {errors.full_name && (
-                                    <p className="mt-1 text-[11px] text-red-400">{errors.full_name}</p>
-                                )}
-                            </motion.div>
+                            </Field>
 
-                            {/* Company Name */}
-                            <motion.div custom={1} variants={fieldVariants} initial="hidden" animate="visible">
-                                <Label className="mb-1.5 block text-[13px] font-medium text-white/70">
-                                    Company / Venture Name
-                                </Label>
-                                <Input
+                            <Field
+                                label="Company / Venture Name"
+                                hint="The legal entity signing this agreement"
+                                icon={Building2}
+                                error={errors.company_name}
+                                delay={0.2}
+                            >
+                                <input
                                     type="text"
                                     value={data.company_name}
                                     onChange={e => setData('company_name', e.target.value)}
                                     placeholder="e.g. Acme Technologies Ltd."
-                                    className="border-white/10 bg-slate-700/60 text-white placeholder:text-white/25 focus:border-blue-500 focus:ring-blue-500/20"
                                     disabled={processing}
+                                    className={cn(
+                                        'w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-[14px] text-white placeholder:text-white/20 outline-none transition-all duration-200',
+                                        errors.company_name
+                                            ? 'border-rose-500/50 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
+                                            : 'border-white/[0.08] focus:border-blue-500/60 focus:ring-2 focus:ring-blue-500/10',
+                                    )}
                                 />
-                                <p className="mt-1 text-[11px] text-white/35">
-                                    The legal entity signing this agreement
-                                </p>
-                                {errors.company_name && (
-                                    <p className="mt-1 text-[11px] text-red-400">{errors.company_name}</p>
-                                )}
-                            </motion.div>
+                            </Field>
 
-                            {/* Email — read-only */}
-                            <motion.div custom={2} variants={fieldVariants} initial="hidden" animate="visible">
-                                <Label className="mb-1.5 block text-[13px] font-medium text-white/70">
-                                    Email Address
-                                </Label>
-                                <Input
+                            <Field
+                                label="Email Address"
+                                icon={Mail}
+                                delay={0.25}
+                            >
+                                <input
                                     type="email"
                                     value={email}
                                     readOnly
-                                    className="cursor-not-allowed border-white/10 bg-slate-700/30 text-white/40 opacity-50"
+                                    className="w-full cursor-not-allowed rounded-xl border border-white/[0.05] bg-white/[0.02] px-4 py-3 text-[14px] text-white/30 outline-none"
                                 />
-                            </motion.div>
+                            </Field>
 
-                            {/* Submit */}
-                            <motion.div custom={3} variants={fieldVariants} initial="hidden" animate="visible" className="pt-2">
-                                <Button
+                            <motion.div {...fadeUp(0.3)} className="pt-1">
+                                <button
                                     type="submit"
                                     disabled={processing}
-                                    className="w-full bg-blue-600 py-2.5 text-[14px] font-semibold hover:bg-blue-500 disabled:opacity-60"
+                                    className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-blue-600 px-5 py-3.5 text-[13px] font-bold uppercase tracking-[0.15em] text-white outline-none transition-all duration-200 hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                                    style={{ boxShadow: '0 0 30px rgba(37,99,235,0.35)' }}
                                 >
                                     {processing ? (
                                         <>
-                                            <Loader2 className="mr-2 size-4 animate-spin" />
-                                            Generating your document...
+                                            <Loader2 className="size-4 animate-spin" />
+                                            Generating your document…
                                         </>
                                     ) : (
-                                        'Prepare My Agreement →'
+                                        <>
+                                            Prepare My Agreement
+                                            <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                                        </>
                                     )}
-                                </Button>
+                                </button>
                             </motion.div>
                         </form>
 
-                        {/* Trust note */}
-                        <div className="flex items-center justify-center gap-2 border-t border-white/[0.05] px-8 py-4">
-                            <Lock className="size-3.5 shrink-0 text-slate-500" />
-                            <p className="text-[11px] text-slate-500">
+                        <motion.div
+                            {...fadeUp(0.35)}
+                            className="mt-5 flex items-center justify-center gap-2"
+                        >
+                            <Lock className="size-3 shrink-0 text-white/20" />
+                            <p className="text-[11px] text-white/25">
                                 Your details are used only for the legal agreement and are never shared.
                             </p>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
+                </div>
 
-                    {/* Tier badge */}
-                    <p className="mt-4 text-center text-[12px] text-white/25">
-                        {tier_label} Audit — {email}
-                    </p>
-                </motion.div>
             </div>
         </DiagnosticLayout>
     );

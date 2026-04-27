@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\WaitlistController as AdminWaitlistController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiagnosticController;
+use App\Http\Controllers\Founder\FounderAuthController;
+use App\Http\Controllers\Founder\FounderDashboardController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\WaitlistController;
 
@@ -61,5 +63,35 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 // BoldSign webhook — CSRF excluded in bootstrap/app.php
 Route::post('/webhooks/boldsign', [OnboardingController::class, 'webhook'])->name('webhooks.boldsign');
+
+// Founder routes — all under /founder/
+Route::prefix('founder')->name('founder.')->group(function () {
+
+    // Public auth routes
+    Route::get('/setup',         [FounderAuthController::class, 'showSetup'])->name('setup');
+    Route::post('/setup',        [FounderAuthController::class, 'setup'])->name('setup.store')->middleware('throttle:5,1');
+    Route::get('/login',         [FounderAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login',        [FounderAuthController::class, 'login'])->name('login.store')->middleware('throttle:10,1');
+    Route::post('/logout',       [FounderAuthController::class, 'logout'])->name('logout');
+
+    // Password reset
+    Route::get('/forgot-password',       [FounderAuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password',      [FounderAuthController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:3,1');
+    Route::get('/reset-password/{token}',[FounderAuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password',       [FounderAuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:3,1');
+
+    // Protected dashboard routes
+    Route::middleware(['auth.founder', 'founder.session'])->group(function () {
+        Route::get('/dashboard', [FounderDashboardController::class, 'index'])->name('dashboard');
+
+        Route::get('/documents', function () {
+            return inertia('Founder/Documents/Index');
+        })->name('documents');
+
+        Route::get('/messages', function () {
+            return inertia('Founder/Messages/Index');
+        })->name('messages');
+    });
+});
 
 require __DIR__.'/auth.php';

@@ -30,7 +30,7 @@ class OnboardingController extends Controller
 
         // Already signed — go straight to dashboard
         if ($payment->signature && $payment->signature->isSigned()) {
-            return redirect('/dashboard');
+            return redirect()->route('founder.dashboard');
         }
 
         $tierLabel = ucfirst($payment->tier);
@@ -44,7 +44,7 @@ class OnboardingController extends Controller
             } catch (\RuntimeException $e) {
                 if (str_contains($e->getMessage(), 'already been completed') || str_contains($e->getMessage(), 'already completed')) {
                     $payment->signature->update(['status' => 'signed', 'signed_at' => now()]);
-                    return redirect('/dashboard');
+                    return redirect()->route('founder.setup');
                 }
                 throw $e;
             }

@@ -22,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'               => \App\Http\Middleware\EnsureUserHasRole::class,
             'payment.complete'   => \App\Http\Middleware\EnsurePaymentComplete::class,
             'signature.complete' => \App\Http\Middleware\EnsureSignatureComplete::class,
+            'auth.founder'       => \App\Http\Middleware\EnsureFounderAuthenticated::class,
+            'founder.session'    => \App\Http\Middleware\FounderSessionTimeout::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

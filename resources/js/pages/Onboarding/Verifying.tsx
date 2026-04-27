@@ -59,7 +59,7 @@ export default function OnboardingVerifying({ signature_verified }: { signature_
 
     useEffect(() => {
         if (signature_verified) {
-            setTimeout(() => router.visit('/dashboard'), 100);
+            setTimeout(() => router.visit(route('founder.setup')), 100);
             return;
         }
         if (attempts >= MAX_ATTEMPTS) {
@@ -73,7 +73,7 @@ export default function OnboardingVerifying({ signature_verified }: { signature_
                 onSuccess: (page) => {
                     if ((page.props as unknown as { signature_verified: boolean }).signature_verified) {
                         if (intervalRef.current) clearInterval(intervalRef.current);
-                        router.visit('/dashboard');
+                        router.visit(route('founder.setup'));
                     }
                 },
             });

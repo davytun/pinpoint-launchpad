@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -42,11 +43,17 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name'  => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
-            'auth'               => ['user' => $request->user()],
+            'auth' => [
+                'user'    => $request->user(),
+                'founder' => Auth::guard('founder')->check()
+                    ? Auth::guard('founder')->user()->only(['id', 'email', 'full_name', 'company_name', 'avatar'])
+                    : null,
+            ],
             'paystack_public_key' => config('services.paystack.public_key') ?: '',
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error'   => $request->session()->get('error'),
+                'info'    => $request->session()->get('info'),
             ],
         ]);
     }

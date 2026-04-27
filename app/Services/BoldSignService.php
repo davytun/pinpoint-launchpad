@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class BoldSignService
 {
@@ -230,11 +233,25 @@ class BoldSignService
 
         $tierLabel = ucfirst($signature->metadata['tier'] ?? 'Foundation');
 
-        \Illuminate\Support\Facades\Mail::to($signature->signer_email)
+        Mail::to($signature->signer_email)
             ->send(new \App\Mail\SignatureCompleteMail($signature, $tierLabel));
 
-        \Illuminate\Support\Facades\Mail::to(config('mail.admin_address'))
+        Mail::to(config('mail.admin_address'))
             ->send(new \App\Mail\SignatureAdminNotificationMail($signature, $tierLabel));
+
+        // Generate a one-time setup token so the founder can create their dashboard account.
+        // The token is validated in FounderAuthController::showSetup() and setup().
+        $setupToken = Str::random(64);
+        Cache::put(
+            'founder_setup_token_' . $signature->signer_email,
+            $setupToken,
+            now()->addHours(48)
+        );
+
+        $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
+
+        Mail::to($signature->signer_email)
+            ->send(new \App\Mail\FounderSetupInviteMail($signature->signer_email, $setupUrl));
 
         Log::info('BoldSign document signed, PDF stored, emails dispatched', [
             'documentId'   => $documentId,

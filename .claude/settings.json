@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -l app/Models/FounderDocument.php)",
+      "Bash(php -l app/Models/Founder.php)",
+      "Bash(php -l app/Services/DocumentService.php)",
+      "Bash(php -l app/Http/Controllers/Founder/FounderDocumentController.php)",
+      "Bash(php -l app/Http/Controllers/Admin/AdminDocumentController.php)"
+    ]
+  }
+}

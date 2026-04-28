@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDocumentController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\WaitlistController as AdminWaitlistController;
@@ -8,12 +9,20 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\Founder\FounderAuthController;
 use App\Http\Controllers\Founder\FounderDashboardController;
+use App\Http\Controllers\Founder\FounderDocumentController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\WaitlistController;
 
 Route::redirect('/', '/waitlist');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('founders/{founder}/documents')->name('documents.')->group(function () {
+        Route::get('/',                      [AdminDocumentController::class, 'index'])->name('index');
+        Route::get('/{document}/download',   [AdminDocumentController::class, 'download'])->name('download');
+        Route::patch('/{document}/reviewed', [AdminDocumentController::class, 'markReviewed'])->name('reviewed');
+        Route::patch('/{document}/note',     [AdminDocumentController::class, 'addNote'])->name('note');
+    });
+
     Route::get('/waitlist',                        [AdminWaitlistController::class, 'index'])->name('waitlist.index');
     Route::get('/waitlist/export',                 [AdminWaitlistController::class, 'export'])->name('waitlist.export');
     Route::patch('/waitlist/{entry}/convert',      [AdminWaitlistController::class, 'toggleConverted'])->name('waitlist.convert');
@@ -84,9 +93,12 @@ Route::prefix('founder')->name('founder.')->group(function () {
     Route::middleware(['auth.founder', 'founder.session'])->group(function () {
         Route::get('/dashboard', [FounderDashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('/documents', function () {
-            return inertia('Founder/Documents/Index');
-        })->name('documents');
+        Route::prefix('documents')->name('documents.')->group(function () {
+            Route::get('/',                          [FounderDocumentController::class, 'index'])->name('index');
+            Route::post('/',                         [FounderDocumentController::class, 'store'])->name('store')->middleware('throttle:10,1');
+            Route::get('/{document}/download',       [FounderDocumentController::class, 'download'])->name('download');
+            Route::delete('/{document}',             [FounderDocumentController::class, 'destroy'])->name('destroy');
+        });
 
         Route::get('/messages', function () {
             return inertia('Founder/Messages/Index');

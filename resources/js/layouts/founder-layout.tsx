@@ -155,7 +155,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
 
     const navItems = useMemo<NavItem[]>(() => [
         { icon: LayoutDashboard, label: 'Dashboard',       href: route('founder.dashboard'), disabled: false },
-        { icon: FileText,        label: 'Documents',        href: route('founder.documents'), disabled: true,  disabledReason: 'Available after audit completion' },
+        { icon: FileText,        label: 'Documents',        href: route('founder.documents.index'), disabled: false },
         { icon: MessageSquare,   label: 'Messages',         href: route('founder.messages'),  disabled: true,  disabledReason: 'Available after audit completion' },
         { icon: ExternalLink,    label: 'My Investor Page', href: '#',                        disabled: true,  disabledReason: 'Available after PARAGON certification' },
     ], []);

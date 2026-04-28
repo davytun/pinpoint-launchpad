@@ -467,7 +467,7 @@ export default function FounderDashboard({
                         </div>
 
                         {/* Messages */}
-                        <div className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] opacity-50">
+                        <div className="waitlist-panel group overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.03]">
                             <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-blue-500/10">
                                 <MessageSquare className="size-4 text-blue-400" aria-hidden="true" />
                             </div>
@@ -475,12 +475,13 @@ export default function FounderDashboard({
                             <p className="mb-4 text-[12px] leading-relaxed text-white/30">
                                 Ask questions or send updates directly to your assigned analyst.
                             </p>
-                            <button
-                                disabled
-                                className="cursor-not-allowed rounded-xl border border-white/[0.06] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/20"
+                            <a
+                                href={route('founder.messages.index')}
+                                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/[0.1] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/60 transition-all duration-200 hover:border-white/20 hover:text-white"
                             >
-                                Go to Messages
-                            </button>
+                                <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
+                                <span className="relative z-10">Go to Messages →</span>
+                            </a>
                         </div>
 
                         {/* Investor Page */}

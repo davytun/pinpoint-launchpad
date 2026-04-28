@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDocumentController;
+use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\WaitlistController as AdminWaitlistController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\Founder\FounderAuthController;
 use App\Http\Controllers\Founder\FounderDashboardController;
 use App\Http\Controllers\Founder\FounderDocumentController;
+use App\Http\Controllers\Founder\FounderMessageController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\WaitlistController;
 
@@ -37,6 +39,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/settings',   [AdminSettingsController::class, 'index'])->name('settings.index');
     Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+
+    Route::prefix('messages')->name('messages.')->group(function () {
+        Route::get('/',                         [AdminMessageController::class, 'inbox'])->name('inbox');
+        Route::get('/attachment/{message}',     [AdminMessageController::class, 'downloadAttachment'])->name('attachment.download');
+        Route::get('/{thread}',                 [AdminMessageController::class, 'show'])->name('show');
+        Route::post('/{thread}/reply',          [AdminMessageController::class, 'reply'])->name('reply')->middleware('throttle:30,1');
+    });
 });
 
 Route::get('/waitlist', [WaitlistController::class, 'index'])->name('waitlist.index');
@@ -100,9 +109,11 @@ Route::prefix('founder')->name('founder.')->group(function () {
             Route::delete('/{document}',             [FounderDocumentController::class, 'destroy'])->name('destroy');
         });
 
-        Route::get('/messages', function () {
-            return inertia('Founder/Messages/Index');
-        })->name('messages');
+        Route::prefix('messages')->name('messages.')->group(function () {
+            Route::get('/',                      [FounderMessageController::class, 'index'])->name('index');
+            Route::post('/',                     [FounderMessageController::class, 'store'])->name('store')->middleware('throttle:20,1');
+            Route::get('/attachment/{message}',  [FounderMessageController::class, 'downloadAttachment'])->name('attachment.download');
+        });
     });
 });
 

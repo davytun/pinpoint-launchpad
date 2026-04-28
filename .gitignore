@@ -16,6 +16,7 @@
 /public/storage
 /storage/*.key
 /storage/app/founder-documents/
+/storage/app/message-attachments/
 /storage/pail
 /vendor
 auth.json

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\BoldSignService;
 use App\Services\DocumentService;
+use App\Services\MessageService;
 use App\Services\PaystackService;
 use App\Services\ScoringService;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(PaystackService::class);
         $this->app->singleton(BoldSignService::class);
         $this->app->singleton(DocumentService::class);
+        $this->app->singleton(MessageService::class);
     }
 
     /**

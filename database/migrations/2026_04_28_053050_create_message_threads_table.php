@@ -6,20 +6,18 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('message_threads', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('founder_id')->unique()->constrained('founders')->cascadeOnDelete();
+            $table->timestamp('last_message_at')->nullable();
+            $table->unsignedInteger('founder_unread_count')->default(0);
+            $table->unsignedInteger('admin_unread_count')->default(0);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('message_threads');

@@ -34,7 +34,7 @@ const PILLAR_COLORS: Record<string, string> = {
     alignment: '#D97706',
     governance: '#059669',
     operations: '#0891B2',
-    need: '#BE185D',
+    network: '#BE185D',
 };
 
 const PILLAR_LABELS: Record<string, string> = {
@@ -44,7 +44,7 @@ const PILLAR_LABELS: Record<string, string> = {
     alignment: 'Alignment',
     governance: 'Governance',
     operations: 'Operations',
-    need: 'Need',
+    network: 'Network',
 };
 
 // ─── Page ───────────────────────────────────────────────────────────────────────

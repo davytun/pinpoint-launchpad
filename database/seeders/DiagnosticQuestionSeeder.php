@@ -53,7 +53,7 @@ class DiagnosticQuestionSeeder extends Seeder
                 'order'         => 6,
             ],
             [
-                'pillar'        => 'need',
+                'pillar'        => 'network',
                 'question_text' => 'Have you secured at least one Letter of Intent (LOI), a pilot contract, or $1k+ in Monthly Recurring Revenue (MRR)?',
                 'sub_text'      => 'Revenue or signed commitments prove market need. Projections alone do not count.',
                 'points'        => 15,

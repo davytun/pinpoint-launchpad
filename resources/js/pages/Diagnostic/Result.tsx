@@ -34,7 +34,7 @@ interface PillarScores {
     alignment:  number;
     governance: number;
     operations: number;
-    need:       number;
+    network:    number;
 }
 
 interface PageProps {
@@ -50,7 +50,7 @@ interface PageProps {
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
 const PILLAR_KEYS: (keyof PillarScores)[] = [
-    'potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'need',
+    'potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'network',
 ];
 const PILLAR_LABELS: Record<keyof PillarScores, string> = {
     potential:  'Potential',
@@ -59,7 +59,7 @@ const PILLAR_LABELS: Record<keyof PillarScores, string> = {
     alignment:  'Alignment',
     governance: 'Governance',
     operations: 'Operations',
-    need:       'Need',
+    network:    'Network',
 };
 
 const BAND_META: Record<string, {

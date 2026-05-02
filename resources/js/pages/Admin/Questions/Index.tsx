@@ -42,7 +42,7 @@ const PILLAR_COLORS: Record<string, { bg: string; text: string; border: string }
     alignment:  { bg: 'rgba(217,119,6,0.12)',  text: '#FCD34D', border: 'rgba(217,119,6,0.3)' },
     governance: { bg: 'rgba(5,150,105,0.12)',  text: '#6EE7B7', border: 'rgba(5,150,105,0.3)' },
     operations: { bg: 'rgba(8,145,178,0.12)',  text: '#67E8F9', border: 'rgba(8,145,178,0.3)' },
-    need:       { bg: 'rgba(190,24,93,0.12)',  text: '#F9A8D4', border: 'rgba(190,24,93,0.3)' },
+    network:    { bg: 'rgba(190,24,93,0.12)',  text: '#F9A8D4', border: 'rgba(190,24,93,0.3)' },
 };
 
 function PillarBadge({ pillar }: { pillar: string }) {

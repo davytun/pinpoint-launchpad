@@ -37,7 +37,7 @@ class PaymentObserver
             'alignment'   => 0,
             'governance'  => 0,
             'operations'  => 0,
-            'need'        => 0,
+            'network'     => 0,
         ];
 
         $overallScore = $founder->diagnosticSession?->score ?? 0;

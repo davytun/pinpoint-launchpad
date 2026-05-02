@@ -17,7 +17,7 @@ class ScoringService
         'alignment'  => 10,
         'governance' => 10,
         'operations' => 10,
-        'need'       => 15,
+        'network'    => 15,
     ];
 
     /**

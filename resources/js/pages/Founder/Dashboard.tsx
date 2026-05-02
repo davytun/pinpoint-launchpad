@@ -36,7 +36,7 @@ interface PillarScores {
     alignment?: number;
     governance?: number;
     operations?: number;
-    need?: number;
+    network?: number;
     [key: string]: number | undefined;
 }
 
@@ -68,10 +68,10 @@ interface PageProps {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const PILLAR_KEYS = ['potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'need'];
+const PILLAR_KEYS = ['potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'network'];
 const PILLAR_LABELS: Record<string, string> = {
     potential: 'Potential', agility: 'Agility', risk: 'Risk',
-    alignment: 'Alignment', governance: 'Governance', operations: 'Operations', need: 'Need',
+    alignment: 'Alignment', governance: 'Governance', operations: 'Operations', network: 'Network',
 };
 
 // Adjusted colors to be slightly more muted for Fintech Pro, maintaining semantic meaning

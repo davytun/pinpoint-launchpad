@@ -51,7 +51,7 @@ interface PageProps {
     flash?: { success?: string };
 }
 
-const PILLAR_KEYS = ['potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'need'];
+const PILLAR_KEYS = ['potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'network'];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 

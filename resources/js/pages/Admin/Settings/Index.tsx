@@ -1,4 +1,6 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+
+import AdminLayout from '@/layouts/admin-layout';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -32,35 +34,15 @@ export default function AdminSettingsIndex() {
     };
 
     return (
-        <>
+        <AdminLayout>
             <Head title="Settings — Admin" />
 
-            <div
-                className="min-h-screen px-5 py-10 sm:px-8"
-                style={{ background: '#0A0F1A' }}
-            >
-                <div className="mx-auto max-w-xl">
+            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 
                     {/* Header */}
-                    <div className="mb-8 flex items-center justify-between">
-                        <div>
-                            <p
-                                className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em]"
-                                style={{ color: 'rgba(255,255,255,0.28)' }}
-                            >
-                                Admin
-                            </p>
-                            <h1 className="text-xl font-bold text-white">Settings</h1>
-                        </div>
-                        <Link
-                            href={route('admin.waitlist.index')}
-                            className="text-xs font-medium transition-colors"
-                            style={{ color: 'rgba(255,255,255,0.35)' }}
-                            onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.70)')}
-                            onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.35)')}
-                        >
-                            ← Waitlist
-                        </Link>
+                    <div className="mb-8">
+                        <h1 className="text-2xl font-bold text-white">Settings</h1>
+                        <p className="mt-1 text-sm text-slate-500">Platform configuration</p>
                     </div>
 
                     {/* Flash */}
@@ -196,8 +178,7 @@ export default function AdminSettingsIndex() {
                             </div>
                         </form>
                     </div>
-                </div>
             </div>
-        </>
+        </AdminLayout>
     );
 }

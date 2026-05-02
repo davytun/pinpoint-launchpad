@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Payment;
+use App\Observers\PaymentObserver;
 use App\Services\BoldSignService;
 use App\Services\DocumentService;
 use App\Services\MessageService;
@@ -28,9 +30,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Payment::observe(PaymentObserver::class);
+
         Schema::defaultStringLength(191);
 
-        // Force HTTPS when APP_URL is https (e.g. behind ngrok or a load balancer)
         if (str_starts_with(config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }

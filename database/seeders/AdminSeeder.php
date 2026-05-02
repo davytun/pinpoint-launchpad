@@ -14,7 +14,7 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'Pinpoint Admin',
                 'password' => env('ADMIN_PASSWORD', 'changeme123'),
-                'role' => 'admin',
+                'role' => 'superadmin',
             ]
         );
     }

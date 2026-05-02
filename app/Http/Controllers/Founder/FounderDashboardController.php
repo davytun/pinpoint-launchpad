@@ -17,6 +17,7 @@ class FounderDashboardController extends Controller
             'diagnosticSession:id,pillar_scores',
             'payment:id,tier,total_amount,paid_at,audit_status',
             'signature:id,status,signed_at',
+            'profile:id,founder_id,slug,is_public,verified_at,expires_at',
         ]);
 
         $pillarScores = Cache::remember(
@@ -118,7 +119,10 @@ class FounderDashboardController extends Controller
                 'status'    => $founder->signature->status,
                 'signed_at' => $founder->signature->signed_at?->toISOString(),
             ] : null,
-            'verification_url' => null,
+            'verification_url' => $founder->profile?->is_public
+                ? route('verify.show', $founder->profile->slug)
+                : null,
+            'profile_is_live'  => $founder->profile?->isLive() ?? false,
         ]);
     }
 }

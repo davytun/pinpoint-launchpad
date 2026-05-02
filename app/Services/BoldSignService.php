@@ -39,11 +39,11 @@ class BoldSignService
                     'signerEmail' => $data['email'],
                     'signerType'  => 'Signer',
                     'existingFormFields' => [
-                        ['id' => 'founder_name',  'value' => $data['founder_name'],     'isReadOnly' => true],
-                        ['id' => 'company_name',  'value' => $data['company_name'],     'isReadOnly' => true],
-                        ['id' => 'tier_selected', 'value' => $data['tier_selected'],    'isReadOnly' => true],
-                        ['id' => 'amount_paid',   'value' => '$' . $data['amount_paid'],'isReadOnly' => true],
-                        ['id' => 'date',          'value' => $data['date'],             'isReadOnly' => true],
+                        ['id' => 'founder_name',  'value' => $data['founder_name'],      'isReadOnly' => true],
+                        ['id' => 'company_name',  'value' => $data['company_name'],      'isReadOnly' => true],
+                        ['id' => 'tier_selected', 'value' => $data['tier_selected'],     'isReadOnly' => true],
+                        ['id' => 'amount_paid',   'value' => '$' . $data['amount_paid'], 'isReadOnly' => true],
+                        ['id' => 'date',          'value' => $data['date'],              'isReadOnly' => true],
                     ],
                 ],
             ],
@@ -234,10 +234,10 @@ class BoldSignService
         $tierLabel = ucfirst($signature->metadata['tier'] ?? 'Foundation');
 
         Mail::to($signature->signer_email)
-            ->send(new \App\Mail\SignatureCompleteMail($signature, $tierLabel));
+            ->queue(new \App\Mail\SignatureCompleteMail($signature, $tierLabel));
 
         Mail::to(config('mail.admin_address'))
-            ->send(new \App\Mail\SignatureAdminNotificationMail($signature, $tierLabel));
+            ->queue(new \App\Mail\SignatureAdminNotificationMail($signature, $tierLabel));
 
         // Generate a one-time setup token so the founder can create their dashboard account.
         // The token is validated in FounderAuthController::showSetup() and setup().
@@ -251,7 +251,7 @@ class BoldSignService
         $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
 
         Mail::to($signature->signer_email)
-            ->send(new \App\Mail\FounderSetupInviteMail($signature->signer_email, $setupUrl));
+            ->queue(new \App\Mail\FounderSetupInviteMail($signature->signer_email, $setupUrl));
 
         Log::info('BoldSign document signed, PDF stored, emails dispatched', [
             'documentId'   => $documentId,

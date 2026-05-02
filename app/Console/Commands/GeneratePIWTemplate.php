@@ -14,11 +14,11 @@ class GeneratePIWTemplate extends Command
     public function handle(): void
     {
         $pdf = Pdf::loadView('documents.piw', [
-            'founder_name'  => '{{FOUNDER_NAME}}',
-            'company_name'  => '{{COMPANY_NAME}}',
-            'tier_selected' => '{{TIER_SELECTED}}',
-            'amount_paid'   => '{{AMOUNT_PAID}}',
-            'date'          => '{{DATE}}',
+            'founder_name'  => '{{t:founder_name;r:y;ro:y;}}',
+            'company_name'  => '{{t:company_name;r:y;ro:y;}}',
+            'tier_selected' => '{{t:tier_selected;r:y;ro:y;}}',
+            'amount_paid'   => '{{t:amount_paid;r:y;ro:y;}}',
+            'date'          => '{{t:date;r:y;ro:y;}}',
         ]);
 
         $pdf->setPaper('A4', 'portrait');

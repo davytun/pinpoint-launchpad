@@ -33,6 +33,20 @@ class OnboardingController extends Controller
             return redirect()->route('founder.dashboard');
         }
 
+        // Declined — reset so the founder can start fresh
+        if ($payment->signature && $payment->signature->status === 'declined') {
+            $payment->signature->update([
+                'status'                => 'pending',
+                'boldsign_document_id'  => null,
+                'embed_url'             => null,
+                'embed_url_expires_at'  => null,
+                'details_confirmed'     => false,
+            ]);
+
+            return redirect()->route('onboarding.sign')
+                ->with('info', 'You declined the previous agreement. Please review your details and sign to proceed with your audit.');
+        }
+
         $tierLabel = ucfirst($payment->tier);
 
         // Existing document with confirmed details — show iframe
@@ -61,6 +75,7 @@ class OnboardingController extends Controller
         return Inertia::render('Onboarding/ConfirmDetails', [
             'email'      => $payment->customer_email,
             'tier_label' => $tierLabel,
+            'info'       => session('info'),
         ]);
     }
 
@@ -162,7 +177,47 @@ class OnboardingController extends Controller
 
         return Inertia::render('Onboarding/Verifying', [
             'signature_verified' => $signature->isSigned(),
+            'signer_email'       => $signature->signer_email,
         ]);
+    }
+
+    public function resendInvite(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate(['email' => ['required', 'email']]);
+
+        $signature = \App\Models\Signature::where('signer_email', $request->input('email'))
+            ->where('status', 'signed')
+            ->latest()
+            ->first();
+
+        if (! $signature) {
+            // Try session fallback
+            $signatureId = $request->session()->get('signature_id');
+            $signature   = $signatureId ? \App\Models\Signature::find($signatureId) : null;
+
+            if (! $signature && $request->session()->has('payment_id')) {
+                $payment   = \App\Models\Payment::with('signature')->find($request->session()->get('payment_id'));
+                $signature = $payment?->signature;
+            }
+        }
+
+        if (! $signature || ! $signature->isSigned()) {
+            return response()->json(['message' => 'Signature not found or not yet complete.'], 422);
+        }
+
+        $setupToken = \Illuminate\Support\Str::random(64);
+        \Illuminate\Support\Facades\Cache::put(
+            'founder_setup_token_' . $signature->signer_email,
+            $setupToken,
+            now()->addHours(48)
+        );
+
+        $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
+
+        \Illuminate\Support\Facades\Mail::to($signature->signer_email)
+            ->queue(new \App\Mail\FounderSetupInviteMail($signature->signer_email, $setupUrl));
+
+        return response()->json(['message' => 'Invite resent.']);
     }
 
     public function webhook(Request $request): \Illuminate\Http\JsonResponse

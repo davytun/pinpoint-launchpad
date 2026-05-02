@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminDocumentController;
+use App\Http\Controllers\Admin\AdminFounderController;
 use App\Http\Controllers\Admin\AdminMessageController;
+use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\WaitlistController as AdminWaitlistController;
@@ -13,38 +17,94 @@ use App\Http\Controllers\Founder\FounderDashboardController;
 use App\Http\Controllers\Founder\FounderDocumentController;
 use App\Http\Controllers\Founder\FounderMessageController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WaitlistController;
+use Inertia\Inertia;
 
 Route::redirect('/', '/waitlist');
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::prefix('founders/{founder}/documents')->name('documents.')->group(function () {
-        Route::get('/',                      [AdminDocumentController::class, 'index'])->name('index');
-        Route::get('/{document}/download',   [AdminDocumentController::class, 'download'])->name('download');
-        Route::patch('/{document}/reviewed', [AdminDocumentController::class, 'markReviewed'])->name('reviewed');
-        Route::patch('/{document}/note',     [AdminDocumentController::class, 'addNote'])->name('note');
+// ── Admin routes ───────────────────────────────────────────────────────────────
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', function () {
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+        return Inertia::render('Admin/Login', [
+            'status' => session('status'),
+        ]);
+    })->name('login')->middleware('guest');
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Dashboard — all admin roles
+    Route::get('/', [AdminDashboardController::class, 'index'])
+        ->middleware('require.role:superadmin,analyst,support')
+        ->name('dashboard');
+
+    // Messages — all admin roles
+    Route::prefix('messages')->name('messages.')->middleware('require.role:superadmin,analyst,support')->group(function () {
+        Route::get('/',                     [AdminMessageController::class, 'inbox'])->name('inbox');
+        Route::get('/attachment/{message}', [AdminMessageController::class, 'downloadAttachment'])->name('attachment.download');
+        Route::get('/{thread}',             [AdminMessageController::class, 'show'])->name('show');
+        Route::post('/{thread}/reply',      [AdminMessageController::class, 'reply'])->name('reply')->middleware('throttle:30,1');
     });
 
-    Route::get('/waitlist',                        [AdminWaitlistController::class, 'index'])->name('waitlist.index');
-    Route::get('/waitlist/export',                 [AdminWaitlistController::class, 'export'])->name('waitlist.export');
-    Route::patch('/waitlist/{entry}/convert',      [AdminWaitlistController::class, 'toggleConverted'])->name('waitlist.convert');
-    Route::post('/waitlist/{entry}/resend',        [AdminWaitlistController::class, 'resend'])->name('waitlist.resend');
-    Route::delete('/waitlist/{entry}',             [AdminWaitlistController::class, 'destroy'])->name('waitlist.destroy');
+    // Waitlist — superadmin + support
+    Route::middleware('require.role:superadmin,support')->group(function () {
+        Route::get('/waitlist',                   [AdminWaitlistController::class, 'index'])->name('waitlist.index');
+        Route::get('/waitlist/export',            [AdminWaitlistController::class, 'export'])->name('waitlist.export');
+        Route::patch('/waitlist/{entry}/convert', [AdminWaitlistController::class, 'toggleConverted'])->name('waitlist.convert');
+        Route::post('/waitlist/{entry}/resend',   [AdminWaitlistController::class, 'resend'])->name('waitlist.resend');
+        Route::delete('/waitlist/{entry}',        [AdminWaitlistController::class, 'destroy'])->name('waitlist.destroy');
+    });
 
-    Route::prefix('questions')->name('questions.')->group(function () {
-        Route::get('/',              [AdminQuestionController::class, 'index'])->name('index');
+    // Founders — superadmin + analyst
+    Route::middleware('require.role:superadmin,analyst')->group(function () {
+        Route::get('/founders',                              [AdminFounderController::class, 'index'])->name('founders.index');
+        Route::get('/founders/{founder}',                   [AdminFounderController::class, 'show'])->name('founders.show');
+        Route::post('/founders/{founder}/assign',           [AdminFounderController::class, 'assign'])->middleware('require.role:superadmin')->name('founders.assign');
+        Route::patch('/founders/{founder}/audit-status',    [AdminFounderController::class, 'updateAuditStatus'])->name('founders.audit-status');
+
+        Route::prefix('founders/{founder}/documents')->name('documents.')->group(function () {
+            Route::get('/',                      [AdminDocumentController::class, 'index'])->name('index');
+            Route::get('/{document}/download',   [AdminDocumentController::class, 'download'])->name('download');
+            Route::patch('/{document}/reviewed', [AdminDocumentController::class, 'markReviewed'])->name('reviewed');
+            Route::patch('/{document}/note',     [AdminDocumentController::class, 'addNote'])->name('note');
+        });
+
+        Route::prefix('profiles')->name('profiles.')->group(function () {
+            Route::get('/',                          [AdminProfileController::class, 'index'])->name('index');
+            Route::get('/{profile}',                 [AdminProfileController::class, 'show'])->name('show');
+            Route::patch('/{profile}',               [AdminProfileController::class, 'update'])->name('update');
+            Route::patch('/badges/{badge}',          [AdminProfileController::class, 'updateBadge'])->name('badge.update');
+            Route::get('/{profile}/access-requests', [AdminProfileController::class, 'accessRequests'])->name('access-requests');
+        });
+    });
+
+    // Questions — superadmin + analyst
+    Route::prefix('questions')->name('questions.')->middleware('require.role:superadmin,analyst')->group(function () {
+        Route::get('/',                [AdminQuestionController::class, 'index'])->name('index');
         Route::get('/{question}/edit', [AdminQuestionController::class, 'edit'])->name('edit');
-        Route::patch('/{question}',  [AdminQuestionController::class, 'update'])->name('update');
+        Route::patch('/{question}',    [AdminQuestionController::class, 'update'])->name('update');
     });
 
-    Route::get('/settings',   [AdminSettingsController::class, 'index'])->name('settings.index');
-    Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
+    // Settings + Revenue — superadmin only
+    Route::middleware('require.role:superadmin')->group(function () {
+        Route::get('/settings',   [AdminSettingsController::class, 'index'])->name('settings.index');
+        Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
 
-    Route::prefix('messages')->name('messages.')->group(function () {
-        Route::get('/',                         [AdminMessageController::class, 'inbox'])->name('inbox');
-        Route::get('/attachment/{message}',     [AdminMessageController::class, 'downloadAttachment'])->name('attachment.download');
-        Route::get('/{thread}',                 [AdminMessageController::class, 'show'])->name('show');
-        Route::post('/{thread}/reply',          [AdminMessageController::class, 'reply'])->name('reply')->middleware('throttle:30,1');
+        Route::get('/revenue', [AdminDashboardController::class, 'revenue'])->name('revenue');
+    });
+
+    // User management — superadmin only
+    Route::prefix('users')->name('users.')->middleware('require.role:superadmin')->group(function () {
+        Route::get('/',           [AdminUserController::class, 'index'])->name('index');
+        Route::get('/create',     [AdminUserController::class, 'create'])->name('create');
+        Route::post('/',          [AdminUserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit',[AdminUserController::class, 'edit'])->name('edit');
+        Route::patch('/{user}',   [AdminUserController::class, 'update'])->name('update');
+        Route::delete('/{user}',  [AdminUserController::class, 'destroy'])->name('destroy');
     });
 });
 
@@ -75,6 +135,7 @@ Route::prefix('onboarding')->name('onboarding.')->group(function () {
     Route::get('/sign',            [OnboardingController::class, 'sign'])           ->name('sign')           ->middleware(['payment.complete', 'throttle:20,1']);
     Route::post('/confirm-details',[OnboardingController::class, 'confirmDetails']) ->name('confirm-details')->middleware(['payment.complete', 'throttle:10,1']);
     Route::get('/complete',        [OnboardingController::class, 'complete'])       ->name('complete')       ->middleware('throttle:30,1');
+    Route::post('/resend-invite',  [OnboardingController::class, 'resendInvite'])  ->name('resend-invite')  ->middleware('throttle:3,60');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index')->middleware('signature.complete');
@@ -116,5 +177,15 @@ Route::prefix('founder')->name('founder.')->group(function () {
         });
     });
 });
+
+// Public verification routes — no auth required
+Route::prefix('verify')->name('verify.')->group(function () {
+    Route::get('/sample-unicorn', [VerificationController::class, 'sample'])->name('sample');
+    Route::get('/{slug}', [VerificationController::class, 'show'])->name('show');
+    Route::post('/{slug}/request-access', [VerificationController::class, 'requestAccess'])
+        ->name('request-access')
+        ->middleware('throttle:3,10');
+});
+
 
 require __DIR__.'/auth.php';

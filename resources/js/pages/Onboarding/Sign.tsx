@@ -1,7 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import {
-    CheckCircle, Lock, Loader2, Percent,
+    AlertTriangle, ArrowRight, CheckCircle, Lock, Loader2, Percent,
     RefreshCw, ShieldCheck, XCircle,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -46,6 +46,7 @@ export default function OnboardingSign({
 }: PageProps) {
     const [loaded,   setLoaded]   = useState(false);
     const [complete, setComplete] = useState(false);
+    const [declined, setDeclined] = useState(false);
     const [error,    setError]    = useState(false);
 
     useEffect(() => {
@@ -58,7 +59,7 @@ export default function OnboardingSign({
                 setTimeout(() => router.visit('/onboarding/complete'), 1200);
             }
             if (action === 'onDocumentDeclined' || action === 'documentDeclined') {
-                router.visit('/onboarding/sign');
+                setDeclined(true);
             }
             if (d?.type === 'boldsign' && d?.action === 'error') setError(true);
         }
@@ -83,6 +84,53 @@ export default function OnboardingSign({
                 className="pointer-events-none absolute inset-x-0 top-0 z-0 h-64"
                 style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(37,99,235,0.16) 0%, transparent 100%)' }}
             />
+
+            {/* ── Declined overlay ── */}
+            {declined && (
+                <motion.div
+                    className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[#050505]/97 px-6 backdrop-blur-xl"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <motion.div
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1,   opacity: 1 }}
+                        transition={{ duration: 0.45, ease }}
+                        className="flex h-16 w-16 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10"
+                        style={{ boxShadow: '0 0 48px rgba(245,158,11,0.15)' }}
+                    >
+                        <AlertTriangle className="size-8 text-amber-400" strokeWidth={1.5} />
+                    </motion.div>
+
+                    <motion.div
+                        className="text-center"
+                        initial={{ y: 12, opacity: 0 }}
+                        animate={{ y: 0,  opacity: 1 }}
+                        transition={{ duration: 0.4, ease, delay: 0.15 }}
+                    >
+                        <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-500/70">
+                            Document Declined
+                        </p>
+                        <h2 className="font-display text-[22px] font-semibold text-white">
+                            You declined the agreement
+                        </h2>
+                        <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-white/40">
+                            No problem — you can review your details and sign a fresh copy whenever you're ready.
+                        </p>
+                    </motion.div>
+
+                    <motion.button
+                        initial={{ y: 12, opacity: 0 }}
+                        animate={{ y: 0,  opacity: 1 }}
+                        transition={{ duration: 0.4, ease, delay: 0.25 }}
+                        onClick={() => router.visit(route('onboarding.sign'))}
+                        className="group flex items-center gap-2 rounded-xl bg-white/[0.06] border border-white/[0.1] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.14em] text-white/80 transition-all hover:bg-white/[0.1] hover:text-white"
+                    >
+                        Review &amp; Re-sign
+                        <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                    </motion.button>
+                </motion.div>
+            )}
 
             {/* ── Signed overlay ── */}
             {complete && (

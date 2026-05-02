@@ -1,4 +1,4 @@
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     AlertTriangle,
@@ -105,43 +105,94 @@ function UploadZone({
     onSuccess: () => void;
 }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [category, setCategory] = useState('');
-    const [dragOver, setDragOver] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [category, setCategory]           = useState('');
+    const [dragOver, setDragOver]           = useState(false);
+    const [uploadError, setUploadError]     = useState<string | null>(null);
+    const [processing, setProcessing]       = useState(false);
+    const [progress, setProgress]           = useState(0);
 
-    const { processing, errors, clearErrors } = useForm();
+    function addFiles(incoming: FileList | null) {
+        if (!incoming) return;
+        setUploadError(null);
+        setSelectedFiles((prev) => {
+            const names = new Set(prev.map((f) => f.name + f.size));
+            const next = Array.from(incoming).filter((f) => !names.has(f.name + f.size));
+            return [...prev, ...next];
+        });
+    }
 
-    function handleFileChange(file: File | null) {
-        clearErrors();
-        setSelectedFile(file);
+    function removeFile(index: number) {
+        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     }
 
     function handleDrop(e: React.DragEvent) {
         e.preventDefault();
         setDragOver(false);
-        const file = e.dataTransfer.files[0] ?? null;
-        handleFileChange(file);
+        addFiles(e.dataTransfer.files);
     }
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (!selectedFile || !category) return;
+        if (!selectedFiles.length || !category || processing) return;
+
+        setUploadError(null);
+        setProcessing(true);
+        setProgress(0);
 
         const formData = new FormData();
-        formData.append('file', selectedFile);
+        selectedFiles.forEach((f) => formData.append('files[]', f));
         formData.append('category', category);
 
-        router.post(route('founder.documents.store'), formData, {
-            forceFormData: true,
-            onSuccess: () => {
-                setSelectedFile(null);
+        // Read XSRF-TOKEN cookie — Laravel sets this as a plain (non-HttpOnly) cookie
+        const xsrf = decodeURIComponent(
+            document.cookie.split('; ').find((c) => c.startsWith('XSRF-TOKEN='))?.split('=').slice(1).join('=') ?? ''
+        );
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', route('founder.documents.store'));
+        xhr.setRequestHeader('X-XSRF-TOKEN', xsrf);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.setRequestHeader('Accept', 'application/json');
+
+        xhr.upload.onprogress = (ev) => {
+            if (ev.lengthComputable) setProgress(Math.round((ev.loaded / ev.total) * 100));
+        };
+
+        xhr.onload = () => {
+            setProcessing(false);
+            if (xhr.status >= 200 && xhr.status < 300) {
+                setProgress(100);
+                setSelectedFiles([]);
                 setCategory('');
-                onSuccess();
-            },
-        });
+                setTimeout(() => {
+                    setProgress(0);
+                    router.reload({ only: ['documents', 'can_upload', 'total_count'] });
+                    onSuccess();
+                }, 400);
+            } else {
+                setProgress(0);
+                try {
+                    const body = JSON.parse(xhr.responseText);
+                    const errs = body?.props?.errors ?? body?.errors ?? {};
+                    const msg  = errs.files ?? errs['files.0'] ?? errs['files.1'] ?? body?.message ?? 'Upload failed.';
+                    setUploadError(Array.isArray(msg) ? msg[0] : msg);
+                } catch {
+                    setUploadError('Upload failed. Please try again.');
+                }
+            }
+        };
+
+        xhr.onerror = () => {
+            setProcessing(false);
+            setProgress(0);
+            setUploadError('Network error. Please check your connection and try again.');
+        };
+
+        xhr.send(formData);
     }
 
-    const canSubmit = !!selectedFile && !!category && !processing;
+    const canSubmit = selectedFiles.length > 0 && !!category && !processing;
 
     return (
         <form onSubmit={handleSubmit}>
@@ -154,7 +205,7 @@ function UploadZone({
                 <div
                     role="button"
                     tabIndex={0}
-                    aria-label="Click or drop file to upload"
+                    aria-label="Click or drop files to upload"
                     onClick={() => fileInputRef.current?.click()}
                     onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
                     onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -166,41 +217,76 @@ function UploadZone({
                     ].join(' ')}
                 >
                     <Upload className="mx-auto mb-3 size-12 text-slate-400" aria-hidden="true" />
-                    <p className="text-[14px] font-medium text-white/60">Drop your file here</p>
+                    <p className="text-[14px] font-medium text-white/60">Drop your files here</p>
                     <p className="text-[12px] text-white/30">or click to browse</p>
-                    <p className="mt-2 text-[11px] text-white/20">PDF, Word, Excel, PowerPoint, Images — max 10MB</p>
+                    <p className="mt-2 text-[11px] text-white/20">PDF, Word, Excel, PowerPoint, Images — max 100MB per file</p>
                     <input
                         ref={fileInputRef}
                         type="file"
+                        multiple
                         className="hidden"
                         accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.jpg,.jpeg,.png"
-                        onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
+                        onChange={(e) => addFiles(e.target.files)}
                     />
                 </div>
 
-                {/* Selected file preview */}
-                <AnimatePresence>
-                    {selectedFile && (
+                {/* Selected files list */}
+                <AnimatePresence initial={false}>
+                    {selectedFiles.length > 0 && (
                         <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="mb-4 flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+                            className="mb-4 space-y-2"
                         >
-                            <FileText className="size-4 shrink-0 text-blue-400" aria-hidden="true" />
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-[13px] text-white/70">{selectedFile.name}</p>
-                                <p className="text-[11px] text-white/30">{formatBytes(selectedFile.size)}</p>
+                            {selectedFiles.map((file, i) => (
+                                <div
+                                    key={file.name + file.size + i}
+                                    className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+                                >
+                                    <FileText className="size-4 shrink-0 text-blue-400" aria-hidden="true" />
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-[13px] text-white/70">{file.name}</p>
+                                        <p className="text-[11px] text-white/30">{formatBytes(file.size)}</p>
+                                    </div>
+                                    {!processing && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); removeFile(i); }}
+                                            className="rounded-lg p-1 text-white/30 transition-colors hover:text-white/60"
+                                            aria-label={`Remove ${file.name}`}
+                                        >
+                                            <X className="size-4" aria-hidden="true" />
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Upload progress bar */}
+                <AnimatePresence>
+                    {processing && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="mb-4"
+                        >
+                            <div className="mb-1.5 flex justify-between text-[11px] text-white/30">
+                                <span>Uploading{selectedFiles.length > 1 ? ` ${selectedFiles.length} files` : ''}…</span>
+                                <span>{progress}%</span>
                             </div>
-                            <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); handleFileChange(null); }}
-                                className="rounded-lg p-1 text-white/30 transition-colors hover:text-white/60"
-                                aria-label="Remove selected file"
-                            >
-                                <X className="size-4" aria-hidden="true" />
-                            </button>
+                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                                <motion.div
+                                    className="h-full rounded-full bg-blue-500"
+                                    animate={{ width: `${progress}%` }}
+                                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                                />
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -211,7 +297,7 @@ function UploadZone({
                         <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/30">
                             Document Category
                         </label>
-                        <Select value={category} onValueChange={setCategory}>
+                        <Select value={category} onValueChange={setCategory} disabled={processing}>
                             <SelectTrigger className="rounded-xl border-white/[0.08] bg-white/[0.04] text-white/60 focus:border-blue-500/50">
                                 <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
@@ -239,26 +325,35 @@ function UploadZone({
                                 : 'cursor-not-allowed border border-white/[0.06] text-white/20',
                         ].join(' ')}
                     >
-                        {canSubmit && (
+                        {canSubmit && !processing && (
                             <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
                         )}
                         <span className="relative z-10 flex items-center gap-2">
                             {processing ? (
                                 <>
                                     <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                                    Uploading...
+                                    Uploading…
                                 </>
                             ) : (
-                                'Upload Document →'
+                                <>Upload {selectedFiles.length > 1 ? `${selectedFiles.length} Files` : 'Document'} →</>
                             )}
                         </span>
                     </button>
                 </div>
 
-                {/* Errors */}
-                {errors?.file && (
-                    <p className="mt-3 text-[12px] text-red-400">{errors.file}</p>
-                )}
+                {/* Error */}
+                <AnimatePresence>
+                    {uploadError && (
+                        <motion.p
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            className="mt-3 text-[12px] text-red-400"
+                        >
+                            {uploadError}
+                        </motion.p>
+                    )}
+                </AnimatePresence>
             </div>
         </form>
     );

@@ -58,6 +58,11 @@ class Payment extends Model
         return $this->hasMany(PaymentLog::class);
     }
 
+    public function founderProfile(): HasOne
+    {
+        return $this->hasOne(FounderProfile::class);
+    }
+
     public function log(string $event, array $metadata = [], ?string $ip = null): void
     {
         // request() may not exist in queue/console context — coalesce safely

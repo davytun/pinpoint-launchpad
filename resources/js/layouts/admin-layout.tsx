@@ -1,0 +1,275 @@
+import { Link, router, usePage } from '@inertiajs/react';
+import {
+    Award,
+    DollarSign,
+    LayoutDashboard,
+    LogOut,
+    Menu,
+    MessageSquare,
+    Settings,
+    UserCog,
+    Users,
+    X,
+} from 'lucide-react';
+import { ReactNode, useEffect, useState } from 'react';
+
+interface AdminUser {
+    id: number;
+    name: string;
+    email: string;
+    role: 'superadmin' | 'analyst' | 'support';
+}
+
+interface AdminLayoutProps {
+    children: ReactNode;
+}
+
+const roleBadge: Record<string, { label: string; className: string }> = {
+    superadmin: { label: 'Super Admin', className: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' },
+    analyst:    { label: 'Analyst',     className: 'bg-blue-500/20 text-blue-400 border border-blue-500/30' },
+    support:    { label: 'Support',     className: 'bg-slate-500/20 text-slate-400 border border-slate-500/30' },
+};
+
+function NavItem({
+    href,
+    icon: Icon,
+    label,
+    active,
+    badge,
+    onClick,
+}: {
+    href: string;
+    icon: React.ElementType;
+    label: string;
+    active: boolean;
+    badge?: number;
+    onClick?: () => void;
+}) {
+    return (
+        <Link
+            href={href}
+            onClick={onClick}
+            className={[
+                'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                active
+                    ? 'bg-white/[0.07] text-white before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:rounded-full before:bg-blue-500'
+                    : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200',
+            ].join(' ')}
+        >
+            <Icon className={`size-[18px] shrink-0 transition-colors ${active ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
+            <span className="flex-1 truncate">{label}</span>
+            {badge != null && badge > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1.5 text-[10px] font-bold text-white">
+                    {badge > 99 ? '99+' : badge}
+                </span>
+            )}
+        </Link>
+    );
+}
+
+function NavSection({ label }: { label: string }) {
+    return (
+        <p className="mb-1 mt-4 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-600 first:mt-0">
+            {label}
+        </p>
+    );
+}
+
+function SidebarContent({
+    user,
+    role,
+    isSuperAdmin,
+    isAnalyst,
+    isSupport,
+    unreadMessages,
+    isActive,
+    logout,
+    onNav,
+}: {
+    user: AdminUser | null;
+    role: string;
+    isSuperAdmin: boolean;
+    isAnalyst: boolean;
+    isSupport: boolean;
+    unreadMessages: number;
+    isActive: (path: string) => boolean;
+    logout: () => void;
+    onNav?: () => void;
+}) {
+    const badge = roleBadge[role] ?? roleBadge.support;
+
+    return (
+        <div className="flex h-full flex-col">
+            {/* Wordmark */}
+            <div className="flex items-center gap-3 border-b border-white/[0.06] px-5 py-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600/20">
+                    <span className="text-sm font-black text-blue-400">P</span>
+                </div>
+                <div className="min-w-0">
+                    <p className="truncate text-sm font-bold tracking-tight text-white">Pinpoint</p>
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${badge.className}`}>
+                        {badge.label}
+                    </span>
+                </div>
+            </div>
+
+            {/* Nav */}
+            <nav className="flex-1 overflow-y-auto px-3 py-4">
+                <NavSection label="Main" />
+                <NavItem href="/admin"          icon={LayoutDashboard} label="Dashboard" active={isActive('/admin')}          onClick={onNav} />
+                <NavItem href="/admin/messages" icon={MessageSquare}   label="Messages"  active={isActive('/admin/messages')} onClick={onNav} badge={unreadMessages} />
+
+                {(isSuperAdmin || isSupport) && (
+                    <>
+                        <NavSection label="Operations" />
+                        <NavItem href="/admin/waitlist" icon={Users} label="Waitlist" active={isActive('/admin/waitlist')} onClick={onNav} />
+                    </>
+                )}
+
+                {(isSuperAdmin || isAnalyst) && (
+                    <>
+                        {!isSuperAdmin && <NavSection label="Audits" />}
+                        <NavItem href="/admin/founders" icon={Users}  label="Founders" active={isActive('/admin/founders')} onClick={onNav} />
+                        <NavItem href="/admin/profiles" icon={Award}  label="Profiles" active={isActive('/admin/profiles')} onClick={onNav} />
+                    </>
+                )}
+
+                {isSuperAdmin && (
+                    <>
+                        <NavSection label="Admin" />
+                        <NavItem href="/admin/revenue"  icon={DollarSign} label="Revenue"  active={isActive('/admin/revenue')}  onClick={onNav} />
+                        <NavItem href="/admin/users"    icon={UserCog}    label="Team"     active={isActive('/admin/users')}    onClick={onNav} />
+                        <NavItem href="/admin/settings" icon={Settings}   label="Settings" active={isActive('/admin/settings')} onClick={onNav} />
+                    </>
+                )}
+            </nav>
+
+            {/* User footer */}
+            <div className="border-t border-white/[0.06] px-4 py-3">
+                <div className="mb-2 flex items-center gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-xs font-bold text-white uppercase">
+                        {user?.name?.[0] ?? '?'}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-white leading-tight">{user?.name ?? '—'}</p>
+                        <p className="truncate text-[11px] text-slate-500 leading-tight">{user?.email ?? ''}</p>
+                    </div>
+                </div>
+                <button
+                    onClick={logout}
+                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-white/[0.04] hover:text-slate-300"
+                >
+                    <LogOut className="size-3.5" />
+                    Sign out
+                </button>
+            </div>
+        </div>
+    );
+}
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
+    const { auth, admin_unread_messages } = usePage<{
+        auth: { user: AdminUser };
+        admin_unread_messages?: number;
+    }>().props;
+
+    const user = auth?.user ?? null;
+    const currentUrl = usePage().url as string;
+    const role = user?.role ?? 'support';
+    const unreadMessages = admin_unread_messages ?? 0;
+
+    const isSuperAdmin = role === 'superadmin';
+    const isAnalyst    = role === 'analyst';
+    const isSupport    = role === 'support';
+
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Close sidebar on route change
+    useEffect(() => {
+        setSidebarOpen(false);
+    }, [currentUrl]);
+
+    // Prevent body scroll when sidebar open on mobile
+    useEffect(() => {
+        if (sidebarOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; };
+    }, [sidebarOpen]);
+
+    function logout() {
+        router.post('/logout');
+    }
+
+    function isActive(path: string) {
+        if (path === '/admin' || path === '/admin/') {
+            return currentUrl === '/admin' || currentUrl === '/admin/';
+        }
+        return currentUrl === path || currentUrl.startsWith(path + '/') || currentUrl.startsWith(path + '?');
+    }
+
+    const sidebarProps = { user, role, isSuperAdmin, isAnalyst, isSupport, unreadMessages, isActive, logout };
+
+    return (
+        <div className="flex min-h-screen bg-[#050505] text-white antialiased">
+
+            {/* ── Desktop sidebar (always visible ≥ lg) ───────────────────── */}
+            <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-white/[0.06] bg-[#0A0A0A] lg:flex">
+                <SidebarContent {...sidebarProps} />
+            </aside>
+
+            {/* ── Mobile sidebar drawer ────────────────────────────────────── */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 z-50 lg:hidden"
+                    aria-modal="true"
+                >
+                    {/* Backdrop */}
+                    <div
+                        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                        onClick={() => setSidebarOpen(false)}
+                    />
+                    {/* Drawer */}
+                    <aside className="absolute inset-y-0 left-0 flex w-72 flex-col border-r border-white/[0.06] bg-[#0A0A0A] shadow-2xl">
+                        <button
+                            onClick={() => setSidebarOpen(false)}
+                            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-white/[0.06] hover:text-white"
+                        >
+                            <X className="size-4" />
+                        </button>
+                        <SidebarContent {...sidebarProps} onNav={() => setSidebarOpen(false)} />
+                    </aside>
+                </div>
+            )}
+
+            {/* ── Main content ─────────────────────────────────────────────── */}
+            <main className="flex min-h-screen flex-1 flex-col lg:ml-60">
+
+                {/* Mobile top bar */}
+                <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-white/[0.06] bg-[#0A0A0A]/90 px-4 backdrop-blur-md lg:hidden">
+                    <button
+                        onClick={() => setSidebarOpen(true)}
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] text-slate-400 hover:text-white"
+                        aria-label="Open menu"
+                    >
+                        <Menu className="size-5" />
+                    </button>
+                    <span className="text-sm font-bold text-white">Pinpoint Admin</span>
+                    {unreadMessages > 0 && (
+                        <Link href="/admin/messages" className="ml-auto flex items-center gap-1.5 rounded-full bg-blue-600/20 px-2.5 py-1 text-[11px] font-bold text-blue-400">
+                            <MessageSquare className="size-3.5" />
+                            {unreadMessages}
+                        </Link>
+                    )}
+                </header>
+
+                {/* Page content */}
+                <div className="flex-1">
+                    {children}
+                </div>
+            </main>
+        </div>
+    );
+}

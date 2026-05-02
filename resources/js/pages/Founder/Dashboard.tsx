@@ -64,6 +64,7 @@ interface PageProps {
     payment?: { tier: string; total_amount: number; paid_at?: string | null } | null;
     signature?: { status: string; signed_at?: string | null } | null;
     verification_url?: string | null;
+    profile_is_live?: boolean;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -200,7 +201,7 @@ export default function FounderDashboard({
     founder, score, score_band, pillar_scores,
     score_band_message, tier, tier_features,
     audit_status, audit_status_config,
-    payment,
+    payment, verification_url, profile_is_live,
 }: PageProps) {
     const [accountOpen, setAccountOpen] = useState(false);
 
@@ -489,17 +490,43 @@ export default function FounderDashboard({
                             <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-blue-500/10">
                                 <ExternalLink className="size-4 text-blue-400" aria-hidden="true" />
                             </div>
-                            <h3 className="mb-1 text-[14px] font-semibold text-white">Your Investor Page</h3>
+                            <div className="mb-1 flex items-center gap-2">
+                                <h3 className="text-[14px] font-semibold text-white">Your Investor Page</h3>
+                                {profile_is_live && (
+                                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+                                        LIVE
+                                    </span>
+                                )}
+                            </div>
                             <p className="mb-4 text-[12px] leading-relaxed text-white/30">
-                                Your public verification page goes live once your audit is complete.
+                                {profile_is_live
+                                    ? 'Your verification page is live and visible to investors.'
+                                    : verification_url
+                                    ? 'Your audit is in progress. Your page will go live once complete.'
+                                    : 'Your public verification page goes live once your audit is complete.'}
                             </p>
-                            <a
-                                href="/verify/sample-unicorn"
-                                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/[0.1] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/60 transition-all duration-200 hover:border-white/20 hover:text-white"
-                            >
-                                <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
-                                <span className="relative z-10">Preview Sample →</span>
-                            </a>
+                            {profile_is_live && verification_url ? (
+                                <a
+                                    href={verification_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-emerald-400 transition-all duration-200 hover:border-emerald-500/50 hover:text-emerald-300"
+                                >
+                                    <span className="relative z-10">View My Investor Page →</span>
+                                </a>
+                            ) : verification_url ? (
+                                <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-white/[0.06] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/20">
+                                    Audit In Progress
+                                </span>
+                            ) : (
+                                <a
+                                    href="/verify/sample-unicorn"
+                                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/[0.1] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/60 transition-all duration-200 hover:border-white/20 hover:text-white"
+                                >
+                                    <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
+                                    <span className="relative z-10">Preview Sample →</span>
+                                </a>
+                            )}
                         </div>
                     </div>
                 </FadeUp>

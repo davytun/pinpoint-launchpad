@@ -29,7 +29,7 @@ class DocumentService
         'pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'jpg', 'jpeg', 'png',
     ];
 
-    private const MAX_SIZE = 10485760; // 10MB
+    private const MAX_SIZE = 104857600; // 100MB
 
     public function validateFile(UploadedFile $file): void
     {

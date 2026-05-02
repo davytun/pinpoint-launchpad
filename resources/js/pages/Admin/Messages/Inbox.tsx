@@ -1,6 +1,8 @@
 import { Head, Link } from '@inertiajs/react';
 import { Inbox, MessageSquare } from 'lucide-react';
 
+import AdminLayout from '@/layouts/admin-layout';
+
 interface Thread {
     id: number;
     founder_name: string | null;
@@ -29,10 +31,10 @@ function getInitials(name?: string | null): string {
 
 export default function AdminMessagesInbox({ threads, total_unread }: PageProps) {
     return (
-        <>
+        <AdminLayout>
             <Head title="Message Inbox — Admin" />
 
-            <div className="min-h-screen bg-[#050505] px-6 py-8 text-white antialiased">
+            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-4xl">
 
                     {/* Header */}
@@ -112,6 +114,6 @@ export default function AdminMessagesInbox({ threads, total_unread }: PageProps)
                     )}
                 </div>
             </div>
-        </>
+        </AdminLayout>
     );
 }

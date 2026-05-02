@@ -44,10 +44,16 @@ class FounderMessageController extends Controller
             ]);
 
         return Inertia::render('Founder/Messages/Index', [
-            'messages'      => $messages,
-            'thread_id'     => $thread->id,
-            'founder_name'  => $founder->full_name,
-            'unread_count'  => 0,
+            'messages'     => $messages,
+            'thread_id'    => $thread->id,
+            'founder_name' => $founder->full_name,
+            'unread_count' => 0,
+            'founder'      => [
+                'id'           => $founder->id,
+                'email'        => $founder->email,
+                'full_name'    => $founder->full_name,
+                'company_name' => $founder->company_name,
+            ],
         ]);
     }
 

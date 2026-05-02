@@ -57,40 +57,65 @@ class FounderDocumentController extends Controller
         ]);
     }
 
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
         $request->validate([
-            'file'     => ['required', 'file'],
+            'files'    => ['required', 'array', 'min:1'],
+            'files.*'  => ['file'],
             'category' => ['required', 'in:cap_table,financial_forecast,bank_statement,pitch_deck,articles_of_incorporation,ip_assignment,customer_contracts,unit_economics,other'],
         ]);
 
         $founder = Auth::guard('founder')->user()->load('payment');
 
-        if ($founder->documents()->count() >= 20) {
-            return back()->withErrors(['file' => 'You have reached the maximum of 20 documents.']);
-        }
-
         if ($founder->payment?->audit_status === 'complete') {
-            return back()->withErrors(['file' => 'Your audit is complete. No further documents can be uploaded.']);
+            return $this->uploadError('Your audit is complete. No further documents can be uploaded.', $request);
         }
 
-        try {
-            $this->documents->validateFile($request->file('file'));
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return back()->withErrors($e->errors());
+        $currentCount = $founder->documents()->count();
+        $incoming     = count($request->file('files'));
+
+        if ($currentCount >= 20) {
+            return $this->uploadError('You have reached the maximum of 20 documents.', $request);
         }
 
-        $document = $this->documents->store(
-            $request->file('file'),
-            $founder,
-            $request->input('category')
-        );
+        if ($currentCount + $incoming > 20) {
+            return $this->uploadError('Only ' . (20 - $currentCount) . ' more document(s) can be uploaded.', $request);
+        }
 
-        Mail::to(config('mail.admin_address'))->queue(
-            new DocumentUploadedMail($founder, $document)
-        );
+        $uploaded = 0;
+        foreach ($request->file('files') as $file) {
+            try {
+                $this->documents->validateFile($file);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $msg = collect($e->errors())->flatten()->first() ?? 'Invalid file.';
+                return $this->uploadError($msg, $request);
+            }
 
-        return back()->with('success', 'Document uploaded successfully.');
+            $document = $this->documents->store($file, $founder, $request->input('category'));
+
+            Mail::to(config('mail.admin_address'))->queue(
+                new DocumentUploadedMail($founder, $document)
+            );
+
+            $uploaded++;
+        }
+
+        $msg = $uploaded === 1 ? 'Document uploaded successfully.' : "{$uploaded} documents uploaded successfully.";
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $msg]);
+        }
+
+        return back()->with('success', $msg);
+    }
+
+    private function uploadError(string $message, Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['errors' => ['files' => $message]], 422);
+        }
+
+        return back()->withErrors(['files' => $message]);
     }
 
     public function download(FounderDocument $document): StreamedResponse

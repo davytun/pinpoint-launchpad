@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'role'               => \App\Http\Middleware\EnsureUserHasRole::class,
+            'require.role'       => \App\Http\Middleware\RequireRole::class,
             'payment.complete'   => \App\Http\Middleware\EnsurePaymentComplete::class,
             'signature.complete' => \App\Http\Middleware\EnsureSignatureComplete::class,
             'auth.founder'       => \App\Http\Middleware\EnsureFounderAuthenticated::class,

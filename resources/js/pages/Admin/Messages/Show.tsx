@@ -1,6 +1,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
+import AdminLayout from '@/layouts/admin-layout';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ExternalLink, FileText, MessageSquare, Paperclip, Send, X } from 'lucide-react';
+import { ArrowLeft, FileText, MessageSquare, Paperclip, Send, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Textarea } from '@/components/ui/textarea';
@@ -129,11 +130,11 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
     }
 
     return (
-        <>
+        <AdminLayout>
             <Head title={`${founder.company_name ?? founder.full_name} — Messages`} />
 
-            <div className="min-h-screen bg-[#050505] text-white antialiased">
-                <div className="mx-auto max-w-6xl px-6 py-8">
+            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+                <div className="mx-auto max-w-6xl">
 
                     {/* Back link */}
                     <Link
@@ -328,6 +329,6 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                     </div>
                 </div>
             </div>
-        </>
+        </AdminLayout>
     );
 }

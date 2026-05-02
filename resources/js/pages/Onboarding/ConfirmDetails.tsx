@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Building2, Lock, Loader2, Mail, User } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Building2, Lock, Loader2, Mail, User } from 'lucide-react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 interface PageProps {
     email:      string;
     tier_label: string;
+    info?:      string | null;
 }
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
@@ -51,7 +52,7 @@ function Field({
     );
 }
 
-export default function ConfirmDetails({ email, tier_label }: PageProps) {
+export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
     const { data, setData, post, processing, errors } = useForm({
         full_name:    '',
         company_name: '',
@@ -168,6 +169,16 @@ export default function ConfirmDetails({ email, tier_label }: PageProps) {
                                 These details appear on your signed warrant — enter them exactly as they should read legally.
                             </p>
                         </div>
+
+                        {info && (
+                            <motion.div
+                                {...fadeUp(0.12)}
+                                className="mb-5 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3"
+                            >
+                                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" />
+                                <p className="text-[13px] leading-relaxed text-amber-300">{info}</p>
+                            </motion.div>
+                        )}
 
                         <form onSubmit={submit} className="space-y-5">
                             <Field

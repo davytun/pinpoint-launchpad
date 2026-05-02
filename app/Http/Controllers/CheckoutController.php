@@ -208,7 +208,20 @@ class CheckoutController extends Controller
                 'url_ref'     => $reference,
                 'ip'          => $request->ip(),
             ]);
-            abort(403, 'Reference mismatch or missing session reference');
+            return redirect()->route('checkout.index')
+                ->with('error', 'Session expired. Please try again.');
+        }
+
+        // Already paid — skip Paystack API call entirely and go straight to render
+        if ($payment->status === 'paid') {
+            $request->session()->put('payment_id', $payment->id);
+            $request->session()->forget('pending_payment_reference');
+
+            return Inertia::render('Checkout/Success', [
+                'tier_label'   => ucfirst($payment->tier),
+                'total_amount' => $payment->total_amount,
+                'email'        => $payment->customer_email,
+            ]);
         }
 
         $payment->log('verification_attempted');

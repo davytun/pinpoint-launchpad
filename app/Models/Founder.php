@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\User;
 
 class Founder extends Authenticatable
 {
@@ -81,5 +82,20 @@ class Founder extends Authenticatable
     public function messageThread(): HasOne
     {
         return $this->hasOne(MessageThread::class);
+    }
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(FounderProfile::class);
+    }
+
+    public function auditAssignment(): HasOne
+    {
+        return $this->hasOne(AuditAssignment::class);
+    }
+
+    public function assignedAnalyst(): ?User
+    {
+        return $this->auditAssignment?->analyst;
     }
 }

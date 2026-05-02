@@ -92,6 +92,12 @@ class AdminMessageController extends Controller
 
     public function reply(Request $request, MessageThread $thread): RedirectResponse
     {
+        $user = Auth::user();
+
+        if ($user->isAnalyst() && !$user->canAccessFounder($thread->founder_id)) {
+            abort(403, 'You are not assigned to this founder.');
+        }
+
         $request->validate([
             'body'       => ['nullable', 'string', 'max:2000'],
             'attachment' => ['nullable', 'file'],

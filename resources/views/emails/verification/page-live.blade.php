@@ -35,7 +35,7 @@
       <td align="center">
         <a href="{{ $verificationUrl }}"
            style="display:inline-block;background-color:#2563EB;color:#ffffff;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 28px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;">
-          View My Investor Page &rarr;
+          View My Investor Page
         </a>
       </td>
     </tr>
@@ -45,16 +45,16 @@
     What's on your page:
   </p>
   <p style="margin:0 0 4px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    &rarr; Your verified PARAGON score
+    &bull; Your verified PARAGON score
   </p>
   <p style="margin:0 0 4px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    &rarr; Analyst executive summary
+    &bull; Analyst executive summary
   </p>
   <p style="margin:0 0 4px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    &rarr; Verified badges for audited areas
+    &bull; Verified badges for audited areas
   </p>
   <p style="margin:0 0 20px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    &rarr; Gated data room for serious investors
+    &bull; Gated data room for serious investors
   </p>
 
   <p style="margin:0;font-size:13px;color:#94A3B8;font-family:Arial,Helvetica,sans-serif;">

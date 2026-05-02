@@ -20,16 +20,7 @@ export const HARMONY_OFFSETS: Record<string, number[]> = {
   monochromatic: [],
 };
 
-const PRESETS: Record<string, { primary: string; neutral: string; radius: number; font: string }> = {
-  fintech: { primary: '#2563EB', neutral: '#64748B', radius: 8, font: 'Inter' },
-  healthcare: { primary: '#059669', neutral: '#6B7280', radius: 12, font: 'Source Sans Pro' },
-  ecommerce: { primary: '#DC2626', neutral: '#78716C', radius: 8, font: 'Poppins' },
-  saas: { primary: '#7C3AED', neutral: '#6B7280', radius: 12, font: 'Inter' },
-  education: { primary: '#2563EB', neutral: '#9CA3AF', radius: 16, font: 'Nunito' },
-  gaming: { primary: '#EF4444', neutral: '#374151', radius: 4, font: 'Orbitron' },
-  luxury: { primary: '#1E293B', neutral: '#94A3B8', radius: 0, font: 'Playfair Display' },
-  startup: { primary: '#8B5CF6', neutral: '#6B7280', radius: 12, font: 'DM Sans' },
-};
+
 
 // --- Color Utils ---
 
@@ -41,7 +32,8 @@ export function hexToHsl(hex: string): [number, number, number] {
 
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
-  let h = 0, s = 0, l = (max + min) / 2;
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
 
   if (max !== min) {
     const d = max - min;
@@ -126,7 +118,7 @@ export function generateTypographyScale(basePx: number = 16, ratio: number = 1.2
 }
 
 export function generateColorScale(hex: string, name: string) {
-  const [h, s, _] = hexToHsl(hex);
+  const [h, s] = hexToHsl(hex);
   const lightnessSteps: Record<number, number> = {
     50: 97, 100: 94, 200: 86, 300: 77, 400: 66,
     500: 50, 600: 41, 700: 35, 800: 27, 900: 20, 950: 12,

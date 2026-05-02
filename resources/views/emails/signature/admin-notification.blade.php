@@ -54,8 +54,8 @@
           Action Required
         </p>
         <table cellpadding="0" cellspacing="0" border="0">
-          <tr><td style="padding:3px 0;font-size:13px;color:#78350F;font-family:Arial,Helvetica,sans-serif;">→ Assign an analyst and begin the audit process.</td></tr>
-          <tr><td style="padding:3px 0;font-size:13px;color:#78350F;font-family:Arial,Helvetica,sans-serif;">→ Update audit_status to "in_progress" once work begins.</td></tr>
+          <tr><td style="padding:3px 0;font-size:13px;color:#78350F;font-family:Arial,Helvetica,sans-serif;">&bull; Assign an analyst and begin the audit process.</td></tr>
+          <tr><td style="padding:3px 0;font-size:13px;color:#78350F;font-family:Arial,Helvetica,sans-serif;">&bull; Update audit_status to "in_progress" once work begins.</td></tr>
         </table>
       </td>
     </tr>

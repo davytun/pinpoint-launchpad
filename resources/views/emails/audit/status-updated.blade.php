@@ -16,7 +16,7 @@
       <td style="background-color:#2563EB;border-radius:6px;">
         <a href="{{ $ctaUrl }}"
            style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;">
-          {{ $ctaText }} →
+          {{ $ctaText }}
         </a>
       </td>
     </tr>

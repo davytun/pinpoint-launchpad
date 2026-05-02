@@ -28,7 +28,7 @@
       <td style="background-color:#2563EB;border-radius:6px;">
         <a href="{{ $profileUrl }}"
            style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;">
-          View Founder Profile →
+          View Founder Profile
         </a>
       </td>
     </tr>

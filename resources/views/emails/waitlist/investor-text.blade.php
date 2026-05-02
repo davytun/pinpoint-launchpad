@@ -6,10 +6,10 @@ Pinpoint is building the infrastructure layer between serious investors and pre-
 
 AS A PRIORITY ACCESS MEMBER
 ────────────────────────────
-  [→]  Early access to vetted founder profiles before public launch
-  [→]  Filter by stage, sector, geography, and funding ask
-  [→]  Direct contact — no intermediaries, no cold outreach noise
-  [→]  A founder matching brief you can set once and update any time
+  [*]  Early access to vetted founder profiles before public launch
+  [*]  Filter by stage, sector, geography, and funding ask
+  [*]  Direct contact — no intermediaries, no cold outreach noise
+  [*]  A founder matching brief you can set once and update any time
 
 We know your time is spent filtering noise. Pinpoint is built to bring you signal. We will reach out shortly for a 15-minute briefing to ensure our audit criteria align with your firm's specific mandate.
 

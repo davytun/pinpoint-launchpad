@@ -55,7 +55,7 @@
                 style="{{ $loop->last ? '' : 'margin-bottom:12px;' }}">
             <tr>
                 <td width="28" valign="top" style="padding-top:1px;">
-                    <span style="display:inline-block;width:18px;height:18px;background-color:#3c53a8;border-radius:3px;text-align:center;line-height:18px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;color:#ffffff;">→</span>
+                    <span style="display:inline-block;width:18px;height:18px;background-color:#3c53a8;border-radius:3px;text-align:center;line-height:18px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;color:#ffffff;">&bull;</span>
                 </td>
                 <td style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#c8c8c8;line-height:1.55;">
                     {{ $item }}
@@ -73,7 +73,7 @@
         <td style="border-radius:6px;background:linear-gradient(135deg,#3c53a8 0%,#5ca336 100%);">
             <a href="{{ url('/checkout') }}"
                style="display:inline-block;padding:14px 32px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.03em;">
-                Secure Your Place →
+                Secure Your Place
             </a>
         </td>
     </tr>

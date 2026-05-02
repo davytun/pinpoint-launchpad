@@ -5,6 +5,7 @@ import {
     Lock,
     Loader2,
     Shield,
+    ArrowRight,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -272,7 +273,10 @@ function AccessRequestModal({
                             {submitting ? (
                                 <><Loader2 className="size-4 animate-spin" /> Submitting...</>
                             ) : (
-                                'Submit Request →'
+                                <>
+                                    Submit Request
+                                    <ArrowRight className="size-4" />
+                                </>
                             )}
                         </button>
                     </form>

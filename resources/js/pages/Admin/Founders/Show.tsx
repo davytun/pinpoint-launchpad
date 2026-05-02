@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, FileText, MessageSquare, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, FileText, MessageSquare, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
@@ -338,7 +338,10 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                     href={route('admin.messages.show', { thread: message_thread.id })}
                                     className="mt-4 inline-block rounded-xl border border-[#4468BB]/30 bg-[#1B294B] px-5 py-2 text-sm font-bold text-[#4468BB] hover:bg-[#4468BB]/20 transition-colors"
                                 >
-                                    Open Thread →
+                                    <span className="flex items-center gap-2">
+                                        Open Thread
+                                        <ArrowRight className="size-4" />
+                                    </span>
                                 </Link>
                             </>
                         ) : (
@@ -359,12 +362,18 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                 <Field label="Slug"      value={<span className="font-mono text-xs">{profile.slug}</span>} />
                                 <div className="flex gap-3 pt-2">
                                     <a href={`/verify/${profile.slug}`} target="_blank" rel="noopener noreferrer"
-                                        className="rounded-xl border border-[#232C43] px-4 py-2 text-xs text-[#788CBA] hover:bg-[#1B294B] hover:text-[#ECF0F9] transition-colors">
-                                        View Public Page →
+                                        className="group rounded-xl border border-[#232C43] px-4 py-2 text-xs text-[#788CBA] hover:bg-[#1B294B] hover:text-[#ECF0F9] transition-colors">
+                                        <span className="flex items-center gap-1.5">
+                                            View Public Page
+                                            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+                                        </span>
                                     </a>
                                     <Link href={route('admin.profiles.show', { profile: profile.id })}
-                                        className="rounded-xl border border-[#4468BB]/30 bg-[#1B294B] px-4 py-2 text-xs font-bold text-[#4468BB] hover:bg-[#4468BB]/20 transition-colors">
-                                        Edit Profile →
+                                        className="group rounded-xl border border-[#4468BB]/30 bg-[#1B294B] px-4 py-2 text-xs font-bold text-[#4468BB] hover:bg-[#4468BB]/20 transition-colors">
+                                        <span className="flex items-center gap-1.5">
+                                            Edit Profile
+                                            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+                                        </span>
                                     </Link>
                                 </div>
                             </div>

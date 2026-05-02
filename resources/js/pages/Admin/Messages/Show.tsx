@@ -1,7 +1,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/layouts/admin-layout';
 import { motion } from 'framer-motion';
-import { ArrowLeft, FileText, MessageSquare, Paperclip, Send, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, MessageSquare, Paperclip, Send, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Textarea } from '@/components/ui/textarea';
@@ -160,10 +160,13 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                 <div className="flex flex-col gap-2">
                                     <Link
                                         href={`/admin/founders/${founder.id}/documents`}
-                                        className="flex items-center gap-2 rounded-lg border border-[#232C43] px-3 py-2 text-xs text-[#788CBA] transition-colors hover:border-[#4468BB]/30 hover:bg-[#1B294B] hover:text-[#ECF0F9]"
+                                        className="group flex items-center gap-2 rounded-lg border border-[#232C43] px-3 py-2 text-xs text-[#788CBA] transition-colors hover:border-[#4468BB]/30 hover:bg-[#1B294B] hover:text-[#ECF0F9]"
                                     >
                                         <FileText className="size-3.5 shrink-0" />
-                                        View Documents →
+                                        <span className="flex items-center gap-1.5">
+                                            View Documents
+                                            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+                                        </span>
                                     </Link>
                                 </div>
                             </div>

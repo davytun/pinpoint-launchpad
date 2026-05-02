@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function Expired() {
     return (
@@ -13,9 +13,10 @@ export default function Expired() {
                 </p>
                 <Link
                     href="/waitlist"
-                    className="text-sm text-[#576FA8] hover:text-[#ECF0F9]"
+                    className="group flex items-center gap-1.5 text-sm text-[#576FA8] hover:text-[#ECF0F9]"
                 >
-                    Learn about Pinpoint &rarr;
+                    Learn about Pinpoint
+                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
             </div>
         </>

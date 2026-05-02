@@ -1,6 +1,6 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { Lock } from 'lucide-react';
+import { ArrowRight, Lock } from 'lucide-react';
 
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,59 +13,12 @@ interface PageProps {
     blurred_score: number;
 }
 
-// ─── Blurred hexagon placeholder ──────────────────────────────────────────────
 
-function BlurredRadar() {
-    const cx = 100, cy = 100, r = 72;
-    const count = 7;
-
-    function pt(i: number, radius: number): string {
-        const angle = (Math.PI * 2 * i) / count - Math.PI / 2;
-        return `${cx + radius * Math.cos(angle)},${cy + radius * Math.sin(angle)}`;
-    }
-
-    const gridLevels = [0.3, 0.55, 0.8, 1.0];
-    const dataRadii  = [0.55, 0.75, 0.45, 0.85, 0.65, 0.5, 0.7];
-    const dataPath   = Array.from({ length: count })
-        .map((_, i) => `${i === 0 ? 'M' : 'L'}${pt(i, r * dataRadii[i])}`)
-        .join(' ') + ' Z';
-
-    return (
-        <svg
-            viewBox="0 0 200 200"
-            className="w-full max-w-[180px]"
-            aria-hidden="true"
-            style={{ filter: 'blur(8px)', opacity: 0.35 }}
-        >
-            {gridLevels.map((level, li) => {
-                const path = Array.from({ length: count })
-                    .map((_, i) => `${i === 0 ? 'M' : 'L'}${pt(i, r * level)}`)
-                    .join(' ') + ' Z';
-                return <path key={li} d={path} fill="none" stroke="#232C43" strokeWidth="1" />;
-            })}
-            {Array.from({ length: count }).map((_, i) => {
-                const [lx, ly] = pt(i, r).split(',').map(Number);
-                return (
-                    <line
-                        key={i}
-                        x1={cx} y1={cy}
-                        x2={lx} y2={ly}
-                        stroke="#232C43"
-                        opacity={0.5}
-                        strokeWidth="1"
-                    />
-                );
-            })}
-            <path d={dataPath} fill="rgba(68,104,187,0.25)" stroke="#4468BB" strokeWidth="1.5" />
-        </svg>
-    );
-}
 
 // ─── Page ───────────────────────────────────────────────────────────────────────
 
 export default function EmailGate({ blurred_score }: PageProps) {
-    const { props } = usePage();
-    const flash = (props as any).flash;
+    const { flash } = usePage<{ flash: { error?: string } }>().props;
     const form = useForm({ email: '' });
 
     function submit(e: React.FormEvent) {
@@ -111,25 +64,22 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                     Enter your email to unlock your full diagnostic and radar chart.
                                 </p>
 
-                                {/* Blurred score + lock overlay */}
-                                <div className="relative mb-2 flex select-none flex-col items-center">
+                                {/* Blurred score with focus state */}
+                                <div className="relative mb-8 flex select-none flex-col items-center">
                                     <span
-                                        className="font-sans text-[5.5rem] font-black leading-none text-[#ECF0F9]"
-                                        style={{ filter: 'blur(12px)', opacity: 0.65 }}
+                                        className="font-sans text-[6rem] font-black leading-none text-[#ECF0F9]"
+                                        style={{ filter: 'blur(16px)', opacity: 0.5 }}
                                         aria-hidden="true"
                                     >
                                         {String(blurred_score).padStart(2, '0')}
                                     </span>
-                                    {/* Lock overlay */}
+                                    {/* Reveal hint */}
                                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-                                        <Lock className="size-5 text-[#788CBA]" />
-                                        <span className="text-xs font-medium text-[#788CBA]">Unlock to reveal</span>
+                                        <Lock className="size-5 text-[#4468BB]" />
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#4468BB]">
+                                            Analysis Locked
+                                        </span>
                                     </div>
-                                </div>
-
-                                {/* Blurred radar */}
-                                <div className="mt-2 flex items-center justify-center">
-                                    <BlurredRadar />
                                 </div>
                             </CardContent>
 
@@ -183,7 +133,10 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                                     Unlocking…
                                                 </>
                                             ) : (
-                                                'Unlock My Results →'
+                                                <>
+                                                    Unlock My Results
+                                                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                                                </>
                                             )}
                                         </span>
                                     </button>

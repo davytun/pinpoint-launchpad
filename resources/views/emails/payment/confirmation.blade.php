@@ -71,9 +71,9 @@
     To begin your analyst-led audit, please sign the Success Fee and Confidentiality Agreement. This document:
   </p>
   <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;">
-    <tr><td style="padding:3px 0;font-size:14px;color:#374151;font-family:Arial,Helvetica,sans-serif;">→ Protects your trade secrets during the audit</td></tr>
-    <tr><td style="padding:3px 0;font-size:14px;color:#374151;font-family:Arial,Helvetica,sans-serif;">→ Confirms your place in the PIN Network</td></tr>
-    <tr><td style="padding:3px 0;font-size:14px;color:#374151;font-family:Arial,Helvetica,sans-serif;">→ Authorises our team to verify your financials</td></tr>
+    <tr><td style="padding:3px 0;font-size:14px;color:#374151;font-family:Arial,Helvetica,sans-serif;">&bull; Protects your trade secrets during the audit</td></tr>
+    <tr><td style="padding:3px 0;font-size:14px;color:#374151;font-family:Arial,Helvetica,sans-serif;">&bull; Confirms your place in the PIN Network</td></tr>
+    <tr><td style="padding:3px 0;font-size:14px;color:#374151;font-family:Arial,Helvetica,sans-serif;">&bull; Authorises our team to verify your financials</td></tr>
   </table>
 
   {{-- CTA button --}}

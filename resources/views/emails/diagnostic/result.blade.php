@@ -104,7 +104,7 @@ $isReady = in_array($session->score_band, ['mid_high', 'high']);
         <td style="border-radius:6px;background:linear-gradient(135deg,#3c53a8 0%,#5ca336 100%);">
             <a href="{{ url('/checkout') }}"
                style="display:inline-block;padding:14px 32px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.03em;">
-                Proceed to Application →
+                Proceed to Application
             </a>
         </td>
     </tr>

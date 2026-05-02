@@ -38,7 +38,7 @@
       <td align="center">
         <a href="{{ $verificationUrl }}"
            style="display:inline-block;background-color:#2563EB;color:#ffffff;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 28px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;">
-          View Your Investor Page &rarr;
+          View Your Investor Page
         </a>
       </td>
     </tr>

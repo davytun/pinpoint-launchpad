@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import {
     AlertCircle,
     AlertTriangle,
+    ArrowRight,
     TrendingUp,
     Zap,
 } from 'lucide-react';
@@ -265,7 +266,8 @@ export default function DiagnosticResult({
                                         >
                                             <span className="waitlist-shimmer absolute inset-0 opacity-50 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
                                             <span className="relative z-10 flex items-center gap-2">
-                                                Proceed to Application →
+                                                Proceed to Application
+                                                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                                             </span>
                                         </a>
                                     </div>

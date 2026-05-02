@@ -31,7 +31,7 @@ const TITLE_KEYS: Record<string, string[]> = {
 };
 
 // Global index singleton
-let db: any = null;
+let db: unknown = null;
 
 export async function getIndex() {
   if (db) return db;
@@ -93,7 +93,7 @@ export async function getIndex() {
           
           const content = Object.entries(row as object)
             .filter(([key]) => !negativeKeys.some(neg => key.includes(neg)))
-            .map(([_, val]) => val)
+            .map(([, val]) => val)
             .join(' ');
 
           docs.push({
@@ -121,7 +121,7 @@ export async function getIndex() {
 export async function searchDesign(query: string, domain?: string) {
   const index = await getIndex();
   
-  const results = await oramaSearch(index, {
+  const results = await oramaSearch(index as Record<string, unknown>, {
     term: query,
     properties: '*', // Search all fields
     threshold: 0.2, // Fuzzy tolerance

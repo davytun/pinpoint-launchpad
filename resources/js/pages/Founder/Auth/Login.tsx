@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -196,7 +196,10 @@ export default function FounderLogin({ flash }: PageProps) {
                                             Signing In…
                                         </>
                                     ) : (
-                                        'Sign In →'
+                                        <>
+                                            Sign In
+                                            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                                        </>
                                     )}
                                 </span>
                             </button>
@@ -210,12 +213,13 @@ export default function FounderLogin({ flash }: PageProps) {
 
                         <p className="mt-5 text-center text-[12px] text-white/25">
                             New to Pinpoint? Complete the diagnostic to get started.{' '}
-                            <Link
-                                href={route('diagnostic.index')}
-                                className="text-white/40 underline underline-offset-2 transition-colors duration-200 hover:text-white"
-                            >
-                                Take the Diagnostic →
-                            </Link>
+                                <Link
+                                    href={route('diagnostic.index')}
+                                    className="group inline-flex items-center gap-1 text-white/40 underline underline-offset-2 transition-colors duration-200 hover:text-white"
+                                >
+                                    Take the Diagnostic
+                                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                                </Link>
                         </p>
                     </div>
                 </motion.div>

@@ -1,5 +1,5 @@
 import { readFile, stat, writeFile, mkdir } from 'fs/promises';
-import { resolve, dirname, join } from 'path';
+import { dirname, join } from 'path';
 import chalk from 'chalk';
 import { glob } from 'glob';
 

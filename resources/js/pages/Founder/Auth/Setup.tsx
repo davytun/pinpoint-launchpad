@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -296,7 +296,10 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                             Creating Account…
                                         </>
                                     ) : (
-                                        'Create My Account →'
+                                        <>
+                                            Create My Account
+                                            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                                        </>
                                     )}
                                 </span>
                             </button>

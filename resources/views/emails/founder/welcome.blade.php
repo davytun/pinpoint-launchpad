@@ -6,11 +6,11 @@ Your account has been created and your **{{ $tierLabel }} Audit** is now in the 
 <x-mail::panel>
 **WHAT HAPPENS NEXT:**
 
-→ An analyst will be assigned to your venture within 2 business days
+&bull; An analyst will be assigned to your venture within 2 business days
 
-→ You will be notified when your audit begins
+&bull; You will be notified when your audit begins
 
-→ Your investor verification page goes live upon completion
+&bull; Your investor verification page goes live upon completion
 </x-mail::panel>
 
 <x-mail::button :url="$dashboardUrl" color="primary">

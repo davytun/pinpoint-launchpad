@@ -23,17 +23,17 @@
         <table cellpadding="0" cellspacing="0" border="0">
           <tr>
             <td style="padding:4px 0;font-size:13px;color:#065F46;font-family:Arial,Helvetica,sans-serif;">
-              → Your audit has been queued for analyst assignment
+              &bull; Your audit has been queued for analyst assignment
             </td>
           </tr>
           <tr>
             <td style="padding:4px 0;font-size:13px;color:#065F46;font-family:Arial,Helvetica,sans-serif;">
-              → You will receive a follow-up within 2 business days
+              &bull; You will receive a follow-up within 2 business days
             </td>
           </tr>
           <tr>
             <td style="padding:4px 0;font-size:13px;color:#065F46;font-family:Arial,Helvetica,sans-serif;">
-              → Your investor verification page will go live upon audit completion
+              &bull; Your investor verification page will go live upon audit completion
             </td>
           </tr>
         </table>

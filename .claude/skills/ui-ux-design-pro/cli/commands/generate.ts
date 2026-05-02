@@ -11,7 +11,7 @@ interface GenerateOptions {
 
 // --- Extraction Logic ---
 
-async function extractPrimaryColor(results: Record<string, any[]>): Promise<string> {
+async function extractPrimaryColor(results: Record<string, { raw?: string; data?: Record<string, unknown> }[]>): Promise<string> {
    // Priority 1: Check 'color' domain (colors.csv) for structured hex
    if (results['color']) {
      for (const hit of results['color']) {
@@ -47,7 +47,7 @@ async function extractPrimaryColor(results: Record<string, any[]>): Promise<stri
    return '#2563EB'; // Fallback Blue
 }
 
-async function extractFont(results: Record<string, any[]>): Promise<string> {
+async function extractFont(results: Record<string, { data?: Record<string, unknown> }[]>): Promise<string> {
   // Priority 1: 'typography' domain
   if (results['typography']) {
     for (const hit of results['typography']) {
@@ -84,7 +84,7 @@ async function extractFont(results: Record<string, any[]>): Promise<string> {
   return 'Inter';
 }
 
-async function extractStyleName(results: Record<string, any[]>): Promise<string> {
+async function extractStyleName(results: Record<string, { data?: Record<string, unknown> }[]>): Promise<string> {
     // Try to find a style name from 'style' domain
     if (results['style']) {
         for (const hit of results['style']) {
@@ -109,7 +109,7 @@ interface ArchitecturalPalette {
 }
 
 function generateTwScale(baseHex: string, saturationAdjust: number = 0): ColorScale {
-  const [h, s, l] = hexToHsl(baseHex);
+  const [h, s] = hexToHsl(baseHex);
   const scale: ColorScale = {};
   
   // Figma/Tailwind standard lightness steps (approximate)
@@ -153,17 +153,21 @@ function generateArchitecturalPalette(primaryHex: string): ArchitecturalPalette 
   };
 }
 
-// --- Markdown Generator ---
+interface DesignSystem {
+  meta: { stack?: string; query: string; generated_at: string };
+  style: { name: string; primary_color: string; font_family: string };
+  palette: ArchitecturalPalette;
+  tokens: Record<string, unknown>;
+}
 
-
-function generateEnhancedMarkdown(system: any, components: { atoms: any[], molecules: any[], organisms: any[] }) {
-  const { meta, style, palette, type_scale, tokens } = system;
+function generateEnhancedMarkdown(system: DesignSystem, components: { atoms: unknown[], molecules: unknown[], organisms: unknown[] }) {
+  const { meta, style, palette, tokens } = system;
   const stackInfo = meta.stack ? ` | **Tech Stack**: ${meta.stack}` : '';
 
-  const renderSection = (title: string, items: any[]) => {
+  const renderSection = (title: string, items: { title: string; data: Record<string, string> }[]) => {
     if (!items || !items.length) return '';
     return `## ${title}
-${items.map((item: any) => `
+${items.map((item: { title: string; data: Record<string, string> }) => `
 ### ${item.title}
 > ${item.data.Description || ''}
 
@@ -235,7 +239,7 @@ ${renderSection('Organisms', components.organisms)}
 export async function generateSystemCommand(query: string, options: GenerateOptions) {
   // 1. Search across domains
   const domains = ['product', 'style', 'color', 'landing', 'typography', 'reasoning', 'ux', 'chart'];
-  const allResults: Record<string, any[]> = {};
+  const allResults: Record<string, unknown[]> = {};
   
   for (const domain of domains) {
     const hits = await searchDesign(query, domain);

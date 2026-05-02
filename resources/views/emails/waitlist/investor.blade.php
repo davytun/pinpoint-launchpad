@@ -45,7 +45,7 @@
             style="{{ $loop->last ? '' : 'margin-bottom:12px;' }}">
         <tr>
             <td width="28" valign="top" style="padding-top:1px;">
-                <span style="display:inline-block;width:18px;height:18px;background-color:#3c53a8;border-radius:3px;text-align:center;line-height:18px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;color:#ffffff;">→</span>
+                <span style="display:inline-block;width:18px;height:18px;background-color:#3c53a8;border-radius:3px;text-align:center;line-height:18px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;color:#ffffff;">&bull;</span>
             </td>
             <td style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#c8c8c8;line-height:1.55;">
                 {{ $benefit }}

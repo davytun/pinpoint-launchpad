@@ -1,10 +1,8 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Lock } from 'lucide-react';
 
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -43,7 +41,7 @@ function BlurredRadar() {
                 const path = Array.from({ length: count })
                     .map((_, i) => `${i === 0 ? 'M' : 'L'}${pt(i, r * level)}`)
                     .join(' ') + ' Z';
-                return <path key={li} d={path} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />;
+                return <path key={li} d={path} fill="none" stroke="#232C43" strokeWidth="1" />;
             })}
             {Array.from({ length: count }).map((_, i) => {
                 const [lx, ly] = pt(i, r).split(',').map(Number);
@@ -52,12 +50,13 @@ function BlurredRadar() {
                         key={i}
                         x1={cx} y1={cy}
                         x2={lx} y2={ly}
-                        stroke="rgba(255,255,255,0.12)"
+                        stroke="#232C43"
+                        opacity={0.5}
                         strokeWidth="1"
                     />
                 );
             })}
-            <path d={dataPath} fill="rgba(37,99,235,0.25)" stroke="rgba(37,99,235,0.6)" strokeWidth="1.5" />
+            <path d={dataPath} fill="rgba(68,104,187,0.25)" stroke="#4468BB" strokeWidth="1.5" />
         </svg>
     );
 }
@@ -65,6 +64,8 @@ function BlurredRadar() {
 // ─── Page ───────────────────────────────────────────────────────────────────────
 
 export default function EmailGate({ blurred_score }: PageProps) {
+    const { props } = usePage();
+    const flash = (props as any).flash;
     const form = useForm({ email: '' });
 
     function submit(e: React.FormEvent) {
@@ -86,10 +87,10 @@ export default function EmailGate({ blurred_score }: PageProps) {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                     >
-                        <Card className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] p-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]">
+                        <Card className="waitlist-panel overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-0 shadow-md md:rounded-[1.75rem]">
 
                             {/* Top — blurred score + radar */}
-                            <CardContent className="flex flex-col items-center border-b border-white/[0.06] px-8 pb-8 pt-10 text-center">
+                            <CardContent className="flex flex-col items-center border-b border-[#232C43] px-8 pb-8 pt-10 text-center">
 
                                 {/* "PARAGON Score Ready" badge with pulsing green dot */}
                                 <div className="mb-5 flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5">
@@ -103,17 +104,17 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                 </div>
 
                                 {/* Headline */}
-                                <h1 className="mb-2 font-display text-2xl font-bold text-white">
+                                <h1 className="mb-2 font-display text-2xl font-bold text-[#ECF0F9]">
                                     Your results are waiting.
                                 </h1>
-                                <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
+                                <p className="mb-6 text-sm leading-relaxed text-[#788CBA]">
                                     Enter your email to unlock your full diagnostic and radar chart.
                                 </p>
 
                                 {/* Blurred score + lock overlay */}
                                 <div className="relative mb-2 flex select-none flex-col items-center">
                                     <span
-                                        className="font-sans text-[5.5rem] font-black leading-none text-foreground"
+                                        className="font-sans text-[5.5rem] font-black leading-none text-[#ECF0F9]"
                                         style={{ filter: 'blur(12px)', opacity: 0.65 }}
                                         aria-hidden="true"
                                     >
@@ -121,8 +122,8 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                     </span>
                                     {/* Lock overlay */}
                                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-                                        <Lock className="size-5 text-muted-foreground" />
-                                        <span className="text-xs font-medium text-muted-foreground">Unlock to reveal</span>
+                                        <Lock className="size-5 text-[#788CBA]" />
+                                        <span className="text-xs font-medium text-[#788CBA]">Unlock to reveal</span>
                                     </div>
                                 </div>
 
@@ -134,40 +135,47 @@ export default function EmailGate({ blurred_score }: PageProps) {
 
                             {/* Bottom — email form */}
                             <CardContent className="px-8 pb-8 pt-7">
+                                {flash?.error && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400"
+                                    >
+                                        {flash.error}
+                                    </motion.div>
+                                )}
                                 <form onSubmit={submit} noValidate className="flex flex-col gap-4">
                                     <div className="flex flex-col gap-1.5">
-                                        <Label htmlFor="email" className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                                        <Label htmlFor="email" className="text-[11px] uppercase tracking-[0.18em] text-[#576FA8]">
                                             Email address
                                         </Label>
                                         <Input
                                             id="email"
                                             type="email"
                                             autoComplete="email"
-                                            // eslint-disable-next-line jsx-a11y/no-autofocus
                                             autoFocus
                                             placeholder="founder@startup.com"
                                             value={form.data.email}
                                             onChange={e => form.setData('email', e.target.value)}
                                             aria-invalid={!!form.errors.email}
-                                            className="waitlist-input focus:border-[#2563EB]/50 focus:ring-[#2563EB]/15 h-12"
+                                            className="waitlist-input focus:border-[#4468BB]/50 focus:ring-[#4468BB]/15 h-12"
                                         />
                                         {form.errors.email && (
                                             <p className="text-xs text-destructive">{form.errors.email}</p>
                                         )}
                                     </div>
 
-                                    <button
-                                        type="submit"
-                                        disabled={form.processing || !form.data.email.trim()}
-                                        className="group relative mt-2 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
-                                        style={{
-                                            background: '#2563EB',
-                                            boxShadow: '0 0 28px rgba(37,99,235,0.35)',
-                                        }}
-                                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)'; }}
-                                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; }}
-                                    >
-                                        <span className="waitlist-shimmer absolute inset-0 opacity-50 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
+                                        <button
+                                            type="submit"
+                                            disabled={form.processing || !form.data.email.trim()}
+                                            className="group relative mt-2 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                            style={{
+                                                background: '#4468BB',
+                                                boxShadow: '0 0 28px rgba(68,104,187,0.35)',
+                                            }}
+                                            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)'; }}
+                                            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; }}
+                                        >                                      <span className="waitlist-shimmer absolute inset-0 opacity-50 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
                                         <span className="relative z-10 flex items-center gap-2">
                                             {form.processing ? (
                                                 <>
@@ -181,7 +189,7 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                     </button>
                                 </form>
 
-                                <p className="mt-4 text-center text-[11px] text-muted-foreground/60">
+                                <p className="mt-4 text-center text-[11px] text-[#576FA8]/60">
                                     No spam. No account required.
                                 </p>
                             </CardContent>

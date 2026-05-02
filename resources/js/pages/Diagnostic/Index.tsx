@@ -227,16 +227,16 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                     <div className="relative" style={{ minHeight: 280 }}>
                         <AnimatePresence mode="wait" custom={direction}>
                             <motion.div key={question.id} custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit">
-                                <Card className="waitlist-panel overflow-hidden rounded-[1.25rem] border border-white/[0.06] bg-[#111] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]">
+                                <Card className="waitlist-panel overflow-hidden rounded-[1.25rem] border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                     <CardContent className="p-6 sm:p-10">
                                         {/* Question text */}
-                                        <p className="font-display text-xl leading-snug font-bold tracking-tight text-white/95 sm:text-2xl">
+                                        <p className="font-display text-xl leading-snug font-bold tracking-tight text-[#ECF0F9] sm:text-2xl">
                                             {question.question_text}
                                         </p>
 
                                         {/* Sub text */}
                                         {question.sub_text && (
-                                            <p className="mt-3 text-sm leading-relaxed text-white/40 italic">{question.sub_text}</p>
+                                            <p className="mt-3 text-sm leading-relaxed text-[#788CBA] italic">{question.sub_text}</p>
                                         )}
 
                                         {/* ── Answer buttons ── */}
@@ -248,7 +248,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                     'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-300 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === true
                                                         ? 'scale-[1.02] border-[#5CA336]/50 bg-[#5CA336]/15 text-[#86efac] shadow-[0_0_30px_rgba(92,163,54,0.2)] ring-1 ring-[#5CA336]/30'
-                                                        : 'border-white/[0.06] bg-white/[0.02] text-white/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] hover:border-[#5CA336]/40 hover:bg-[#5CA336]/5 hover:text-white',
+                                                        : 'border-[#232C43] bg-[#080B11] text-[#788CBA] hover:border-[#5CA336]/40 hover:bg-[#5CA336]/5 hover:text-[#ECF0F9]',
                                                 )}
                                             >
                                                 {answers[question.id] === true && (
@@ -263,8 +263,8 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                 className={cn(
                                                     'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-300 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === false
-                                                        ? 'scale-[1.02] border-white/20 bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.05)] ring-1 ring-white/10'
-                                                        : 'border-white/[0.06] bg-white/[0.02] text-white/50 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] hover:border-white/20 hover:bg-white/[0.04] hover:text-white',
+                                                        ? 'scale-[1.02] border-[#4468BB]/50 bg-[#4468BB]/15 text-[#9AA9CB] shadow-[0_0_20px_rgba(68,104,187,0.2)] ring-1 ring-[#4468BB]/30'
+                                                        : 'border-[#232C43] bg-[#080B11] text-[#788CBA] hover:border-[#4468BB]/40 hover:bg-[#4468BB]/10 hover:text-[#ECF0F9]',
                                                 )}
                                             >
                                                 {answers[question.id] === false && (
@@ -286,7 +286,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 type="button"
                                 onClick={goBack}
                                 disabled={currentIndex === 0}
-                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-white/10 px-4 py-2 text-xs font-bold tracking-widest text-white/30 uppercase transition-colors hover:text-white/80 disabled:pointer-events-none disabled:opacity-20"
+                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-[#232C43] px-4 py-2 text-xs font-bold tracking-widest text-[#788CBA] uppercase transition-colors hover:text-[#ECF0F9] hover:bg-[#1B294B]/30 disabled:pointer-events-none disabled:opacity-30"
                             >
                                 <span className="transition-transform group-hover:-translate-x-1"><ChevronLeft /></span> Back
                             </button>
@@ -295,8 +295,8 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 <span className="text-sm font-bold tabular-nums" style={{ color: '#5CA336' }}>
                                     {currentIndex + 1}
                                 </span>
-                                <span className="text-xs text-white/20">/</span>
-                                <span className="text-xs text-white/30 tabular-nums">{total_questions}</span>
+                                <span className="text-xs text-[#576FA8]">/</span>
+                                <span className="text-xs text-[#788CBA] tabular-nums">{total_questions}</span>
                             </div>
 
                             <div className="w-16 shrink-0" />

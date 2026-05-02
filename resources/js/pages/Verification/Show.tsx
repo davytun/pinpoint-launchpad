@@ -1,12 +1,10 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { AnimatePresence, motion } from 'framer-motion';
 import {
     CheckCircle2,
     Clock,
     Lock,
     Loader2,
     Shield,
-    ExternalLink,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -147,16 +145,12 @@ function AccessRequestModal({
         message: '',
     });
     const [submitting, setSubmitting] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-    const [flashMsg, setFlashMsg] = useState<string | null>(null);
 
     useEffect(() => {
         if (props.flash?.success) {
-            setSubmitted(true);
-            setFlashMsg(props.flash.success);
             onClose();
         }
-    }, [props.flash?.success]);
+    }, [props.flash?.success, onClose]);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -166,31 +160,30 @@ function AccessRequestModal({
             form,
             {
                 preserveScroll: true,
-                onSuccess: () => { setSubmitted(true); setSubmitting(false); onClose(); },
+                onSuccess: () => { setSubmitting(false); onClose(); },
                 onError: () => setSubmitting(false),
                 onFinish: () => setSubmitting(false),
             }
         );
     }
 
-    const inputClass =
-        'w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2.5 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500';
+
 
     return (
         <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
-            <DialogContent className="border-slate-800 bg-slate-900 text-white sm:max-w-md">
+            <DialogContent className="border-[#232C43] bg-[#101623] text-white sm:max-w-md">
                 <DialogHeader>
                     {isSample ? (
                         <>
-                            <DialogTitle className="text-white">Sample Profile</DialogTitle>
-                            <DialogDescription className="text-slate-400">
+                            <DialogTitle className="text-[#ECF0F9]">Sample Profile</DialogTitle>
+                            <DialogDescription className="text-[#788CBA]">
                                 This is a sample profile. Request access on a real founder's page.
                             </DialogDescription>
                         </>
                     ) : (
                         <>
-                            <DialogTitle className="text-white">Request Data Room Access</DialogTitle>
-                            <DialogDescription className="text-slate-400">
+                            <DialogTitle className="text-[#ECF0F9]">Request Data Room Access</DialogTitle>
+                            <DialogDescription className="text-[#788CBA]">
                                 Tell the founder who you are. They'll be in touch directly.
                             </DialogDescription>
                         </>
@@ -201,7 +194,7 @@ function AccessRequestModal({
                     <div className="pt-2">
                         <button
                             onClick={onClose}
-                            className="w-full rounded-lg bg-slate-700 py-2.5 text-sm font-semibold text-white hover:bg-slate-600"
+                            className="w-full rounded-lg bg-[#1B294B] py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1B294B]/80"
                         >
                             Close
                         </button>
@@ -209,15 +202,15 @@ function AccessRequestModal({
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-4 pt-2">
                         <div>
-                            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-slate-400">
-                                Full Name <span className="text-red-400">*</span>
+                            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#788CBA]">
+                                Full Name <span className="text-rose-400">*</span>
                             </label>
                             <input
                                 type="text"
                                 required
                                 value={form.investor_name}
                                 onChange={(e) => setForm((f) => ({ ...f, investor_name: e.target.value }))}
-                                className={inputClass}
+                                className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-3 py-2.5 text-sm text-[#ECF0F9] placeholder-[#576FA8] transition-colors focus:border-[#4468BB]/50 focus:outline-none focus:ring-1 focus:ring-[#4468BB]/50"
                                 placeholder="Jane Smith"
                             />
                         </div>
@@ -230,7 +223,7 @@ function AccessRequestModal({
                                 required
                                 value={form.investor_email}
                                 onChange={(e) => setForm((f) => ({ ...f, investor_email: e.target.value }))}
-                                className={inputClass}
+                                className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-3 py-2.5 text-sm text-[#ECF0F9] placeholder-[#576FA8] transition-colors focus:border-[#4468BB]/50 focus:outline-none focus:ring-1 focus:ring-[#4468BB]/50"
                                 placeholder="jane@vcfirm.com"
                             />
                         </div>
@@ -242,7 +235,7 @@ function AccessRequestModal({
                                 type="text"
                                 value={form.firm_name}
                                 onChange={(e) => setForm((f) => ({ ...f, firm_name: e.target.value }))}
-                                className={inputClass}
+                                className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-3 py-2.5 text-sm text-[#ECF0F9] placeholder-[#576FA8] transition-colors focus:border-[#4468BB]/50 focus:outline-none focus:ring-1 focus:ring-[#4468BB]/50"
                                 placeholder="Accel Partners (optional)"
                             />
                         </div>
@@ -254,7 +247,7 @@ function AccessRequestModal({
                                 type="url"
                                 value={form.linkedin_url}
                                 onChange={(e) => setForm((f) => ({ ...f, linkedin_url: e.target.value }))}
-                                className={inputClass}
+                                className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-3 py-2.5 text-sm text-[#ECF0F9] placeholder-[#576FA8] transition-colors focus:border-[#4468BB]/50 focus:outline-none focus:ring-1 focus:ring-[#4468BB]/50"
                                 placeholder="https://linkedin.com/in/... (optional)"
                             />
                         </div>
@@ -267,14 +260,14 @@ function AccessRequestModal({
                                 maxLength={500}
                                 value={form.message}
                                 onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-                                className={inputClass + ' resize-none'}
+                                className="w-full resize-none rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-3 py-2.5 text-sm text-[#ECF0F9] placeholder-[#576FA8] transition-colors focus:border-[#4468BB]/50 focus:outline-none focus:ring-1 focus:ring-[#4468BB]/50"
                                 placeholder="e.g. We invest in B2B SaaS at Seed stage and would love to learn more."
                             />
                         </div>
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-60"
+                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#4468BB] py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#3C53A8] disabled:opacity-60"
                         >
                             {submitting ? (
                                 <><Loader2 className="size-4 animate-spin" /> Submitting...</>
@@ -292,8 +285,6 @@ function AccessRequestModal({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function VerificationShow({
-    profile_id,
-    founder_name,
     company_name,
     sector,
     batch,
@@ -329,7 +320,7 @@ export default function VerificationShow({
         <>
             <Head title={`${company_name} — Pinpoint Verified`} />
 
-            <div className="min-h-screen bg-slate-950 text-white">
+            <div className="min-h-screen bg-[#080B11] text-[#ECF0F9]">
                 <div className="mx-auto max-w-5xl px-4 py-10 lg:px-8">
 
                     {/* Sample banner */}
@@ -347,12 +338,12 @@ export default function VerificationShow({
                     )}
 
                     {/* ── Header ── */}
-                    <div className="mb-8 flex flex-col gap-4 border-b border-slate-800 pb-8 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="mb-8 flex flex-col gap-4 border-b border-[#232C43] pb-8 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <p className="text-sm text-slate-400">Venture Profile:</p>
-                            <h1 className="text-3xl font-black text-white">{company_name}</h1>
+                            <p className="text-sm text-[#788CBA]">Venture Profile:</p>
+                            <h1 className="text-3xl font-black text-[#ECF0F9]">{company_name}</h1>
                             {(batch || sector) && (
-                                <p className="mt-1 text-sm italic text-slate-500">
+                                <p className="mt-1 text-sm italic text-[#576FA8]">
                                     {[batch, sector].filter(Boolean).join(' | ')}
                                 </p>
                             )}
@@ -363,7 +354,7 @@ export default function VerificationShow({
                                 PINPOINT CERTIFIED: INSTITUTIONAL GRADE
                             </div>
                             {verified_at && (
-                                <p className="font-mono text-xs text-slate-500">
+                                <p className="font-mono text-xs text-[#576FA8]">
                                     Verified On: {verified_at}
                                 </p>
                             )}
@@ -375,8 +366,8 @@ export default function VerificationShow({
 
                         {/* Left: score + radar */}
                         <div className="flex flex-col gap-6">
-                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-                                <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-slate-400">
+                            <div className="rounded-2xl border border-[#232C43] bg-[#101623] p-6">
+                                <p className="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#576FA8]">
                                     PARAGON Score
                                 </p>
                                 <div className="flex items-end gap-1 leading-none">
@@ -388,15 +379,15 @@ export default function VerificationShow({
                                             <CountUp target={overall_score} />
                                         ) : '—'}
                                     </span>
-                                    <span className="mb-1 text-xl text-slate-500">/ 100</span>
+                                    <span className="mb-1 text-xl text-[#576FA8]">/ 100</span>
                                 </div>
-                                <div className="my-4 border-t border-slate-800" />
+                                <div className="my-4 border-t border-[#232C43]" />
                                 <ResponsiveContainer width="100%" height={220}>
                                     <RadarChart data={radarItems} outerRadius="62%" margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
                                         <PolarGrid stroke="rgba(255,255,255,0.07)" />
                                         <PolarAngleAxis
                                             dataKey="subject"
-                                            tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 600 }}
+                                            tick={{ fill: '#788CBA', fontSize: 10, fontWeight: 600 }}
                                         />
                                         <Radar
                                             dataKey="value"
@@ -412,23 +403,23 @@ export default function VerificationShow({
 
                         {/* Center + right: summary */}
                         <div className="lg:col-span-2">
-                            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                            <div className="rounded-2xl border border-[#232C43] bg-[#101623] p-6">
                                 <div className="mb-4 flex items-center justify-between gap-4">
-                                    <p className="text-xs font-bold uppercase tracking-[0.28em] text-slate-400">
+                                    <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#576FA8]">
                                         ANALYST EXECUTIVE SUMMARY
                                     </p>
-                                    <span className="flex items-center gap-1 text-xs text-slate-500">
+                                    <span className="flex items-center gap-1 text-xs text-[#576FA8]">
                                         <Clock className="size-3" />
                                         Timestamped &amp; Analyst-Signed
                                     </span>
                                 </div>
 
                                 {analyst_summary ? (
-                                    <p className="text-sm leading-relaxed text-slate-300">
+                                    <p className="text-sm leading-relaxed text-[#ECF0F9]">
                                         {analyst_summary}
                                     </p>
                                 ) : (
-                                    <p className="text-sm italic text-slate-600">
+                                    <p className="text-sm italic text-[#576FA8]">
                                         The analyst summary will appear here once the audit review is complete.
                                     </p>
                                 )}
@@ -438,7 +429,7 @@ export default function VerificationShow({
                                         {badges.map((badge) => (
                                             <span
                                                 key={badge.badge_type}
-                                                className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300"
+                                                className="rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-3 py-1 text-xs font-semibold text-[#788CBA]"
                                             >
                                                 {badge.label}
                                             </span>
@@ -450,9 +441,9 @@ export default function VerificationShow({
                     </div>
 
                     {/* ── Diligence Assets Table ── */}
-                    <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900">
-                        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4">
-                            <h2 className="font-semibold text-white">Verified Diligence Assets</h2>
+                    <div className="mt-6 rounded-2xl border border-[#232C43] bg-[#101623]">
+                        <div className="flex items-center justify-between border-b border-[#232C43] px-6 py-4">
+                            <h2 className="font-semibold text-[#ECF0F9]">Verified Diligence Assets</h2>
                             {reqSubmitted ? (
                                 <span className="flex items-center gap-2 text-sm text-emerald-400">
                                     <CheckCircle2 className="size-4" />
@@ -461,7 +452,7 @@ export default function VerificationShow({
                             ) : (
                                 <button
                                     onClick={() => setModalOpen(true)}
-                                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-500"
+                                    className="rounded-lg bg-[#4468BB] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#3C53A8]"
                                 >
                                     Request Access to Full Data Room
                                 </button>
@@ -471,20 +462,20 @@ export default function VerificationShow({
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b border-slate-800">
-                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Document Name</th>
-                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Verification Level</th>
-                                        <th className="px-6 py-3 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Preview</th>
+                                    <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
+                                        <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#576FA8]">Document Name</th>
+                                        <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#576FA8]">Verification Level</th>
+                                        <th className="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-[#576FA8]">Preview</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {rows.map((row, i) => (
-                                        <tr key={i} className="border-b border-slate-800/50 last:border-0">
-                                            <td className="px-6 py-3.5 text-slate-300">{row.name}</td>
-                                            <td className="px-6 py-3.5 text-slate-400">{row.level}</td>
-                                            <td className="px-6 py-3.5">
-                                                <span className="flex items-center gap-1.5 text-xs italic text-slate-500">
-                                                    <Lock className="size-3 text-slate-600" />
+                                        <tr key={i} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
+                                            <td className="px-6 py-4 text-[#ECF0F9]">{row.name}</td>
+                                            <td className="px-6 py-4 text-[#788CBA]">{row.level}</td>
+                                            <td className="px-6 py-4">
+                                                <span className="flex items-center gap-1.5 text-xs italic text-[#576FA8]">
+                                                    <Lock className="size-3 text-[#576FA8]" />
                                                     LOCKED
                                                 </span>
                                             </td>
@@ -496,12 +487,12 @@ export default function VerificationShow({
                     </div>
 
                     {/* ── Footer ── */}
-                    <div className="mt-8 border-t border-slate-800 pt-8 text-center">
-                        <p className="text-sm text-slate-500">This verification is valid for 90 days.</p>
+                    <div className="mt-8 border-t border-[#232C43] pt-8 text-center">
+                        <p className="text-sm text-[#576FA8]">This verification is valid for 90 days.</p>
                         {expires_at && (
-                            <p className="text-sm text-slate-500">Next scheduled audit: {expires_at}</p>
+                            <p className="text-sm text-[#576FA8]">Next scheduled audit: {expires_at}</p>
                         )}
-                        <p className="mt-2 font-mono text-xs uppercase tracking-widest text-slate-600">
+                        <p className="mt-2 font-mono text-xs uppercase tracking-widest text-[#232C43]">
                             Pinpoint Launchpad | Filtering for Quality. Solving for Success.
                         </p>
                     </div>

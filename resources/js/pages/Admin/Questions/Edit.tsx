@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import AdminLayout from '@/layouts/admin-layout';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -31,71 +32,46 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
         form.patch(route('admin.questions.update', question.id));
     }
 
-    const inputStyle = {
-        background:  'rgba(255,255,255,0.04)',
-        border:      '1px solid rgba(255,255,255,0.10)',
-        color:       'white',
-        borderRadius: '0.75rem',
-        outline:     'none',
-        transition:  'border-color 0.15s',
-    };
+    const inputClass =
+        'w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-3 text-sm text-[#ECF0F9] placeholder-[#576FA8] focus:border-[#4468BB]/50 focus:outline-none focus:ring-1 focus:ring-[#4468BB]/50 transition-colors';
 
     return (
-        <>
+        <AdminLayout>
             <Head title={`Edit Q${question.order} — Admin`} />
 
-            <div
-                className="min-h-screen px-5 py-10 sm:px-8"
-                style={{ background: '#0A0F1A' }}
-            >
+            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-2xl">
 
                     {/* Back link */}
                     <Link
                         href={route('admin.questions.index')}
-                        className="mb-8 inline-flex items-center gap-1.5 text-xs font-medium transition-colors"
-                        style={{ color: 'rgba(255,255,255,0.35)' }}
-                        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.70)')}
-                        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.35)')}
+                        className="mb-8 inline-flex items-center gap-1.5 text-xs font-medium text-[#788CBA] transition-colors hover:text-[#ECF0F9]"
                     >
                         ← Back to Questions
                     </Link>
 
                     {/* Header */}
                     <div className="mb-8">
-                        <p
-                            className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em]"
-                            style={{ color: 'rgba(255,255,255,0.28)' }}
-                        >
+                        <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#576FA8]">
                             Admin · Question {question.order}
                         </p>
-                        <h1 className="text-xl font-bold text-white">
+                        <h1 className="text-2xl font-bold text-[#ECF0F9]">
                             Edit Question
                         </h1>
-                        <p
-                            className="mt-1 text-sm capitalize"
-                            style={{ color: 'rgba(255,255,255,0.35)' }}
-                        >
+                        <p className="mt-1 text-sm capitalize text-[#788CBA]">
                             Pillar: {question.pillar}
                         </p>
                     </div>
 
                     {/* Form card */}
-                    <div
-                        className="rounded-2xl border p-7"
-                        style={{
-                            borderColor: 'rgba(255,255,255,0.08)',
-                            background:  'rgba(255,255,255,0.025)',
-                        }}
-                    >
+                    <div className="rounded-xl border border-[#232C43] bg-[#101623] p-7">
                         <form onSubmit={submit} noValidate className="space-y-6">
 
                             {/* question_text */}
                             <div className="space-y-1.5">
                                 <label
                                     htmlFor="question_text"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em]"
-                                    style={{ color: 'rgba(255,255,255,0.35)' }}
+                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#788CBA]"
                                 >
                                     Question Text
                                 </label>
@@ -104,10 +80,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     rows={3}
                                     value={form.data.question_text}
                                     onChange={e => form.setData('question_text', e.target.value)}
-                                    className="w-full resize-y px-4 py-3 text-sm leading-relaxed"
-                                    style={inputStyle}
-                                    onFocus={e => (e.currentTarget.style.borderColor = 'rgba(37,99,235,0.5)')}
-                                    onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)')}
+                                    className={`${inputClass} resize-y leading-relaxed`}
                                 />
                                 {form.errors.question_text && (
                                     <p className="text-xs text-rose-400">{form.errors.question_text}</p>
@@ -118,10 +91,9 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                             <div className="space-y-1.5">
                                 <label
                                     htmlFor="sub_text"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em]"
-                                    style={{ color: 'rgba(255,255,255,0.35)' }}
+                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#788CBA]"
                                 >
-                                    Sub Text <span style={{ color: 'rgba(255,255,255,0.20)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>optional</span>
+                                    Sub Text <span className="font-normal normal-case tracking-normal text-[#576FA8]">optional</span>
                                 </label>
                                 <input
                                     id="sub_text"
@@ -129,10 +101,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     value={form.data.sub_text}
                                     onChange={e => form.setData('sub_text', e.target.value)}
                                     placeholder="Clarifying context shown below the question"
-                                    className="w-full px-4 py-3 text-sm"
-                                    style={inputStyle}
-                                    onFocus={e => (e.currentTarget.style.borderColor = 'rgba(37,99,235,0.5)')}
-                                    onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)')}
+                                    className={inputClass}
                                 />
                                 {form.errors.sub_text && (
                                     <p className="text-xs text-rose-400">{form.errors.sub_text}</p>
@@ -143,10 +112,9 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                             <div className="space-y-1.5">
                                 <label
                                     htmlFor="points"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em]"
-                                    style={{ color: 'rgba(255,255,255,0.35)' }}
+                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#788CBA]"
                                 >
-                                    Points <span style={{ color: 'rgba(255,255,255,0.20)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(1–20)</span>
+                                    Points <span className="font-normal normal-case tracking-normal text-[#576FA8]">(1–20)</span>
                                 </label>
                                 <input
                                     id="points"
@@ -155,10 +123,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     max={20}
                                     value={form.data.points}
                                     onChange={e => form.setData('points', parseInt(e.target.value, 10) || 1)}
-                                    className="w-28 px-4 py-3 text-sm tabular-nums"
-                                    style={inputStyle}
-                                    onFocus={e => (e.currentTarget.style.borderColor = 'rgba(37,99,235,0.5)')}
-                                    onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)')}
+                                    className={`${inputClass} w-28 tabular-nums`}
                                 />
                                 {form.errors.points && (
                                     <p className="text-xs text-rose-400">{form.errors.points}</p>
@@ -166,12 +131,10 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                             </div>
 
                             {/* is_active toggle */}
-                            <div className="flex items-center justify-between rounded-xl border px-4 py-3.5"
-                                style={{ borderColor: 'rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}
-                            >
+                            <div className="flex items-center justify-between rounded-xl border border-[#232C43] bg-[#0C1427]/50 px-4 py-3.5">
                                 <div>
-                                    <p className="text-sm font-medium text-white">Active</p>
-                                    <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                                    <p className="text-sm font-medium text-[#ECF0F9]">Active</p>
+                                    <p className="text-xs text-[#576FA8]">
                                         Inactive questions are hidden from the diagnostic
                                     </p>
                                 </div>
@@ -180,33 +143,22 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     role="switch"
                                     aria-checked={form.data.is_active}
                                     onClick={() => form.setData('is_active', !form.data.is_active)}
-                                    className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none"
-                                    style={{
-                                        background: form.data.is_active
-                                            ? 'rgba(5,150,105,0.7)'
-                                            : 'rgba(255,255,255,0.12)',
-                                    }}
+                                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none ${form.data.is_active ? 'bg-emerald-500' : 'bg-[#232C43]'}`}
                                 >
                                     <span
-                                        className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200"
-                                        style={{
-                                            transform: form.data.is_active ? 'translateX(20px)' : 'translateX(2px)',
-                                        }}
+                                        className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${form.data.is_active ? 'translate-x-[20px]' : 'translate-x-[2px]'}`}
                                     />
                                 </button>
                             </div>
 
                             {/* Divider */}
-                            <div style={{ height: 1, background: 'rgba(255,255,255,0.07)' }} />
+                            <div className="h-px bg-[#232C43]" />
 
                             {/* Save */}
                             <div className="flex items-center justify-between">
                                 <Link
                                     href={route('admin.questions.index')}
-                                    className="text-sm transition-colors"
-                                    style={{ color: 'rgba(255,255,255,0.30)' }}
-                                    onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.60)')}
-                                    onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.30)')}
+                                    className="text-sm text-[#788CBA] transition-colors hover:text-[#ECF0F9]"
                                 >
                                     Cancel
                                 </Link>
@@ -214,24 +166,11 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                 <button
                                     type="submit"
                                     disabled={form.processing}
-                                    className="flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50"
-                                    style={{
-                                        background: '#2563EB',
-                                        boxShadow: '0 0 20px rgba(37,99,235,0.30)',
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (!form.processing) (e.currentTarget as HTMLButtonElement).style.background = '#1D4ED8';
-                                    }}
-                                    onMouseLeave={e => {
-                                        (e.currentTarget as HTMLButtonElement).style.background = '#2563EB';
-                                    }}
+                                    className="flex items-center gap-2 rounded-lg bg-[#4468BB] px-6 py-2.5 text-sm font-bold text-white transition-all duration-150 hover:bg-[#3C53A8] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {form.processing ? (
                                         <>
-                                            <span
-                                                className="h-4 w-4 animate-spin rounded-full border-2"
-                                                style={{ borderColor: 'rgba(255,255,255,0.2)', borderTopColor: 'white' }}
-                                            />
+                                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
                                             Saving…
                                         </>
                                     ) : (
@@ -243,6 +182,6 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                     </div>
                 </div>
             </div>
-        </>
+        </AdminLayout>
     );
 }

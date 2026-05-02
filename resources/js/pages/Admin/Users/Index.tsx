@@ -51,12 +51,12 @@ export default function AdminUsersIndex({ users }: PageProps) {
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-white">Team</h1>
-                        <p className="mt-1 text-sm text-slate-500">{users.length} member{users.length !== 1 ? 's' : ''}</p>
+                        <h1 className="text-2xl font-bold text-[#ECF0F9]">Team</h1>
+                        <p className="mt-1 text-sm text-[#788CBA]">{users.length} member{users.length !== 1 ? 's' : ''}</p>
                     </div>
                     <Link
                         href={route('admin.users.create')}
-                        className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-500"
+                        className="flex items-center gap-2 rounded-lg bg-[#4468BB] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#3C53A8]"
                     >
                         <Plus className="size-4" />
                         Add Team Member
@@ -69,43 +69,43 @@ export default function AdminUsersIndex({ users }: PageProps) {
                     </div>
                 )}
 
-                <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0A0A0A]">
+                <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                     {users.length === 0 ? (
-                        <div className="py-16 text-center text-sm text-slate-500">No team members yet.</div>
+                        <div className="py-16 text-center text-sm text-[#576FA8]">No team members yet.</div>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b border-white/[0.06]">
+                                    <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                         {['Name', 'Email', 'Role', 'Assigned Founders', 'Joined', 'Actions'].map((h) => (
-                                            <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-slate-500">{h}</th>
+                                            <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#576FA8]">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {users.map((u) => (
-                                        <tr key={u.id} className="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02]">
+                                        <tr key={u.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-medium text-white">{u.name}</span>
+                                                    <span className="font-medium text-[#ECF0F9]">{u.name}</span>
                                                     {u.is_self && (
-                                                        <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] text-slate-500">you</span>
+                                                        <span className="rounded-full bg-[#1B294B] px-2 py-0.5 text-[10px] text-[#576FA8]">you</span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-4 text-slate-400">{u.email}</td>
+                                            <td className="px-5 py-4 text-[#788CBA]">{u.email}</td>
                                             <td className="px-5 py-4">
                                                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${roleBadge[u.role] ?? ''}`}>
                                                     {roleLabel[u.role] ?? u.role}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-4 text-slate-400">{u.assigned_founders_count}</td>
-                                            <td className="px-5 py-4 text-slate-400">{u.created_at}</td>
+                                            <td className="px-5 py-4 text-[#788CBA]">{u.assigned_founders_count}</td>
+                                            <td className="px-5 py-4 text-[#788CBA]">{u.created_at}</td>
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <Link
                                                         href={route('admin.users.edit', { user: u.id })}
-                                                        className="flex items-center gap-1 text-xs text-slate-400 hover:text-white"
+                                                        className="flex items-center gap-1 text-xs text-[#576FA8] hover:text-[#ECF0F9]"
                                                     >
                                                         <UserPen className="size-3.5" />
                                                         Edit
@@ -113,7 +113,7 @@ export default function AdminUsersIndex({ users }: PageProps) {
                                                     {!u.is_self && (
                                                         <button
                                                             onClick={() => destroy(u.id)}
-                                                            className="flex items-center gap-1 text-xs text-red-500/70 hover:text-red-400"
+                                                            className="flex items-center gap-1 text-xs text-rose-500/70 hover:text-rose-400"
                                                         >
                                                             <Trash2 className="size-3.5" />
                                                             Remove

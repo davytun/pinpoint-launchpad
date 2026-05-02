@@ -14,7 +14,6 @@ interface PinpointLogoProps {
 
 export function PinpointLogo({
     height = 28,
-    variant = 'dark',
     className,
 }: PinpointLogoProps) {
     return (

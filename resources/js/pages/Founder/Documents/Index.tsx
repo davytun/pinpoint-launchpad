@@ -7,11 +7,12 @@ import {
     File,
     FileSpreadsheet,
     FileText,
-    Image,
+    Image as ImageIcon,
     Loader2,
     Trash2,
     Upload,
     X,
+    ArrowRight
 } from 'lucide-react';
 import { useRef, useState } from 'react';
 
@@ -63,9 +64,9 @@ interface PageProps {
 function FadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+            transition={{ duration: 0.4, delay, ease: [0.25, 1, 0.5, 1] }}
         >
             {children}
         </motion.div>
@@ -81,10 +82,10 @@ function FileIcon({ icon, extension }: { icon: string; extension: string }) {
         ['jpg', 'jpeg', 'png'].includes(extension) ? 'text-purple-400' :
         'text-slate-400';
 
-    const cls = `size-5 shrink-0 ${colorClass}`;
+    const cls = `size-4.5 shrink-0 ${colorClass}`;
 
     if (icon === 'file-spreadsheet') return <FileSpreadsheet className={cls} aria-hidden="true" />;
-    if (icon === 'image') return <Image className={cls} aria-hidden="true" />;
+    if (icon === 'image') return <ImageIcon className={cls} aria-hidden="true" />;
     if (icon === 'file-text') return <FileText className={cls} aria-hidden="true" />;
     return <File className={cls} aria-hidden="true" />;
 }
@@ -93,6 +94,14 @@ function formatBytes(bytes: number): string {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function ProCard({ children, className = '' }: { children: React.ReactNode, className?: string }) {
+    return (
+        <div className={`overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm ${className}`}>
+            {children}
+        </div>
+    );
 }
 
 // ─── Upload Zone ──────────────────────────────────────────────────────────────
@@ -144,7 +153,6 @@ function UploadZone({
         selectedFiles.forEach((f) => formData.append('files[]', f));
         formData.append('category', category);
 
-        // Read XSRF-TOKEN cookie — Laravel sets this as a plain (non-HttpOnly) cookie
         const xsrf = decodeURIComponent(
             document.cookie.split('; ').find((c) => c.startsWith('XSRF-TOKEN='))?.split('=').slice(1).join('=') ?? ''
         );
@@ -196,9 +204,9 @@ function UploadZone({
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="waitlist-panel mb-4 overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
-                    Upload Document
+            <ProCard className="mb-6 p-6">
+                <p className="mb-5 text-[11px] font-semibold uppercase tracking-wider text-[#576FA8]">
+                    Upload Supporting Documents
                 </p>
 
                 {/* Drop zone */}
@@ -212,14 +220,16 @@ function UploadZone({
                     onDragLeave={() => setDragOver(false)}
                     onDrop={handleDrop}
                     className={[
-                        'mb-4 cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-colors duration-200',
-                        dragOver ? 'border-blue-500/50 bg-blue-500/5' : 'border-slate-600 hover:border-blue-500/50',
+                        'mb-6 cursor-pointer rounded-xl border border-dashed p-8 text-center transition-all duration-200',
+                        dragOver ? 'border-[#4468BB] bg-[#1B294B]/50' : 'border-[#232C43] hover:border-[#4468BB] hover:bg-[#1B294B]/20',
                     ].join(' ')}
                 >
-                    <Upload className="mx-auto mb-3 size-12 text-slate-400" aria-hidden="true" />
-                    <p className="text-[14px] font-medium text-white/60">Drop your files here</p>
-                    <p className="text-[12px] text-white/30">or click to browse</p>
-                    <p className="mt-2 text-[11px] text-white/20">PDF, Word, Excel, PowerPoint, Images — max 100MB per file</p>
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#0C1427] border border-[#232C43]">
+                        <Upload className="size-6 text-[#9AA9CB]" aria-hidden="true" />
+                    </div>
+                    <p className="text-[14px] font-medium text-[#ECF0F9]">Drop your files here</p>
+                    <p className="text-[13px] text-[#788CBA]">or click to browse</p>
+                    <p className="mt-3 text-[11px] text-[#455987]">PDF, DOCX, XLSX, Images — max 100MB</p>
                     <input
                         ref={fileInputRef}
                         type="file"
@@ -238,23 +248,23 @@ function UploadZone({
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="mb-4 space-y-2"
+                            className="mb-6 space-y-2"
                         >
                             {selectedFiles.map((file, i) => (
                                 <div
                                     key={file.name + file.size + i}
-                                    className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+                                    className="flex items-center gap-3 rounded-lg border border-[#232C43] bg-[#0C1427] px-4 py-3"
                                 >
-                                    <FileText className="size-4 shrink-0 text-blue-400" aria-hidden="true" />
+                                    <FileText className="size-4 shrink-0 text-[#4468BB]" aria-hidden="true" />
                                     <div className="min-w-0 flex-1">
-                                        <p className="truncate text-[13px] text-white/70">{file.name}</p>
-                                        <p className="text-[11px] text-white/30">{formatBytes(file.size)}</p>
+                                        <p className="truncate text-[13px] text-[#DCE2EF]">{file.name}</p>
+                                        <p className="text-[11px] text-[#576FA8]">{formatBytes(file.size)}</p>
                                     </div>
                                     {!processing && (
                                         <button
                                             type="button"
                                             onClick={(e) => { e.stopPropagation(); removeFile(i); }}
-                                            className="rounded-lg p-1 text-white/30 transition-colors hover:text-white/60"
+                                            className="rounded-md p-1 text-[#455987] transition-colors hover:bg-red-500/10 hover:text-red-400"
                                             aria-label={`Remove ${file.name}`}
                                         >
                                             <X className="size-4" aria-hidden="true" />
@@ -274,17 +284,17 @@ function UploadZone({
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="mb-4"
+                            className="mb-6"
                         >
-                            <div className="mb-1.5 flex justify-between text-[11px] text-white/30">
+                            <div className="mb-2 flex justify-between text-[11px] text-[#788CBA]">
                                 <span>Uploading{selectedFiles.length > 1 ? ` ${selectedFiles.length} files` : ''}…</span>
-                                <span>{progress}%</span>
+                                <span className="font-bold">{progress}%</span>
                             </div>
-                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                            <div className="h-1 w-full overflow-hidden rounded-full bg-[#232C43]">
                                 <motion.div
-                                    className="h-full rounded-full bg-blue-500"
+                                    className="h-full rounded-full bg-[#4468BB]"
                                     animate={{ width: `${progress}%` }}
-                                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                                    transition={{ duration: 0.2, ease: 'easeOut' }}
                                 />
                             </div>
                         </motion.div>
@@ -292,21 +302,21 @@ function UploadZone({
                 </AnimatePresence>
 
                 {/* Category + upload button row */}
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end border-t border-[#232C43] pt-6">
                     <div className="flex-1">
-                        <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.16em] text-white/30">
+                        <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-[#576FA8]">
                             Document Category
                         </label>
                         <Select value={category} onValueChange={setCategory} disabled={processing}>
-                            <SelectTrigger className="rounded-xl border-white/[0.08] bg-white/[0.04] text-white/60 focus:border-blue-500/50">
+                            <SelectTrigger className="rounded-lg border-[#232C43] bg-[#0C1427] text-[#ECF0F9] focus:ring-1 focus:ring-[#4468BB]/50">
                                 <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
-                            <SelectContent className="border-white/[0.08] bg-[#111]">
+                            <SelectContent className="border-[#232C43] bg-[#101623]">
                                 {categories.map((cat) => (
                                     <SelectItem
                                         key={cat.value}
                                         value={cat.value}
-                                        className="text-white/70 focus:bg-white/[0.06] focus:text-white"
+                                        className="text-[#BCC5DC] focus:bg-[#1B294B] focus:text-[#ECF0F9]"
                                     >
                                         {cat.label}
                                     </SelectItem>
@@ -319,15 +329,12 @@ function UploadZone({
                         type="submit"
                         disabled={!canSubmit}
                         className={[
-                            'group relative overflow-hidden rounded-xl px-6 py-2.5 text-[13px] font-bold uppercase tracking-[0.12em] transition-all duration-200',
+                            'group relative flex h-10 items-center justify-center rounded-lg px-6 text-[13px] font-semibold uppercase tracking-wider transition-all duration-200',
                             canSubmit
-                                ? 'border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:border-blue-500/50 hover:bg-blue-500/20'
-                                : 'cursor-not-allowed border border-white/[0.06] text-white/20',
+                                ? 'bg-[#4468BB] text-white hover:bg-[#365396] shadow-lg shadow-[#4468BB]/10'
+                                : 'cursor-not-allowed bg-[#232C43] text-[#455987]',
                         ].join(' ')}
                     >
-                        {canSubmit && !processing && (
-                            <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
-                        )}
                         <span className="relative z-10 flex items-center gap-2">
                             {processing ? (
                                 <>
@@ -335,7 +342,7 @@ function UploadZone({
                                     Uploading…
                                 </>
                             ) : (
-                                <>Upload {selectedFiles.length > 1 ? `${selectedFiles.length} Files` : 'Document'} →</>
+                                <>Upload {selectedFiles.length > 1 ? `${selectedFiles.length} Files` : 'Document'} <ArrowRight className="size-3.5" /></>
                             )}
                         </span>
                     </button>
@@ -348,13 +355,13 @@ function UploadZone({
                             initial={{ opacity: 0, y: -4 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="mt-3 text-[12px] text-red-400"
+                            className="mt-4 text-[13px] text-red-400"
                         >
                             {uploadError}
                         </motion.p>
                     )}
                 </AnimatePresence>
-            </div>
+            </ProCard>
         </form>
     );
 }
@@ -369,48 +376,54 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center gap-4 rounded-2xl border border-white/[0.04] bg-white/[0.02] px-4 py-3.5 transition-colors duration-150 hover:bg-white/[0.05]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="group flex items-center gap-4 py-3 transition-all duration-150 hover:bg-[#1B294B]/20 px-4"
         >
             {/* File icon */}
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.04]">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[#232C43] bg-[#0C1427]">
                 <FileIcon icon={doc.file_icon} extension={doc.extension} />
             </div>
 
             {/* File info */}
-            <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-medium text-white" title={doc.original_filename}>
+            <div className="min-w-0 flex-[2.5]">
+                <p className="truncate text-[13.5px] font-medium text-[#ECF0F9]" title={doc.original_filename}>
                     {doc.original_filename}
                 </p>
-                <div className="flex items-center gap-2 text-[11px] text-white/30">
+                <div className="mt-1 flex items-center gap-2 text-[11px] text-[#576FA8] sm:hidden">
                     <span>{doc.file_size}</span>
-                    <span>·</span>
+                    <span className="opacity-30">·</span>
                     <span>{doc.created_at}</span>
                 </div>
             </div>
 
+            {/* Desktop columns */}
+            <div className="hidden sm:flex flex-1 items-center gap-4 text-[12.5px] text-[#788CBA]">
+                <span className="w-20 shrink-0 text-right">{doc.file_size}</span>
+                <span className="flex-1 text-right opacity-60 font-mono text-[11px]">{doc.created_at}</span>
+            </div>
+
             {/* Status badge */}
-            <div className="hidden sm:block">
+            <div className="w-32 shrink-0 flex justify-end">
                 {doc.is_reviewed ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-400">
-                        <CheckCircle2 className="size-3" aria-hidden="true" /> Reviewed
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500/80">
+                        Reviewed
                     </span>
                 ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white/30">
-                        Pending Review
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#455987]">
+                        Pending
                     </span>
                 )}
             </div>
 
             {/* Actions */}
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="flex w-24 shrink-0 items-center justify-end gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
                 <button
                     onClick={handleDownload}
                     title="Download"
-                    className="rounded-lg p-2 text-white/30 transition-colors hover:bg-white/[0.05] hover:text-white"
+                    className="rounded-md p-1.5 text-[#788CBA] transition-colors hover:bg-[#101623] hover:text-[#ECF0F9]"
                 >
                     <Download className="size-4" aria-hidden="true" />
                 </button>
@@ -418,7 +431,7 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
                     <button
                         onClick={() => onDelete(doc)}
                         title="Delete"
-                        className="rounded-lg p-2 text-white/30 transition-colors hover:bg-red-500/[0.08] hover:text-red-400"
+                        className="rounded-md p-1.5 text-[#455987] transition-colors hover:bg-red-500/10 hover:text-red-400"
                     >
                         <Trash2 className="size-4" aria-hidden="true" />
                     </button>
@@ -456,7 +469,6 @@ export default function DocumentsIndex({
         });
     }
 
-    // Group documents by category
     const grouped = documents.reduce<Record<string, DocumentItem[]>>((acc, doc) => {
         if (!acc[doc.category_label]) acc[doc.category_label] = [];
         acc[doc.category_label].push(doc);
@@ -470,21 +482,23 @@ export default function DocumentsIndex({
         <FounderLayout founder={founder}>
             <Head title="Documents — Pinpoint Launchpad" />
 
-            <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-[64rem] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
 
                 {/* ── Header ── */}
                 <FadeUp delay={0}>
-                    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                         <div>
-                            <h1 className="font-display text-3xl font-bold text-white">Your Documents</h1>
-                            <p className="mt-1.5 text-[14px] text-slate-400">
-                                Upload supporting documents for your analyst to review during the audit.
+                            <h1 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">Your Documents</h1>
+                            <p className="mt-2 text-[15px] text-[#788CBA]">
+                                Upload supporting evidence for your analyst to review.
                             </p>
                         </div>
                         <div className="shrink-0">
-                            <span className="inline-flex items-center rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-[13px] text-slate-300">
-                                {total_count} / {max_files} documents
-                            </span>
+                            <div className="inline-flex items-center rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2 text-[13px] font-medium text-[#ECF0F9]">
+                                <span className="mr-2 font-bold text-[#4468BB]">{total_count}</span>
+                                <span className="opacity-30">/</span>
+                                <span className="ml-2 opacity-50">{max_files} Documents</span>
+                            </div>
                         </div>
                     </div>
                 </FadeUp>
@@ -494,101 +508,123 @@ export default function DocumentsIndex({
                     {flash?.success && (
                         <motion.div
                             key="flash"
-                            initial={{ opacity: 0, y: -8 }}
+                            initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="mb-6 flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.07] px-4 py-3"
+                            transition={{ duration: 0.3 }}
+                            className="mb-8 flex items-center gap-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3.5"
                         >
                             <CheckCircle2 className="size-4 shrink-0 text-emerald-400" aria-hidden="true" />
-                            <p className="text-[13px] text-emerald-300">{flash.success}</p>
+                            <p className="text-[14px] font-medium text-emerald-300">{flash.success}</p>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
                 {/* ── Audit complete notice ── */}
                 {auditComplete && (
-                    <FadeUp delay={0.06}>
-                        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.07] px-4 py-4">
-                            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" aria-hidden="true" />
-                            <p className="text-[13px] text-amber-300">
-                                Your audit is complete. Document uploads are now closed.
-                            </p>
+                    <FadeUp delay={0.05}>
+                        <div className="mb-8 flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-4">
+                            <AlertTriangle className="mt-0.5 size-4.5 shrink-0 text-amber-400" aria-hidden="true" />
+                            <div>
+                                <p className="text-[14px] font-medium text-amber-400">Audit Complete</p>
+                                <p className="mt-1 text-[13px] text-amber-300/80">
+                                    Your audit is finalized. Document uploads are now closed for this cycle.
+                                </p>
+                            </div>
                         </div>
                     </FadeUp>
                 )}
 
                 {/* ── Upload section ── */}
                 {showUpload && (
-                    <FadeUp delay={0.08}>
+                    <FadeUp delay={0.1}>
                         <UploadZone categories={categories} onSuccess={() => {}} />
                     </FadeUp>
                 )}
 
                 {/* ── Documents list ── */}
-                <FadeUp delay={showUpload ? 0.16 : 0.08}>
+                <FadeUp delay={showUpload ? 0.2 : 0.1}>
                     {documents.length === 0 ? (
-                        <div className="waitlist-panel flex flex-col items-center justify-center rounded-3xl border border-white/[0.06] bg-[#0A0A0A] px-6 py-16 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                            <FileText className="mb-4 size-12 text-slate-500" aria-hidden="true" />
-                            <p className="text-[15px] font-semibold text-white/50">No documents uploaded yet</p>
-                            <p className="mt-1 text-[13px] text-white/25">
-                                Upload your first document above to share it with your analyst.
+                        <ProCard className="flex flex-col items-center justify-center px-6 py-20 text-center">
+                            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0C1427] border border-[#232C43]">
+                                <FileText className="size-8 text-[#455987]" aria-hidden="true" />
+                            </div>
+                            <p className="text-[17px] font-medium text-[#ECF0F9]">No documents yet</p>
+                            <p className="mt-2 text-[14px] text-[#788CBA] max-w-sm">
+                                Documents you upload will appear here grouped by their category.
                             </p>
-                        </div>
+                        </ProCard>
                     ) : (
-                        <div className="space-y-6">
-                            {Object.entries(grouped).map(([categoryLabel, docs]) => (
-                                <div key={categoryLabel}>
-                                    <div className="mb-3 flex items-center gap-2">
-                                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                            {categoryLabel}
-                                        </p>
-                                        <span className="text-[10px] text-white/20">({docs.length})</span>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <AnimatePresence mode="popLayout">
-                                            {docs.map((doc) => (
-                                                <DocumentRow
-                                                    key={doc.id}
-                                                    doc={doc}
-                                                    onDelete={setDeleteTarget}
-                                                />
-                                            ))}
-                                        </AnimatePresence>
-                                    </div>
+                        <ProCard className="overflow-visible">
+                            <div className="hidden sm:flex items-center gap-4 border-b border-[#232C43] px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#455987]">
+                                <div className="w-8 shrink-0" /> {/* Icon spacer */}
+                                <div className="flex-[2.5]">Document Name</div>
+                                <div className="flex-1 flex items-center gap-4">
+                                    <div className="w-20 text-right">Size</div>
+                                    <div className="flex-1 text-right">Uploaded</div>
                                 </div>
-                            ))}
-                        </div>
+                                <div className="w-32 text-right">Status</div>
+                                <div className="w-24 shrink-0" /> {/* Actions spacer */}
+                            </div>
+                            
+                            <div className="divide-y divide-[#232C43]/50">
+                                {Object.entries(grouped).map(([categoryLabel, docs]) => (
+                                    <div key={categoryLabel}>
+                                        <div className="bg-[#1B294B]/10 px-4 py-2 flex items-center justify-between border-b border-[#232C43]/30">
+                                            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#576FA8]">
+                                                {categoryLabel}
+                                            </p>
+                                            <span className="text-[10px] font-medium text-[#455987]">
+                                                {docs.length} Items
+                                            </span>
+                                        </div>
+                                        <div className="divide-y divide-[#232C43]/30">
+                                            <AnimatePresence mode="popLayout">
+                                                {docs.map((doc) => (
+                                                    <DocumentRow
+                                                        key={doc.id}
+                                                        doc={doc}
+                                                        onDelete={setDeleteTarget}
+                                                    />
+                                                ))}
+                                            </AnimatePresence>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </ProCard>
                     )}
                 </FadeUp>
             </div>
 
             {/* ── Delete confirmation dialog ── */}
             <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-                <DialogContent className="border-white/[0.08] bg-[#111] text-white">
+                <DialogContent className="border-[#232C43] bg-[#101623] text-white">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Delete document?</DialogTitle>
+                        <DialogTitle className="text-[18px] font-semibold text-[#ECF0F9]">Delete document?</DialogTitle>
                     </DialogHeader>
-                    <p className="text-[13px] text-white/50">
-                        Are you sure you want to delete{' '}
-                        <span className="font-medium text-white/70">{deleteTarget?.original_filename}</span>?
-                        This cannot be undone.
-                    </p>
-                    <DialogFooter className="gap-2">
+                    <div className="py-4">
+                        <p className="text-[14px] leading-relaxed text-[#788CBA]">
+                            Are you sure you want to delete{' '}
+                            <span className="font-bold text-[#ECF0F9]">{deleteTarget?.original_filename}</span>?
+                            This action cannot be undone and will remove it from the analyst's queue.
+                        </p>
+                    </div>
+                    <DialogFooter className="gap-3 sm:gap-0">
                         <Button
                             variant="ghost"
                             onClick={() => setDeleteTarget(null)}
-                            className="text-white/40 hover:text-white"
+                            className="text-[#788CBA] hover:bg-[#1B294B] hover:text-[#ECF0F9]"
                         >
                             Cancel
                         </Button>
                         <Button
                             onClick={confirmDelete}
                             disabled={deleting}
-                            className="border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                            className="bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
                         >
-                            {deleting ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                            Delete
+                            {deleting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Trash2 className="mr-2 size-4" />}
+                            Delete Document
                         </Button>
                     </DialogFooter>
                 </DialogContent>

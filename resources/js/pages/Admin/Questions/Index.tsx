@@ -1,4 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import AdminLayout from '@/layouts/admin-layout';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -62,32 +63,23 @@ export default function AdminQuestionsIndex() {
     const { questions, flash } = usePage<PageProps>().props;
 
     return (
-        <>
+        <AdminLayout>
             <Head title="Diagnostic Questions — Admin" />
 
-            <div
-                className="min-h-screen px-5 py-10 sm:px-8"
-                style={{ background: '#0A0F1A' }}
-            >
+            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-5xl">
 
                     {/* Header row */}
                     <div className="mb-8 flex items-center justify-between">
                         <div>
-                            <p
-                                className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em]"
-                                style={{ color: 'rgba(255,255,255,0.30)' }}
-                            >
+                            <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#788CBA]">
                                 Admin
                             </p>
-                            <h1 className="text-xl font-bold text-white">Diagnostic Questions</h1>
+                            <h1 className="text-2xl font-bold text-[#ECF0F9]">Diagnostic Questions</h1>
                         </div>
                         <Link
                             href={route('admin.waitlist.index')}
-                            className="text-xs font-medium transition-colors"
-                            style={{ color: 'rgba(255,255,255,0.35)' }}
-                            onMouseEnter={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.70)')}
-                            onMouseLeave={e => ((e.target as HTMLElement).style.color = 'rgba(255,255,255,0.35)')}
+                            className="text-xs font-medium text-[#788CBA] transition-colors hover:text-[#ECF0F9]"
                         >
                             ← Waitlist
                         </Link>
@@ -95,28 +87,15 @@ export default function AdminQuestionsIndex() {
 
                     {/* Flash */}
                     {flash?.success && (
-                        <div
-                            className="mb-6 rounded-xl border px-4 py-3 text-sm"
-                            style={{
-                                borderColor: 'rgba(5,150,105,0.35)',
-                                background: 'rgba(5,150,105,0.08)',
-                                color: '#6EE7B7',
-                            }}
-                        >
+                        <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
                             {flash.success}
                         </div>
                     )}
 
                     {/* Table */}
-                    <div
-                        className="overflow-hidden rounded-2xl border"
-                        style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
-                    >
+                    <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                         {/* Table header */}
-                        <div
-                            className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] gap-4 border-b px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em]"
-                            style={{ borderColor: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.28)' }}
-                        >
+                        <div className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] gap-4 border-b border-[#232C43] bg-[#0C1427]/50 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#576FA8]">
                             <span>#</span>
                             <span>Pillar</span>
                             <span>Question</span>
@@ -126,20 +105,13 @@ export default function AdminQuestionsIndex() {
                         </div>
 
                         {/* Rows */}
-                        {questions.data.map((q, i) => (
+                        {questions.data.map((q) => (
                             <div
                                 key={q.id}
-                                className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] items-center gap-4 border-b px-5 py-4 transition-colors duration-150 last:border-0"
-                                style={{
-                                    borderColor: 'rgba(255,255,255,0.05)',
-                                    background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.012)',
-                                }}
+                                className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] items-center gap-4 border-b border-[#232C43] px-5 py-4 transition-colors duration-150 last:border-0 hover:bg-[#1B294B]/30"
                             >
                                 {/* Order */}
-                                <span
-                                    className="text-sm font-mono font-semibold"
-                                    style={{ color: 'rgba(255,255,255,0.25)' }}
-                                >
+                                <span className="text-sm font-mono font-semibold text-[#576FA8]">
                                     {q.order}
                                 </span>
 
@@ -148,36 +120,24 @@ export default function AdminQuestionsIndex() {
 
                                 {/* Question text truncated */}
                                 <p
-                                    className="truncate text-sm"
-                                    style={{ color: 'rgba(255,255,255,0.70)' }}
+                                    className="truncate text-sm text-[#ECF0F9]"
                                     title={q.question_text}
                                 >
                                     {q.question_text}
                                 </p>
 
                                 {/* Points */}
-                                <span
-                                    className="text-right text-sm font-semibold tabular-nums"
-                                    style={{ color: 'rgba(255,255,255,0.55)' }}
-                                >
+                                <span className="text-right text-sm font-semibold tabular-nums text-[#788CBA]">
                                     {q.points}
                                 </span>
 
                                 {/* Active toggle (read-only indicator — editing happens on edit page) */}
                                 <div className="flex justify-center">
                                     <span
-                                        className="inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200"
-                                        style={{
-                                            background: q.is_active
-                                                ? 'rgba(5,150,105,0.55)'
-                                                : 'rgba(255,255,255,0.10)',
-                                        }}
+                                        className={`inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ${q.is_active ? 'bg-emerald-500/50' : 'bg-[#232C43]'}`}
                                     >
                                         <span
-                                            className="mx-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200"
-                                            style={{
-                                                transform: q.is_active ? 'translateX(16px)' : 'translateX(0)',
-                                            }}
+                                            className={`mx-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${q.is_active ? 'translate-x-[16px]' : 'translate-x-0'}`}
                                         />
                                     </span>
                                 </div>
@@ -186,20 +146,7 @@ export default function AdminQuestionsIndex() {
                                 <div className="flex justify-end">
                                     <Link
                                         href={route('admin.questions.edit', q.id)}
-                                        className="rounded-lg px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition-all duration-150"
-                                        style={{
-                                            background: 'rgba(255,255,255,0.05)',
-                                            border: '1px solid rgba(255,255,255,0.10)',
-                                            color: 'rgba(255,255,255,0.50)',
-                                        }}
-                                        onMouseEnter={e => {
-                                            (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.09)';
-                                            (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.85)';
-                                        }}
-                                        onMouseLeave={e => {
-                                            (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
-                                            (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.50)';
-                                        }}
+                                        className="rounded-lg border border-[#232C43] bg-[#1B294B]/50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#788CBA] transition-all duration-150 hover:bg-[#1B294B] hover:text-[#ECF0F9]"
                                     >
                                         Edit
                                     </Link>
@@ -211,10 +158,7 @@ export default function AdminQuestionsIndex() {
                     {/* Pagination */}
                     {questions.last_page > 1 && (
                         <div className="mt-5 flex items-center justify-between">
-                            <p
-                                className="text-xs"
-                                style={{ color: 'rgba(255,255,255,0.28)' }}
-                            >
+                            <p className="text-xs text-[#576FA8]">
                                 {questions.total} questions
                             </p>
                             <div className="flex gap-1">
@@ -224,19 +168,17 @@ export default function AdminQuestionsIndex() {
                                             key={i}
                                             href={link.url}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
-                                            className="rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150"
-                                            style={{
-                                                background: link.active ? 'rgba(37,99,235,0.25)' : 'rgba(255,255,255,0.04)',
-                                                border: link.active ? '1px solid rgba(37,99,235,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                                                color: link.active ? '#93B4FF' : 'rgba(255,255,255,0.40)',
-                                            }}
+                                            className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
+                                                link.active 
+                                                    ? 'border-[#4468BB] bg-[#4468BB]/10 text-[#4468BB]' 
+                                                    : 'border-[#232C43] bg-[#101623] text-[#788CBA] hover:bg-[#1B294B] hover:text-[#ECF0F9]'
+                                            }`}
                                         />
                                     ) : (
                                         <span
                                             key={i}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
-                                            className="rounded-lg px-3 py-1.5 text-xs"
-                                            style={{ color: 'rgba(255,255,255,0.18)' }}
+                                            className="rounded-lg px-3 py-1.5 text-xs text-[#576FA8]"
                                         />
                                     )
                                 ))}
@@ -245,6 +187,6 @@ export default function AdminQuestionsIndex() {
                     )}
                 </div>
             </div>
-        </>
+        </AdminLayout>
     );
 }

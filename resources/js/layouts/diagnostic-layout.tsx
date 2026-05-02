@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
-import { Badge } from '@/components/ui/badge';
 
 interface DiagnosticLayoutProps {
     children: React.ReactNode;
@@ -15,7 +14,7 @@ interface DiagnosticLayoutProps {
 export default function DiagnosticLayout({
     children,
     hideWordmark = false,
-    glowColor = '#2563EB',
+    glowColor = '#4468BB',
 }: DiagnosticLayoutProps) {
     // Key changes on route so AnimatePresence remounts on navigation
     const [routeKey, setRouteKey] = useState(() =>

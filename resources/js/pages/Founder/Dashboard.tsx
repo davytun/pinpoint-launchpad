@@ -1,19 +1,18 @@
-import { Head } from '@inertiajs/react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Head, Link } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     AlertCircle,
     AlertTriangle,
     CheckCircle2,
-    ChevronDown,
-    ChevronUp,
     ExternalLink,
     FileText,
     MessageSquare,
-    Package,
-    Star,
     TrendingUp,
-    User,
     Zap,
+    ArrowRight,
+    ChevronDown,
+    ChevronUp,
+    User
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -75,11 +74,12 @@ const PILLAR_LABELS: Record<string, string> = {
     alignment: 'Alignment', governance: 'Governance', operations: 'Operations', need: 'Need',
 };
 
+// Adjusted colors to be slightly more muted for Fintech Pro, maintaining semantic meaning
 const BAND_META: Record<string, { color: string; border: string; bg: string; textColor: string; badgeLabel: string; Icon: React.ElementType }> = {
-    low:      { color: '#EF4444', border: 'rgba(239,68,68,0.5)',   bg: 'rgba(239,68,68,0.08)',   textColor: '#FCA5A5', badgeLabel: 'High Risk Profile',     Icon: AlertCircle  },
-    mid_low:  { color: '#F97316', border: 'rgba(249,115,22,0.5)',  bg: 'rgba(249,115,22,0.08)',  textColor: '#FDBA74', badgeLabel: 'Development Required',   Icon: AlertTriangle },
-    mid_high: { color: '#3C53A8', border: 'rgba(60,83,168,0.6)',   bg: 'rgba(60,83,168,0.12)',   textColor: '#93C5FD', badgeLabel: 'Investment Pipeline',    Icon: TrendingUp    },
-    high:     { color: '#5CA336', border: 'rgba(92,163,54,0.6)',   bg: 'rgba(92,163,54,0.12)',   textColor: '#86efac', badgeLabel: 'Top Percentile',         Icon: Zap           },
+    low:      { color: '#EF4444', border: 'rgba(239,68,68,0.3)',   bg: 'rgba(239,68,68,0.1)',   textColor: '#FCA5A5', badgeLabel: 'High Risk Profile',     Icon: AlertCircle  },
+    mid_low:  { color: '#F97316', border: 'rgba(249,115,22,0.3)',  bg: 'rgba(249,115,22,0.1)',  textColor: '#FDBA74', badgeLabel: 'Development Required',   Icon: AlertTriangle },
+    mid_high: { color: '#4468BB', border: 'rgba(68,104,187,0.4)',  bg: 'rgba(68,104,187,0.15)', textColor: '#9AA9CB', badgeLabel: 'Investment Pipeline',    Icon: TrendingUp    },
+    high:     { color: '#5CA336', border: 'rgba(92,163,54,0.4)',   bg: 'rgba(92,163,54,0.15)',  textColor: '#86efac', badgeLabel: 'Top Percentile',         Icon: Zap           },
 };
 
 const TIER_LABELS: Record<string, string> = {
@@ -107,7 +107,7 @@ function fmtDateTime(iso?: string | null): string {
     return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-// ─── Count-up (exact from Diagnostic/Result.tsx) ──────────────────────────────
+// ─── Count-up ─────────────────────────────────────────────────────────────────
 
 function CountUp({ target, duration = 1500 }: { target: number; duration?: number }) {
     const [value, setValue] = useState(0);
@@ -135,9 +135,9 @@ function CountUp({ target, duration = 1500 }: { target: number; duration?: numbe
 function FadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
+            transition={{ duration: 0.4, delay, ease: [0.25, 1, 0.5, 1] }} // Subtle, fast easing
         >
             {children}
         </motion.div>
@@ -152,45 +152,62 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
         { label: 'Payment',     done: true,                              active: false },
         { label: 'Agreement',   done: true,                              active: false },
         { label: 'Audit',       done: auditStatus === 'complete',        active: auditStatus !== 'complete' },
-        { label: 'Certified',   done: auditStatus === 'complete',        active: false, locked: auditStatus !== 'complete' },
+        { label: 'Certified',   done: auditStatus === 'complete',        active: false },
     ];
 
     return (
-        <div className="flex items-center gap-1">
+        <div className="flex w-full items-center justify-between mt-2 sm:mt-6 pb-8">
             {steps.map((step, i) => (
-                <div key={step.label} className="flex items-center gap-1">
-                    <div className="flex flex-col items-center gap-1.5">
+                <div key={step.label} className="flex items-center flex-1 last:flex-none">
+                    {/* Step Circle */}
+                    <div className="flex flex-col items-center relative">
                         <div
                             className={[
-                                'flex h-6 w-6 items-center justify-center rounded-full border text-[10px] font-bold transition-all',
-                                step.done   ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-400' :
-                                step.active ? 'border-blue-500/50 bg-blue-500/10 text-blue-400 shadow-[0_0_8px_rgba(37,99,235,0.3)]' :
-                                              'border-white/[0.07] bg-white/[0.02] text-white/20',
+                                'flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold border transition-colors duration-200 shrink-0 relative z-10',
+                                step.done   ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' :
+                                step.active ? 'border-[#4468BB]/80 bg-[#4468BB]/10 text-[#6986C9]' :
+                                              'border-[#232C43] bg-[#0C1427] text-[#576FA8]',
                             ].join(' ')}
                         >
-                            {step.done ? <CheckCircle2 className="size-3" /> : i + 1}
+                            {step.done ? <CheckCircle2 className="size-3.5" /> : i + 1}
                         </div>
+                        
+                        {/* Label */}
                         <span
                             className={[
-                                'text-[9px] font-bold uppercase tracking-[0.12em]',
-                                step.done   ? 'text-emerald-400/70' :
-                                step.active ? 'text-blue-400/80' :
-                                              'text-white/20',
+                                'mt-3 absolute top-6 whitespace-nowrap text-[11px] font-medium tracking-wide transition-colors duration-200',
+                                step.done   ? 'text-emerald-400' :
+                                step.active ? 'text-[#9AA9CB]' :
+                                              'text-[#455987]',
                             ].join(' ')}
                         >
                             {step.label}
                         </span>
                     </div>
+
+                    {/* Connector Line */}
                     {i < steps.length - 1 && (
-                        <div
-                            className={[
-                                'mb-4 h-px w-4 sm:w-6',
-                                step.done ? 'bg-emerald-500/30' : 'bg-white/[0.06]',
-                            ].join(' ')}
-                        />
+                        <div className="flex-1 px-2">
+                            <div
+                                className={[
+                                    'h-[1px] w-full transition-colors duration-300',
+                                    step.done ? 'bg-emerald-500/40' : 'bg-[#232C43]',
+                                ].join(' ')}
+                            />
+                        </div>
                     )}
                 </div>
             ))}
+        </div>
+    );
+}
+
+// ─── Card Components ───
+
+function ProCard({ children, className = '' }: { children: React.ReactNode, className?: string }) {
+    return (
+        <div className={`overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm ${className}`}>
+            {children}
         </div>
     );
 }
@@ -203,11 +220,11 @@ export default function FounderDashboard({
     audit_status, audit_status_config,
     payment, verification_url, profile_is_live,
 }: PageProps) {
-    const [accountOpen, setAccountOpen] = useState(false);
-
     const meta       = BAND_META[score_band ?? 'mid_high'] ?? BAND_META.mid_high;
     const tierLabel  = TIER_LABELS[tier ?? ''] ?? (tier ? (tier.charAt(0).toUpperCase() + tier.slice(1)) : 'Foundation');
     const statusCfg  = audit_status_config[audit_status] ?? audit_status_config['pending'];
+
+    const [accountOpen, setAccountOpen] = useState(false);
 
     const hasPillarData = Object.values(pillar_scores).some((v) => (v ?? 0) > 0);
     const radarData = PILLAR_KEYS.map((k) => ({
@@ -215,381 +232,280 @@ export default function FounderDashboard({
         value:   pillar_scores[k] ?? 0,
     }));
 
-    // Audit status border accent
-    const statusBorderColor =
-        audit_status === 'in_progress' ? 'rgba(37,99,235,0.3)' :
-        audit_status === 'needs_info'  ? 'rgba(245,158,11,0.3)' :
-        audit_status === 'complete'    ? 'rgba(16,185,129,0.3)' :
-        'rgba(255,255,255,0.06)';
-
     return (
         <FounderLayout founder={founder}>
             <Head title="Dashboard — Pinpoint Launchpad" />
 
-            <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-[64rem] space-y-6 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
 
                 {/* ── Section 1 — Welcome Header ── */}
                 <FadeUp delay={0}>
-                    <div className="mb-10">
-                        <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/50 backdrop-blur-sm">
-                            <span className="h-1.5 w-1.5 rounded-full" style={{ background: meta.color }} />
-                            {meta.badgeLabel}
-                        </span>
-                        <h1 className="font-display mt-4 text-[26px] font-semibold leading-tight tracking-tight text-white sm:text-[30px]">
-                            {greeting(founder.full_name)}
-                        </h1>
-                        <p className="mt-1.5 text-[14px] text-white/40">
-                            {founder.company_name ?? '—'} — {tierLabel} Audit
-                        </p>
+                    <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-2.5 py-1 text-[11px] font-medium tracking-wide text-[#9AA9CB]">
+                                <span className="h-1.5 w-1.5 rounded-full" style={{ background: meta.color }} />
+                                {meta.badgeLabel}
+                            </div>
+                            <h1 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                                {greeting(founder.full_name)}
+                            </h1>
+                            <p className="mt-1.5 text-[14px] text-[#788CBA]">
+                                {founder.company_name ?? '—'} <span className="mx-2 opacity-50">•</span> {tierLabel} Audit
+                            </p>
+                        </div>
                     </div>
                 </FadeUp>
 
                 {/* ── Section 2 — Audit Status ── */}
-                <FadeUp delay={0.08}>
-                    <div
-                        className="waitlist-panel mb-6 overflow-hidden rounded-3xl border bg-[#0A0A0A] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
-                        style={{ borderColor: statusBorderColor }}
-                    >
-                        <div className="p-6 sm:p-8">
-                            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
-                                Audit Status
-                            </p>
-                            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-                                {/* Left */}
-                                <div className="flex-1">
+                <FadeUp delay={0.1}>
+                    <ProCard className="p-6 sm:p-8">
+                        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+                            <div className="lg:w-1/2">
+                                <div className="mb-4 flex items-center gap-3">
+                                    <span className="text-[12px] font-semibold uppercase tracking-wider text-[#788CBA]">
+                                        Current Phase
+                                    </span>
                                     <Badge
-                                        className="mb-3 rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em]"
-                                        style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.8)', border: '1px solid rgba(255,255,255,0.08)' }}
+                                        className="rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#232C43] text-[#DCE2EF] border-none"
                                     >
                                         {statusCfg.label}
                                     </Badge>
-                                    <p className="text-[13px] leading-relaxed text-white/40">
-                                        {statusCfg.description}
-                                    </p>
-
-                                    {audit_status === 'needs_info' && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -6 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                                            className="mt-4 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.07] p-4"
-                                        >
-                                            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" aria-hidden="true" />
-                                            <div>
-                                                <p className="text-[13px] font-semibold text-amber-300">
-                                                    Your analyst needs additional information.
-                                                </p>
-                                                <p className="mt-0.5 text-[12px] text-amber-400/60">
-                                                    Please check your Messages tab.
-                                                </p>
-                                            </div>
-                                        </motion.div>
-                                    )}
-
-                                    {audit_status === 'complete' && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -6 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                                            className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.07] p-4"
-                                        >
-                                            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-400" aria-hidden="true" />
-                                            <div>
-                                                <p className="text-[13px] font-semibold text-emerald-300">
-                                                    Your PARAGON Certification is complete.
-                                                </p>
-                                                <p className="mt-0.5 text-[12px] text-emerald-400/60">
-                                                    Your investor verification page is now live.
-                                                </p>
-                                            </div>
-                                        </motion.div>
-                                    )}
                                 </div>
+                                
+                                <p className="text-[15px] leading-relaxed text-[#9AA9CB] max-w-lg">
+                                    {statusCfg.description}
+                                </p>
 
-                                {/* Right — stepper */}
-                                <div className="sm:shrink-0">
-                                    <ProgressStepper auditStatus={audit_status} />
-                                </div>
+                                {audit_status === 'needs_info' && (
+                                    <div className="mt-5 flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-4">
+                                        <AlertTriangle className="size-4 text-amber-400 shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-[13px] font-medium text-amber-400">Action Required</p>
+                                            <p className="mt-1 text-[13px] text-amber-400/80">Your analyst requested more details. Please check your Messages.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="lg:w-[45%] lg:pb-0 pb-4">
+                                <ProgressStepper auditStatus={audit_status} />
                             </div>
                         </div>
-                    </div>
+                    </ProCard>
                 </FadeUp>
 
-                {/* ── Section 3 — PARAGON Score + Radar ── */}
-                <FadeUp delay={0.16}>
-                    <div className="mb-6 grid gap-5 sm:grid-cols-2">
-
-                        {/* Score */}
-                        <div className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-8">
-                            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
-                                Your PARAGON Score
+                {/* ── Section 3 — PARAGON Score & Radar ── */}
+                <div className="grid gap-6 sm:grid-cols-2">
+                    <FadeUp delay={0.15}>
+                        <ProCard className="flex h-full flex-col items-center justify-center p-8 text-center relative">
+                            <p className="mb-6 text-[12px] font-semibold uppercase tracking-wider text-[#788CBA]">
+                                PARAGON Score
                             </p>
                             {score != null ? (
                                 <>
-                                    <div className="flex items-end gap-1 leading-none">
+                                    <div className="mb-5 flex items-baseline justify-center">
                                         <span
-                                            className="font-display text-[6rem] font-black leading-none tracking-tighter sm:text-[7rem]"
-                                            style={{ color: meta.color, textShadow: `0 0 40px ${meta.color}66` }}
+                                            className="font-display text-[5.5rem] font-bold leading-none tracking-tighter"
+                                            style={{ color: meta.color }}
                                         >
                                             <CountUp target={score} duration={1500} />
                                         </span>
-                                        <span className="mb-3 font-display text-2xl font-light text-white/25 sm:mb-5">
-                                            /100
-                                        </span>
                                     </div>
-                                    <div className="mt-3 flex items-center gap-2">
-                                        <Badge
-                                            className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em]"
-                                            style={{ background: meta.bg, color: meta.textColor, border: `1px solid ${meta.border}` }}
-                                        >
-                                            <meta.Icon className="mr-1.5 inline size-3" aria-hidden="true" />
-                                            {meta.badgeLabel}
-                                        </Badge>
-                                    </div>
+                                    <Badge
+                                        className="rounded-sm px-3 py-1 text-[11px] font-bold uppercase tracking-wider"
+                                        style={{ background: meta.bg, color: meta.textColor, border: `1px solid ${meta.border}` }}
+                                    >
+                                        <meta.Icon className="mr-2 inline size-3.5" aria-hidden="true" />
+                                        {meta.badgeLabel}
+                                    </Badge>
                                     {score_band_message && (
-                                        <p className="mt-3 text-[12px] leading-relaxed text-white/30">{score_band_message}</p>
+                                        <p className="mt-4 text-[13px] leading-relaxed text-[#788CBA]">
+                                            {score_band_message}
+                                        </p>
                                     )}
                                 </>
                             ) : (
-                                <div className="space-y-3" aria-label="Score pending">
-                                    <Skeleton className="h-20 w-28 rounded-xl bg-white/[0.04]" />
-                                    <Skeleton className="h-4 w-32 rounded bg-white/[0.04]" />
-                                    <p className="text-[11px] text-white/20">Score pending audit assignment</p>
+                                <div className="flex flex-col items-center space-y-4 py-6">
+                                    <Skeleton className="h-16 w-24 rounded-lg bg-[#232C43]" />
+                                    <p className="text-[13px] text-[#576FA8]">Score pending audit completion</p>
                                 </div>
                             )}
-                        </div>
+                        </ProCard>
+                    </FadeUp>
 
-                        {/* Radar */}
-                        <figure className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-8">
-                            <figcaption className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
-                                Pillar Radar
-                            </figcaption>
+                    <FadeUp delay={0.20}>
+                        <ProCard className="h-full p-6 sm:p-8">
+                            <p className="mb-4 text-[12px] font-semibold uppercase tracking-wider text-[#788CBA]">
+                                Pillar Breakdown
+                            </p>
                             {hasPillarData ? (
-                                <div className="relative">
-                                    <div
-                                        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[60px]"
-                                        style={{ background: `radial-gradient(circle, ${meta.color}66, transparent 70%)` }}
-                                    />
-                                    <ResponsiveContainer width="100%" height={280}>
-                                        <RadarChart data={radarData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
-                                            <PolarGrid stroke="rgba(255,255,255,0.07)" />
+                                <div className="relative h-[220px] w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RadarChart data={radarData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+                                            <PolarGrid stroke="#232C43" />
                                             <PolarAngleAxis
                                                 dataKey="subject"
-                                                tick={{ fill: 'rgba(255,255,255,0.50)', fontSize: 11, fontWeight: 600 }}
+                                                tick={{ fill: '#788CBA', fontSize: 11, fontWeight: 500 }}
                                             />
                                             <Radar
                                                 dataKey="value"
                                                 stroke={meta.color}
-                                                fill={`${meta.color}25`}
+                                                fill={meta.color}
+                                                fillOpacity={0.15}
                                                 strokeWidth={2}
-                                                dot={{ fill: meta.color, r: 3 }}
+                                                dot={{ fill: meta.color, r: 3, strokeWidth: 0 }}
                                             />
                                         </RadarChart>
                                     </ResponsiveContainer>
                                 </div>
                             ) : (
-                                <div className="flex h-[280px] flex-col items-center justify-center gap-4" aria-label="Pillar scores pending">
-                                    <div className="space-y-2 w-full px-4">
-                                        <Skeleton className="mx-auto h-28 w-28 rounded-full bg-white/[0.04]" />
-                                        <Skeleton className="mx-auto h-3 w-3/4 rounded bg-white/[0.04]" />
-                                        <Skeleton className="mx-auto h-3 w-1/2 rounded bg-white/[0.04]" />
-                                    </div>
-                                    <p className="text-[11px] text-white/20">Pillar data pending audit assignment</p>
+                                <div className="flex h-[220px] flex-col items-center justify-center gap-4">
+                                    <Skeleton className="h-28 w-28 rounded-full bg-[#232C43]" />
+                                    <p className="text-[13px] text-[#576FA8]">Pillar data unlocked post-audit</p>
                                 </div>
                             )}
-                        </figure>
-                    </div>
-                </FadeUp>
+                        </ProCard>
+                    </FadeUp>
+                </div>
 
                 {/* ── Section 4 — Audit Package ── */}
-                <FadeUp delay={0.24}>
-                    <div className="waitlist-panel mb-6 overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-8">
-                        <div className="mb-5 flex items-center justify-between">
+                <FadeUp delay={0.25}>
+                    <ProCard className="p-6 sm:p-8">
+                        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[#232C43] pb-4">
                             <div className="flex items-center gap-3">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-blue-500/10">
-                                    <Package className="size-4 text-blue-400" aria-hidden="true" />
+                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#1B294B] text-[#9AA9CB]">
+                                    <FileText className="size-4.5" />
                                 </div>
-                                <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
-                                        Audit Package
-                                    </p>
-                                    <h2 className="font-display text-[15px] font-semibold text-white">
-                                        {tierLabel} — What's Included
-                                    </h2>
-                                </div>
+                                <h2 className="text-[16px] font-medium text-[#ECF0F9]">
+                                    {tierLabel} Package Inclusions
+                                </h2>
                             </div>
                             {payment && (
-                                <span className="text-[13px] font-semibold text-white/50">
-                                    ${Number(payment.total_amount).toLocaleString()} USD
+                                <span className="text-[14px] font-medium text-[#788CBA]">
+                                    Paid: ${Number(payment.total_amount).toLocaleString()}
                                 </span>
                             )}
                         </div>
-
-                        <ul className="space-y-3">
-                            {tier_features.map((feature) => (
-                                <li key={feature} className="flex items-start gap-3">
-                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-500/70" aria-hidden="true" />
-                                    <span className="text-[13px] leading-relaxed text-white/70">{feature}</span>
+                        <ul className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {tier_features.map((feature, i) => (
+                                <li key={i} className="flex items-start gap-3">
+                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#4468BB]" />
+                                    <span className="text-[14px] leading-relaxed text-[#BCC5DC]">{feature}</span>
                                 </li>
                             ))}
                         </ul>
-
-                        {tier === 'institutional' && (
-                            <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.07] px-4 py-3">
-                                <Star className="mt-0.5 size-4 shrink-0 text-amber-400" aria-hidden="true" />
-                                <p className="text-[12px] leading-relaxed text-amber-300/80">
-                                    $1,500 credited against your 2% equity warrant upon successful raise.
-                                </p>
-                            </div>
-                        )}
-                    </div>
+                    </ProCard>
                 </FadeUp>
 
                 {/* ── Section 5 — Quick Actions ── */}
-                <FadeUp delay={0.32}>
-                    <div className="mb-6 grid gap-4 sm:grid-cols-3">
-
-                        {/* Documents */}
-                        <div className="waitlist-panel group overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.03]">
-                            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-blue-500/10">
-                                <FileText className="size-4 text-blue-400" aria-hidden="true" />
+                <FadeUp delay={0.30}>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        <Link
+                            href={route('founder.documents.index')}
+                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-colors hover:border-[#4468BB] hover:bg-[#1B294B]"
+                        >
+                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
+                                <FileText className="size-4.5 text-[#9AA9CB] transition-colors group-hover:text-[#D8E0F3]" />
                             </div>
-                            <h3 className="mb-1 text-[14px] font-semibold text-white">Upload Documents</h3>
-                            <p className="mb-4 text-[12px] leading-relaxed text-white/30">
-                                Share financials, cap table, and supporting documents with your analyst.
-                            </p>
-                            <a
-                                href={route('founder.documents.index')}
-                                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/[0.1] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/60 transition-all duration-200 hover:border-white/20 hover:text-white"
-                            >
-                                <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
-                                <span className="relative z-10">Go to Documents →</span>
-                            </a>
-                        </div>
-
-                        {/* Messages */}
-                        <div className="waitlist-panel group overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.03]">
-                            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-blue-500/10">
-                                <MessageSquare className="size-4 text-blue-400" aria-hidden="true" />
+                            <div>
+                                <h3 className="text-[15px] font-medium text-[#ECF0F9]">Documents</h3>
+                                <p className="mt-1 text-[13px] text-[#788CBA]">Manage and upload requested files.</p>
                             </div>
-                            <h3 className="mb-1 text-[14px] font-semibold text-white">Message Analyst</h3>
-                            <p className="mb-4 text-[12px] leading-relaxed text-white/30">
-                                Ask questions or send updates directly to your assigned analyst.
-                            </p>
-                            <a
-                                href={route('founder.messages.index')}
-                                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/[0.1] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/60 transition-all duration-200 hover:border-white/20 hover:text-white"
-                            >
-                                <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
-                                <span className="relative z-10">Go to Messages →</span>
-                            </a>
-                        </div>
-
-                        {/* Investor Page */}
-                        <div className="waitlist-panel group overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.03]">
-                            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-blue-500/10">
-                                <ExternalLink className="size-4 text-blue-400" aria-hidden="true" />
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#4468BB] transition-colors group-hover:text-[#8FA4D6]">
+                                View <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
-                            <div className="mb-1 flex items-center gap-2">
-                                <h3 className="text-[14px] font-semibold text-white">Your Investor Page</h3>
+                        </Link>
+
+                        <Link
+                            href={route('founder.messages.index')}
+                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-colors hover:border-[#4468BB] hover:bg-[#1B294B]"
+                        >
+                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
+                                <MessageSquare className="size-4.5 text-[#9AA9CB] transition-colors group-hover:text-[#D8E0F3]" />
+                            </div>
+                            <div>
+                                <h3 className="text-[15px] font-medium text-[#ECF0F9]">Messages</h3>
+                                <p className="mt-1 text-[13px] text-[#788CBA]">Communicate directly with your analyst.</p>
+                            </div>
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#4468BB] transition-colors group-hover:text-[#8FA4D6]">
+                                Open <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                            </div>
+                        </Link>
+
+                        <div className="flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5">
+                            <div className="mb-4 flex items-center justify-between">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
+                                    <ExternalLink className="size-4.5 text-[#9AA9CB]" />
+                                </div>
                                 {profile_is_live && (
-                                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-emerald-400">
-                                        LIVE
+                                    <span className="rounded-sm bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/20">
+                                        Live
                                     </span>
                                 )}
                             </div>
-                            <p className="mb-4 text-[12px] leading-relaxed text-white/30">
-                                {profile_is_live
-                                    ? 'Your verification page is live and visible to investors.'
-                                    : verification_url
-                                    ? 'Your audit is in progress. Your page will go live once complete.'
-                                    : 'Your public verification page goes live once your audit is complete.'}
-                            </p>
+                            <div>
+                                <h3 className="text-[15px] font-medium text-[#ECF0F9]">Investor Page</h3>
+                                <p className="mt-1 text-[13px] text-[#788CBA]">
+                                    {profile_is_live ? 'Your page is publicly visible.' : 'Goes live post-audit.'}
+                                </p>
+                            </div>
                             {profile_is_live && verification_url ? (
                                 <a
                                     href={verification_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-emerald-400 transition-all duration-200 hover:border-emerald-500/50 hover:text-emerald-300"
+                                    className="group mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-emerald-400 transition-colors hover:text-emerald-300"
                                 >
-                                    <span className="relative z-10">View My Investor Page →</span>
+                                    View Link <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                                 </a>
-                            ) : verification_url ? (
-                                <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-xl border border-white/[0.06] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/20">
-                                    Audit In Progress
-                                </span>
                             ) : (
-                                <a
-                                    href="/verify/sample-unicorn"
-                                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/[0.1] px-4 py-2 text-[12px] font-bold uppercase tracking-[0.12em] text-white/60 transition-all duration-200 hover:border-white/20 hover:text-white"
-                                >
-                                    <span className="waitlist-shimmer absolute inset-0 opacity-0 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-40" />
-                                    <span className="relative z-10">Preview Sample →</span>
-                                </a>
+                                <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#455987]">
+                                    Pending Audit
+                                </div>
                             )}
                         </div>
                     </div>
                 </FadeUp>
-
                 {/* ── Section 6 — Account Details ── */}
-                <FadeUp delay={0.40}>
-                    <div className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+                <FadeUp delay={0.35}>
+                    <ProCard className="transition-colors">
                         <button
                             onClick={() => setAccountOpen((v) => !v)}
                             aria-expanded={accountOpen}
-                            aria-controls="account-details-panel"
-                            className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors duration-200 hover:bg-white/[0.02]"
+                            className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors hover:bg-[#1B294B]"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.04]">
-                                    <User className="size-3.5 text-white/40" aria-hidden="true" />
+                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
+                                    <User className="size-4.5 text-[#9AA9CB]" />
                                 </div>
-                                <span className="text-[13px] font-semibold text-white/70">Account Details</span>
+                                <span className="text-[15px] font-medium text-[#ECF0F9]">Account Details</span>
                             </div>
                             {accountOpen
-                                ? <ChevronUp   className="size-4 text-white/20" aria-hidden="true" />
-                                : <ChevronDown className="size-4 text-white/20" aria-hidden="true" />}
+                                ? <ChevronUp   className="size-4.5 text-[#788CBA]" />
+                                : <ChevronDown className="size-4.5 text-[#788CBA]" />}
                         </button>
 
                         <AnimatePresence>
                             {accountOpen && (
                                 <motion.div
-                                    id="account-details-panel"
                                     initial={{ opacity: 0, height: 0 }}
                                     animate={{ opacity: 1, height: 'auto' }}
                                     exit={{ opacity: 0, height: 0 }}
-                                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                                    transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="border-t border-white/[0.05] px-6 py-2">
-                                        <dl>
+                                    <div className="border-t border-[#232C43] bg-[#080B11] px-6 py-5">
+                                        <dl className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
                                             {[
-                                                { label: 'Full Name',    value: founder.full_name,                 editable: true  },
-                                                { label: 'Company',      value: founder.company_name,              editable: true  },
-                                                { label: 'Email',        value: founder.email,                     editable: false },
-                                                { label: 'Member Since', value: fmtDate(founder.created_at),       editable: false },
-                                                { label: 'Last Login',   value: fmtDateTime(founder.last_login_at), editable: false },
-                                            ].map(({ label, value, editable }, i, arr) => (
-                                                <div
-                                                    key={label}
-                                                    className={[
-                                                        'flex items-center justify-between py-3.5',
-                                                        i < arr.length - 1 ? 'border-b border-white/[0.04]' : '',
-                                                    ].join(' ')}
-                                                >
-                                                    <div>
-                                                        <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/25">{label}</dt>
-                                                        <dd className="mt-0.5 text-[13px] text-white/60">{value ?? '—'}</dd>
-                                                    </div>
-                                                    {editable && (
-                                                        <button
-                                                            disabled
-                                                            title="Editing coming soon"
-                                                            className="cursor-not-allowed text-[11px] text-white/15"
-                                                        >
-                                                            Edit
-                                                        </button>
-                                                    )}
+                                                { label: 'Full Name',    value: founder.full_name },
+                                                { label: 'Company',      value: founder.company_name },
+                                                { label: 'Email',        value: founder.email },
+                                                { label: 'Member Since', value: fmtDate(founder.created_at) },
+                                                { label: 'Last Login',   value: fmtDateTime(founder.last_login_at) },
+                                            ].map(({ label, value }) => (
+                                                <div key={label} className="flex flex-col">
+                                                    <dt className="text-[12px] font-semibold uppercase tracking-wider text-[#576FA8]">{label}</dt>
+                                                    <dd className="mt-1.5 text-[14px] text-[#BCC5DC]">{value ?? '—'}</dd>
                                                 </div>
                                             ))}
                                         </dl>
@@ -597,7 +513,7 @@ export default function FounderDashboard({
                                 </motion.div>
                             )}
                         </AnimatePresence>
-                    </div>
+                    </ProCard>
                 </FadeUp>
 
             </div>

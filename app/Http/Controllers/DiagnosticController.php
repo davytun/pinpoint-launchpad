@@ -12,6 +12,8 @@ use App\Mail\PathwayCFounderMail;
 use App\Mail\UnicornAlertMail;
 use App\Models\DiagnosticQuestion;
 use App\Models\DiagnosticSession;
+use App\Models\Founder;
+use App\Models\Payment;
 use App\Models\Setting;
 use App\Services\ScoringService;
 use Illuminate\Http\RedirectResponse;
@@ -108,27 +110,37 @@ class DiagnosticController extends Controller
 
         $email = $validated['email'];
 
+        // Block if email is already a Founder (signed up)
+        $isFounder = Founder::query()->where([['email', '=', (string) $email]])->exists();
+        if ($isFounder) {
+            return redirect()->route('diagnostic.email-gate')
+                ->with('error', 'An account already exists with this email. Please login to your dashboard.');
+        }
+
         // Block if this email already has a paid payment — no re-entry
-        $alreadyPaid = \App\Models\Payment::where('customer_email', $email)
-            ->where('status', 'paid')
-            ->exists();
+        $alreadyPaid = Payment::query()->where([
+            ['customer_email', '=', (string) $email],
+            ['status', '=', 'paid']
+        ])->exists();
 
         if ($alreadyPaid) {
-            return redirect()->route('diagnostic.index')
-                ->with('error', 'Unable to process this request. Please contact support if you believe this is an error.');
+            return redirect()->route('diagnostic.email-gate')
+                ->with('error', 'This email has already completed the assessment and associated payment. Please contact support.');
         }
 
         // IP-based cooldown — prevent email rotation abuse
-        $recentByIp = DiagnosticSession::where('ip_address', $request->ip())
-            ->where('created_at', '>=', now()->subHours(24))
-            ->count();
+        $ipAddress = (string) $request->ip();
+        $recentByIp = DiagnosticSession::query()->where([
+            ['ip_address', '=', $ipAddress],
+            ['created_at', '>=', now()->subHours(24)]
+        ])->count();
 
         if ($recentByIp >= 3) {
-            \Illuminate\Support\Facades\Log::warning('Diagnostic IP abuse detected', [
+            Log::warning('Diagnostic IP abuse detected', [
                 'ip_hash'    => hash_hmac('sha256', (string) $request->ip(), config('app.key')),
                 'email_hash' => hash_hmac('sha256', $email, config('app.key')),
             ]);
-            return redirect()->route('diagnostic.index')
+            return redirect()->route('diagnostic.email-gate')
                 ->with('error', 'Too many attempts from your network. Please try again in 24 hours.');
         }
 

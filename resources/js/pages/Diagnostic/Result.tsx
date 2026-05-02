@@ -7,7 +7,7 @@ import {
     TrendingUp,
     Zap,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import {
     PolarAngleAxis,
     PolarGrid,
@@ -17,7 +17,6 @@ import {
 } from 'recharts';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -104,28 +103,7 @@ const BAND_META: Record<string, {
     },
 };
 
-// ─── Animated score count-up ───────────────────────────────────────────────────
 
-function CountUp({ target, duration = 1500 }: { target: number; duration?: number }) {
-    const [value, setValue] = useState(0);
-    const raf = useRef<number>(0);
-    const startTs = useRef<number>(0);
-
-    useEffect(() => {
-        startTs.current = performance.now();
-        function tick(now: number) {
-            const elapsed = now - startTs.current;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            setValue(Math.round(eased * target));
-            if (progress < 1) raf.current = requestAnimationFrame(tick);
-        }
-        raf.current = requestAnimationFrame(tick);
-        return () => cancelAnimationFrame(raf.current);
-    }, [target, duration]);
-
-    return <>{value}</>;
-}
 
 // ─── Fade-in-up wrapper ────────────────────────────────────────────────────────
 
@@ -168,14 +146,14 @@ export default function DiagnosticResult({
 
                     {/* Heading */}
                     <FadeUp delay={0.05}>
-                        <h1 className="mb-10 text-2xl font-bold text-foreground sm:text-3xl">
+                        <h1 className="mb-10 text-2xl font-bold text-[#ECF0F9] sm:text-3xl">
                             Your PARAGON Diagnostic Results
                         </h1>
                     </FadeUp>
 
                     {/* ── Section 1: Score Hero ── */}
                     <FadeUp delay={0.1}>
-                        <Card className="waitlist-panel mb-8 overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] p-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] text-center md:rounded-[1.75rem]">
+                        <Card className="waitlist-panel mb-8 overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-0 shadow-md md:rounded-[1.75rem]">
                             <CardContent className="flex flex-col items-center p-6 sm:p-10">
                                 {/* Band badge */}
                                 <Badge
@@ -197,7 +175,7 @@ export default function DiagnosticResult({
                                     >
                                         {score}
                                     </span>
-                                    <span className="mb-3 font-display text-2xl font-light text-white/50 sm:mb-5">
+                                    <span className="mb-3 font-display text-2xl font-light text-[#576FA8] sm:mb-5">
                                         /100
                                     </span>
                                 </div>
@@ -217,9 +195,9 @@ export default function DiagnosticResult({
 
                         {/* Radar chart */}
                         <FadeUp delay={0.2}>
-                            <Card className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]">
+                            <Card className="waitlist-panel overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                 <CardHeader>
-                                    <CardTitle className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                                    <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[#576FA8]">
                                         Pillar Radar
                                     </CardTitle>
                                 </CardHeader>
@@ -227,10 +205,10 @@ export default function DiagnosticResult({
                                     <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[60px]" style={{ background: `radial-gradient(circle, ${meta.color}66, transparent 70%)` }} />
                                     <ResponsiveContainer width="100%" height={280}>
                                         <RadarChart data={radarData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
-                                            <PolarGrid stroke="rgba(255,255,255,0.07)" />
+                                            <PolarGrid stroke="#232C43" />
                                             <PolarAngleAxis
                                                 dataKey="subject"
-                                                tick={{ fill: 'rgba(255,255,255,0.50)', fontSize: 11, fontWeight: 600 }}
+                                                tick={{ fill: '#788CBA', fontSize: 11, fontWeight: 600 }}
                                             />
                                             <Radar
                                                 dataKey="value"
@@ -251,7 +229,7 @@ export default function DiagnosticResult({
                             {/* Section 3: Score band message */}
                             <FadeUp delay={0.25}>
                                 <Card
-                                    className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]"
+                                    className="waitlist-panel overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]"
                                     style={{ borderLeft: `3px solid ${meta.border}` }}
                                 >
                                     <CardHeader className="pb-2">
@@ -264,7 +242,7 @@ export default function DiagnosticResult({
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm leading-relaxed text-muted-foreground">
+                                        <p className="text-sm leading-relaxed text-[#788CBA]">
                                             {score_band_message}
                                         </p>
                                     </CardContent>
@@ -296,7 +274,7 @@ export default function DiagnosticResult({
                                         <button
                                             type="button"
                                             onClick={() => setChecklistClicked(true)}
-                                            className="w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                                            className="w-full rounded-xl border border-[#232C43] bg-[#0C1427]/50 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-[#788CBA] transition-colors hover:bg-[#1B294B]/30 hover:text-[#ECF0F9]"
                                         >
                                             View Your Readiness Checklist
                                         </button>
@@ -313,7 +291,7 @@ export default function DiagnosticResult({
                                             </motion.div>
                                         )}
 
-                                        <p className="mt-1 text-center text-xs text-muted-foreground/60">
+                                        <p className="mt-1 text-center text-xs text-[#576FA8]">
                                             Address these gaps, then retake.
                                         </p>
                                     </div>
@@ -322,9 +300,9 @@ export default function DiagnosticResult({
 
                             {/* Pillar score breakdown */}
                             <FadeUp delay={0.38}>
-                                <Card className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]">
+                                <Card className="waitlist-panel overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                     <CardHeader className="pb-3">
-                                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">
+                                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#576FA8]">
                                             Pillar Breakdown
                                         </CardTitle>
                                     </CardHeader>
@@ -332,14 +310,14 @@ export default function DiagnosticResult({
                                         {PILLAR_KEYS.map((key, i) => (
                                             <div key={key}>
                                                 <div className="mb-1 flex items-center justify-between">
-                                                    <span className="text-xs font-semibold text-muted-foreground">
+                                                    <span className="text-xs font-semibold text-[#788CBA]">
                                                         {PILLAR_LABELS[key]}
                                                     </span>
-                                                    <span className="text-xs text-muted-foreground/50">
+                                                    <span className="text-xs text-[#576FA8]">
                                                         {pillar_scores[key]}%
                                                     </span>
                                                 </div>
-                                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.5)]">
+                                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#0C1427] shadow-[inset_0_1px_1px_rgba(0,0,0,0.5)]">
                                                     <motion.div
                                                         className="h-full rounded-full"
                                                         initial={{ width: 0 }}

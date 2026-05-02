@@ -31,7 +31,7 @@ interface PageProps {
 function StatusBadge({ row }: { row: ProfileRow }) {
     if (!row.is_public) {
         return (
-            <span className="rounded-full bg-slate-700 px-2.5 py-0.5 text-xs font-semibold text-slate-300">
+            <span className="rounded-full bg-[#232C43] px-2.5 py-0.5 text-xs font-semibold text-[#788CBA]">
                 Draft
             </span>
         );
@@ -51,7 +51,7 @@ function StatusBadge({ row }: { row: ProfileRow }) {
         );
     }
     return (
-        <span className="rounded-full bg-slate-700 px-2.5 py-0.5 text-xs font-semibold text-slate-300">
+        <span className="rounded-full bg-[#232C43] px-2.5 py-0.5 text-xs font-semibold text-[#788CBA]">
             Draft
         </span>
     );
@@ -64,55 +64,55 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
         <AdminLayout>
             <Head title="Verification Profiles — Admin" />
 
-            <div className="min-h-screen bg-slate-950 px-4 py-10 text-white lg:px-8">
+            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-6xl">
                     <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-white">Verification Profiles</h1>
-                        <p className="mt-1 text-sm text-slate-400">
+                        <h1 className="text-2xl font-bold text-[#ECF0F9]">Verification Profiles</h1>
+                        <p className="mt-1 text-sm text-[#788CBA]">
                             {profiles.length} profile{profiles.length !== 1 ? 's' : ''} total
                         </p>
                     </div>
 
                     {profiles.length === 0 ? (
-                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-12 text-center">
-                            <p className="text-slate-500">No profiles yet. They are created automatically when an audit is marked complete.</p>
+                        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-12 text-center">
+                            <p className="text-[#576FA8]">No profiles yet. They are created automatically when an audit is marked complete.</p>
                         </div>
                     ) : (
-                        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
+                        <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="border-b border-slate-800">
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Company</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Founder</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Score</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Status</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Badges</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Expires</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-slate-500">Actions</th>
+                                        <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#576FA8]">Company</th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#576FA8]">Founder</th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#576FA8]">Score</th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#576FA8]">Status</th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#576FA8]">Badges</th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#576FA8]">Expires</th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#576FA8]">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {profiles.map((p) => (
-                                            <tr key={p.id} className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/30">
+                                            <tr key={p.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
                                                 <td className="px-5 py-4">
-                                                    <div className="font-semibold text-white">{p.company_name ?? '—'}</div>
-                                                    <div className="text-xs text-slate-500">{p.batch ?? ''}{p.batch && p.sector ? ' · ' : ''}{p.sector ?? ''}</div>
+                                                    <div className="font-semibold text-[#ECF0F9]">{p.company_name ?? '—'}</div>
+                                                    <div className="text-xs text-[#576FA8]">{p.batch ?? ''}{p.batch && p.sector ? ' · ' : ''}{p.sector ?? ''}</div>
                                                 </td>
                                                 <td className="px-5 py-4">
-                                                    <div className="text-slate-300">{p.founder_name ?? '—'}</div>
-                                                    <div className="text-xs text-slate-500">{p.founder_email}</div>
+                                                    <div className="text-[#788CBA]">{p.founder_name ?? '—'}</div>
+                                                    <div className="text-xs text-[#576FA8]">{p.founder_email}</div>
                                                 </td>
-                                                <td className="px-5 py-4 font-mono font-bold text-white">
+                                                <td className="px-5 py-4 font-mono font-bold text-[#ECF0F9]">
                                                     {p.overall_score ?? '—'}
                                                 </td>
                                                 <td className="px-5 py-4">
                                                     <StatusBadge row={p} />
                                                 </td>
-                                                <td className="px-5 py-4 text-slate-400">
+                                                <td className="px-5 py-4 text-[#788CBA]">
                                                     {p.verified_badges_count} / 7
                                                 </td>
-                                                <td className="px-5 py-4 text-slate-400">
+                                                <td className="px-5 py-4 text-[#788CBA]">
                                                     {p.expires_at ?? '—'}
                                                 </td>
                                                 <td className="px-5 py-4">
@@ -121,19 +121,19 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                                                             href={`/verify/${p.slug}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300"
+                                                            className="flex items-center gap-1 text-xs text-[#4468BB] hover:text-[#3C53A8]"
                                                         >
                                                             View <ExternalLink className="size-3" />
                                                         </a>
                                                         <Link
                                                             href={`/admin/profiles/${p.id}`}
-                                                            className="text-xs text-slate-400 hover:text-white"
+                                                            className="text-xs text-[#576FA8] hover:text-[#ECF0F9]"
                                                         >
                                                             Edit
                                                         </Link>
                                                         <Link
                                                             href={`/admin/profiles/${p.id}/access-requests`}
-                                                            className="text-xs text-slate-400 hover:text-white"
+                                                            className="text-xs text-[#576FA8] hover:text-[#ECF0F9]"
                                                         >
                                                             Requests
                                                         </Link>

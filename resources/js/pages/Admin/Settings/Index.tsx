@@ -24,14 +24,7 @@ export default function AdminSettingsIndex() {
         form.patch(route('admin.settings.update'));
     }
 
-    const inputStyle = {
-        background:   'rgba(255,255,255,0.04)',
-        border:       '1px solid rgba(255,255,255,0.10)',
-        color:        'white',
-        borderRadius: '0.75rem',
-        outline:      'none',
-        transition:   'border-color 0.15s',
-    };
+
 
     return (
         <AdminLayout>
@@ -41,71 +34,39 @@ export default function AdminSettingsIndex() {
 
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-white">Settings</h1>
-                        <p className="mt-1 text-sm text-slate-500">Platform configuration</p>
+                        <h1 className="text-2xl font-bold text-[#ECF0F9]">Settings</h1>
+                        <p className="mt-1 text-sm text-[#788CBA]">Platform configuration</p>
                     </div>
 
                     {/* Flash */}
                     {flash?.success && (
-                        <div
-                            className="mb-6 rounded-xl border px-4 py-3 text-sm"
-                            style={{
-                                borderColor: 'rgba(5,150,105,0.35)',
-                                background:  'rgba(5,150,105,0.08)',
-                                color:       '#6EE7B7',
-                            }}
-                        >
+                        <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
                             {flash.success}
                         </div>
                     )}
 
                     {/* Settings card */}
-                    <div
-                        className="rounded-2xl border p-7"
-                        style={{
-                            borderColor: 'rgba(255,255,255,0.08)',
-                            background:  'rgba(255,255,255,0.025)',
-                        }}
-                    >
-                        <h2
-                            className="mb-6 text-[11px] font-bold uppercase tracking-[0.2em]"
-                            style={{ color: 'rgba(255,255,255,0.28)' }}
-                        >
+                    <div className="rounded-xl border border-[#232C43] bg-[#101623] p-7">
+                        <h2 className="mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-[#576FA8]">
                             Diagnostic Settings
                         </h2>
 
                         <form onSubmit={submit} noValidate>
 
                             {/* Setting row */}
-                            <div
-                                className="rounded-xl border p-5"
-                                style={{
-                                    borderColor: 'rgba(255,255,255,0.07)',
-                                    background:  'rgba(255,255,255,0.02)',
-                                }}
-                            >
+                            <div className="rounded-xl border border-[#232C43] bg-[#0C1427]/50 p-5">
                                 <div className="mb-4 flex items-start justify-between gap-6">
                                     <div className="flex-1">
-                                        <p className="text-sm font-semibold text-white">
+                                        <p className="text-sm font-semibold text-[#ECF0F9]">
                                             Diagnostic Cooldown Days
                                         </p>
-                                        <p
-                                            className="mt-1 text-xs leading-relaxed"
-                                            style={{ color: 'rgba(255,255,255,0.40)' }}
-                                        >
+                                        <p className="mt-1 text-xs leading-relaxed text-[#788CBA]">
                                             Number of days a founder must wait before retaking after scoring below 65%
                                         </p>
                                     </div>
 
                                     {/* Current value pill */}
-                                    <span
-                                        className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold tabular-nums"
-                                        style={{
-                                            background: 'rgba(37,99,235,0.12)',
-                                            border:     '1px solid rgba(37,99,235,0.25)',
-                                            color:      '#93B4FF',
-                                        }}
-                                    >
+                                    <span className="shrink-0 rounded-full border border-[#4468BB]/30 bg-[#4468BB]/10 px-3 py-1 text-xs font-semibold tabular-nums text-[#4468BB]">
                                         {cooldown_days}d
                                     </span>
                                 </div>
@@ -123,15 +84,9 @@ export default function AdminSettingsIndex() {
                                                 parseInt(e.target.value, 10) || 1,
                                             )
                                         }
-                                        className="w-24 px-4 py-2.5 text-sm tabular-nums"
-                                        style={inputStyle}
-                                        onFocus={e => (e.currentTarget.style.borderColor = 'rgba(37,99,235,0.5)')}
-                                        onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.10)')}
+                                        className="w-24 rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm tabular-nums text-[#ECF0F9] transition-colors focus:border-[#4468BB]/50 focus:outline-none focus:ring-1 focus:ring-[#4468BB]/50"
                                     />
-                                    <span
-                                        className="text-sm"
-                                        style={{ color: 'rgba(255,255,255,0.35)' }}
-                                    >
+                                    <span className="text-sm text-[#576FA8]">
                                         days
                                     </span>
                                 </div>
@@ -144,31 +99,18 @@ export default function AdminSettingsIndex() {
                             </div>
 
                             {/* Divider */}
-                            <div className="my-6" style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
+                            <div className="my-6 h-px bg-[#232C43]" />
 
                             {/* Save */}
                             <div className="flex justify-end">
                                 <button
                                     type="submit"
                                     disabled={form.processing}
-                                    className="flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50"
-                                    style={{
-                                        background: '#2563EB',
-                                        boxShadow:  '0 0 20px rgba(37,99,235,0.28)',
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (!form.processing) (e.currentTarget as HTMLButtonElement).style.background = '#1D4ED8';
-                                    }}
-                                    onMouseLeave={e => {
-                                        (e.currentTarget as HTMLButtonElement).style.background = '#2563EB';
-                                    }}
+                                    className="flex items-center gap-2 rounded-lg bg-[#4468BB] px-6 py-2.5 text-sm font-bold text-white transition-all duration-150 hover:bg-[#3C53A8] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {form.processing ? (
                                         <>
-                                            <span
-                                                className="h-4 w-4 animate-spin rounded-full border-2"
-                                                style={{ borderColor: 'rgba(255,255,255,0.2)', borderTopColor: 'white' }}
-                                            />
+                                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
                                             Saving…
                                         </>
                                     ) : (

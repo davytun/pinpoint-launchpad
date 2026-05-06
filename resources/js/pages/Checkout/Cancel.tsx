@@ -1,5 +1,4 @@
 import { Head, Link } from '@inertiajs/react';
-import { motion } from 'framer-motion';
 import { ArrowRight, RotateCcw } from 'lucide-react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -15,42 +14,31 @@ export default function CheckoutCancel() {
             <div className="flex min-h-screen flex-col items-center justify-center px-4 py-16">
 
                 {/* Wordmark */}
-                <motion.div
-                    className="mb-8 flex items-center gap-3"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                >
+                <div className="mb-8 flex items-center gap-3">
                     <PinpointLogo height={26} variant="dark" />
-                </motion.div>
+                </div>
 
-                <motion.div
-                    className="w-full max-w-sm"
-                    initial={{ opacity: 0, y: 24, filter: 'blur(4px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
-                >
+                <div className="w-full max-w-[400px]">
                     {/* Main card */}
-                    <div className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111] p-8 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:rounded-[1.75rem]">
+                    <div className="relative overflow-hidden rounded-[2rem] border border-[#232C43] bg-[#101623] p-8 text-center shadow-2xl sm:p-10">
 
                         {/* Icon */}
                         <div className="mb-6 flex justify-center">
-                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10">
-                                <RotateCcw className="size-6 text-white/50" />
+                            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#1B294B]/20 ring-1 ring-[#232C43]">
+                                <RotateCcw className="size-6 text-[#576FA8]" />
                             </div>
                         </div>
 
                         {/* Copy */}
                         <p
-                            className="font-display mb-1.5 text-[10px] font-bold uppercase tracking-[0.25em]"
-                            style={{ color: 'rgba(255,255,255,0.35)' }}
+                            className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-[#576FA8]"
                         >
                             Transaction Stopped
                         </p>
-                        <h1 className="font-display mb-3 text-2xl font-semibold leading-tight text-white md:text-3xl">
+                        <h1 className="font-display mb-3 text-2xl font-semibold leading-tight text-[#ECF0F9] md:text-3xl">
                             No Charge Made
                         </h1>
-                        <p className="mb-8 text-[15px] leading-relaxed text-white/50">
+                        <p className="mb-8 text-[14px] leading-relaxed text-[#788CBA]">
                             Your session is active and your results remain secured. You can return to pricing whenever you're ready.
                         </p>
 
@@ -58,22 +46,19 @@ export default function CheckoutCancel() {
                         <div className="flex flex-col gap-3">
                             <Link
                                 href="/checkout"
-                                className="group relative block w-full overflow-hidden rounded-xl px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white transition-all duration-200 hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-                                style={{
-                                    background: '#3C53A8',
-                                    boxShadow: '0 0 28px rgba(60,83,168,0.3)',
-                                }}
+                                className="group relative block w-full overflow-hidden rounded-xl bg-[#4468BB] px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:bg-[#3b5ba5]"
+                                style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
                             >
-                                <span className="waitlist-shimmer absolute inset-0 opacity-50 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
+                                <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     Return to Pricing
-                                    <ArrowRight className="h-4 w-4" />
+                                    <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                                 </span>
                             </Link>
 
                             <Link
                                 href="/diagnostic/result"
-                                className="block w-full rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+                                className="block w-full rounded-xl border border-[#232C43] bg-[#1B294B]/10 px-5 py-4 text-center text-[13px] font-bold uppercase tracking-[0.18em] text-[#576FA8] transition-colors hover:bg-[#1B294B]/20 hover:text-[#ECF0F9]"
                             >
                                 Back to My Results
                             </Link>
@@ -81,16 +66,10 @@ export default function CheckoutCancel() {
                     </div>
 
                     {/* Reassurance note */}
-                    <motion.p
-                        className="mt-5 text-center text-xs"
-                        style={{ color: 'rgba(255,255,255,0.3)' }}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5, duration: 0.4 }}
-                    >
+                    <p className="mt-5 text-center text-xs text-[#576FA8]/60">
                         Your diagnostic score and results remain saved for 30 days.
-                    </motion.p>
-                </motion.div>
+                    </p>
+                </div>
             </div>
         </DiagnosticLayout>
     );

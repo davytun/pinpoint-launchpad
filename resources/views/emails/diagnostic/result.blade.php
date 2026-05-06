@@ -4,126 +4,95 @@
     badge="PARAGON Score"
     preheader="Your score is {{ $session->score }}/100. Here is what it means and what happens next.">
 
-@php
-$bandColors = [
-    'low'      => '#DC2626',
-    'mid_low'  => '#D97706',
-    'mid_high' => '#3c53a8',
-    'high'     => '#5ca336',
-];
-$bandLabels = [
-    'low'      => 'Build Phase',
-    'mid_low'  => 'Early Stage',
-    'mid_high' => 'Investment Ready',
-    'high'     => 'High Velocity',
-];
-$bandMessages = [
-    'low'      => 'You are in the Build phase. Your focus now is product-market validation and structural clean-up before any investor conversation.',
-    'mid_low'  => 'You have a foundation, but key gaps could trigger red flags in due diligence. Address them before approaching institutional capital.',
-    'mid_high' => 'You are an Investment Ready Candidate. Your fundamentals are solid. A PARAGON Certification closes the final verification gap.',
-    'high'     => 'You are a High Velocity Candidate. Your profile is exceptional. A PARAGON Certification makes that verifiable to any investor.',
-];
-$color   = $bandColors[$session->score_band] ?? '#3c53a8';
-$label   = $bandLabels[$session->score_band]  ?? 'Unknown';
-$message = $bandMessages[$session->score_band] ?? '';
-$isReady = in_array($session->score_band, ['mid_high', 'high']);
-@endphp
+  @php
+    $bandColors = [
+        'low'      => '#DC2626',
+        'mid_low'  => '#D97706',
+        'mid_high' => '#3C53A8',
+        'high'     => '#059669',
+    ];
+    $bandLabels = [
+        'low'      => 'Build Phase',
+        'mid_low'  => 'Early Stage',
+        'mid_high' => 'Investment Ready',
+        'high'     => 'High Velocity',
+    ];
+    $bandMessages = [
+        'low'      => 'You are in the Build phase. Your focus now is product-market validation and structural clean-up before any investor conversation.',
+        'mid_low'  => 'You have a foundation, but key gaps could trigger red flags in due diligence. Address them before approaching institutional capital.',
+        'mid_high' => 'You are an Investment Ready Candidate. Your fundamentals are solid. A PARAGON Certification closes the final verification gap.',
+        'high'     => 'You are a High Velocity Candidate. Your profile is exceptional. A PARAGON Certification makes that verifiable to any investor.',
+    ];
+    $color   = $bandColors[$session->score_band] ?? '#3C53A8';
+    $label   = $bandLabels[$session->score_band]  ?? 'Unknown';
+    $message = $bandMessages[$session->score_band] ?? '';
+    $isReady = in_array($session->score_band, ['mid_high', 'high']);
+  @endphp
 
-{{-- Greeting --}}
-<p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b6b6b;line-height:1.5;">
-    Diagnostic complete,
-</p>
+  <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.025em;">Your Diagnostic Results</h1>
+  
+  <p style="margin-bottom: 32px;">
+    We've completed the preliminary analysis of your venture. Your PARAGON score reflects your current institutional readiness across seven core pillars.
+  </p>
 
-{{-- Headline --}}
-<h1 style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:26px;font-weight:700;color:#f5f5f5;line-height:1.25;letter-spacing:-0.4px;">
-    Your PARAGON results are in.
-</h1>
-
-{{-- Score block --}}
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-    style="background-color:#161616;border-radius:8px;border:1px solid #1e1e1e;margin-bottom:28px;">
+  {{-- Score block --}}
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 12px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
     <tr>
-        <td style="padding:28px;text-align:center;">
-            <p style="margin:0 0 4px;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4b4b4b;">
-                PARAGON Score
-            </p>
-            <p style="margin:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:56px;font-weight:700;color:{{ $color }};line-height:1;letter-spacing:-1px;">
-                {{ $session->score }}<span style="font-size:22px;color:#4b4b4b;font-weight:400;">/100</span>
-            </p>
-            <span style="display:inline-block;background-color:{{ $color }};color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:4px 14px;border-radius:20px;">
-                {{ $label }}
-            </span>
-        </td>
+      <td style="padding: 40px; text-align: center;">
+        <p style="margin: 0 0 8px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #6B7280;">PARAGON Score</p>
+        <p style="margin: 0 0 16px 0; font-size: 56px; font-weight: 800; color: {{ $color }}; line-height: 1; letter-spacing: -2px;">
+          {{ $session->score }}<span style="font-size: 20px; color: #9CA3AF; font-weight: 400; letter-spacing: 0;">/100</span>
+        </p>
+        <span style="display: inline-block; background-color: {{ $color }}; color: #ffffff; padding: 6px 16px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+          {{ $label }}
+        </span>
+      </td>
     </tr>
-</table>
+  </table>
 
-{{-- Band message --}}
-<p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
+  <p style="margin-bottom: 32px; font-size: 16px; color: #4B5563; line-height: 1.6;">
     {{ $message }}
-</p>
+  </p>
 
-{{-- Pillar breakdown --}}
-<p style="margin:0 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4b4b4b;">
-    Pillar Breakdown
-</p>
-
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-    style="background-color:#161616;border-radius:8px;border:1px solid #1e1e1e;margin-bottom:28px;">
+  {{-- Pillar breakdown --}}
+  <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #111827;">Pillar Breakdown</p>
+  
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 8px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
     <tr>
-        <td style="padding:20px 24px;">
-            @foreach($session->pillar_scores as $pillar => $score)
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                style="{{ $loop->first ? '' : 'margin-top:12px;' }}">
-                <tr>
-                    <td style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#6b6b6b;width:90px;text-transform:capitalize;">
-                        {{ ucfirst($pillar) }}
-                    </td>
-                    <td style="padding:0 12px;">
-                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                            style="background-color:#1e1e1e;border-radius:3px;height:5px;">
-                            <tr>
-                                <td style="width:{{ $score }}%;background-color:{{ $color }};border-radius:3px;height:5px;"></td>
-                                <td style="width:{{ 100 - $score }}%;"></td>
-                            </tr>
-                        </table>
-                    </td>
-                    <td style="font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;color:#c8c8c8;width:36px;text-align:right;">
-                        {{ $score }}%
-                    </td>
-                </tr>
-            </table>
-            @endforeach
-        </td>
+      <td style="padding: 24px;">
+        @foreach($session->pillar_scores as $pillar => $score)
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="{{ $loop->first ? '' : 'margin-top: 16px;' }}">
+          <tr>
+            <td style="font-size: 13px; color: #6B7280; width: 100px; text-transform: capitalize;">{{ $pillar }}</td>
+            <td style="padding: 0 16px;">
+              <div style="background-color: #E2E8F0; border-radius: 9999px; height: 6px; width: 100%;">
+                <div style="background-color: {{ $color }}; border-radius: 9999px; height: 6px; width: {{ $score }}%;"></div>
+              </div>
+            </td>
+            <td style="font-size: 13px; color: #111827; font-weight: 700; width: 32px; text-align: right;">{{ $score }}%</td>
+          </tr>
+        </table>
+        @endforeach
+      </td>
     </tr>
-</table>
+  </table>
 
-{{-- CTA --}}
-@if($isReady)
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-    <tr>
-        <td style="border-radius:6px;background:linear-gradient(135deg,#3c53a8 0%,#5ca336 100%);">
-            <a href="{{ url('/checkout') }}"
-               style="display:inline-block;padding:14px 32px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.03em;">
-                Proceed to Application
-            </a>
-        </td>
-    </tr>
-</table>
-@else
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
-    <tr>
-        <td style="border-radius:6px;background-color:#1e1e1e;border:1px solid #2a2a2a;">
-            <a href="#"
-               style="display:inline-block;padding:14px 32px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#6b6b6b;text-decoration:none;letter-spacing:0.03em;">
-                Download Your Readiness Checklist
-            </a>
-        </td>
-    </tr>
-</table>
-@endif
+  @if($isReady)
+  <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
+    <a href="{{ url('/checkout') }}" class="cta-button">
+      Proceed to Application
+    </a>
+  </div>
+  @else
+  <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
+    <a href="#" class="cta-button" style="background-color: #6B7280;">
+      Download Readiness Checklist
+    </a>
+  </div>
+  @endif
 
-<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#4b4b4b;line-height:1.6;font-style:italic;">
-    You will receive a follow-up email shortly with your personalised roadmap.
-</p>
+  <p style="margin-bottom: 0; font-style: italic; font-size: 14px; color: #9CA3AF;">
+    You will receive a follow-up email shortly with your personalised institutional roadmap.
+  </p>
 
 </x-email-layout>

@@ -1,13 +1,15 @@
 <?php
 
-use App\Models\User;
+use App\Models\Founder;
 
-test('guests are redirected to the login page', function () {
-    $this->get('/dashboard')->assertRedirect('/login');
+test('guests are redirected from the founder dashboard', function () {
+    $this->get('/founder/dashboard')->assertRedirect('/founder/login');
 });
 
-test('authenticated users can visit the dashboard', function () {
-    $this->actingAs($user = User::factory()->create());
+test('authenticated founders can visit the dashboard', function () {
+    $founder = Founder::factory()->create();
 
-    $this->get('/dashboard')->assertOk();
+    $this->actingAs($founder, 'founder')
+        ->get('/founder/dashboard')
+        ->assertOk();
 });

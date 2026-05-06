@@ -48,7 +48,7 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 >
-                    <div className="waitlist-panel overflow-hidden rounded-3xl border border-white/[0.06] bg-[#0A0A0A] p-8 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-10">
+                    <div className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-8 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-10">
 
                         {/* Logo */}
                         <div className="mb-8 flex justify-center">

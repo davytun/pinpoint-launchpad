@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Signature;
 use App\Services\BoldSignService;
+use Cache;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Mail;
+use Str;
 
 class OnboardingController extends Controller
 {
@@ -175,17 +179,22 @@ class OnboardingController extends Controller
 
         $signature->refresh();
 
+        $payment = $signature->payment;
+
         return Inertia::render('Onboarding/Verifying', [
             'signature_verified' => $signature->isSigned(),
             'signer_email'       => $signature->signer_email,
+            'tier_label'         => ucfirst($payment?->tier ?? 'Foundation') . ' Audit',
+            'amount_paid'        => '$' . number_format($payment?->total_amount ?? 0) . ' USD',
+            'signed_at'          => $signature->signed_at?->format('M j, Y, g:i A') ?? now()->format('M j, Y, g:i A'),
         ]);
     }
 
-    public function resendInvite(Request $request): \Illuminate\Http\JsonResponse
+    public function resendInvite(Request $request): JsonResponse
     {
         $request->validate(['email' => ['required', 'email']]);
 
-        $signature = \App\Models\Signature::where('signer_email', $request->input('email'))
+        $signature = Signature::where('signer_email', $request->input('email'))
             ->where('status', 'signed')
             ->latest()
             ->first();
@@ -193,10 +202,10 @@ class OnboardingController extends Controller
         if (! $signature) {
             // Try session fallback
             $signatureId = $request->session()->get('signature_id');
-            $signature   = $signatureId ? \App\Models\Signature::find($signatureId) : null;
+            $signature   = $signatureId ? Signature::find($signatureId) : null;
 
             if (! $signature && $request->session()->has('payment_id')) {
-                $payment   = \App\Models\Payment::with('signature')->find($request->session()->get('payment_id'));
+                $payment   = Payment::with('signature')->find($request->session()->get('payment_id'));
                 $signature = $payment?->signature;
             }
         }
@@ -205,8 +214,8 @@ class OnboardingController extends Controller
             return response()->json(['message' => 'Signature not found or not yet complete.'], 422);
         }
 
-        $setupToken = \Illuminate\Support\Str::random(64);
-        \Illuminate\Support\Facades\Cache::put(
+        $setupToken = Str::random(64);
+        Cache::put(
             'founder_setup_token_' . $signature->signer_email,
             $setupToken,
             now()->addHours(48)
@@ -214,13 +223,13 @@ class OnboardingController extends Controller
 
         $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
 
-        \Illuminate\Support\Facades\Mail::to($signature->signer_email)
+        Mail::to($signature->signer_email)
             ->queue(new \App\Mail\FounderSetupInviteMail($signature->signer_email, $setupUrl));
 
         return response()->json(['message' => 'Invite resent.']);
     }
 
-    public function webhook(Request $request): \Illuminate\Http\JsonResponse
+    public function webhook(Request $request): JsonResponse
     {
         $this->boldSign->handleWebhook($request);
 

@@ -40,14 +40,19 @@ return new class extends Migration
             $table->index(['user_id', 'status']);
         });
 
-        // MySQL/MariaDB: enforce at least one of user_id / diagnostic_session_id is non-null
-        DB::statement('ALTER TABLE payments ADD CONSTRAINT chk_payments_owner
-            CHECK (user_id IS NOT NULL OR diagnostic_session_id IS NOT NULL)');
+        // MySQL/MariaDB only: enforce at least one of user_id / diagnostic_session_id is non-null
+        // SQLite (used in tests) does not support ALTER TABLE … ADD CONSTRAINT
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE payments ADD CONSTRAINT chk_payments_owner
+                CHECK (user_id IS NOT NULL OR diagnostic_session_id IS NOT NULL)');
+        }
     }
 
     public function down(): void
     {
-        DB::statement('ALTER TABLE payments DROP CONSTRAINT IF EXISTS chk_payments_owner');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE payments DROP CONSTRAINT IF EXISTS chk_payments_owner');
+        }
         Schema::dropIfExists('payments');
     }
 };

@@ -227,7 +227,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                     <div className="relative" style={{ minHeight: 280 }}>
                         <AnimatePresence mode="wait" custom={direction}>
                             <motion.div key={question.id} custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit">
-                                <Card className="waitlist-panel overflow-hidden rounded-[1.25rem] border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
+                                <Card className="overflow-hidden rounded-[1.25rem] border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                     <CardContent className="p-6 sm:p-10">
                                         {/* Question text */}
                                         <p className="font-display text-xl leading-snug font-bold tracking-tight text-[#ECF0F9] sm:text-2xl">

@@ -1,7 +1,9 @@
 <?php
 
-it('returns a successful response', function () {
-    $response = $this->get('/');
+it('homepage redirects to the waitlist', function () {
+    $this->get('/')->assertRedirect('/waitlist');
+});
 
-    $response->assertStatus(200);
+it('diagnostic page loads successfully', function () {
+    $this->get('/diagnostic')->assertStatus(200);
 });

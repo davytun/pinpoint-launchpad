@@ -1,37 +1,36 @@
-<x-email-layout :subject="'New Payment Received'" :recipient-email="config('mail.admin_address', 'admin@pinpointlaunchpad.com')">
+<x-email-layout :subject="'New Payment Received'" :recipient-email="'Admin'">
 
-  <p style="margin:0 0 6px 0;font-size:20px;font-weight:bold;color:#111827;font-family:Arial,Helvetica,sans-serif;">
-    New Payment Received
-  </p>
-  <p style="margin:0 0 20px 0;font-size:13px;color:#6B7280;font-family:Arial,Helvetica,sans-serif;">
-    A founder has completed checkout. Details below.
-  </p>
+  <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.025em;">New Payment Received</h1>
+  
+  <p style="margin-bottom: 24px;">A founder has successfully completed the checkout process for their PARAGON audit.</p>
 
-  {{-- Details table --}}
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F9FAFB;border:1px solid #E5E7EB;border-radius:6px;margin-bottom:24px;">
+  {{-- Payment details table --}}
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 8px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
     <tr>
-      <td style="padding:20px 24px;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      <td style="padding: 24px;">
+        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3C53A8;">Transaction Details</p>
+        
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr>
-            <td style="padding:5px 0;font-size:13px;color:#6B7280;width:40%;font-family:Arial,Helvetica,sans-serif;">Email</td>
-            <td style="padding:5px 0;font-size:13px;color:#111827;font-weight:bold;font-family:Arial,Helvetica,sans-serif;">{{ $email }}</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Founder Email</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $email }}</td>
           </tr>
           <tr>
-            <td style="padding:5px 0;font-size:13px;color:#6B7280;font-family:Arial,Helvetica,sans-serif;">Tier</td>
-            <td style="padding:5px 0;font-size:13px;color:#111827;font-weight:bold;font-family:Arial,Helvetica,sans-serif;">{{ $tier_label }}</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Audit Tier</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $tier_label }}</td>
           </tr>
           <tr>
-            <td style="padding:5px 0;font-size:13px;color:#6B7280;font-family:Arial,Helvetica,sans-serif;">Amount</td>
-            <td style="padding:5px 0;font-size:13px;color:#111827;font-weight:bold;font-family:Arial,Helvetica,sans-serif;">${{ number_format($total_amount, 2) }} USD</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Amount Paid</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #059669; font-weight: 700; text-align: right;">${{ number_format($total_amount, 2) }} USD</td>
           </tr>
           <tr>
-            <td style="padding:5px 0;font-size:13px;color:#6B7280;font-family:Arial,Helvetica,sans-serif;">Date</td>
-            <td style="padding:5px 0;font-size:13px;color:#111827;font-family:Arial,Helvetica,sans-serif;">
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Paid At</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">
               @if($paid_at instanceof \Illuminate\Support\Carbon || $paid_at instanceof \Carbon\Carbon)
-                {{ $paid_at->format('d M Y, H:i') }}
+                {{ $paid_at->format('d M Y, H:i') }} UTC
               @elseif($paid_at)
                 @php
-                  try { echo \Carbon\Carbon::parse($paid_at)->format('d M Y, H:i'); }
+                  try { echo \Carbon\Carbon::parse($paid_at)->format('d M Y, H:i') . ' UTC'; }
                   catch (\Exception $e) { echo 'N/A'; }
                 @endphp
               @else
@@ -39,30 +38,26 @@
               @endif
             </td>
           </tr>
-          <tr>
-            <td style="padding:5px 0;font-size:13px;color:#6B7280;font-family:Arial,Helvetica,sans-serif;">Audit Status</td>
-            <td style="padding:5px 0;font-size:13px;color:#D97706;font-weight:bold;font-family:Arial,Helvetica,sans-serif;">Pending (not yet started)</td>
-          </tr>
         </table>
       </td>
     </tr>
   </table>
 
-  {{-- Next action --}}
-  <p style="margin:0 0 16px 0;font-size:14px;color:#374151;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">
-    <strong>Next action:</strong> Assign an analyst and begin the audit process. Once work begins, update the audit status to <em>In Progress</em> to remove refund eligibility.
-  </p>
+  <div style="background-color: #F9FAFB; border-radius: 8px; border-left: 4px solid #3C53A8; padding: 24px; margin-bottom: 32px;">
+    <p style="margin: 0 0 12px 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #111827;">Action Required:</p>
+    <p style="margin: 0; font-size: 14px; color: #4B5563; line-height: 1.6;">
+      Assign an analyst to begin the audit. Note: Founders are eligible for a refund until the audit status is updated to <strong>In Progress</strong>.
+    </p>
+  </div>
 
-  {{-- CTA button --}}
-  <table cellpadding="0" cellspacing="0" border="0">
-    <tr>
-      <td style="background-color:#2563EB;border-radius:6px;">
-        <a href="{{ url('/admin') }}"
-           style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;">
-          View in Admin Dashboard
-        </a>
-      </td>
-    </tr>
-  </table>
+  <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
+    <a href="{{ url('/admin') }}" class="cta-button">
+      Go to Admin Dashboard
+    </a>
+  </div>
+
+  <p style="margin-bottom: 0;">
+    &mdash; Pinpoint System
+  </p>
 
 </x-email-layout>

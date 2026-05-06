@@ -4,10 +4,9 @@ import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
+import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -89,22 +88,19 @@ const RATIONALE = [
     },
 ];
 
-// ─── Stagger variants ─────────────────────────────────────────────────────────
+// ─── Animations ────────────────────────────────────────────────────────────────
 
-const cardStagger = {
-    hidden: { opacity: 0 },
-    show:   { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-};
-
-const cardItem = {
-    hidden: { opacity: 0, y: 28, filter: 'blur(4px)' },
-    show:   { opacity: 1, y: 0,  filter: 'blur(0px)', transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] } },
-};
-
-const fadeUp = {
-    hidden: { opacity: 0, y: 24, filter: 'blur(4px)' },
-    show:   { opacity: 1, y: 0,  filter: 'blur(0px)', transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] } },
-};
+function FadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay, ease: [0.25, 1, 0.5, 1] }}
+        >
+            {children}
+        </motion.div>
+    );
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -154,26 +150,28 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         </header>
 
                         {/* ── Hero header ── */}
-                        <motion.div
-                            initial="hidden"
-                            animate="show"
-                            variants={fadeUp}
-                            className="mb-14 text-center"
-                        >
-                            <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/50 backdrop-blur-sm">
-                                <span className="h-1.5 w-1.5 rounded-full" style={{ background: bandMeta.text }} />
-                                PARAGON Certification Programme
-                            </span>
+                        <div className="mb-14 text-center">
+                            <FadeUp delay={0.05}>
+                                <span className="inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-[#9AA9CB]">
+                                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: bandMeta.text }} />
+                                    PARAGON Certification Programme
+                                </span>
+                            </FadeUp>
 
-                            <h1 className="mt-5 font-display text-3xl font-semibold leading-tight tracking-tight text-white md:text-4xl">
-                                Audit Tier Selection
-                            </h1>
-                            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/50">
-                                Your score of{' '}
-                                <span className="font-bold text-white">{score}/100</span>{' '}
-                                qualifies you for the following credential programmes.
-                            </p>
-                        </motion.div>
+                            <FadeUp delay={0.12}>
+                                <h1 className="mt-5 font-display text-3xl font-semibold leading-tight tracking-tight text-white md:text-4xl">
+                                    Audit Tier Selection
+                                </h1>
+                            </FadeUp>
+
+                            <FadeUp delay={0.18}>
+                                <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[#788CBA]">
+                                    Your score of{' '}
+                                    <span className="font-bold text-white">{score}/100</span>{' '}
+                                    qualifies you for the following credential programmes.
+                                </p>
+                            </FadeUp>
+                        </div>
 
                         {/* ── Error banner ── */}
                         {error && (
@@ -189,38 +187,26 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         )}
 
                         {/* ── Pricing cards ── */}
-                        <motion.div
-                            initial="hidden"
-                            animate="show"
-                            variants={cardStagger}
-                            className="grid gap-5 md:grid-cols-3"
-                        >
-                            {tiers.map((tier) => {
+                        <div className="grid gap-5 md:grid-cols-3">
+                            {tiers.map((tier, i) => {
                                 const accent     = tier.is_featured ? FEATURED_ACCENT : STANDARD_ACCENT;
                                 const isSelected = selectedTier === tier.key;
                                 const isOther    = isLoading && !isSelected;
 
                                 return (
-                                    <motion.div
-                                        key={tier.key}
-                                        variants={cardItem}
-                                        className={tier.is_featured ? 'md:-mt-4' : ''}
-                                    >
+                                    <FadeUp key={tier.key} delay={0.25 + i * 0.1}>
                                         <div
-                                            className="waitlist-panel relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border transition-all duration-300 group hover:border-[#6EBE44]"
-                                            style={{
-                                                backgroundColor: 'rgba(10,10,10,0.7)',
-                                                backdropFilter:  'blur(24px)',
-                                                borderColor:     accent.border,
-                                                boxShadow:       tier.is_featured ? `0 0 60px ${accent.glow}, inset 0 1px 0 rgba(255,255,255,0.04)` : 'inset 0 1px 0 rgba(255,255,255,0.04)',
-                                            }}
+                                            className={cn(
+                                                "relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-300 group bg-[#101623]",
+                                                tier.is_featured ? 'border-[#4468BB]/50 shadow-[0_0_40px_rgba(68,104,187,0.15)] md:-mt-4' : 'border-[#232C43] shadow-sm'
+                                            )}
                                         >
                                             {/* Ambient tier glow */}
                                             {tier.is_featured && (
                                                 <div
                                                     className="pointer-events-none absolute inset-x-0 top-0 h-40"
                                                     style={{
-                                                        background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${accent.glow} 0%, transparent 100%)`,
+                                                        background: `radial-gradient(ellipse 80% 60% at 50% 0%, rgba(68,104,187,0.15) 0%, transparent 100%)`,
                                                     }}
                                                 />
                                             )}
@@ -241,23 +227,23 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
 
                                                 {/* Tier name + tagline */}
                                                 <h2 className="font-display text-[1.35rem] font-semibold tracking-tight text-white">{tier.label}</h2>
-                                                <p className="mt-2 text-[13px] leading-relaxed text-white/70">
-                                                    <strong className="font-bold text-white">Best for:</strong> {tier.tagline}
+                                                <p className="mt-2 text-[13px] leading-relaxed text-[#788CBA]">
+                                                    <strong className="font-bold text-[#ECF0F9]">Best for:</strong> {tier.tagline}
                                                 </p>
 
-                                                <Separator className="my-6 bg-white/[0.06]" />
+                                                <div className="my-6 h-px bg-[#232C43]" />
 
                                                 {/* Price block */}
                                                 <div className="mb-7">
                                                     <div className="flex items-end gap-1 leading-none">
                                                         <span
                                                             className="font-display text-[2.75rem] font-bold tracking-tight text-white"
-                                                            style={{ textShadow: tier.is_featured ? `0 0 40px ${accent.glow}` : 'none' }}
+                                                            style={{ color: tier.is_featured ? '#fff' : '#ECF0F9' }}
                                                         >
                                                             ${tier.base_price}
                                                         </span>
                                                     </div>
-                                                    <p className="mt-2 text-sm font-bold text-white">
+                                                    <p className="mt-2 text-sm font-bold text-[#576FA8]">
                                                         + ${tier.gate_fee} Gate Fee
                                                     </p>
                                                 </div>
@@ -269,14 +255,14 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                         return (
                                                             <li key={fi} className="flex items-start gap-3">
                                                                 {isEverything ? (
-                                                                    <ArrowRight className="mt-0.5 size-4 shrink-0 text-white/40" />
+                                                                    <ArrowRight className="mt-0.5 size-4 shrink-0 text-[#576FA8]" />
                                                                 ) : (
                                                                     <CheckCircle2
                                                                         className="mt-0.5 size-4 shrink-0"
-                                                                        style={{ color: tier.is_featured ? accent.color : 'rgba(255,255,255,0.6)' }}
+                                                                        style={{ color: tier.is_featured ? '#4468BB' : '#576FA8' }}
                                                                     />
                                                                 )}
-                                                                <span className={`text-[13px] leading-relaxed ${isEverything ? 'italic text-white/60' : 'text-white/90'}`}>
+                                                                <span className={`text-[13px] leading-relaxed ${isEverything ? 'italic text-[#576FA8]' : 'text-[#9AA9CB]'}`}>
                                                                     {feature}
                                                                 </span>
                                                             </li>
@@ -303,7 +289,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                                 </button>
                                                             </TooltipTrigger>
                                                             <TooltipContent
-                                                                className="z-[100] max-w-[280px] rounded-xl border border-white/10 bg-[#1A1A1A] p-4 text-[13px] leading-relaxed text-white/75 shadow-2xl"
+                                                                className="z-[100] max-w-[280px] rounded-xl border border-[#232C43] bg-[#101623] p-4 text-[13px] leading-relaxed text-[#788CBA] shadow-2xl"
                                                                 side="top"
                                                                 align="start"
                                                                 sideOffset={12}
@@ -322,13 +308,13 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                         onClick={() => handleSelectTier(tier.key)}
                                                         className="group relative w-full overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
                                                         style={{
-                                                            background:  tier.is_featured ? accent.color : 'rgba(110,190,68,0.12)',
-                                                            border:      `1px solid ${tier.is_featured ? 'transparent' : 'rgba(110,190,68,0.25)'}`,
+                                                            background:  tier.is_featured ? '#4468BB' : 'rgba(68,104,187,0.12)',
+                                                            border:      `1px solid ${tier.is_featured ? 'transparent' : 'rgba(68,104,187,0.25)'}`,
                                                             color:       '#fff',
-                                                            boxShadow:   tier.is_featured ? `0 0 28px ${accent.glow}` : 'none',
+                                                            boxShadow:   tier.is_featured ? `0 0 28px rgba(68,104,187,0.35)` : 'none',
                                                         }}
-                                                        onMouseEnter={e => { if (!isLoading && tier.is_featured) (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)'; else if (!isLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(110,190,68,0.2)'; }}
-                                                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; (e.currentTarget as HTMLButtonElement).style.backgroundColor = tier.is_featured ? accent.color : 'rgba(110,190,68,0.12)'; }}
+                                                        onMouseEnter={e => { if (!isLoading && tier.is_featured) (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)'; else if (!isLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(68,104,187,0.2)'; }}
+                                                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; (e.currentTarget as HTMLButtonElement).style.backgroundColor = tier.is_featured ? '#4468BB' : 'rgba(68,104,187,0.12)'; }}
                                                     >
                                                         {tier.is_featured && (
                                                             <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
@@ -359,59 +345,52 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                 </div>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </FadeUp>
                                 );
                             })}
-                        </motion.div>
+                        </div>
 
                         {/* ── Rationale section ── */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.45, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] }}
-                            className="mt-24"
-                        >
-                            <div className="mb-10 text-center">
-                                <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/40">
-                                    Radical Transparency
-                                </span>
-                                <h2 className="mt-4 font-display text-2xl font-bold text-white">
-                                    Why we charge what we charge
-                                </h2>
-                            </div>
+                        <FadeUp delay={0.6}>
+                            <div className="mt-24">
+                                <div className="mb-10 text-center">
+                                    <span className="inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-[#576FA8]">
+                                        Radical Transparency
+                                    </span>
+                                    <h2 className="mt-4 font-display text-2xl font-bold text-white">
+                                        Why we charge what we charge
+                                    </h2>
+                                </div>
 
-                            <div className="grid gap-4 md:grid-cols-2">
-                                {RATIONALE.map((item, i) => (
-                                    <motion.div
-                                        key={item.num}
-                                        initial={{ opacity: 0, y: 16 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.45, delay: 0.5 + i * 0.08, ease: [0.16, 1, 0.3, 1] as [number,number,number,number] }}
-                                    >
-                                        <Card className="waitlist-panel group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-white/[0.06] bg-[#0A0A0A] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-500 hover:border-[#3A54A5]/40 hover:bg-[#0D0D0D]">
-                                            
-                                            {/* Subdued top-glow that activates on hover */}
-                                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3A54A5]/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                                            <div className="pointer-events-none absolute inset-x-0 top-0 h-[120px] bg-gradient-to-b from-[#3A54A5]/[0.06] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    {RATIONALE.map((item, i) => (
+                                        <FadeUp key={item.num} delay={0.7 + i * 0.08}>
+                                            <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm transition-all duration-500 hover:border-[#4468BB]/40 hover:bg-[#1B294B]/30">
+                                                
+                                                {/* Subdued top-glow that activates on hover */}
+                                                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4468BB]/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-                                            <CardContent className="flex flex-1 flex-col p-8 sm:p-10 relative z-10">
-                                                <h3 className="mb-3 text-[14px] font-bold uppercase tracking-[0.18em] text-white/90">
-                                                    {item.title}
-                                                </h3>
-                                                <p className="text-[15px] leading-relaxed text-white/45">
-                                                    {item.body}
-                                                </p>
-                                            </CardContent>
-                                        </Card>
-                                    </motion.div>
-                                ))}
+                                                <div className="flex flex-1 flex-col p-8 sm:p-10 relative z-10">
+                                                    <h3 className="mb-3 text-[14px] font-bold uppercase tracking-[0.18em] text-[#ECF0F9]">
+                                                        {item.title}
+                                                    </h3>
+                                                    <p className="text-[15px] leading-relaxed text-[#788CBA]">
+                                                        {item.body}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </FadeUp>
+                                    ))}
+                                </div>
                             </div>
-                        </motion.div>
+                        </FadeUp>
 
                         {/* ── Refund note ── */}
-                        <p className="mt-10 text-center text-xs text-white/25">
-                            Full refund available if your audit has not yet commenced. Once analyst work begins, no refund is applicable.
-                        </p>
+                        <FadeUp delay={1.1}>
+                            <p className="mt-10 text-center text-xs text-[#576FA8]">
+                                Full refund available if your audit has not yet commenced. Once analyst work begins, no refund is applicable.
+                            </p>
+                        </FadeUp>
 
                     </div>
                 </TooltipProvider>

@@ -1,41 +1,40 @@
 <?php
 
-use App\Models\User;
+use App\Models\Founder;
 
-test('login screen can be rendered', function () {
-    $response = $this->get('/login');
-
-    $response->assertStatus(200);
+test('founder login screen can be rendered', function () {
+    $this->get('/founder/login')->assertStatus(200);
 });
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+test('founders can authenticate using the login screen', function () {
+    $founder = Founder::factory()->create();
 
-    $response = $this->post('/login', [
-        'email' => $user->email,
+    $response = $this->post('/founder/login', [
+        'email'    => $founder->email,
         'password' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $this->assertAuthenticatedAs($founder, 'founder');
+    $response->assertRedirect(route('founder.dashboard'));
 });
 
-test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+test('founders cannot authenticate with invalid password', function () {
+    $founder = Founder::factory()->create();
 
-    $this->post('/login', [
-        'email' => $user->email,
+    $this->post('/founder/login', [
+        'email'    => $founder->email,
         'password' => 'wrong-password',
     ]);
 
-    $this->assertGuest();
+    $this->assertGuest('founder');
 });
 
-test('users can logout', function () {
-    $user = User::factory()->create();
+test('founders can logout and are redirected to login', function () {
+    $founder = Founder::factory()->create();
 
-    $response = $this->actingAs($user)->post('/logout');
+    $response = $this->actingAs($founder, 'founder')
+        ->withSession(['founder_last_activity' => now()->timestamp])
+        ->post('/founder/logout');
 
-    $this->assertGuest();
-    $response->assertRedirect('/');
+    $response->assertRedirect('/founder/login');
 });

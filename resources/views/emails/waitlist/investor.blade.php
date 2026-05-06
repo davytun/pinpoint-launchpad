@@ -4,33 +4,20 @@
     badge="PIN Network"
     preheader="You're in. Priority access to vetted founder deal flow — no noise, no intermediaries.">
 
-{{-- Greeting --}}
-<p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b6b6b;line-height:1.5;">
-    Hi {{ $entry->name }},
-</p>
+  <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.025em;">You're in. Welcome to the PIN Network.</h1>
+  
+  <p style="margin-bottom: 24px;">Hi {{ $entry->name }},</p>
+  
+  <p style="margin-bottom: 32px;">
+    Pinpoint is building the infrastructure layer between serious investors and pre-market founders. We're deliberate about who joins early — so deal flow quality stays high and the signal-to-noise ratio stays low.
+  </p>
 
-{{-- Headline --}}
-<h1 style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:26px;font-weight:700;color:#f5f5f5;line-height:1.25;letter-spacing:-0.4px;">
-    You're in. Welcome to the PIN&nbsp;Network.
-</h1>
-
-{{-- Body copy --}}
-<p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
-    Pinpoint is building the infrastructure layer between serious investors and pre-market founders.
-    We're deliberate about who joins early — so deal flow quality stays high and the
-    signal-to-noise ratio stays low.
-</p>
-
-{{-- Benefits box --}}
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-    style="background-color:#161616;border-radius:8px;border:1px solid #1e1e1e;margin-bottom:28px;">
-<tr>
-    <td style="padding:24px 28px;">
-
-        <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#3c53a8;">
-            As a Priority Access Member
-        </p>
-
+  {{-- Benefits box --}}
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 12px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
+    <tr>
+      <td style="padding: 24px;">
+        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3C53A8;">Priority Access Benefits</p>
+        
         @php
         $benefits = [
             'Early access to vetted founder profiles before public launch',
@@ -40,40 +27,31 @@
         ];
         @endphp
 
-        @foreach($benefits as $benefit)
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-            style="{{ $loop->last ? '' : 'margin-bottom:12px;' }}">
-        <tr>
-            <td width="28" valign="top" style="padding-top:1px;">
-                <span style="display:inline-block;width:18px;height:18px;background-color:#3c53a8;border-radius:3px;text-align:center;line-height:18px;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;color:#ffffff;">&bull;</span>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          @foreach($benefits as $benefit)
+          <tr>
+            <td width="24" valign="top" style="padding-bottom: 12px;">
+              <span style="color: #3C53A8; font-weight: 700;">&bull;</span>
             </td>
-            <td style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#c8c8c8;line-height:1.55;">
-                {{ $benefit }}
-            </td>
-        </tr>
+            <td style="font-size: 14px; color: #4B5563; padding-bottom: 12px;">{{ $benefit }}</td>
+          </tr>
+          @endforeach
         </table>
-        @endforeach
+      </td>
+    </tr>
+  </table>
 
-    </td>
-</tr>
-</table>
+  <p style="margin-bottom: 24px;">
+    We know your time is spent filtering noise. Pinpoint is built to bring you signal. We will reach out shortly for a <strong>15-minute briefing</strong> to ensure our audit criteria align with your firm's specific mandate.
+  </p>
 
-{{-- Cohort note --}}
-<p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
-    We know your time is spent filtering noise. Pinpoint is built to bring you signal.
-    We will reach out shortly for a <span style="color:#f5f5f5;font-weight:600;">15-minute briefing</span>
-    to ensure our audit criteria align with your firm's specific mandate.
-</p>
+  <p style="margin-bottom: 32px;">
+    If anything changes on your end — fund stage, thesis, check size — just reply to this email and we'll update your profile.
+  </p>
 
-<p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
-    If anything changes on your end — fund stage, thesis, check size — just reply to
-    this email and we'll update your profile.
-</p>
-
-{{-- Sign-off --}}
-<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b6b6b;line-height:1.6;">
+  <p style="margin-bottom: 0;">
     Good to have you here,<br>
-    <span style="color:#f5f5f5;font-weight:600;">The Pinpoint Team</span>
-</p>
+    <strong>The Pinpoint Team</strong>
+  </p>
 
 </x-email-layout>

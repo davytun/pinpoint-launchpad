@@ -25,7 +25,7 @@ class FounderWelcomeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.founder.welcome',
+            view: 'emails.founder.welcome',
             with: [
                 'founder'    => $this->founder,
                 'tierLabel'  => ucfirst($this->founder->tier ?? 'Foundation'),

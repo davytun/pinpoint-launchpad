@@ -1,55 +1,50 @@
-<x-email-layout subject="Investor Interest — Pinpoint Launchpad" :recipient-email="$recipientEmail">
+<x-email-layout :subject="'Investor Interest — ' . ($firmName ?? 'An Investor') . ' Viewed Your Profile'" :recipient-email="$recipientEmail">
 
-  <p style="margin:0 0 20px 0;font-size:15px;color:#1E293B;font-family:Arial,Helvetica,sans-serif;">
-    Hi <strong>{{ $founder->full_name }}</strong>,
-  </p>
-
-  <p style="margin:0 0 20px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
-    An investor has requested access to your full data room on Pinpoint Launchpad.
+  <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.025em;">Investor Interest Detected</h1>
+  
+  <p style="margin-bottom: 24px;">Hi {{ $founder->full_name }},</p>
+  
+  <p style="margin-bottom: 32px;">
+    An investor has requested access to your full data room on Pinpoint Launchpad. This is a high-intent signal.
   </p>
 
   {{-- Investor details box --}}
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 8px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
     <tr>
-      <td style="background-color:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:16px 20px;">
-        <p style="margin:0 0 6px 0;font-size:11px;font-weight:bold;letter-spacing:0.1em;color:#1D4ED8;font-family:Arial,Helvetica,sans-serif;text-transform:uppercase;">
-          INVESTOR DETAILS
-        </p>
-        <p style="margin:0 0 4px 0;font-size:13px;color:#1E293B;font-family:Arial,Helvetica,sans-serif;">
-          <strong>Name:</strong> {{ $investorName }}
-        </p>
-        <p style="margin:0 0 4px 0;font-size:13px;color:#1E293B;font-family:Arial,Helvetica,sans-serif;">
-          <strong>Firm:</strong> {{ $firmName ?? 'Independent' }}
-        </p>
-        <p style="margin:0;font-size:13px;color:#1E293B;font-family:Arial,Helvetica,sans-serif;">
-          <strong>Email:</strong>
-          <a href="mailto:{{ $investorEmail }}" style="color:#2563EB;">{{ $investorEmail }}</a>
-        </p>
+      <td style="padding: 24px;">
+        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3C53A8;">Investor Details</p>
+        
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Name</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $investorName }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Firm</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $firmName ?? 'Independent' }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Email</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #3C53A8; font-weight: 700; text-align: right;">
+              <a href="mailto:{{ $investorEmail }}" style="color: #3C53A8; text-decoration: none;">{{ $investorEmail }}</a>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
 
-  <p style="margin:0 0 20px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
-    This is a warm signal. Respond promptly — investors move fast.
+  <p style="margin-bottom: 24px;">
+    Respond promptly to maintain momentum — high-quality investors move fast. You can reply directly to the investor via the email provided above.
   </p>
 
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
-    <tr>
-      <td align="center">
-        <a href="{{ $verificationUrl }}"
-           style="display:inline-block;background-color:#2563EB;color:#ffffff;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 28px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;">
-          View Your Investor Page
-        </a>
-      </td>
-    </tr>
-  </table>
+  <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
+    <a href="{{ $verificationUrl }}" class="cta-button">
+      View Your Investor Page
+    </a>
+  </div>
 
-  <p style="margin:0 0 20px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    You can reply directly to this investor at
-    <a href="mailto:{{ $investorEmail }}" style="color:#2563EB;">{{ $investorEmail }}</a>.
-  </p>
-
-  <p style="margin:0;font-size:13px;color:#94A3B8;font-family:Arial,Helvetica,sans-serif;">
+  <p style="margin-bottom: 0;">
     &mdash; The Pinpoint Team
   </p>
 

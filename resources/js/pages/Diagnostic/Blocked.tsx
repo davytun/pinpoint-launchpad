@@ -29,7 +29,7 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
 
             <DiagnosticLayout>
                 <div className="flex min-h-[calc(100vh-72px)] flex-col items-center justify-center px-4 py-12">
-                    <div className="waitlist-panel mx-auto w-full max-w-lg overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-8 shadow-md sm:p-12 md:rounded-[1.75rem]">
+                    <div className="mx-auto w-full max-w-lg overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-8 shadow-md sm:p-12 md:rounded-[1.75rem]">
                         {/* Compass icon — oscillating */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}

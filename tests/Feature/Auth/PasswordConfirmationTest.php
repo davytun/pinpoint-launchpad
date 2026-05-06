@@ -1,32 +1,9 @@
 <?php
 
-use App\Models\User;
+// Password confirmation middleware is not used in this app's founder auth flow.
+// Founders use a token-gated setup route and standard session auth thereafter.
+// Placeholder to prevent stale Breeze tests from being re-added.
 
-test('confirm password screen can be rendered', function () {
-    $user = User::factory()->create();
-
-    $response = $this->actingAs($user)->get('/confirm-password');
-
-    $response->assertStatus(200);
-});
-
-test('password can be confirmed', function () {
-    $user = User::factory()->create();
-
-    $response = $this->actingAs($user)->post('/confirm-password', [
-        'password' => 'password',
-    ]);
-
-    $response->assertRedirect();
-    $response->assertSessionHasNoErrors();
-});
-
-test('password is not confirmed with invalid password', function () {
-    $user = User::factory()->create();
-
-    $response = $this->actingAs($user)->post('/confirm-password', [
-        'password' => 'wrong-password',
-    ]);
-
-    $response->assertSessionHasErrors();
+it('placeholder — no confirm-password route in this app', function () {
+    expect(true)->toBeTrue();
 });

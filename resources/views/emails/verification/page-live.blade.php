@@ -1,63 +1,61 @@
-<x-email-layout subject="Your Investor Page is Now Live — Pinpoint Launchpad" :recipient-email="$recipientEmail">
+<x-email-layout :subject="'Your Investor Page is Now Live — Pinpoint Launchpad'" :recipient-email="$recipientEmail">
 
-  <p style="margin:0 0 20px 0;font-size:15px;color:#1E293B;font-family:Arial,Helvetica,sans-serif;">
-    Congratulations, <strong>{{ $founder->full_name }}</strong>.
-  </p>
-
-  <p style="margin:0 0 20px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
-    Your PARAGON audit is complete and your investor verification page is now live.
+  <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.025em;">Your Investor Page is Live!</h1>
+  
+  <p style="margin-bottom: 24px;">Congratulations, {{ $founder->full_name }}.</p>
+  
+  <p style="margin-bottom: 32px;">
+    Your PARAGON audit is complete and your investor verification page is now live. This is a significant milestone in your fundraising journey.
   </p>
 
   {{-- Emerald highlight box --}}
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F0FDF4; border-radius: 12px; border: 1px solid #BBF7D0; margin-bottom: 32px;">
     <tr>
-      <td style="background-color:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:16px 20px;">
-        <p style="margin:0 0 6px 0;font-size:11px;font-weight:bold;letter-spacing:0.1em;color:#15803D;font-family:Arial,Helvetica,sans-serif;text-transform:uppercase;">
-          YOUR PAGE IS LIVE
+      <td style="padding: 24px;">
+        <p style="margin: 0 0 12px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #15803D;">Your Public Verification Link</p>
+        <p style="margin: 0 0 12px 0; font-size: 14px;">
+          <a href="{{ $verificationUrl }}" style="color: #2563EB; word-break: break-all; font-weight: 600;">{{ $verificationUrl }}</a>
         </p>
-        <p style="margin:0 0 6px 0;font-size:13px;font-family:Arial,Helvetica,sans-serif;">
-          <a href="{{ $verificationUrl }}" style="color:#2563EB;word-break:break-all;">{{ $verificationUrl }}</a>
-        </p>
-        <p style="margin:0;font-size:12px;color:#64748B;font-family:Arial,Helvetica,sans-serif;">
-          Valid for 90 days from today.
+        <p style="margin: 0; font-size: 12px; color: #15803D; font-style: italic;">
+          Valid for 90 days. Next scheduled review: {{ now()->addDays(90)->format('d M Y') }}.
         </p>
       </td>
     </tr>
   </table>
 
-  <p style="margin:0 0 20px 0;font-size:14px;color:#475569;line-height:1.7;font-family:Arial,Helvetica,sans-serif;">
-    Share this link with investors, add it to your pitch deck, and include it in your fundraising emails.
+  <p style="margin-bottom: 24px;">
+    Share this link with investors, include it in your pitch deck, and add it to your LinkedIn profile. It provides immediate institutional validation of your venture's fundamentals.
   </p>
 
-  {{-- CTA Button --}}
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
-    <tr>
-      <td align="center">
-        <a href="{{ $verificationUrl }}"
-           style="display:inline-block;background-color:#2563EB;color:#ffffff;font-size:14px;font-weight:bold;text-decoration:none;padding:12px 28px;border-radius:6px;font-family:Arial,Helvetica,sans-serif;">
-          View My Investor Page
-        </a>
-      </td>
-    </tr>
-  </table>
+  <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
+    <a href="{{ $verificationUrl }}" class="cta-button" style="background-color: #059669;">
+      View Your Investor Page
+    </a>
+  </div>
 
-  <p style="margin:0 0 8px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;font-weight:bold;">
-    What's on your page:
-  </p>
-  <p style="margin:0 0 4px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    &bull; Your verified PARAGON score
-  </p>
-  <p style="margin:0 0 4px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    &bull; Analyst executive summary
-  </p>
-  <p style="margin:0 0 4px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    &bull; Verified badges for audited areas
-  </p>
-  <p style="margin:0 0 20px 0;font-size:13px;color:#475569;font-family:Arial,Helvetica,sans-serif;">
-    &bull; Gated data room for serious investors
-  </p>
+  <div style="background-color: #F9FAFB; border-radius: 8px; border-left: 4px solid #3C53A8; padding: 24px; margin-bottom: 32px;">
+    <p style="margin: 0 0 12px 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #111827;">What's on your page:</p>
+    <ul style="margin: 0; padding: 0; list-style-type: none; font-size: 14px; color: #4B5563;">
+      <li style="margin-bottom: 8px; padding-left: 20px; position: relative;">
+        <span style="position: absolute; left: 0; color: #3C53A8;">&bull;</span>
+        Your verified PARAGON score
+      </li>
+      <li style="margin-bottom: 8px; padding-left: 20px; position: relative;">
+        <span style="position: absolute; left: 0; color: #3C53A8;">&bull;</span>
+        Analyst executive summary
+      </li>
+      <li style="margin-bottom: 8px; padding-left: 20px; position: relative;">
+        <span style="position: absolute; left: 0; color: #3C53A8;">&bull;</span>
+        Verified badges for audited pillars
+      </li>
+      <li style="margin-bottom: 0; padding-left: 20px; position: relative;">
+        <span style="position: absolute; left: 0; color: #3C53A8;">&bull;</span>
+        Gated data room for serious investors
+      </li>
+    </ul>
+  </div>
 
-  <p style="margin:0;font-size:13px;color:#94A3B8;font-family:Arial,Helvetica,sans-serif;">
+  <p style="margin-bottom: 0;">
     &mdash; The Pinpoint Team
   </p>
 

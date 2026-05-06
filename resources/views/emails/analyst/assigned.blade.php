@@ -1,41 +1,49 @@
 <x-email-layout :subject="'New Founder Assigned — ' . $companyName" :recipient-email="$analystEmail">
 
-  <p style="margin:0 0 6px 0;font-size:20px;font-weight:bold;color:#111827;font-family:Arial,Helvetica,sans-serif;">
-    New Founder Assigned
-  </p>
-  <p style="margin:0 0 20px 0;font-size:14px;color:#374151;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">
-    Hi {{ $analystName }},
-  </p>
-  <p style="margin:0 0 20px 0;font-size:14px;color:#374151;line-height:1.6;font-family:Arial,Helvetica,sans-serif;">
-    You have been assigned a new founder audit. Please review their details below and reach out if you need anything.
+  <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.025em;">New Founder Assigned</h1>
+  
+  <p style="margin-bottom: 24px;">Hi {{ $analystName }},</p>
+  
+  <p style="margin-bottom: 32px;">
+    You have been assigned as the lead analyst for a new venture audit. Please review the details below to begin the PARAGON certification process.
   </p>
 
-  {{-- Founder details box --}}
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EFF6FF;border:1px solid #BFDBFE;border-left:4px solid #2563EB;border-radius:6px;margin-bottom:24px;">
+  {{-- Founder details table --}}
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 8px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
     <tr>
-      <td style="padding:16px 20px;">
-        <p style="margin:0 0 8px 0;font-size:13px;color:#1E40AF;font-family:Arial,Helvetica,sans-serif;"><strong>Founder:</strong> {{ $founderName }}</p>
-        <p style="margin:0 0 8px 0;font-size:13px;color:#1E40AF;font-family:Arial,Helvetica,sans-serif;"><strong>Company:</strong> {{ $companyName }}</p>
-        <p style="margin:0 0 8px 0;font-size:13px;color:#1E40AF;font-family:Arial,Helvetica,sans-serif;"><strong>Tier:</strong> {{ $tier }}</p>
-        <p style="margin:0;font-size:13px;color:#1E40AF;font-family:Arial,Helvetica,sans-serif;"><strong>Score:</strong> {{ $score }}/100</p>
+      <td style="padding: 24px;">
+        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3C53A8;">Founder Details</p>
+        
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Founder</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $founderName }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Company</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $companyName }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Audit Tier</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $tier }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Current Score</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $score }}/100</td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
 
-  {{-- CTA button --}}
-  <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
-    <tr>
-      <td style="background-color:#2563EB;border-radius:6px;">
-        <a href="{{ $profileUrl }}"
-           style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;font-family:Arial,Helvetica,sans-serif;">
-          View Founder Profile
-        </a>
-      </td>
-    </tr>
-  </table>
+  <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
+    <a href="{{ $profileUrl }}" class="cta-button">
+      View Founder Profile
+    </a>
+  </div>
 
-  <p style="margin:0;font-size:13px;color:#6B7280;font-family:Arial,Helvetica,sans-serif;">
-    — The Pinpoint Team
+  <p style="margin-bottom: 0;">
+    &mdash; The Pinpoint Team
   </p>
 
 </x-email-layout>

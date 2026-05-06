@@ -26,7 +26,7 @@ class FounderSetupInviteMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.founder.setup-invite',
+            view: 'emails.founder.setup-invite',
             with: [
                 'setupUrl' => $this->setupUrl,
                 'email'    => $this->email,

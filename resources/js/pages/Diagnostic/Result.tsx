@@ -154,7 +154,7 @@ export default function DiagnosticResult({
 
                     {/* ── Section 1: Score Hero ── */}
                     <FadeUp delay={0.1}>
-                        <Card className="waitlist-panel mb-8 overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-0 shadow-md md:rounded-[1.75rem]">
+                        <Card className="mb-8 overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-0 shadow-md md:rounded-[1.75rem]">
                             <CardContent className="flex flex-col items-center p-6 sm:p-10">
                                 {/* Band badge */}
                                 <Badge
@@ -196,7 +196,7 @@ export default function DiagnosticResult({
 
                         {/* Radar chart */}
                         <FadeUp delay={0.2}>
-                            <Card className="waitlist-panel overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
+                            <Card className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                 <CardHeader>
                                     <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[#576FA8]">
                                         Pillar Radar
@@ -230,7 +230,7 @@ export default function DiagnosticResult({
                             {/* Section 3: Score band message */}
                             <FadeUp delay={0.25}>
                                 <Card
-                                    className="waitlist-panel overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]"
+                                    className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]"
                                     style={{ borderLeft: `3px solid ${meta.border}` }}
                                 >
                                     <CardHeader className="pb-2">
@@ -302,7 +302,7 @@ export default function DiagnosticResult({
 
                             {/* Pillar score breakdown */}
                             <FadeUp delay={0.38}>
-                                <Card className="waitlist-panel overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
+                                <Card className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#576FA8]">
                                             Pillar Breakdown

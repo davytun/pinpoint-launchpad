@@ -10,6 +10,7 @@ import {
     X,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -72,11 +73,11 @@ function SidebarContent({
                         </button>
                     )}
                 </div>
-                <div className="mt-5">
-                    <p className="truncate text-[13px] font-semibold text-white/80">
+                <div className="mt-5 px-1">
+                    <p className="truncate text-[14px] font-semibold tracking-tight text-[#ECF0F9]">
                         {founder.full_name ?? 'Founder'}
                     </p>
-                    <p className="truncate text-[11px] text-white/30">
+                    <p className="truncate text-[11px] font-medium text-[#576FA8]">
                         {founder.company_name ?? founder.email}
                     </p>
                 </div>
@@ -118,15 +119,24 @@ function SidebarContent({
                                 href={href}
                                 onClick={onClose}
                                 aria-current={isActive ? 'page' : undefined}
-                                className={[
-                                    'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200',
+                                className={cn(
+                                    'group flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-300',
                                     isActive
-                                        ? 'border-l-2 border-blue-500 bg-blue-500/10 text-blue-400'
-                                        : 'text-white/40 hover:bg-white/[0.05] hover:text-white',
-                                ].join(' ')}
+                                        ? 'bg-[#1B294B]/40 text-[#ECF0F9] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] ring-1 ring-[#4468BB]/30'
+                                        : 'text-[#576FA8] hover:bg-white/[0.03] hover:text-[#ECF0F9]'
+                                )}
                             >
-                                <Icon className="size-4 shrink-0" aria-hidden="true" />
-                                <span className="text-[13px] font-medium">{label}</span>
+                                <Icon className={cn(
+                                    "size-4 shrink-0 transition-colors duration-300",
+                                    isActive ? "text-[#4468BB]" : "text-[#576FA8] group-hover:text-[#788CBA]"
+                                )} aria-hidden="true" />
+                                <span className="text-[13.5px] font-medium tracking-tight">{label}</span>
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="active-pill"
+                                        className="ml-auto h-1 w-1 rounded-full bg-[#4468BB] shadow-[0_0_8px_#4468BB]"
+                                    />
+                                )}
                             </Link>
                         );
                     })}
@@ -138,10 +148,10 @@ function SidebarContent({
                 <div className="mb-3 h-px bg-white/[0.06]" />
                 <button
                     onClick={onLogout}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-white/30 transition-all duration-200 hover:bg-red-500/[0.08] hover:text-red-400"
+                    className="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-[#576FA8] transition-all duration-300 hover:bg-red-500/[0.06] hover:text-red-400"
                 >
-                    <LogOut className="size-4 shrink-0" aria-hidden="true" />
-                    <span className="text-[13px] font-medium">Logout</span>
+                    <LogOut className="size-4 shrink-0 transition-colors group-hover:text-red-400" aria-hidden="true" />
+                    <span className="text-[13.5px] font-medium tracking-tight">Logout</span>
                 </button>
             </div>
         </div>
@@ -202,7 +212,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
             />
 
             {/* ── Desktop sidebar ── */}
-            <aside className="waitlist-panel fixed inset-y-0 left-0 z-30 hidden w-[260px] flex-col border-r border-white/[0.06] lg:flex">
+            <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] flex-col border-r border-[#232C43] bg-[#0B0E14] lg:flex">
                 <SidebarContent
                     founder={founder}
                     navItems={navItems}
@@ -230,7 +240,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
                             role="dialog"
                             aria-modal="true"
                             aria-label="Navigation menu"
-                            className="waitlist-panel fixed inset-y-0 left-0 z-50 w-[260px] border-r border-white/[0.06] lg:hidden"
+                            className="fixed inset-y-0 left-0 z-50 w-[260px] border-r border-[#232C43] bg-[#0B0E14] lg:hidden"
                             initial={{ x: -260 }}
                             animate={{ x: 0 }}
                             exit={{ x: -260 }}

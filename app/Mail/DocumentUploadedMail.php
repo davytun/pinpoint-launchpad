@@ -29,7 +29,7 @@ class DocumentUploadedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.documents.uploaded',
+            view: 'emails.documents.uploaded',
             with: [
                 'founder_name'   => $this->founder->full_name,
                 'founder_email'  => $this->founder->email,

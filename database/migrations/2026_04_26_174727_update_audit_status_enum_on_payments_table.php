@@ -12,11 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE payments MODIFY COLUMN audit_status ENUM('pending','in_progress','needs_info','on_hold','complete') DEFAULT 'pending'");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE payments MODIFY COLUMN audit_status ENUM('pending','in_progress','needs_info','on_hold','complete') DEFAULT 'pending'");
+        }
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE payments MODIFY COLUMN audit_status ENUM('pending','in_progress','complete') DEFAULT 'pending'");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE payments MODIFY COLUMN audit_status ENUM('pending','in_progress','complete') DEFAULT 'pending'");
+        }
     }
 };

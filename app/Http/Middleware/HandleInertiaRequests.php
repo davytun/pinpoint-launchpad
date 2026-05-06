@@ -56,7 +56,7 @@ class HandleInertiaRequests extends Middleware
                 'error'   => $request->session()->get('error'),
                 'info'    => $request->session()->get('info'),
             ],
-            'admin_unread_messages' => $request->user()?->isAdmin()
+            'admin_unread_messages' => Auth::guard('web')->user()?->isAdmin()
                 ? MessageThread::sum('admin_unread_count')
                 : null,
         ]);

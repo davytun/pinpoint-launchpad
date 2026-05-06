@@ -1,37 +1,23 @@
 <x-email-layout
     :recipient-email="$entry->email"
     subject="You're on the list — Pinpoint Launchpad"
-    badge="Founder Access"
+    badge="Waitlist Confirmed"
     preheader="You're on the list. Here's your Founder Readiness Checklist — the signals that separate investable from interesting.">
 
-{{-- Greeting --}}
-<p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b6b6b;line-height:1.5;">
-    Hi {{ $entry->name }},
-</p>
+  <h1 style="color: #111827; font-size: 24px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.025em;">You're officially on the waitlist.</h1>
+  
+  <p style="margin-bottom: 24px;">Hi {{ $entry->name }},</p>
+  
+  <p style="margin-bottom: 32px;">
+    While we calibrate the <strong>PARAGON engine</strong> and prepare your diagnostic slot, here's your head start — the <strong>Founder Readiness Checklist</strong>. These are the signals that separate investable from interesting.
+  </p>
 
-{{-- Headline --}}
-<h1 style="margin:0 0 20px;font-family:Arial,Helvetica,sans-serif;font-size:26px;font-weight:700;color:#f5f5f5;line-height:1.25;letter-spacing:-0.4px;">
-    You're officially on the waitlist.
-</h1>
-
-{{-- Body copy --}}
-<p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
-    While we calibrate the <span style="color:#f5f5f5;font-weight:600;">PARAGON engine</span>
-    and prepare your diagnostic slot, here's your head start — the
-    <span style="color:#f5f5f5;font-weight:600;">Founder Readiness Checklist</span>.
-    These are the signals that separate investable from interesting.
-</p>
-
-{{-- Checklist box --}}
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-    style="background-color:#161616;border-radius:8px;border:1px solid #1e1e1e;margin-bottom:28px;">
-<tr>
-    <td style="padding:24px 28px;">
-
-        <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#5ca336;">
-            Founder Readiness Checklist
-        </p>
-
+  {{-- Checklist box --}}
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 12px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
+    <tr>
+      <td style="padding: 24px;">
+        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #059669;">Founder Readiness Checklist</p>
+        
         @php
         $items = [
             'MVP in hands of 5–10 pilot users',
@@ -43,34 +29,27 @@
         ];
         @endphp
 
-        @foreach($items as $item)
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-            style="{{ $loop->last ? '' : 'margin-bottom:12px;' }}">
-        <tr>
-            <td width="28" valign="top" style="padding-top:1px;">
-                <span style="display:inline-block;width:18px;height:18px;background-color:#5ca336;border-radius:3px;text-align:center;line-height:18px;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;color:#ffffff;">✓</span>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+          @foreach($items as $item)
+          <tr>
+            <td width="24" valign="top" style="padding-bottom: 12px;">
+              <span style="color: #059669; font-weight: 700;">✓</span>
             </td>
-            <td style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#c8c8c8;line-height:1.55;">
-                {{ $item }}
-            </td>
-        </tr>
+            <td style="font-size: 14px; color: #4B5563; padding-bottom: 12px;">{{ $item }}</td>
+          </tr>
+          @endforeach
         </table>
-        @endforeach
+      </td>
+    </tr>
+  </table>
 
-    </td>
-</tr>
-</table>
+  <p style="margin-bottom: 32px;">
+    We'll notify you the moment your diagnostic slot opens. Until then, use this checklist to close any gaps — the founders who move fast get seen first.
+  </p>
 
-{{-- Closing line --}}
-<p style="margin:0 0 28px;font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#a0a0a0;line-height:1.75;">
-    We'll notify you the moment your diagnostic slot opens. Until then, use this checklist
-    to close any gaps — the founders who move fast get seen first.
-</p>
-
-{{-- Sign-off --}}
-<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b6b6b;line-height:1.6;">
+  <p style="margin-bottom: 0;">
     Talk soon,<br>
-    <span style="color:#f5f5f5;font-weight:600;">The Pinpoint Team</span>
-</p>
+    <strong>The Pinpoint Team</strong>
+  </p>
 
 </x-email-layout>

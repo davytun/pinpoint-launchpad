@@ -51,13 +51,13 @@ function Field({
     return (
         <FadeUp delay={delay}>
             <div className="space-y-2">
-                <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#576FA8]">
+                <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#91A7D8]">
                     <Icon className="size-3 shrink-0" />
                     {label}
                 </label>
             {children}
                 {hint && !error && (
-                    <p className="ml-0.5 text-[11px] text-[#576FA8]/60">{hint}</p>
+                    <p className="ml-0.5 text-[11px] text-[#91A7D8]/60">{hint}</p>
                 )}
                 {error && (
                     <p className="ml-0.5 text-[11px] text-rose-400">{error}</p>
@@ -104,7 +104,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                             <div
                                                 className={cn(
                                                     'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold tabular-nums transition-colors',
-                                                    step.state === 'active' ? 'border-[#4468BB]/50 bg-[#4468BB]/10 text-[#6986C9]' : 'border-[#232C43] bg-[#0C1427] text-[#576FA8]'
+                                                    step.state === 'active' ? 'border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[#6986C9]' : 'border-[#232C43] bg-[#0C1427] text-[#91A7D8]'
                                                 )}
                                             >
                                                 {step.n}
@@ -112,7 +112,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                             <span
                                                 className={cn(
                                                     'text-[13px] font-medium transition-colors',
-                                                    step.state === 'active' ? 'text-[#ECF0F9]' : 'text-[#455987]'
+                                                    step.state === 'active' ? 'text-[#D8E0F3]' : 'text-[#455987]'
                                                 )}
                                             >
                                                 {step.label}
@@ -125,7 +125,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-white">
                                         One step before your audit begins.
                                     </h1>
-                                    <p className="text-[14px] leading-relaxed text-[#788CBA]">
+                                    <p className="text-[14px] leading-relaxed text-[#C1CDE8]">
                                         Your name and entity will appear on the legally binding Pinpoint Investment
                                         Warrant. This takes under a minute.
                                     </p>
@@ -139,11 +139,11 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                         <div className="mt-12 hidden rounded-xl border border-[#232C43] bg-[#101623] px-5 py-4 lg:block">
                             <div className="flex items-center gap-2">
                                 <span
-                                    className="inline-flex items-center rounded-full border border-[#4468BB]/30 bg-[#4468BB]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#60A5FA]"
+                                    className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#60A5FA]"
                                 >
                                     {tier_label}
                                 </span>
-                                <span className="text-[12px] text-[#576FA8]">{email}</span>
+                                <span className="text-[12px] text-[#91A7D8]">{email}</span>
                             </div>
                         </div>
                     </FadeUp>
@@ -157,23 +157,23 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                     >
                         {/* Mobile header */}
                         <div className="mb-8 lg:hidden">
-                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#576FA8]">
+                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#91A7D8]">
                                 Step 1 of 2
                             </p>
-                            <h1 className="font-display text-2xl font-semibold text-[#ECF0F9]">
+                            <h1 className="font-display text-2xl font-semibold text-[#D8E0F3]">
                                 Confirm Your Details
                             </h1>
                         </div>
 
                         {/* Desktop heading */}
                         <div className="mb-8 hidden lg:block">
-                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#576FA8]">
+                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#91A7D8]">
                                 Step 1 of 2
                             </p>
-                            <h2 className="font-display text-2xl font-semibold text-[#ECF0F9]">
+                            <h2 className="font-display text-2xl font-semibold text-[#D8E0F3]">
                                 Confirm Your Details
                             </h2>
-                            <p className="mt-2 text-[13px] leading-relaxed text-[#788CBA]">
+                            <p className="mt-2 text-[13px] leading-relaxed text-[#C1CDE8]">
                                 These details appear on your signed warrant — enter them exactly as they should read legally.
                             </p>
                         </div>
@@ -203,10 +203,10 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     disabled={processing}
                                     autoFocus
                                     className={cn(
-                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#ECF0F9] placeholder:text-[#576FA8]/40 outline-none transition-all duration-200',
+                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] placeholder:text-[#91A7D8]/40 outline-none transition-all duration-200',
                                         errors.full_name
                                             ? 'border-rose-500/50 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
-                                            : 'border-[#232C43] focus:border-[#4468BB]/60 focus:ring-2 focus:ring-[#4468BB]/10',
+                                            : 'border-[#232C43] focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10',
                                     )}
                                 />
                             </Field>
@@ -225,10 +225,10 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     placeholder="e.g. Acme Technologies Ltd."
                                     disabled={processing}
                                     className={cn(
-                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#ECF0F9] placeholder:text-[#576FA8]/40 outline-none transition-all duration-200',
+                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] placeholder:text-[#91A7D8]/40 outline-none transition-all duration-200',
                                         errors.company_name
                                             ? 'border-rose-500/50 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
-                                            : 'border-[#232C43] focus:border-[#4468BB]/60 focus:ring-2 focus:ring-[#4468BB]/10',
+                                            : 'border-[#232C43] focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10',
                                     )}
                                 />
                             </Field>
@@ -242,7 +242,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     type="email"
                                     value={email}
                                     readOnly
-                                    className="w-full cursor-not-allowed rounded-xl border border-[#232C43] bg-[#0C1427] px-4 py-3 text-[14px] text-[#576FA8] outline-none"
+                                    className="w-full cursor-not-allowed rounded-xl border border-[#232C43] bg-[#0C1427] px-4 py-3 text-[14px] text-[#91A7D8] outline-none"
                                 />
                             </Field>
 
@@ -251,7 +251,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     <button
                                         type="submit"
                                         disabled={processing}
-                                        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#4468BB] px-5 py-3.5 text-[13px] font-bold uppercase tracking-[0.15em] text-white outline-none transition-all duration-200 hover:bg-[#3b5ba5] disabled:cursor-not-allowed disabled:opacity-60"
+                                        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-3.5 text-[13px] font-bold uppercase tracking-[0.15em] text-white outline-none transition-all duration-200 hover:bg-[#3b5ba5] disabled:cursor-not-allowed disabled:opacity-60"
                                         style={{ boxShadow: '0 0 30px rgba(68,104,187,0.3)' }}
                                     >
                                         <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
@@ -273,8 +273,8 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
 
                         <FadeUp delay={0.35}>
                             <div className="mt-5 flex items-center justify-center gap-2">
-                                <Lock className="size-3 shrink-0 text-[#576FA8]/40" />
-                                <p className="text-[11px] text-[#576FA8]/60">
+                                <Lock className="size-3 shrink-0 text-[#91A7D8]/40" />
+                                <p className="text-[11px] text-[#91A7D8]/60">
                                     Your details are used only for the legal agreement and are never shared.
                                 </p>
                             </div>

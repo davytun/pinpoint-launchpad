@@ -143,13 +143,13 @@ function StatCard({
     return (
         <div className="flex items-center gap-3.5 rounded-xl border border-[#232C43] bg-[#101623] px-4 py-4">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0C1427]">
-                <Icon className="h-4 w-4 text-[#576FA8]" />
+                <Icon className="h-4 w-4 text-[#91A7D8]" />
             </div>
             <div className="min-w-0">
-                <p className="truncate text-[11px] font-medium uppercase tracking-widest text-[#576FA8]">{label}</p>
+                <p className="truncate text-[11px] font-medium uppercase tracking-widest text-[#91A7D8]">{label}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
-                    <span className="text-xl font-semibold tabular-nums text-[#ECF0F9]">{value.toLocaleString()}</span>
-                    {sub && <span className="text-xs text-[#788CBA]">{sub}</span>}
+                    <span className="text-xl font-semibold tabular-nums text-[#D8E0F3]">{value.toLocaleString()}</span>
+                    {sub && <span className="text-xs text-[#C1CDE8]">{sub}</span>}
                 </div>
             </div>
         </div>
@@ -164,7 +164,7 @@ function TypeBadge({ type }: { type: 'founder' | 'investor' }) {
             'inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider',
             type === 'founder'
                 ? 'bg-[#5CA336]/15 text-[#8fd168] ring-1 ring-[#5CA336]/25'
-                : 'bg-[#3C53A8]/15 text-[#8da4e8] ring-1 ring-[#3C53A8]/25',
+                : 'bg-[#2F4587]/15 text-[#8da4e8] ring-1 ring-[#2F4587]/25',
         )}>
             {type}
         </span>
@@ -179,7 +179,7 @@ function StatusPill({ value, label }: { value: boolean; label: string }) {
             'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium',
             value
                 ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20'
-                : 'bg-[#0C1427] text-[#576FA8] ring-1 ring-[#232C43]',
+                : 'bg-[#0C1427] text-[#91A7D8] ring-1 ring-[#232C43]',
         )}>
             {value ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
             {label}
@@ -197,8 +197,8 @@ function SortTh({
         <th className={cn('px-4 py-3', className)}>
             <button
                 onClick={() => onClick(column)}
-                className="flex items-center gap-1 text-left text-[11px] font-semibold uppercase tracking-wider transition-colors hover:text-[#ECF0F9]"
-                style={{ color: active ? '#ECF0F9' : '#576FA8' }}
+                className="flex items-center gap-1 text-left text-[11px] font-semibold uppercase tracking-wider transition-colors hover:text-[#D8E0F3]"
+                style={{ color: active ? '#D8E0F3' : '#91A7D8' }}
             >
                 {label}
                 {active
@@ -237,13 +237,13 @@ function FilterTabs({ activeType, totals, currentProps }: {
                     )}
                     className={cn(
                         'flex items-center gap-2 rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors duration-150',
-                        activeType === key ? 'bg-[#1B294B] text-[#ECF0F9] shadow-sm' : 'text-[#788CBA] hover:text-[#ECF0F9]',
+                        activeType === key ? 'bg-[#1B294B] text-[#D8E0F3] shadow-sm' : 'text-[#C1CDE8] hover:text-[#D8E0F3]',
                     )}
                 >
                     {label}
                     <span className={cn(
                         'rounded-full px-1.5 py-px text-[10px] font-bold tabular-nums',
-                        activeType === key ? 'bg-[#4468BB]/30 text-[#ECF0F9]' : 'bg-[#0C1427] text-[#576FA8]',
+                        activeType === key ? 'bg-[#3A54A5]/30 text-[#D8E0F3]' : 'bg-[#0C1427] text-[#91A7D8]',
                     )}>
                         {count}
                     </span>
@@ -258,16 +258,16 @@ function FilterTabs({ activeType, totals, currentProps }: {
 function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
     return (
         <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#576FA8]" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#91A7D8]" />
             <input
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="Search name, email, company…"
-                className="h-9 w-full rounded-lg border border-[#232C43] bg-[#101623] pl-8 pr-8 text-sm text-[#ECF0F9] placeholder:text-[#576FA8] focus:border-[#4468BB]/50 focus:outline-none focus:ring-0"
+                className="h-9 w-full rounded-lg border border-[#232C43] bg-[#101623] pl-8 pr-8 text-sm text-[#D8E0F3] placeholder:text-[#91A7D8] focus:border-[#3A54A5]/50 focus:outline-none focus:ring-0"
             />
             {value && (
-                <button onClick={() => onChange('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#576FA8] hover:text-[#788CBA]">
+                <button onClick={() => onChange('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#91A7D8] hover:text-[#C1CDE8]">
                     <X className="h-3.5 w-3.5" />
                 </button>
             )}
@@ -309,7 +309,7 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
                     'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
                     entry.converted_at
                         ? 'bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25'
-                        : 'text-[#576FA8] hover:bg-[#1B294B] hover:text-[#ECF0F9]',
+                        : 'text-[#91A7D8] hover:bg-[#1B294B] hover:text-[#D8E0F3]',
                 )}
             >
                 <CheckCircle2 className="h-3.5 w-3.5" />
@@ -320,7 +320,7 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
                 onClick={handleResend}
                 disabled={resending}
                 title="Resend waitlist email"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-[#576FA8] transition-colors hover:bg-[#1B294B] hover:text-[#ECF0F9] disabled:opacity-40"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-[#91A7D8] transition-colors hover:bg-[#1B294B] hover:text-[#D8E0F3] disabled:opacity-40"
             >
                 <RefreshCw className={cn('h-3.5 w-3.5', resending && 'animate-spin')} />
             </button>
@@ -329,7 +329,7 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
             <button
                 onClick={handleDelete}
                 title="Delete entry"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-[#576FA8] transition-colors hover:bg-rose-500/15 hover:text-rose-400"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-[#91A7D8] transition-colors hover:bg-rose-500/15 hover:text-rose-400"
             >
                 <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -348,7 +348,7 @@ function Pagination({ entries }: { entries: Paginated<WaitlistEntry> }) {
 
     return (
         <div className="flex items-center justify-between border-t border-[#232C43] px-1 pt-4">
-            <p className="text-xs text-[#576FA8]">Showing {from}–{to} of {total}</p>
+            <p className="text-xs text-[#91A7D8]">Showing {from}–{to} of {total}</p>
             <div className="flex gap-1">
                 {entries.links.map((link, i) => {
                     const isNav     = i === 0 || i === entries.links.length - 1;
@@ -361,14 +361,14 @@ function Pagination({ entries }: { entries: Paginated<WaitlistEntry> }) {
                             preserveScroll
                             className={cn(
                                 'flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-xs font-medium transition-colors',
-                                link.active ? 'bg-[#1B294B] text-[#ECF0F9]' : 'text-[#788CBA] hover:bg-[#0C1427] hover:text-[#ECF0F9]',
+                                link.active ? 'bg-[#1B294B] text-[#D8E0F3]' : 'text-[#C1CDE8] hover:bg-[#0C1427] hover:text-[#D8E0F3]',
                             )}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ) : (
                         <span
                             key={i}
-                            className="flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-xs font-medium text-[#576FA8]"
+                            className="flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-xs font-medium text-[#91A7D8]"
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     );
@@ -416,12 +416,12 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                     {/* Header */}
                     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
                         <div>
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#576FA8]">Admin</p>
-                            <h1 className="mt-1 text-2xl font-semibold text-[#ECF0F9]">Waitlist</h1>
+                            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#91A7D8]">Admin</p>
+                            <h1 className="mt-1 text-2xl font-semibold text-[#D8E0F3]">Waitlist</h1>
                         </div>
                         <a
                             href={route('admin.waitlist.export')}
-                            className="inline-flex items-center gap-2 rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2 text-sm font-medium text-[#788CBA] transition-colors hover:border-[#4468BB]/30 hover:bg-[#1B294B] hover:text-[#ECF0F9]"
+                            className="inline-flex items-center gap-2 rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2 text-sm font-medium text-[#C1CDE8] transition-colors hover:border-[#3A54A5]/30 hover:bg-[#1B294B] hover:text-[#D8E0F3]"
                         >
                             <Download className="h-4 w-4" />
                             Export CSV
@@ -451,7 +451,7 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                     {/* Table */}
                     <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                         {entries.data.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-16 text-[#576FA8]">
+                            <div className="flex flex-col items-center justify-center py-16 text-[#91A7D8]">
                                 <Users className="mb-3 h-8 w-8 opacity-40" />
                                 <p className="text-sm">{searchValue ? 'No results for that search.' : 'No entries yet.'}</p>
                             </div>
@@ -462,16 +462,16 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                                         <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                             <SortTh column="name"         label="Name"           sort={sort} dir={dir} onClick={handleSort} className="w-[22%]" />
                                             <SortTh column="type"         label="Type"           sort={sort} dir={dir} onClick={handleSort} />
-                                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#576FA8]">
+                                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
                                                 Company / Firm
                                             </th>
-                                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#576FA8]">
+                                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
                                                 Stage / Role
                                             </th>
                                             <SortTh column="created_at"   label="Signed Up"      sort={sort} dir={dir} onClick={handleSort} />
                                             <SortTh column="email_sent_at" label="Email"          sort={sort} dir={dir} onClick={handleSort} />
                                             <SortTh column="converted_at" label="Converted"       sort={sort} dir={dir} onClick={handleSort} />
-                                            <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-[#576FA8]">
+                                            <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
                                                 Actions
                                             </th>
                                         </tr>
@@ -480,19 +480,19 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                                         {entries.data.map((entry) => (
                                             <tr key={entry.id} className="group transition-colors hover:bg-[#1B294B]/30">
                                                 <td className="px-4 py-3.5">
-                                                    <p className="font-medium text-[#ECF0F9]">{entry.name}</p>
-                                                    <p className="mt-0.5 text-xs text-[#788CBA]">{entry.email}</p>
+                                                    <p className="font-medium text-[#D8E0F3]">{entry.name}</p>
+                                                    <p className="mt-0.5 text-xs text-[#C1CDE8]">{entry.email}</p>
                                                 </td>
                                                 <td className="px-4 py-3.5">
                                                     <TypeBadge type={entry.type} />
                                                 </td>
-                                                <td className="px-4 py-3.5 text-[#788CBA]">
+                                                <td className="px-4 py-3.5 text-[#C1CDE8]">
                                                     {entry.company_name ?? entry.firm_name ?? '—'}
                                                 </td>
-                                                <td className="px-4 py-3.5 text-[#788CBA]">
+                                                <td className="px-4 py-3.5 text-[#C1CDE8]">
                                                     {humanize(entry.stage ?? entry.role)}
                                                 </td>
-                                                <td className="px-4 py-3.5 text-[#576FA8] tabular-nums">
+                                                <td className="px-4 py-3.5 text-[#91A7D8] tabular-nums">
                                                     {fmt(entry.created_at)}
                                                 </td>
                                                 <td className="px-4 py-3.5">

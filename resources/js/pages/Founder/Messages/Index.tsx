@@ -188,10 +188,10 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                     <div className="mb-8 flex items-end justify-between">
                         <div>
                             <h1 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">Engagement Channel</h1>
-                            <p className="mt-2 text-[15px] text-[#788CBA]">Direct line to your assigned analytical team for audit coordination.</p>
+                            <p className="mt-2 text-[15px] text-[#C1CDE8]">Direct line to your assigned analytical team for audit coordination.</p>
                         </div>
                         <div className="hidden sm:block">
-                            <div className="flex items-center gap-2 rounded-full border border-[#232C43] bg-[#0C1427] px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[#576FA8]">
+                            <div className="flex items-center gap-2 rounded-full border border-[#232C43] bg-[#0C1427] px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[#91A7D8]">
                                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                                 Active Thread
                             </div>
@@ -206,12 +206,12 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                         {/* Thread Header */}
                         <div className="flex items-center justify-between border-b border-[#232C43] bg-[#0C1427]/50 px-6 py-4">
                             <div className="flex items-center gap-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1B294B] border border-[#4468BB]/20 text-[#ECF0F9]">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1B294B] border border-[#3A54A5]/20 text-[#D8E0F3]">
                                     <MessageSquare className="size-5" />
                                 </div>
                                 <div>
-                                    <p className="text-[14px] font-medium text-[#ECF0F9]">Analytical Review Team</p>
-                                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#576FA8]">Official Audit Support</p>
+                                    <p className="text-[14px] font-medium text-[#D8E0F3]">Analytical Review Team</p>
+                                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#91A7D8]">Official Audit Support</p>
                                 </div>
                             </div>
                         </div>
@@ -228,7 +228,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                         <MessageSquare className="size-6 text-[#455987]" />
                                     </div>
                                     <div>
-                                        <p className="text-[15px] font-medium text-[#788CBA]">Engagement Initialized</p>
+                                        <p className="text-[15px] font-medium text-[#C1CDE8]">Engagement Initialized</p>
                                         <p className="mt-1 text-[13px] text-[#455987] max-w-[240px]">
                                             Transmit your first inquiry or status update to begin the audit coordination.
                                         </p>
@@ -258,18 +258,18 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                             className={`flex flex-col group ${isFounder ? 'items-end' : 'items-start'}`}
                                         >
                                             <div className="mb-2 flex items-center gap-3">
-                                                {!isFounder && <span className="text-[11px] font-bold uppercase tracking-widest text-[#4468BB]">Audit Lead</span>}
+                                                {!isFounder && <span className="text-[11px] font-bold uppercase tracking-widest text-[#3A54A5]">Audit Lead</span>}
                                                 <span className="text-[11px] font-medium text-[#455987] opacity-60 group-hover:opacity-100 transition-opacity">
                                                     {msg.created_at}
                                                 </span>
-                                                {isFounder && <span className="text-[11px] font-bold uppercase tracking-widest text-[#788CBA]">Authorized Founder</span>}
+                                                {isFounder && <span className="text-[11px] font-bold uppercase tracking-widest text-[#C1CDE8]">Authorized Founder</span>}
                                             </div>
 
                                             <div
                                                 className={[
                                                     'max-w-[80%] rounded-lg px-5 py-4 text-[14px] leading-relaxed relative',
                                                     isFounder
-                                                        ? 'bg-[#1B294B] text-[#ECF0F9] border border-[#4468BB]/20'
+                                                        ? 'bg-[#1B294B] text-[#D8E0F3] border border-[#3A54A5]/20'
                                                         : 'bg-[#0C1427] text-[#BCC5DC] border border-[#232C43]',
                                                     msg.is_optimistic && 'opacity-60 grayscale-[0.5]'
                                                 ].join(' ')}
@@ -279,19 +279,19 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                                 )}
 
                                                 {msg.has_attachment && (
-                                                    <div className="mt-4 flex items-center gap-3 rounded-md bg-[#080B11]/60 border border-[#232C43] p-3 transition-colors hover:border-[#4468BB]/30">
+                                                    <div className="mt-4 flex items-center gap-3 rounded-md bg-[#080B11]/60 border border-[#232C43] p-3 transition-colors hover:border-[#3A54A5]/30">
                                                         <div className="flex h-10 w-10 items-center justify-center rounded bg-[#101623] border border-[#232C43] shadow-inner">
-                                                            <FileText className="size-5 text-[#4468BB]" />
+                                                            <FileText className="size-5 text-[#3A54A5]" />
                                                         </div>
                                                         <div className="min-w-0 flex-1">
-                                                            <p className="truncate text-[13px] font-medium text-[#ECF0F9]">{msg.attachment_filename}</p>
+                                                            <p className="truncate text-[13px] font-medium text-[#D8E0F3]">{msg.attachment_filename}</p>
                                                             {msg.attachment_size && (
                                                                 <p className="text-[11px] font-bold text-[#455987] uppercase mt-0.5 tracking-tighter">{msg.attachment_size}</p>
                                                             )}
                                                         </div>
                                                         <a
                                                             href={msg.is_optimistic ? '#' : route('founder.messages.attachment.download', { message: msg.id })}
-                                                            className="rounded-md bg-[#101623] p-2 text-[#788CBA] hover:text-white border border-transparent hover:border-[#232C43] transition-all"
+                                                            className="rounded-md bg-[#101623] p-2 text-[#C1CDE8] hover:text-white border border-transparent hover:border-[#232C43] transition-all"
                                                         >
                                                             <Send className="size-4 rotate-90" />
                                                         </a>
@@ -314,9 +314,9 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 10 }}
-                                        className="mb-4 inline-flex items-center gap-3 rounded-md border border-[#4468BB]/40 bg-[#1B294B] px-4 py-2 text-[12px] text-[#ECF0F9]"
+                                        className="mb-4 inline-flex items-center gap-3 rounded-md border border-[#3A54A5]/40 bg-[#1B294B] px-4 py-2 text-[12px] text-[#D8E0F3]"
                                     >
-                                        <Paperclip className="size-4 text-[#4468BB]" />
+                                        <Paperclip className="size-4 text-[#3A54A5]" />
                                         <span className="truncate max-w-[240px] font-medium">{attachment.name}</span>
                                         <button
                                             type="button"
@@ -338,7 +338,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                     onChange={(e) => setBody(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     placeholder="Enter audit inquiry or engagement update..."
-                                    className="min-h-[120px] max-h-[300px] w-full resize-none rounded-xl border-[#232C43] bg-[#080B11]/60 p-5 text-[15px] text-[#ECF0F9] placeholder:text-[#455987] focus:ring-1 focus:ring-[#4468BB]/50 transition-all group-hover:border-[#4468BB]/20"
+                                    className="min-h-[120px] max-h-[300px] w-full resize-none rounded-xl border-[#232C43] bg-[#080B11]/60 p-5 text-[15px] text-[#D8E0F3] placeholder:text-[#455987] focus:ring-1 focus:ring-[#3A54A5]/50 transition-all group-hover:border-[#3A54A5]/20"
                                 />
                                 
                                 <div className="absolute bottom-5 right-5 flex items-center gap-5">
@@ -350,7 +350,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                         <button
                                             type="button"
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="rounded-lg p-2.5 text-[#576FA8] transition-all hover:bg-[#1B294B] hover:text-[#ECF0F9] border border-transparent hover:border-[#4468BB]/20"
+                                            className="rounded-lg p-2.5 text-[#91A7D8] transition-all hover:bg-[#1B294B] hover:text-[#D8E0F3] border border-transparent hover:border-[#3A54A5]/20"
                                             title="Attach supporting evidence"
                                         >
                                             <Paperclip className="size-5" />
@@ -370,7 +370,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                             className={[
                                                 'flex h-11 items-center justify-center gap-3 rounded-lg px-6 text-[13px] font-bold uppercase tracking-widest transition-all',
                                                 (body.trim() || attachment) && !processing
-                                                    ? 'bg-[#4468BB] text-white hover:bg-[#365396] shadow-lg shadow-[#4468BB]/20 active:scale-[0.98]'
+                                                    ? 'bg-[#3A54A5] text-white hover:bg-[#365396] shadow-lg shadow-[#3A54A5]/20 active:scale-[0.98]'
                                                     : 'bg-[#232C43] text-[#455987] cursor-not-allowed',
                                             ].join(' ')}
                                         >
@@ -387,7 +387,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
 
                             <div className="mt-4 flex items-center justify-between text-[11px] text-[#455987]">
                                 <div className="flex items-center gap-2">
-                                    <div className="h-1 w-1 rounded-full bg-[#4468BB]" />
+                                    <div className="h-1 w-1 rounded-full bg-[#3A54A5]" />
                                     Secure Connection
                                 </div>
                                 <div>

@@ -20,7 +20,7 @@
 
   <p style="margin-bottom: 0;">
     If you did not initiate this application, please contact us immediately at 
-    <a href="mailto:support@pinpointlaunchpad.com" style="color: #3C53A8; text-decoration: none;">support@pinpointlaunchpad.com</a>.
+    <a href="mailto:support@pinpointlaunchpad.com" style="color: #2F4587; text-decoration: none;">support@pinpointlaunchpad.com</a>.
   </p>
 
 </x-email-layout>

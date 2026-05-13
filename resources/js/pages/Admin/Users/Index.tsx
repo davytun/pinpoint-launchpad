@@ -51,12 +51,12 @@ export default function AdminUsersIndex({ users }: PageProps) {
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#ECF0F9]">Team</h1>
-                        <p className="mt-1 text-sm text-[#788CBA]">{users.length} member{users.length !== 1 ? 's' : ''}</p>
+                        <h1 className="text-2xl font-bold text-[#D8E0F3]">Team</h1>
+                        <p className="mt-1 text-sm text-[#C1CDE8]">{users.length} member{users.length !== 1 ? 's' : ''}</p>
                     </div>
                     <Link
                         href={route('admin.users.create')}
-                        className="flex items-center gap-2 rounded-lg bg-[#4468BB] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#3C53A8]"
+                        className="flex items-center gap-2 rounded-lg bg-[#3A54A5] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#2F4587]"
                     >
                         <Plus className="size-4" />
                         Add Team Member
@@ -71,14 +71,14 @@ export default function AdminUsersIndex({ users }: PageProps) {
 
                 <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                     {users.length === 0 ? (
-                        <div className="py-16 text-center text-sm text-[#576FA8]">No team members yet.</div>
+                        <div className="py-16 text-center text-sm text-[#91A7D8]">No team members yet.</div>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                         {['Name', 'Email', 'Role', 'Assigned Founders', 'Joined', 'Actions'].map((h) => (
-                                            <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#576FA8]">{h}</th>
+                                            <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">{h}</th>
                                         ))}
                                     </tr>
                                 </thead>
@@ -87,25 +87,25 @@ export default function AdminUsersIndex({ users }: PageProps) {
                                         <tr key={u.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-medium text-[#ECF0F9]">{u.name}</span>
+                                                    <span className="font-medium text-[#D8E0F3]">{u.name}</span>
                                                     {u.is_self && (
-                                                        <span className="rounded-full bg-[#1B294B] px-2 py-0.5 text-[10px] text-[#576FA8]">you</span>
+                                                        <span className="rounded-full bg-[#1B294B] px-2 py-0.5 text-[10px] text-[#91A7D8]">you</span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-4 text-[#788CBA]">{u.email}</td>
+                                            <td className="px-5 py-4 text-[#C1CDE8]">{u.email}</td>
                                             <td className="px-5 py-4">
                                                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${roleBadge[u.role] ?? ''}`}>
                                                     {roleLabel[u.role] ?? u.role}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-4 text-[#788CBA]">{u.assigned_founders_count}</td>
-                                            <td className="px-5 py-4 text-[#788CBA]">{u.created_at}</td>
+                                            <td className="px-5 py-4 text-[#C1CDE8]">{u.assigned_founders_count}</td>
+                                            <td className="px-5 py-4 text-[#C1CDE8]">{u.created_at}</td>
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <Link
                                                         href={route('admin.users.edit', { user: u.id })}
-                                                        className="flex items-center gap-1 text-xs text-[#576FA8] hover:text-[#ECF0F9]"
+                                                        className="flex items-center gap-1 text-xs text-[#91A7D8] hover:text-[#D8E0F3]"
                                                     >
                                                         <UserPen className="size-3.5" />
                                                         Edit

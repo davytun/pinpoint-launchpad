@@ -7,10 +7,10 @@
 $bandColors = [
     'low'      => '#DC2626',
     'mid_low'  => '#D97706',
-    'mid_high' => '#3c53a8',
+    'mid_high' => '#2F4587',
     'high'     => '#5ca336',
 ];
-$color = $bandColors[$session->score_band] ?? '#3c53a8';
+$color = $bandColors[$session->score_band] ?? '#2F4587';
 @endphp
 
 {{-- Headline --}}
@@ -26,7 +26,7 @@ $color = $bandColors[$session->score_band] ?? '#3c53a8';
     style="background-color:#161616;border-radius:8px;border:1px solid #1e1e1e;margin-bottom:28px;">
     <tr>
         <td style="padding:24px 28px;">
-            <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#3c53a8;">
+            <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#2F4587;">
                 Candidate Summary
             </p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -85,7 +85,7 @@ $color = $bandColors[$session->score_band] ?? '#3c53a8';
 {{-- CTA --}}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0">
     <tr>
-        <td style="border-radius:6px;background-color:#3c53a8;">
+        <td style="border-radius:6px;background-color:#2F4587;">
             <a href="{{ url('/admin/diagnostic') }}"
                style="display:inline-block;padding:14px 32px;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.03em;">
                 View All Diagnostics

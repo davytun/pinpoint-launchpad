@@ -182,9 +182,9 @@ class DiagnosticController extends Controller
         Mail::to($session->email)->queue(new DiagnosticResultMail($session));
 
         // 2. Fire the correct pathway based on score band
-        if ($session->score_band === 'low' || $session->score_band === 'mid_low') {
+        if ($session->score_band === 'low') {
             Mail::to($session->email)->queue(new PathwayAMail($session));
-        } elseif ($session->score_band === 'mid_high') {
+        } elseif ($session->score_band === 'mid_low' || $session->score_band === 'mid_high') {
             Mail::to($session->email)->queue(new PathwayBEmail1Mail($session));
             Mail::to($session->email)->later(now()->addDays(2), new PathwayBEmail2Mail($session));
             Mail::to($session->email)->later(now()->addDays(5), new PathwayBEmail3Mail($session));

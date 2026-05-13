@@ -72,14 +72,14 @@ export default function AdminQuestionsIndex() {
                     {/* Header row */}
                     <div className="mb-8 flex items-center justify-between">
                         <div>
-                            <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#788CBA]">
+                            <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C1CDE8]">
                                 Admin
                             </p>
-                            <h1 className="text-2xl font-bold text-[#ECF0F9]">Diagnostic Questions</h1>
+                            <h1 className="text-2xl font-bold text-[#D8E0F3]">Diagnostic Questions</h1>
                         </div>
                         <Link
                             href={route('admin.waitlist.index')}
-                            className="text-xs font-medium text-[#788CBA] transition-colors hover:text-[#ECF0F9]"
+                            className="text-xs font-medium text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
                         >
                             ← Waitlist
                         </Link>
@@ -95,7 +95,7 @@ export default function AdminQuestionsIndex() {
                     {/* Table */}
                     <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                         {/* Table header */}
-                        <div className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] gap-4 border-b border-[#232C43] bg-[#0C1427]/50 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#576FA8]">
+                        <div className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] gap-4 border-b border-[#232C43] bg-[#0C1427]/50 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
                             <span>#</span>
                             <span>Pillar</span>
                             <span>Question</span>
@@ -111,7 +111,7 @@ export default function AdminQuestionsIndex() {
                                 className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] items-center gap-4 border-b border-[#232C43] px-5 py-4 transition-colors duration-150 last:border-0 hover:bg-[#1B294B]/30"
                             >
                                 {/* Order */}
-                                <span className="text-sm font-mono font-semibold text-[#576FA8]">
+                                <span className="text-sm font-mono font-semibold text-[#91A7D8]">
                                     {q.order}
                                 </span>
 
@@ -120,14 +120,14 @@ export default function AdminQuestionsIndex() {
 
                                 {/* Question text truncated */}
                                 <p
-                                    className="truncate text-sm text-[#ECF0F9]"
+                                    className="truncate text-sm text-[#D8E0F3]"
                                     title={q.question_text}
                                 >
                                     {q.question_text}
                                 </p>
 
                                 {/* Points */}
-                                <span className="text-right text-sm font-semibold tabular-nums text-[#788CBA]">
+                                <span className="text-right text-sm font-semibold tabular-nums text-[#C1CDE8]">
                                     {q.points}
                                 </span>
 
@@ -146,7 +146,7 @@ export default function AdminQuestionsIndex() {
                                 <div className="flex justify-end">
                                     <Link
                                         href={route('admin.questions.edit', q.id)}
-                                        className="rounded-lg border border-[#232C43] bg-[#1B294B]/50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#788CBA] transition-all duration-150 hover:bg-[#1B294B] hover:text-[#ECF0F9]"
+                                        className="rounded-lg border border-[#232C43] bg-[#1B294B]/50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#C1CDE8] transition-all duration-150 hover:bg-[#1B294B] hover:text-[#D8E0F3]"
                                     >
                                         Edit
                                     </Link>
@@ -158,7 +158,7 @@ export default function AdminQuestionsIndex() {
                     {/* Pagination */}
                     {questions.last_page > 1 && (
                         <div className="mt-5 flex items-center justify-between">
-                            <p className="text-xs text-[#576FA8]">
+                            <p className="text-xs text-[#91A7D8]">
                                 {questions.total} questions
                             </p>
                             <div className="flex gap-1">
@@ -170,15 +170,15 @@ export default function AdminQuestionsIndex() {
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                                                 link.active 
-                                                    ? 'border-[#4468BB] bg-[#4468BB]/10 text-[#4468BB]' 
-                                                    : 'border-[#232C43] bg-[#101623] text-[#788CBA] hover:bg-[#1B294B] hover:text-[#ECF0F9]'
+                                                    ? 'border-[#3A54A5] bg-[#3A54A5]/10 text-[#3A54A5]' 
+                                                    : 'border-[#232C43] bg-[#101623] text-[#C1CDE8] hover:bg-[#1B294B] hover:text-[#D8E0F3]'
                                             }`}
                                         />
                                     ) : (
                                         <span
                                             key={i}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
-                                            className="rounded-lg px-3 py-1.5 text-xs text-[#576FA8]"
+                                            className="rounded-lg px-3 py-1.5 text-xs text-[#91A7D8]"
                                         />
                                     )
                                 ))}

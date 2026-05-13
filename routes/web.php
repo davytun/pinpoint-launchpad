@@ -133,6 +133,7 @@ Route::post('/webhooks/paystack', [CheckoutController::class, 'webhook'])->name(
 
 Route::prefix('onboarding')->name('onboarding.')->group(function () {
     Route::get('/sign',            [OnboardingController::class, 'sign'])           ->name('sign')           ->middleware(['payment.complete', 'throttle:20,1']);
+    Route::get('/confirm-details', fn() => redirect()->route('onboarding.sign'));
     Route::post('/confirm-details',[OnboardingController::class, 'confirmDetails']) ->name('confirm-details')->middleware(['payment.complete', 'throttle:10,1']);
     Route::get('/complete',        [OnboardingController::class, 'complete'])       ->name('complete')       ->middleware('throttle:30,1');
     Route::post('/resend-invite',  [OnboardingController::class, 'resendInvite'])  ->name('resend-invite')  ->middleware('throttle:3,60');
@@ -187,5 +188,16 @@ Route::prefix('verify')->name('verify.')->group(function () {
         ->middleware('throttle:3,10');
 });
 
+
+// Tester guide PDF — token-protected, no auth required
+Route::get('/tester-guide', function () {
+    $token = request('token');
+    if ($token !== env('TESTER_GUIDE_TOKEN', 'pinpoint-beta-2026')) {
+        abort(403);
+    }
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdfs.tester-guide')
+        ->setPaper('a4', 'portrait');
+    return $pdf->download('Pinpoint-Tester-Guide.pdf');
+})->name('tester-guide');
 
 require __DIR__.'/auth.php';

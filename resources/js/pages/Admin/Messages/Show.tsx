@@ -139,7 +139,7 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                     {/* Back link */}
                     <Link
                         href={route('admin.messages.inbox')}
-                        className="mb-6 inline-flex items-center gap-2 text-sm text-[#788CBA] transition-colors hover:text-[#ECF0F9]"
+                        className="mb-6 inline-flex items-center gap-2 text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
                     >
                         <ArrowLeft className="size-4" />
                         Back to Inbox
@@ -150,17 +150,17 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                         {/* ── Left: founder info sidebar ── */}
                         <aside className="w-full shrink-0 lg:w-64">
                             <div className="rounded-xl border border-[#232C43] bg-[#101623] p-5">
-                                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#576FA8]">Founder</p>
-                                <h2 className="text-lg font-bold text-[#ECF0F9]">{founder.full_name ?? '—'}</h2>
-                                <p className="mt-0.5 text-sm text-[#788CBA]">{founder.company_name ?? '—'}</p>
-                                <p className="mt-0.5 text-xs text-[#576FA8] break-all">{founder.email}</p>
+                                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#91A7D8]">Founder</p>
+                                <h2 className="text-lg font-bold text-[#D8E0F3]">{founder.full_name ?? '—'}</h2>
+                                <p className="mt-0.5 text-sm text-[#C1CDE8]">{founder.company_name ?? '—'}</p>
+                                <p className="mt-0.5 text-xs text-[#91A7D8] break-all">{founder.email}</p>
 
                                 <div className="my-4 h-px bg-[#232C43]" />
 
                                 <div className="flex flex-col gap-2">
                                     <Link
                                         href={`/admin/founders/${founder.id}/documents`}
-                                        className="group flex items-center gap-2 rounded-lg border border-[#232C43] px-3 py-2 text-xs text-[#788CBA] transition-colors hover:border-[#4468BB]/30 hover:bg-[#1B294B] hover:text-[#ECF0F9]"
+                                        className="group flex items-center gap-2 rounded-lg border border-[#232C43] px-3 py-2 text-xs text-[#C1CDE8] transition-colors hover:border-[#3A54A5]/30 hover:bg-[#1B294B] hover:text-[#D8E0F3]"
                                     >
                                         <FileText className="size-3.5 shrink-0" />
                                         <span className="flex items-center gap-1.5">
@@ -184,8 +184,8 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                 >
                                     {renderedMessages.length === 0 ? (
                                         <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-                                            <MessageSquare className="size-12 text-[#576FA8]" />
-                                            <p className="text-sm font-semibold text-[#788CBA]">No messages yet</p>
+                                            <MessageSquare className="size-12 text-[#91A7D8]" />
+                                            <p className="text-sm font-semibold text-[#C1CDE8]">No messages yet</p>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col gap-4">
@@ -193,7 +193,7 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                 if (item.type === 'date') {
                                                     return (
                                                         <div key={`date-${i}`} className="flex justify-center">
-                                                            <span className="rounded-full bg-[#1B294B] px-3 py-1 text-xs text-[#788CBA]">
+                                                            <span className="rounded-full bg-[#1B294B] px-3 py-1 text-xs text-[#C1CDE8]">
                                                                 {item.label}
                                                             </span>
                                                         </div>
@@ -212,15 +212,15 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                         transition={{ duration: 0.2 }}
                                                         className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}
                                                     >
-                                                        <span className={`mb-1 text-xs ${isAdmin ? 'text-[#4468BB] text-right' : 'text-[#788CBA] text-left'}`}>
+                                                        <span className={`mb-1 text-xs ${isAdmin ? 'text-[#3A54A5] text-right' : 'text-[#C1CDE8] text-left'}`}>
                                                             {msg.sender_name}
                                                         </span>
 
                                                         <div
                                                             className={[
-                                                                'max-w-[75%] rounded-2xl px-4 py-3 text-sm text-[#ECF0F9]',
+                                                                'max-w-[75%] rounded-2xl px-4 py-3 text-sm text-[#D8E0F3]',
                                                                 isAdmin
-                                                                    ? 'rounded-br-sm bg-[#4468BB]'
+                                                                    ? 'rounded-br-sm bg-[#3A54A5]'
                                                                     : 'rounded-bl-sm bg-[#232C43]',
                                                             ].join(' ')}
                                                         >
@@ -236,13 +236,13 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                                     <Paperclip className="size-3.5 shrink-0" />
                                                                     <span className="truncate">{msg.attachment_filename}</span>
                                                                     {msg.attachment_size && (
-                                                                        <span className="shrink-0 text-[#788CBA]">{msg.attachment_size}</span>
+                                                                        <span className="shrink-0 text-[#C1CDE8]">{msg.attachment_size}</span>
                                                                     )}
                                                                 </a>
                                                             )}
                                                         </div>
 
-                                                        <span className={`mt-1 text-[10px] ${isAdmin ? 'text-[#4468BB]/70 text-right' : 'text-[#576FA8] text-left'}`}>
+                                                        <span className={`mt-1 text-[10px] ${isAdmin ? 'text-[#3A54A5]/70 text-right' : 'text-[#91A7D8] text-left'}`}>
                                                             {msg.created_at}
                                                         </span>
                                                     </motion.div>
@@ -256,10 +256,10 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                 <div className="border-t border-[#232C43] p-4">
 
                                     {attachment && (
-                                        <div className="mb-2 flex items-center gap-2 rounded-lg border border-[#232C43] bg-[#1B294B]/50 px-3 py-2 text-xs text-[#ECF0F9]">
-                                            <Paperclip className="size-3.5 shrink-0 text-[#788CBA]" />
+                                        <div className="mb-2 flex items-center gap-2 rounded-lg border border-[#232C43] bg-[#1B294B]/50 px-3 py-2 text-xs text-[#D8E0F3]">
+                                            <Paperclip className="size-3.5 shrink-0 text-[#C1CDE8]" />
                                             <span className="truncate">{attachment.name}</span>
-                                            <button type="button" onClick={removeAttachment} className="ml-auto shrink-0 text-[#576FA8] hover:text-[#ECF0F9]">
+                                            <button type="button" onClick={removeAttachment} className="ml-auto shrink-0 text-[#91A7D8] hover:text-[#D8E0F3]">
                                                 <X className="size-3.5" />
                                             </button>
                                         </div>
@@ -275,7 +275,7 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                 onChange={handleBodyChange}
                                                 onKeyDown={handleKeyDown}
                                                 placeholder="Type your reply..."
-                                                className="min-h-[80px] max-h-[200px] resize-none border-[#232C43] bg-[#1B294B]/30 text-[#ECF0F9] placeholder:text-[#576FA8] focus:border-[#4468BB]/50 focus:ring-[#4468BB]/20"
+                                                className="min-h-[80px] max-h-[200px] resize-none border-[#232C43] bg-[#1B294B]/30 text-[#D8E0F3] placeholder:text-[#91A7D8] focus:border-[#3A54A5]/50 focus:ring-[#3A54A5]/20"
                                                 maxLength={2000}
                                             />
                                             <div className={`mt-1 text-right text-xs ${charColor}`}>
@@ -287,7 +287,7 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                             <button
                                                 type="button"
                                                 onClick={() => fileInputRef.current?.click()}
-                                                className="rounded-lg p-2 text-[#788CBA] transition-colors hover:bg-[#1B294B] hover:text-[#ECF0F9]"
+                                                className="rounded-lg p-2 text-[#C1CDE8] transition-colors hover:bg-[#1B294B] hover:text-[#D8E0F3]"
                                                 title="Attach file"
                                             >
                                                 <Paperclip className="size-4" />
@@ -307,8 +307,8 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                 className={[
                                                     'relative overflow-hidden rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-200',
                                                     canSend
-                                                        ? 'bg-[#4468BB] text-white hover:bg-[#3C53A8]'
-                                                        : 'cursor-not-allowed bg-[#1B294B] text-[#576FA8]',
+                                                        ? 'bg-[#3A54A5] text-white hover:bg-[#2F4587]'
+                                                        : 'cursor-not-allowed bg-[#1B294B] text-[#91A7D8]',
                                                 ].join(' ')}
                                             >
                                                 <span className="flex items-center gap-1.5">
@@ -323,7 +323,7 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                         </div>
                                     </div>
 
-                                    <p className="mt-1 text-[10px] text-[#576FA8]">
+                                    <p className="mt-1 text-[10px] text-[#91A7D8]">
                                         Press Enter to send · Shift+Enter for new line
                                     </p>
                                 </div>

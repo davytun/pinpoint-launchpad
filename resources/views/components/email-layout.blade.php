@@ -73,7 +73,7 @@
         
         .cta-button {
             display: inline-block;
-            background-color: #3C53A8;
+            background-color: #2F4587;
             color: #ffffff !important;
             padding: 14px 28px;
             border-radius: 8px;

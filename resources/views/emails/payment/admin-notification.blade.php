@@ -8,7 +8,7 @@
   <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 8px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
     <tr>
       <td style="padding: 24px;">
-        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3C53A8;">Transaction Details</p>
+        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #2F4587;">Transaction Details</p>
         
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr>
@@ -43,7 +43,7 @@
     </tr>
   </table>
 
-  <div style="background-color: #F9FAFB; border-radius: 8px; border-left: 4px solid #3C53A8; padding: 24px; margin-bottom: 32px;">
+  <div style="background-color: #F9FAFB; border-radius: 8px; border-left: 4px solid #2F4587; padding: 24px; margin-bottom: 32px;">
     <p style="margin: 0 0 12px 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #111827;">Action Required:</p>
     <p style="margin: 0; font-size: 14px; color: #4B5563; line-height: 1.6;">
       Assign an analyst to begin the audit. Note: Founders are eligible for a refund until the audit status is updated to <strong>In Progress</strong>.

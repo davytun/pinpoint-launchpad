@@ -83,7 +83,7 @@ class DiagnosticQuestionSeeder extends Seeder
         ];
 
         foreach ($questions as $data) {
-            DiagnosticQuestion::firstOrCreate(
+            DiagnosticQuestion::updateOrCreate(
                 ['order' => $data['order']],
                 array_merge($data, ['is_active' => true])
             );

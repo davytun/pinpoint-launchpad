@@ -33,7 +33,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
     }
 
     const inputClass =
-        'w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-3 text-sm text-[#ECF0F9] placeholder-[#576FA8] focus:border-[#4468BB]/50 focus:outline-none focus:ring-1 focus:ring-[#4468BB]/50 transition-colors';
+        'w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-3 text-sm text-[#D8E0F3] placeholder-[#91A7D8] focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50 transition-colors';
 
     return (
         <AdminLayout>
@@ -45,20 +45,20 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                     {/* Back link */}
                     <Link
                         href={route('admin.questions.index')}
-                        className="mb-8 inline-flex items-center gap-1.5 text-xs font-medium text-[#788CBA] transition-colors hover:text-[#ECF0F9]"
+                        className="mb-8 inline-flex items-center gap-1.5 text-xs font-medium text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
                     >
                         ← Back to Questions
                     </Link>
 
                     {/* Header */}
                     <div className="mb-8">
-                        <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#576FA8]">
+                        <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#91A7D8]">
                             Admin · Question {question.order}
                         </p>
-                        <h1 className="text-2xl font-bold text-[#ECF0F9]">
+                        <h1 className="text-2xl font-bold text-[#D8E0F3]">
                             Edit Question
                         </h1>
-                        <p className="mt-1 text-sm capitalize text-[#788CBA]">
+                        <p className="mt-1 text-sm capitalize text-[#C1CDE8]">
                             Pillar: {question.pillar}
                         </p>
                     </div>
@@ -71,7 +71,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                             <div className="space-y-1.5">
                                 <label
                                     htmlFor="question_text"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#788CBA]"
+                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C1CDE8]"
                                 >
                                     Question Text
                                 </label>
@@ -91,9 +91,9 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                             <div className="space-y-1.5">
                                 <label
                                     htmlFor="sub_text"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#788CBA]"
+                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C1CDE8]"
                                 >
-                                    Sub Text <span className="font-normal normal-case tracking-normal text-[#576FA8]">optional</span>
+                                    Sub Text <span className="font-normal normal-case tracking-normal text-[#91A7D8]">optional</span>
                                 </label>
                                 <input
                                     id="sub_text"
@@ -112,9 +112,9 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                             <div className="space-y-1.5">
                                 <label
                                     htmlFor="points"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#788CBA]"
+                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C1CDE8]"
                                 >
-                                    Points <span className="font-normal normal-case tracking-normal text-[#576FA8]">(1–20)</span>
+                                    Points <span className="font-normal normal-case tracking-normal text-[#91A7D8]">(1–20)</span>
                                 </label>
                                 <input
                                     id="points"
@@ -133,8 +133,8 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                             {/* is_active toggle */}
                             <div className="flex items-center justify-between rounded-xl border border-[#232C43] bg-[#0C1427]/50 px-4 py-3.5">
                                 <div>
-                                    <p className="text-sm font-medium text-[#ECF0F9]">Active</p>
-                                    <p className="text-xs text-[#576FA8]">
+                                    <p className="text-sm font-medium text-[#D8E0F3]">Active</p>
+                                    <p className="text-xs text-[#91A7D8]">
                                         Inactive questions are hidden from the diagnostic
                                     </p>
                                 </div>
@@ -158,7 +158,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                             <div className="flex items-center justify-between">
                                 <Link
                                     href={route('admin.questions.index')}
-                                    className="text-sm text-[#788CBA] transition-colors hover:text-[#ECF0F9]"
+                                    className="text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
                                 >
                                     Cancel
                                 </Link>
@@ -166,7 +166,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                 <button
                                     type="submit"
                                     disabled={form.processing}
-                                    className="flex items-center gap-2 rounded-lg bg-[#4468BB] px-6 py-2.5 text-sm font-bold text-white transition-all duration-150 hover:bg-[#3C53A8] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex items-center gap-2 rounded-lg bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white transition-all duration-150 hover:bg-[#2F4587] disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {form.processing ? (
                                         <>

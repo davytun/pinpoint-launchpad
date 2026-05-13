@@ -10,7 +10,7 @@
 
   {{-- Message preview box --}}
   @if($message_preview || $has_attachment)
-  <div style="background-color: #F9FAFB; border-radius: 8px; border-left: 4px solid #3C53A8; padding: 24px; margin-bottom: 32px;">
+  <div style="background-color: #F9FAFB; border-radius: 8px; border-left: 4px solid #2F4587; padding: 24px; margin-bottom: 32px;">
     <p style="margin: 0 0 12px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #111827;">Message Preview</p>
     
     @if($message_preview)
@@ -20,7 +20,7 @@
     @endif
     
     @if($has_attachment)
-    <p style="margin: 0; font-size: 13px; color: #3C53A8; font-weight: 600;">
+    <p style="margin: 0; font-size: 13px; color: #2F4587; font-weight: 600;">
       📎 {{ $attachment_filename }} attached
     </p>
     @endif

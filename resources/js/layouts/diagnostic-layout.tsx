@@ -14,7 +14,7 @@ interface DiagnosticLayoutProps {
 export default function DiagnosticLayout({
     children,
     hideWordmark = false,
-    glowColor = '#4468BB',
+    glowColor = '#3A54A5',
 }: DiagnosticLayoutProps) {
     // Key changes on route so AnimatePresence remounts on navigation
     const [routeKey, setRouteKey] = useState(() =>

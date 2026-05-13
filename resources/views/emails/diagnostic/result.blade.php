@@ -8,7 +8,7 @@
     $bandColors = [
         'low'      => '#DC2626',
         'mid_low'  => '#D97706',
-        'mid_high' => '#3C53A8',
+        'mid_high' => '#2F4587',
         'high'     => '#059669',
     ];
     $bandLabels = [
@@ -23,7 +23,7 @@
         'mid_high' => 'You are an Investment Ready Candidate. Your fundamentals are solid. A PARAGON Certification closes the final verification gap.',
         'high'     => 'You are a High Velocity Candidate. Your profile is exceptional. A PARAGON Certification makes that verifiable to any investor.',
     ];
-    $color   = $bandColors[$session->score_band] ?? '#3C53A8';
+    $color   = $bandColors[$session->score_band] ?? '#2F4587';
     $label   = $bandLabels[$session->score_band]  ?? 'Unknown';
     $message = $bandMessages[$session->score_band] ?? '';
     $isReady = in_array($session->score_band, ['mid_high', 'high']);
@@ -85,8 +85,8 @@
   </div>
   @else
   <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
-    <a href="#" class="cta-button" style="background-color: #6B7280;">
-      Download Readiness Checklist
+    <a href="{{ url('/diagnostic/result') }}" class="cta-button" style="background-color: #6B7280;">
+      View Your Results
     </a>
   </div>
   @endif

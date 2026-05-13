@@ -78,7 +78,7 @@ const PILLAR_LABELS: Record<string, string> = {
 const BAND_META: Record<string, { color: string; border: string; bg: string; textColor: string; badgeLabel: string; Icon: React.ElementType }> = {
     low:      { color: '#EF4444', border: 'rgba(239,68,68,0.3)',   bg: 'rgba(239,68,68,0.1)',   textColor: '#FCA5A5', badgeLabel: 'High Risk Profile',     Icon: AlertCircle  },
     mid_low:  { color: '#F97316', border: 'rgba(249,115,22,0.3)',  bg: 'rgba(249,115,22,0.1)',  textColor: '#FDBA74', badgeLabel: 'Development Required',   Icon: AlertTriangle },
-    mid_high: { color: '#4468BB', border: 'rgba(68,104,187,0.4)',  bg: 'rgba(68,104,187,0.15)', textColor: '#9AA9CB', badgeLabel: 'Investment Pipeline',    Icon: TrendingUp    },
+    mid_high: { color: '#3A54A5', border: 'rgba(68,104,187,0.4)',  bg: 'rgba(68,104,187,0.15)', textColor: '#91A7D8', badgeLabel: 'Investment Pipeline',    Icon: TrendingUp    },
     high:     { color: '#5CA336', border: 'rgba(92,163,54,0.4)',   bg: 'rgba(92,163,54,0.15)',  textColor: '#86efac', badgeLabel: 'Top Percentile',         Icon: Zap           },
 };
 
@@ -165,8 +165,8 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
                             className={[
                                 'flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold border transition-colors duration-200 shrink-0 relative z-10',
                                 step.done   ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' :
-                                step.active ? 'border-[#4468BB]/80 bg-[#4468BB]/10 text-[#6986C9]' :
-                                              'border-[#232C43] bg-[#0C1427] text-[#576FA8]',
+                                step.active ? 'border-[#3A54A5]/80 bg-[#3A54A5]/10 text-[#6986C9]' :
+                                              'border-[#232C43] bg-[#0C1427] text-[#91A7D8]',
                             ].join(' ')}
                         >
                             {step.done ? <CheckCircle2 className="size-3.5" /> : i + 1}
@@ -177,7 +177,7 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
                             className={[
                                 'mt-3 absolute top-6 whitespace-nowrap text-[11px] font-medium tracking-wide transition-colors duration-200',
                                 step.done   ? 'text-emerald-400' :
-                                step.active ? 'text-[#9AA9CB]' :
+                                step.active ? 'text-[#91A7D8]' :
                                               'text-[#455987]',
                             ].join(' ')}
                         >
@@ -242,14 +242,14 @@ export default function FounderDashboard({
                 <FadeUp delay={0}>
                     <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
-                            <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-2.5 py-1 text-[11px] font-medium tracking-wide text-[#9AA9CB]">
+                            <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-2.5 py-1 text-[11px] font-medium tracking-wide text-[#91A7D8]">
                                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: meta.color }} />
                                 {meta.badgeLabel}
                             </div>
                             <h1 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                                 {greeting(founder.full_name)}
                             </h1>
-                            <p className="mt-1.5 text-[14px] text-[#788CBA]">
+                            <p className="mt-1.5 text-[14px] text-[#C1CDE8]">
                                 {founder.company_name ?? '—'} <span className="mx-2 opacity-50">•</span> {tierLabel} Audit
                             </p>
                         </div>
@@ -262,7 +262,7 @@ export default function FounderDashboard({
                         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
                             <div className="lg:w-1/2">
                                 <div className="mb-4 flex items-center gap-3">
-                                    <span className="text-[12px] font-semibold uppercase tracking-wider text-[#788CBA]">
+                                    <span className="text-[12px] font-semibold uppercase tracking-wider text-[#C1CDE8]">
                                         Current Phase
                                     </span>
                                     <Badge
@@ -272,7 +272,7 @@ export default function FounderDashboard({
                                     </Badge>
                                 </div>
                                 
-                                <p className="text-[15px] leading-relaxed text-[#9AA9CB] max-w-lg">
+                                <p className="text-[15px] leading-relaxed text-[#91A7D8] max-w-lg">
                                     {statusCfg.description}
                                 </p>
 
@@ -298,7 +298,7 @@ export default function FounderDashboard({
                 <div className="grid gap-6 sm:grid-cols-2">
                     <FadeUp delay={0.15}>
                         <ProCard className="flex h-full flex-col items-center justify-center p-8 text-center relative">
-                            <p className="mb-6 text-[12px] font-semibold uppercase tracking-wider text-[#788CBA]">
+                            <p className="mb-6 text-[12px] font-semibold uppercase tracking-wider text-[#C1CDE8]">
                                 PARAGON Score
                             </p>
                             {score != null ? (
@@ -319,7 +319,7 @@ export default function FounderDashboard({
                                         {meta.badgeLabel}
                                     </Badge>
                                     {score_band_message && (
-                                        <p className="mt-4 text-[13px] leading-relaxed text-[#788CBA]">
+                                        <p className="mt-4 text-[13px] leading-relaxed text-[#C1CDE8]">
                                             {score_band_message}
                                         </p>
                                     )}
@@ -327,7 +327,7 @@ export default function FounderDashboard({
                             ) : (
                                 <div className="flex flex-col items-center space-y-4 py-6">
                                     <Skeleton className="h-16 w-24 rounded-lg bg-[#232C43]" />
-                                    <p className="text-[13px] text-[#576FA8]">Score pending audit completion</p>
+                                    <p className="text-[13px] text-[#91A7D8]">Score pending audit completion</p>
                                 </div>
                             )}
                         </ProCard>
@@ -335,7 +335,7 @@ export default function FounderDashboard({
 
                     <FadeUp delay={0.20}>
                         <ProCard className="h-full p-6 sm:p-8">
-                            <p className="mb-4 text-[12px] font-semibold uppercase tracking-wider text-[#788CBA]">
+                            <p className="mb-4 text-[12px] font-semibold uppercase tracking-wider text-[#C1CDE8]">
                                 Pillar Breakdown
                             </p>
                             {hasPillarData ? (
@@ -345,7 +345,7 @@ export default function FounderDashboard({
                                             <PolarGrid stroke="#232C43" />
                                             <PolarAngleAxis
                                                 dataKey="subject"
-                                                tick={{ fill: '#788CBA', fontSize: 11, fontWeight: 500 }}
+                                                tick={{ fill: '#C1CDE8', fontSize: 11, fontWeight: 500 }}
                                             />
                                             <Radar
                                                 dataKey="value"
@@ -361,7 +361,7 @@ export default function FounderDashboard({
                             ) : (
                                 <div className="flex h-[220px] flex-col items-center justify-center gap-4">
                                     <Skeleton className="h-28 w-28 rounded-full bg-[#232C43]" />
-                                    <p className="text-[13px] text-[#576FA8]">Pillar data unlocked post-audit</p>
+                                    <p className="text-[13px] text-[#91A7D8]">Pillar data unlocked post-audit</p>
                                 </div>
                             )}
                         </ProCard>
@@ -373,15 +373,15 @@ export default function FounderDashboard({
                     <ProCard className="p-6 sm:p-8">
                         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[#232C43] pb-4">
                             <div className="flex items-center gap-3">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#1B294B] text-[#9AA9CB]">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#1B294B] text-[#91A7D8]">
                                     <FileText className="size-4.5" />
                                 </div>
-                                <h2 className="text-[16px] font-medium text-[#ECF0F9]">
+                                <h2 className="text-[16px] font-medium text-[#D8E0F3]">
                                     {tierLabel} Package Inclusions
                                 </h2>
                             </div>
                             {payment && (
-                                <span className="text-[14px] font-medium text-[#788CBA]">
+                                <span className="text-[14px] font-medium text-[#C1CDE8]">
                                     Paid: ${Number(payment.total_amount).toLocaleString()}
                                 </span>
                             )}
@@ -389,7 +389,7 @@ export default function FounderDashboard({
                         <ul className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
                             {tier_features.map((feature, i) => (
                                 <li key={i} className="flex items-start gap-3">
-                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#4468BB]" />
+                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#3A54A5]" />
                                     <span className="text-[14px] leading-relaxed text-[#BCC5DC]">{feature}</span>
                                 </li>
                             ))}
@@ -402,32 +402,32 @@ export default function FounderDashboard({
                     <div className="grid gap-4 sm:grid-cols-3">
                         <Link
                             href={route('founder.documents.index')}
-                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-colors hover:border-[#4468BB] hover:bg-[#1B294B]"
+                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-colors hover:border-[#3A54A5] hover:bg-[#1B294B]"
                         >
                             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
-                                <FileText className="size-4.5 text-[#9AA9CB] transition-colors group-hover:text-[#D8E0F3]" />
+                                <FileText className="size-4.5 text-[#91A7D8] transition-colors group-hover:text-[#D8E0F3]" />
                             </div>
                             <div>
-                                <h3 className="text-[15px] font-medium text-[#ECF0F9]">Documents</h3>
-                                <p className="mt-1 text-[13px] text-[#788CBA]">Manage and upload requested files.</p>
+                                <h3 className="text-[15px] font-medium text-[#D8E0F3]">Documents</h3>
+                                <p className="mt-1 text-[13px] text-[#C1CDE8]">Manage and upload requested files.</p>
                             </div>
-                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#4468BB] transition-colors group-hover:text-[#8FA4D6]">
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#3A54A5] transition-colors group-hover:text-[#8FA4D6]">
                                 View <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
                         </Link>
 
                         <Link
                             href={route('founder.messages.index')}
-                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-colors hover:border-[#4468BB] hover:bg-[#1B294B]"
+                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-colors hover:border-[#3A54A5] hover:bg-[#1B294B]"
                         >
                             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
-                                <MessageSquare className="size-4.5 text-[#9AA9CB] transition-colors group-hover:text-[#D8E0F3]" />
+                                <MessageSquare className="size-4.5 text-[#91A7D8] transition-colors group-hover:text-[#D8E0F3]" />
                             </div>
                             <div>
-                                <h3 className="text-[15px] font-medium text-[#ECF0F9]">Messages</h3>
-                                <p className="mt-1 text-[13px] text-[#788CBA]">Communicate directly with your analyst.</p>
+                                <h3 className="text-[15px] font-medium text-[#D8E0F3]">Messages</h3>
+                                <p className="mt-1 text-[13px] text-[#C1CDE8]">Communicate directly with your analyst.</p>
                             </div>
-                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#4468BB] transition-colors group-hover:text-[#8FA4D6]">
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#3A54A5] transition-colors group-hover:text-[#8FA4D6]">
                                 Open <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
                         </Link>
@@ -435,7 +435,7 @@ export default function FounderDashboard({
                         <div className="flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5">
                             <div className="mb-4 flex items-center justify-between">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
-                                    <ExternalLink className="size-4.5 text-[#9AA9CB]" />
+                                    <ExternalLink className="size-4.5 text-[#91A7D8]" />
                                 </div>
                                 {profile_is_live && (
                                     <span className="rounded-sm bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/20">
@@ -444,8 +444,8 @@ export default function FounderDashboard({
                                 )}
                             </div>
                             <div>
-                                <h3 className="text-[15px] font-medium text-[#ECF0F9]">Investor Page</h3>
-                                <p className="mt-1 text-[13px] text-[#788CBA]">
+                                <h3 className="text-[15px] font-medium text-[#D8E0F3]">Investor Page</h3>
+                                <p className="mt-1 text-[13px] text-[#C1CDE8]">
                                     {profile_is_live ? 'Your page is publicly visible.' : 'Goes live post-audit.'}
                                 </p>
                             </div>
@@ -476,13 +476,13 @@ export default function FounderDashboard({
                         >
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
-                                    <User className="size-4.5 text-[#9AA9CB]" />
+                                    <User className="size-4.5 text-[#91A7D8]" />
                                 </div>
-                                <span className="text-[15px] font-medium text-[#ECF0F9]">Account Details</span>
+                                <span className="text-[15px] font-medium text-[#D8E0F3]">Account Details</span>
                             </div>
                             {accountOpen
-                                ? <ChevronUp   className="size-4.5 text-[#788CBA]" />
-                                : <ChevronDown className="size-4.5 text-[#788CBA]" />}
+                                ? <ChevronUp   className="size-4.5 text-[#C1CDE8]" />
+                                : <ChevronDown className="size-4.5 text-[#C1CDE8]" />}
                         </button>
 
                         <AnimatePresence>
@@ -504,7 +504,7 @@ export default function FounderDashboard({
                                                 { label: 'Last Login',   value: fmtDateTime(founder.last_login_at) },
                                             ].map(({ label, value }) => (
                                                 <div key={label} className="flex flex-col">
-                                                    <dt className="text-[12px] font-semibold uppercase tracking-wider text-[#576FA8]">{label}</dt>
+                                                    <dt className="text-[12px] font-semibold uppercase tracking-wider text-[#91A7D8]">{label}</dt>
                                                     <dd className="mt-1.5 text-[14px] text-[#BCC5DC]">{value ?? '—'}</dd>
                                                 </div>
                                             ))}

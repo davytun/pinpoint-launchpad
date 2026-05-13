@@ -87,7 +87,7 @@ const BAND_META: Record<string, {
         Icon: AlertTriangle,
     },
     mid_high: {
-        color: '#3C53A8',
+        color: '#2F4587',
         border: 'rgba(60,83,168,0.6)',
         bg: 'rgba(60,83,168,0.12)',
         textColor: '#93C5FD',
@@ -147,7 +147,7 @@ export default function DiagnosticResult({
 
                     {/* Heading */}
                     <FadeUp delay={0.05}>
-                        <h1 className="mb-10 text-2xl font-bold text-[#ECF0F9] sm:text-3xl">
+                        <h1 className="mb-10 text-2xl font-bold text-[#D8E0F3] sm:text-3xl">
                             Your PARAGON Diagnostic Results
                         </h1>
                     </FadeUp>
@@ -176,7 +176,7 @@ export default function DiagnosticResult({
                                     >
                                         {score}
                                     </span>
-                                    <span className="mb-3 font-display text-2xl font-light text-[#576FA8] sm:mb-5">
+                                    <span className="mb-3 font-display text-2xl font-light text-[#91A7D8] sm:mb-5">
                                         /100
                                     </span>
                                 </div>
@@ -198,7 +198,7 @@ export default function DiagnosticResult({
                         <FadeUp delay={0.2}>
                             <Card className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                 <CardHeader>
-                                    <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[#576FA8]">
+                                    <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[#91A7D8]">
                                         Pillar Radar
                                     </CardTitle>
                                 </CardHeader>
@@ -209,7 +209,7 @@ export default function DiagnosticResult({
                                             <PolarGrid stroke="#232C43" />
                                             <PolarAngleAxis
                                                 dataKey="subject"
-                                                tick={{ fill: '#788CBA', fontSize: 11, fontWeight: 600 }}
+                                                tick={{ fill: '#C1CDE8', fontSize: 11, fontWeight: 600 }}
                                             />
                                             <Radar
                                                 dataKey="value"
@@ -243,7 +243,7 @@ export default function DiagnosticResult({
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm leading-relaxed text-[#788CBA]">
+                                        <p className="text-sm leading-relaxed text-[#C1CDE8]">
                                             {score_band_message}
                                         </p>
                                     </CardContent>
@@ -276,7 +276,7 @@ export default function DiagnosticResult({
                                         <button
                                             type="button"
                                             onClick={() => setChecklistClicked(true)}
-                                            className="w-full rounded-xl border border-[#232C43] bg-[#0C1427]/50 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-[#788CBA] transition-colors hover:bg-[#1B294B]/30 hover:text-[#ECF0F9]"
+                                            className="w-full rounded-xl border border-[#232C43] bg-[#0C1427]/50 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-[#C1CDE8] transition-colors hover:bg-[#1B294B]/30 hover:text-[#D8E0F3]"
                                         >
                                             View Your Readiness Checklist
                                         </button>
@@ -293,7 +293,7 @@ export default function DiagnosticResult({
                                             </motion.div>
                                         )}
 
-                                        <p className="mt-1 text-center text-xs text-[#576FA8]">
+                                        <p className="mt-1 text-center text-xs text-[#91A7D8]">
                                             Address these gaps, then retake.
                                         </p>
                                     </div>
@@ -304,7 +304,7 @@ export default function DiagnosticResult({
                             <FadeUp delay={0.38}>
                                 <Card className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                     <CardHeader className="pb-3">
-                                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#576FA8]">
+                                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#91A7D8]">
                                             Pillar Breakdown
                                         </CardTitle>
                                     </CardHeader>
@@ -312,10 +312,10 @@ export default function DiagnosticResult({
                                         {PILLAR_KEYS.map((key, i) => (
                                             <div key={key}>
                                                 <div className="mb-1 flex items-center justify-between">
-                                                    <span className="text-xs font-semibold text-[#788CBA]">
+                                                    <span className="text-xs font-semibold text-[#C1CDE8]">
                                                         {PILLAR_LABELS[key]}
                                                     </span>
-                                                    <span className="text-xs text-[#576FA8]">
+                                                    <span className="text-xs text-[#91A7D8]">
                                                         {pillar_scores[key]}%
                                                     </span>
                                                 </div>
@@ -330,7 +330,7 @@ export default function DiagnosticResult({
                                                             ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
                                                         }}
                                                         style={{
-                                                            background: `linear-gradient(90deg, #3C53A8 0%, #5CA336 100%)`,
+                                                            background: `linear-gradient(90deg, #2F4587 0%, #5CA336 100%)`,
                                                             boxShadow: '0 0 10px rgba(92,163,54,0.5)',
                                                         }}
                                                     />

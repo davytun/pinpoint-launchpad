@@ -71,7 +71,7 @@ const AUDIENCES = {
     investor: {
         slug: 'investor' as const,
         label: 'For Investors',
-        badge: 'bg-[#3C53A8] text-white',
+        badge: 'bg-[#2F4587] text-white',
         badgeGlow: 'shadow-[0_0_20px_rgba(60,83,168,0.4)]',
         // Card headline — speaks to investor skepticism, not founder anxiety
         title: 'Stop sourcing on gut feel.\u00a0Start with verified\u00a0signal.',
@@ -91,13 +91,13 @@ const AUDIENCES = {
         submitRoute: 'waitlist.investors.store',
         submitLabel: 'Join the Investor Waitlist',
         Icon: Landmark,
-        accent: '#3C53A8',
+        accent: '#2F4587',
         glowColor: 'rgba(60,83,168,0.14)',
-        cardBorderHover: 'hover:border-[#3C53A8]/30 hover:shadow-[0_0_70px_rgba(60,83,168,0.1)]',
-        glowClass: 'from-[#3C53A8]/20 via-[#3C53A8]/5 to-transparent',
-        iconClass: 'text-[#3C53A8]',
-        focusRingClass: 'focus:ring-[#3C53A8]/15 focus:border-[#3C53A8]/50',
-        selectActiveClass: 'bg-[#3C53A8]/10 text-white',
+        cardBorderHover: 'hover:border-[#2F4587]/30 hover:shadow-[0_0_70px_rgba(60,83,168,0.1)]',
+        glowClass: 'from-[#2F4587]/20 via-[#2F4587]/5 to-transparent',
+        iconClass: 'text-[#2F4587]',
+        focusRingClass: 'focus:ring-[#2F4587]/15 focus:border-[#2F4587]/50',
+        selectActiveClass: 'bg-[#2F4587]/10 text-white',
     },
 } as const;
 
@@ -127,7 +127,7 @@ function ScrollProgressBar() {
             className="fixed top-0 left-0 right-0 z-[100] h-[2px]"
             aria-hidden="true"
         >
-            <div className="h-full w-full" style={{ background: 'linear-gradient(90deg, #5ca336 0%, #3c53a8 100%)' }} />
+            <div className="h-full w-full" style={{ background: 'linear-gradient(90deg, #5ca336 0%, #2F4587 100%)' }} />
         </motion.div>
     );
 }
@@ -185,7 +185,7 @@ function ParagonSection() {
             className="mt-24 flex flex-col items-center text-center"
         >
             <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/50 backdrop-blur-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#3C53A8]" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#2F4587]" />
                 The PARAGON Model
             </span>
 
@@ -213,7 +213,7 @@ function ParagonSection() {
                 transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                 className="waitlist-radar relative mt-12 w-full max-w-2xl"
             >
-                <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-[#5CA336]/20 to-[#3C53A8]/20 blur-[60px]" />
+                <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-[#5CA336]/20 to-[#2F4587]/20 blur-[60px]" />
                 <ParagonRadarChart />
             </motion.div>
         </motion.section>
@@ -773,7 +773,7 @@ export default function Waitlist({ selectedAudience, founderStages, investorRole
                                 {/* Hero */}
                                 <motion.section variants={fadeUp} className="relative mx-auto max-w-3xl text-center">
                                     <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 aspect-square w-[50vw] max-w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#5CA336]/10 blur-[80px] md:blur-[100px]" />
-                                    <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 aspect-square w-[30vw] max-w-[300px] -translate-x-1/2 translate-y-[20%] rounded-full bg-[#3C53A8]/15 blur-[60px] md:blur-[80px]" />
+                                    <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 aspect-square w-[30vw] max-w-[300px] -translate-x-1/2 translate-y-[20%] rounded-full bg-[#2F4587]/15 blur-[60px] md:blur-[80px]" />
                                     <motion.div variants={fadeUp} className="flex justify-center">
                                         <div className="mx-auto inline-flex max-w-[85vw] items-center justify-center rounded-[2rem] border border-white/[0.08] bg-white/[0.03] px-5 py-2.5 backdrop-blur-sm sm:max-w-none sm:rounded-full">
                                             <span className="text-center text-[9px] font-semibold uppercase leading-tight tracking-[0.15em] text-white/40 sm:text-[11px] sm:tracking-[0.3em]">
@@ -785,7 +785,7 @@ export default function Waitlist({ selectedAudience, founderStages, investorRole
                                     <AnimatedHeadline />
 
                                     <motion.div variants={fadeUp} className="mx-auto mt-6 flex justify-center">
-                                        <span className="h-px w-24 bg-gradient-to-r from-[#5ca336]/40 via-white/10 to-[#3c53a8]/40" />
+                                        <span className="h-px w-24 bg-gradient-to-r from-[#5ca336]/40 via-white/10 to-[#2F4587]/40" />
                                     </motion.div>
 
                                     <motion.p variants={fadeUp} className="mx-auto mt-6 max-w-xl text-base leading-[1.85] text-white/40 md:text-[17px]">

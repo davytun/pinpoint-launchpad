@@ -27,7 +27,7 @@ const chartConfig = {
     },
     average: {
         label: 'Average Startup',
-        color: '#3c53a8',
+        color: '#2F4587',
     },
 } satisfies ChartConfig;
 
@@ -47,7 +47,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
                     <div key={entry.dataKey} className="flex items-center gap-2.5 py-0.5">
                         <span
                             className="inline-block size-2 rounded-full"
-                            style={{ backgroundColor: isVerified ? '#5ca336' : '#3c53a8' }}
+                            style={{ backgroundColor: isVerified ? '#5ca336' : '#2F4587' }}
                         />
                         <span className="text-[13px] text-white/55">
                             {isVerified ? 'Pinpoint-Verified' : 'Average Startup'}
@@ -102,7 +102,7 @@ function Legend({ active, onToggle }: { active: { verified: boolean; average: bo
         <div className="-mt-8 mb-4 flex flex-wrap items-center justify-center gap-3 md:-mt-4 md:mb-0 md:gap-6">
             {(['verified', 'average'] as const).map((key) => {
                 const isVerified = key === 'verified';
-                const color = isVerified ? '#5ca336' : '#3c53a8';
+                const color = isVerified ? '#5ca336' : '#2F4587';
                 const label = isVerified ? 'Pinpoint-Verified' : 'Average Startup';
                 const isActive = active[key];
 
@@ -160,13 +160,13 @@ export function ParagonRadarChart() {
                             <Radar
                                 name="average"
                                 dataKey="average"
-                                stroke="#3c53a8"
+                                stroke="#2F4587"
                                 strokeOpacity={0.6}
                                 strokeWidth={1.5}
-                                fill="#3c53a8"
+                                fill="#2F4587"
                                 fillOpacity={0.12}
-                                dot={{ fill: '#3c53a8', r: 3, fillOpacity: 0.7, strokeWidth: 0 }}
-                                activeDot={{ fill: '#3c53a8', r: 5, strokeWidth: 0, fillOpacity: 1 }}
+                                dot={{ fill: '#2F4587', r: 3, fillOpacity: 0.7, strokeWidth: 0 }}
+                                activeDot={{ fill: '#2F4587', r: 5, strokeWidth: 0, fillOpacity: 1 }}
                             />
                         )}
 

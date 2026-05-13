@@ -103,10 +103,10 @@ function FadeUp({ delay = 0, children }: { delay?: number; children: React.React
 function Row({ label, children, isTotal = false }: { label: string; children: React.ReactNode; isTotal?: boolean }) {
     return (
         <div className="flex items-center justify-between py-3">
-            <span className="text-[13px] text-[#576FA8]">{label}</span>
+            <span className="text-[13px] text-[#91A7D8]">{label}</span>
             <span className={cn(
                 'text-[13px]',
-                isTotal ? 'font-mono text-[14px] font-bold tracking-tight text-[#ECF0F9]' : 'font-medium text-[#ECF0F9]/90'
+                isTotal ? 'font-mono text-[14px] font-bold tracking-tight text-[#D8E0F3]' : 'font-medium text-[#D8E0F3]/90'
             )}>
                 {children}
             </span>
@@ -123,13 +123,13 @@ function Step({ n, label, sub, isLast = false }: { n: number; label: string; sub
                 <div className="absolute left-[0.6rem] top-7 bottom-0 w-[1.5px] bg-[#232C43]" />
             )}
             <div
-                className="relative z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-full border border-[#4468BB]/50 bg-[#4468BB]/10 text-[10px] font-bold text-[#6986C9] tabular-nums"
+                className="relative z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-full border border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[10px] font-bold text-[#6986C9] tabular-nums"
             >
                 {n}
             </div>
             <div className="-mt-0.5">
-                <p className="text-[13.5px] font-semibold text-[#ECF0F9]">{label}</p>
-                <p className="mt-1 max-w-[280px] text-[12px] leading-relaxed text-[#788CBA]">{sub}</p>
+                <p className="text-[13.5px] font-semibold text-[#D8E0F3]">{label}</p>
+                <p className="mt-1 max-w-[280px] text-[12px] leading-relaxed text-[#C1CDE8]">{sub}</p>
             </div>
         </div>
     );
@@ -170,7 +170,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                                 >
                                     Payment Authorized
                                 </p>
-                                <h1 className="font-display text-[26px] font-semibold leading-tight tracking-tight text-[#ECF0F9] sm:text-[28px]">
+                                <h1 className="font-display text-[26px] font-semibold leading-tight tracking-tight text-[#D8E0F3] sm:text-[28px]">
                                     Commitment Secured
                                 </h1>
                             </div>
@@ -180,7 +180,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                         <FadeUp delay={0.3}>
                             <div className="mb-7 overflow-hidden rounded-2xl border border-[#232C43] bg-[#0C1427]/50">
                                 <div className="border-b border-dashed border-[#232C43] bg-[#1B294B]/10 px-5 py-3">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#576FA8]">Invoice Details</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#91A7D8]">Invoice Details</p>
                                 </div>
                                 <div className="divide-y divide-dashed divide-[#232C43] px-5 py-1.5">
                                     <Row label="Tier">{tier_label} Audit</Row>
@@ -200,10 +200,10 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                         <FadeUp delay={0.4}>
                             <div className="mb-8 flex items-center gap-3.5 rounded-xl border border-[#232C43] bg-[#1B294B]/10 p-4">
                                 <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#1B294B]/20">
-                                    <MailCheck className="size-3.5 text-[#576FA8]" />
+                                    <MailCheck className="size-3.5 text-[#91A7D8]" />
                                 </div>
-                                <p className="text-[13px] leading-tight text-[#788CBA]">
-                                    Receipt delivered to <span className="font-semibold text-[#ECF0F9]/80">{email}</span>.
+                                <p className="text-[13px] leading-tight text-[#C1CDE8]">
+                                    Receipt delivered to <span className="font-semibold text-[#D8E0F3]/80">{email}</span>.
                                 </p>
                             </div>
                         </FadeUp>
@@ -211,7 +211,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                         {/* Next steps Timeline */}
                         <FadeUp delay={0.5}>
                             <div className="mb-8">
-                                <h2 className="mb-5 text-[11px] font-bold uppercase tracking-[0.15em] text-[#576FA8]">Action Required</h2>
+                                <h2 className="mb-5 text-[11px] font-bold uppercase tracking-[0.15em] text-[#91A7D8]">Action Required</h2>
                                 <div className="pl-1">
                                     <Step
                                         n={1}
@@ -237,7 +237,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                         <FadeUp delay={0.6}>
                             <Link
                                 href={route('onboarding.sign')}
-                                className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#4468BB] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:bg-[#3b5ba5]"
+                                className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:bg-[#3b5ba5]"
                                 style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
                             >
                                 <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
@@ -251,8 +251,8 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                     {/* Info chip */}
                     <FadeUp delay={0.75}>
                         <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#232C43] bg-[#101623]/50 px-5 py-4">
-                            <Info className="mt-0.5 size-4 shrink-0 text-[#576FA8]/40" />
-                            <p className="text-[12px] leading-relaxed text-[#576FA8]/60">
+                            <Info className="mt-0.5 size-4 shrink-0 text-[#91A7D8]/40" />
+                            <p className="text-[12px] leading-relaxed text-[#91A7D8]/60">
                                 Protected transaction. If the program fails to commence within 10 business days, you are fully entitled to our risk-free, zero-questions refund policy.
                             </p>
                         </div>

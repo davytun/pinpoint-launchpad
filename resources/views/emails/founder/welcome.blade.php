@@ -8,19 +8,19 @@
     Your account has been created and your <strong>{{ $tierLabel }} Audit</strong> is now in the queue. We're excited to help you get investor-ready.
   </p>
 
-  <div style="background-color: #F9FAFB; border-radius: 8px; border-left: 4px solid #3C53A8; padding: 24px; margin-bottom: 32px;">
+  <div style="background-color: #F9FAFB; border-radius: 8px; border-left: 4px solid #2F4587; padding: 24px; margin-bottom: 32px;">
     <p style="margin: 0 0 12px 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #111827;">What happens next:</p>
     <ul style="margin: 0; padding: 0; list-style-type: none; font-size: 14px; color: #4B5563;">
       <li style="margin-bottom: 8px; padding-left: 20px; position: relative;">
-        <span style="position: absolute; left: 0; color: #3C53A8;">&bull;</span>
+        <span style="position: absolute; left: 0; color: #2F4587;">&bull;</span>
         An analyst will be assigned to your venture within 2 business days.
       </li>
       <li style="margin-bottom: 8px; padding-left: 20px; position: relative;">
-        <span style="position: absolute; left: 0; color: #3C53A8;">&bull;</span>
+        <span style="position: absolute; left: 0; color: #2F4587;">&bull;</span>
         You will receive a notification as soon as your audit begins.
       </li>
       <li style="margin-bottom: 0; padding-left: 20px; position: relative;">
-        <span style="position: absolute; left: 0; color: #3C53A8;">&bull;</span>
+        <span style="position: absolute; left: 0; color: #2F4587;">&bull;</span>
         Your investor verification page goes live immediately upon completion.
       </li>
     </ul>

@@ -52,14 +52,14 @@ function NavItem({
             className={[
                 'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150',
                 active
-                    ? 'bg-[#1B294B] text-[#ECF0F9] border border-[#4468BB]/20'
-                    : 'text-[#788CBA] hover:bg-[#1B294B] hover:text-[#ECF0F9] border border-transparent',
+                    ? 'bg-[#1B294B] text-[#D8E0F3] border border-[#3A54A5]/20'
+                    : 'text-[#C1CDE8] hover:bg-[#1B294B] hover:text-[#D8E0F3] border border-transparent',
             ].join(' ')}
         >
-            <Icon className={`size-[18px] shrink-0 transition-colors ${active ? 'text-[#4468BB]' : 'text-[#576FA8] group-hover:text-[#788CBA]'}`} />
+            <Icon className={`size-[18px] shrink-0 transition-colors ${active ? 'text-[#3A54A5]' : 'text-[#8FA4D4] group-hover:text-[#A7B8DD]'}`} />
             <span className="flex-1 truncate">{label}</span>
             {badge != null && badge > 0 && (
-                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#4468BB] px-1.5 text-[10px] font-bold text-white shadow-lg shadow-[#4468BB]/20">
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#3A54A5] px-1.5 text-[10px] font-bold text-white shadow-lg shadow-[#3A54A5]/20">
                     {badge > 99 ? '99+' : badge}
                 </span>
             )}
@@ -69,7 +69,7 @@ function NavItem({
 
 function NavSection({ label }: { label: string }) {
     return (
-        <p className="mb-1 mt-4 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[#576FA8] first:mt-0">
+        <p className="mb-1 mt-4 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-[#91A7D8] first:mt-0">
             {label}
         </p>
     );
@@ -102,11 +102,11 @@ function SidebarContent({
         <div className="flex h-full flex-col">
             {/* Wordmark */}
             <div className="flex items-center gap-3 border-b border-[#232C43] px-5 py-4 bg-[#080B11]/50">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1B294B] border border-[#4468BB]/20">
-                    <span className="text-sm font-black text-[#ECF0F9]">P</span>
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1B294B] border border-[#3A54A5]/20">
+                    <span className="text-sm font-black text-[#D8E0F3]">P</span>
                 </div>
                 <div className="min-w-0">
-                    <p className="truncate text-sm font-bold tracking-tight text-[#ECF0F9]">Pinpoint Command</p>
+                    <p className="truncate text-sm font-bold tracking-tight text-[#D8E0F3]">Pinpoint Command</p>
                     <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${badge.className}`}>
                         {badge.label}
                     </span>
@@ -147,17 +147,17 @@ function SidebarContent({
             {/* User footer */}
             <div className="border-t border-[#232C43] px-4 py-3 bg-[#080B11]/50">
                 <div className="mb-2 flex items-center gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#101623] border border-[#232C43] text-xs font-bold text-[#788CBA] uppercase">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#101623] border border-[#232C43] text-xs font-bold text-[#C1CDE8] uppercase">
                         {user?.name?.[0] ?? '?'}
                     </div>
                     <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-[#ECF0F9] leading-tight">{user?.name ?? '—'}</p>
-                        <p className="truncate text-[11px] text-[#576FA8] leading-tight">{user?.email ?? ''}</p>
+                        <p className="truncate text-sm font-medium text-[#D8E0F3] leading-tight">{user?.name ?? '—'}</p>
+                        <p className="truncate text-[11px] text-[#91A7D8] leading-tight">{user?.email ?? ''}</p>
                     </div>
                 </div>
                 <button
                     onClick={logout}
-                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium text-[#788CBA] transition-colors hover:bg-[#1B294B] hover:text-[#ECF0F9] border border-transparent hover:border-[#232C43]"
+                    className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium text-[#C1CDE8] transition-colors hover:bg-[#1B294B] hover:text-[#D8E0F3] border border-transparent hover:border-[#232C43]"
                 >
                     <LogOut className="size-3.5" />
                     Secure Sign Out
@@ -213,7 +213,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const sidebarProps = { user, role, isSuperAdmin, isAnalyst, isSupport, unreadMessages, isActive, logout };
 
     return (
-        <div className="flex min-h-screen bg-[#080B11] text-[#ECF0F9] antialiased selection:bg-[#4468BB]/30 selection:text-white">
+        <div className="flex min-h-screen bg-[#080B11] text-[#D8E0F3] antialiased selection:bg-[#3A54A5]/30 selection:text-white">
 
             {/* ── Desktop sidebar (always visible ≥ lg) ───────────────────── */}
             <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-[#232C43] bg-[#101623] lg:flex">
@@ -235,7 +235,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     <aside className="absolute inset-y-0 left-0 flex w-72 flex-col border-r border-[#232C43] bg-[#101623] shadow-2xl">
                         <button
                             onClick={() => setSidebarOpen(false)}
-                            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-[#576FA8] hover:bg-[#1B294B] hover:text-[#ECF0F9]"
+                            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-[#91A7D8] hover:bg-[#1B294B] hover:text-[#D8E0F3]"
                         >
                             <X className="size-4" />
                         </button>
@@ -251,14 +251,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-[#232C43] bg-[#101623]/90 px-4 backdrop-blur-md lg:hidden">
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#232C43] text-[#788CBA] hover:text-[#ECF0F9]"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#232C43] text-[#C1CDE8] hover:text-[#D8E0F3]"
                         aria-label="Open menu"
                     >
                         <Menu className="size-5" />
                     </button>
-                    <span className="text-sm font-bold text-[#ECF0F9]">Pinpoint Command</span>
+                    <span className="text-sm font-bold text-[#D8E0F3]">Pinpoint Command</span>
                     {unreadMessages > 0 && (
-                        <Link href="/admin/messages" className="ml-auto flex items-center gap-1.5 rounded-full bg-[#1B294B] px-2.5 py-1 text-[11px] font-bold text-[#4468BB] border border-[#4468BB]/20">
+                        <Link href="/admin/messages" className="ml-auto flex items-center gap-1.5 rounded-full bg-[#1B294B] px-2.5 py-1 text-[11px] font-bold text-[#3A54A5] border border-[#3A54A5]/20">
                             <MessageSquare className="size-3.5" />
                             {unreadMessages}
                         </Link>

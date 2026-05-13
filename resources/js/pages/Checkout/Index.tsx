@@ -152,7 +152,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         {/* ── Hero header ── */}
                         <div className="mb-14 text-center">
                             <FadeUp delay={0.05}>
-                                <span className="inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-[#9AA9CB]">
+                                <span className="inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-[#91A7D8]">
                                     <span className="h-1.5 w-1.5 rounded-full" style={{ background: bandMeta.text }} />
                                     PARAGON Certification Programme
                                 </span>
@@ -165,7 +165,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                             </FadeUp>
 
                             <FadeUp delay={0.18}>
-                                <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[#788CBA]">
+                                <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[#C1CDE8]">
                                     Your score of{' '}
                                     <span className="font-bold text-white">{score}/100</span>{' '}
                                     qualifies you for the following credential programmes.
@@ -198,7 +198,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                         <div
                                             className={cn(
                                                 "relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-300 group bg-[#101623]",
-                                                tier.is_featured ? 'border-[#4468BB]/50 shadow-[0_0_40px_rgba(68,104,187,0.15)] md:-mt-4' : 'border-[#232C43] shadow-sm'
+                                                tier.is_featured ? 'border-[#3A54A5]/50 shadow-[0_0_40px_rgba(68,104,187,0.15)] md:-mt-4' : 'border-[#232C43] shadow-sm'
                                             )}
                                         >
                                             {/* Ambient tier glow */}
@@ -227,8 +227,8 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
 
                                                 {/* Tier name + tagline */}
                                                 <h2 className="font-display text-[1.35rem] font-semibold tracking-tight text-white">{tier.label}</h2>
-                                                <p className="mt-2 text-[13px] leading-relaxed text-[#788CBA]">
-                                                    <strong className="font-bold text-[#ECF0F9]">Best for:</strong> {tier.tagline}
+                                                <p className="mt-2 text-[13px] leading-relaxed text-[#C1CDE8]">
+                                                    <strong className="font-bold text-[#D8E0F3]">Best for:</strong> {tier.tagline}
                                                 </p>
 
                                                 <div className="my-6 h-px bg-[#232C43]" />
@@ -238,12 +238,12 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                     <div className="flex items-end gap-1 leading-none">
                                                         <span
                                                             className="font-display text-[2.75rem] font-bold tracking-tight text-white"
-                                                            style={{ color: tier.is_featured ? '#fff' : '#ECF0F9' }}
+                                                            style={{ color: tier.is_featured ? '#fff' : '#D8E0F3' }}
                                                         >
                                                             ${tier.base_price}
                                                         </span>
                                                     </div>
-                                                    <p className="mt-2 text-sm font-bold text-[#576FA8]">
+                                                    <p className="mt-2 text-sm font-bold text-[#91A7D8]">
                                                         + ${tier.gate_fee} Gate Fee
                                                     </p>
                                                 </div>
@@ -255,14 +255,14 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                         return (
                                                             <li key={fi} className="flex items-start gap-3">
                                                                 {isEverything ? (
-                                                                    <ArrowRight className="mt-0.5 size-4 shrink-0 text-[#576FA8]" />
+                                                                    <ArrowRight className="mt-0.5 size-4 shrink-0 text-[#91A7D8]" />
                                                                 ) : (
                                                                     <CheckCircle2
                                                                         className="mt-0.5 size-4 shrink-0"
-                                                                        style={{ color: tier.is_featured ? '#4468BB' : '#576FA8' }}
+                                                                        style={{ color: tier.is_featured ? '#3A54A5' : '#91A7D8' }}
                                                                     />
                                                                 )}
-                                                                <span className={`text-[13px] leading-relaxed ${isEverything ? 'italic text-[#576FA8]' : 'text-[#9AA9CB]'}`}>
+                                                                <span className={`text-[13px] leading-relaxed ${isEverything ? 'italic text-[#91A7D8]' : 'text-[#91A7D8]'}`}>
                                                                     {feature}
                                                                 </span>
                                                             </li>
@@ -289,7 +289,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                                 </button>
                                                             </TooltipTrigger>
                                                             <TooltipContent
-                                                                className="z-[100] max-w-[280px] rounded-xl border border-[#232C43] bg-[#101623] p-4 text-[13px] leading-relaxed text-[#788CBA] shadow-2xl"
+                                                                className="z-[100] max-w-[280px] rounded-xl border border-[#232C43] bg-[#101623] p-4 text-[13px] leading-relaxed text-[#C1CDE8] shadow-2xl"
                                                                 side="top"
                                                                 align="start"
                                                                 sideOffset={12}
@@ -308,13 +308,13 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                         onClick={() => handleSelectTier(tier.key)}
                                                         className="group relative w-full overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
                                                         style={{
-                                                            background:  tier.is_featured ? '#4468BB' : 'rgba(68,104,187,0.12)',
+                                                            background:  tier.is_featured ? '#3A54A5' : 'rgba(68,104,187,0.12)',
                                                             border:      `1px solid ${tier.is_featured ? 'transparent' : 'rgba(68,104,187,0.25)'}`,
                                                             color:       '#fff',
                                                             boxShadow:   tier.is_featured ? `0 0 28px rgba(68,104,187,0.35)` : 'none',
                                                         }}
                                                         onMouseEnter={e => { if (!isLoading && tier.is_featured) (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)'; else if (!isLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(68,104,187,0.2)'; }}
-                                                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; (e.currentTarget as HTMLButtonElement).style.backgroundColor = tier.is_featured ? '#4468BB' : 'rgba(68,104,187,0.12)'; }}
+                                                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; (e.currentTarget as HTMLButtonElement).style.backgroundColor = tier.is_featured ? '#3A54A5' : 'rgba(68,104,187,0.12)'; }}
                                                     >
                                                         {tier.is_featured && (
                                                             <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
@@ -354,7 +354,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         <FadeUp delay={0.6}>
                             <div className="mt-24">
                                 <div className="mb-10 text-center">
-                                    <span className="inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-[#576FA8]">
+                                    <span className="inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-[#91A7D8]">
                                         Radical Transparency
                                     </span>
                                     <h2 className="mt-4 font-display text-2xl font-bold text-white">
@@ -365,16 +365,16 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                 <div className="grid gap-4 md:grid-cols-2">
                                     {RATIONALE.map((item, i) => (
                                         <FadeUp key={item.num} delay={0.7 + i * 0.08}>
-                                            <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm transition-all duration-500 hover:border-[#4468BB]/40 hover:bg-[#1B294B]/30">
+                                            <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm transition-all duration-500 hover:border-[#3A54A5]/40 hover:bg-[#1B294B]/30">
                                                 
                                                 {/* Subdued top-glow that activates on hover */}
-                                                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4468BB]/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                                                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3A54A5]/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
                                                 <div className="flex flex-1 flex-col p-8 sm:p-10 relative z-10">
-                                                    <h3 className="mb-3 text-[14px] font-bold uppercase tracking-[0.18em] text-[#ECF0F9]">
+                                                    <h3 className="mb-3 text-[14px] font-bold uppercase tracking-[0.18em] text-[#D8E0F3]">
                                                         {item.title}
                                                     </h3>
-                                                    <p className="text-[15px] leading-relaxed text-[#788CBA]">
+                                                    <p className="text-[15px] leading-relaxed text-[#C1CDE8]">
                                                         {item.body}
                                                     </p>
                                                 </div>
@@ -387,7 +387,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
 
                         {/* ── Refund note ── */}
                         <FadeUp delay={1.1}>
-                            <p className="mt-10 text-center text-xs text-[#576FA8]">
+                            <p className="mt-10 text-center text-xs text-[#91A7D8]">
                                 Full refund available if your audit has not yet commenced. Once analyst work begins, no refund is applicable.
                             </p>
                         </FadeUp>

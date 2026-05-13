@@ -56,17 +56,17 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                 </div>
 
                                 {/* Headline */}
-                                <h1 className="mb-2 font-display text-2xl font-bold text-[#ECF0F9]">
+                                <h1 className="mb-2 font-display text-2xl font-bold text-[#D8E0F3]">
                                     Your results are waiting.
                                 </h1>
-                                <p className="mb-6 text-sm leading-relaxed text-[#788CBA]">
+                                <p className="mb-6 text-sm leading-relaxed text-[#C1CDE8]">
                                     Enter your email to unlock your full diagnostic and radar chart.
                                 </p>
 
                                 {/* Blurred score with focus state */}
                                 <div className="relative mb-8 flex select-none flex-col items-center">
                                     <span
-                                        className="font-sans text-[6rem] font-black leading-none text-[#ECF0F9]"
+                                        className="font-sans text-[6rem] font-black leading-none text-[#D8E0F3]"
                                         style={{ filter: 'blur(16px)', opacity: 0.5 }}
                                         aria-hidden="true"
                                     >
@@ -74,8 +74,8 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                     </span>
                                     {/* Reveal hint */}
                                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-                                        <Lock className="size-5 text-[#4468BB]" />
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#4468BB]">
+                                        <Lock className="size-5 text-[#3A54A5]" />
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#3A54A5]">
                                             Analysis Locked
                                         </span>
                                     </div>
@@ -93,7 +93,7 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                 )}
                                 <form onSubmit={submit} noValidate className="flex flex-col gap-4">
                                     <div className="flex flex-col gap-1.5">
-                                        <Label htmlFor="email" className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#576FA8]">
+                                        <Label htmlFor="email" className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
                                             Email address
                                         </Label>
                                         <input
@@ -104,7 +104,7 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                             placeholder="founder@startup.com"
                                             value={form.data.email}
                                             onChange={e => form.setData('email', e.target.value)}
-                                            className="h-12 w-full rounded-xl border border-[#232C43] bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#ECF0F9] placeholder:text-[#576FA8]/40 outline-none transition-all duration-200 focus:border-[#4468BB]/60 focus:ring-2 focus:ring-[#4468BB]/10"
+                                            className="h-12 w-full rounded-xl border border-[#232C43] bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] placeholder:text-[#91A7D8]/40 outline-none transition-all duration-200 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10"
                                         />
                                         {form.errors.email && (
                                             <p className="text-xs text-rose-400">{form.errors.email}</p>
@@ -114,7 +114,7 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                     <button
                                         type="submit"
                                         disabled={form.processing || !form.data.email.trim()}
-                                        className="group relative mt-2 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-[#4468BB] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
+                                        className="group relative mt-2 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60"
                                         style={{
                                             boxShadow: '0 0 28px rgba(68,104,187,0.35)',
                                         }}
@@ -138,7 +138,7 @@ export default function EmailGate({ blurred_score }: PageProps) {
                                     </button>
                                 </form>
 
-                                <p className="mt-4 text-center text-[11px] text-[#576FA8]/60">
+                                <p className="mt-4 text-center text-[11px] text-[#91A7D8]/60">
                                     No spam. No account required.
                                 </p>
                             </CardContent>

@@ -216,7 +216,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 animate={{ width: `${progressPct}%` }}
                                 transition={{ duration: 0.5, ease: 'easeOut' }}
                                 style={{
-                                    background: `linear-gradient(90deg, #3C53A8 0%, #5CA336 100%)`,
+                                    background: `linear-gradient(90deg, #2F4587 0%, #5CA336 100%)`,
                                     boxShadow: '0 0 10px rgba(92,163,54,0.5)',
                                 }}
                             />
@@ -230,13 +230,13 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 <Card className="overflow-hidden rounded-[1.25rem] border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
                                     <CardContent className="p-6 sm:p-10">
                                         {/* Question text */}
-                                        <p className="font-display text-xl leading-snug font-bold tracking-tight text-[#ECF0F9] sm:text-2xl">
+                                        <p className="font-display text-xl leading-snug font-bold tracking-tight text-[#D8E0F3] sm:text-2xl">
                                             {question.question_text}
                                         </p>
 
                                         {/* Sub text */}
                                         {question.sub_text && (
-                                            <p className="mt-3 text-sm leading-relaxed text-[#788CBA] italic">{question.sub_text}</p>
+                                            <p className="mt-3 text-sm leading-relaxed text-[#C1CDE8] italic">{question.sub_text}</p>
                                         )}
 
                                         {/* ── Answer buttons ── */}
@@ -248,7 +248,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                     'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-300 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === true
                                                         ? 'scale-[1.02] border-[#5CA336]/50 bg-[#5CA336]/15 text-[#86efac] shadow-[0_0_30px_rgba(92,163,54,0.2)] ring-1 ring-[#5CA336]/30'
-                                                        : 'border-[#232C43] bg-[#080B11] text-[#788CBA] hover:border-[#5CA336]/40 hover:bg-[#5CA336]/5 hover:text-[#ECF0F9]',
+                                                        : 'border-[#232C43] bg-[#080B11] text-[#C1CDE8] hover:border-[#5CA336]/40 hover:bg-[#5CA336]/5 hover:text-[#D8E0F3]',
                                                 )}
                                             >
                                                 {answers[question.id] === true && (
@@ -263,8 +263,8 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                 className={cn(
                                                     'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-300 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === false
-                                                        ? 'scale-[1.02] border-[#4468BB]/50 bg-[#4468BB]/15 text-[#9AA9CB] shadow-[0_0_20px_rgba(68,104,187,0.2)] ring-1 ring-[#4468BB]/30'
-                                                        : 'border-[#232C43] bg-[#080B11] text-[#788CBA] hover:border-[#4468BB]/40 hover:bg-[#4468BB]/10 hover:text-[#ECF0F9]',
+                                                        ? 'scale-[1.02] border-[#3A54A5]/50 bg-[#3A54A5]/15 text-[#91A7D8] shadow-[0_0_20px_rgba(68,104,187,0.2)] ring-1 ring-[#3A54A5]/30'
+                                                        : 'border-[#232C43] bg-[#080B11] text-[#C1CDE8] hover:border-[#3A54A5]/40 hover:bg-[#3A54A5]/10 hover:text-[#D8E0F3]',
                                                 )}
                                             >
                                                 {answers[question.id] === false && (
@@ -286,7 +286,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 type="button"
                                 onClick={goBack}
                                 disabled={currentIndex === 0}
-                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-[#232C43] px-4 py-2 text-xs font-bold tracking-widest text-[#788CBA] uppercase transition-colors hover:text-[#ECF0F9] hover:bg-[#1B294B]/30 disabled:pointer-events-none disabled:opacity-30"
+                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-[#232C43] px-4 py-2 text-xs font-bold tracking-widest text-[#C1CDE8] uppercase transition-colors hover:text-[#D8E0F3] hover:bg-[#1B294B]/30 disabled:pointer-events-none disabled:opacity-30"
                             >
                                 <span className="transition-transform group-hover:-translate-x-1"><ChevronLeft /></span> Back
                             </button>
@@ -295,8 +295,8 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 <span className="text-sm font-bold tabular-nums" style={{ color: '#5CA336' }}>
                                     {currentIndex + 1}
                                 </span>
-                                <span className="text-xs text-[#576FA8]">/</span>
-                                <span className="text-xs text-[#788CBA] tabular-nums">{total_questions}</span>
+                                <span className="text-xs text-[#91A7D8]">/</span>
+                                <span className="text-xs text-[#C1CDE8] tabular-nums">{total_questions}</span>
                             </div>
 
                             <div className="w-16 shrink-0" />

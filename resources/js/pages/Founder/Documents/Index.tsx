@@ -205,7 +205,7 @@ function UploadZone({
     return (
         <form onSubmit={handleSubmit}>
             <ProCard className="mb-6 p-6">
-                <p className="mb-5 text-[11px] font-semibold uppercase tracking-wider text-[#576FA8]">
+                <p className="mb-5 text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
                     Upload Supporting Documents
                 </p>
 
@@ -221,14 +221,14 @@ function UploadZone({
                     onDrop={handleDrop}
                     className={[
                         'mb-6 cursor-pointer rounded-xl border border-dashed p-8 text-center transition-all duration-200',
-                        dragOver ? 'border-[#4468BB] bg-[#1B294B]/50' : 'border-[#232C43] hover:border-[#4468BB] hover:bg-[#1B294B]/20',
+                        dragOver ? 'border-[#3A54A5] bg-[#1B294B]/50' : 'border-[#232C43] hover:border-[#3A54A5] hover:bg-[#1B294B]/20',
                     ].join(' ')}
                 >
                     <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#0C1427] border border-[#232C43]">
-                        <Upload className="size-6 text-[#9AA9CB]" aria-hidden="true" />
+                        <Upload className="size-6 text-[#91A7D8]" aria-hidden="true" />
                     </div>
-                    <p className="text-[14px] font-medium text-[#ECF0F9]">Drop your files here</p>
-                    <p className="text-[13px] text-[#788CBA]">or click to browse</p>
+                    <p className="text-[14px] font-medium text-[#D8E0F3]">Drop your files here</p>
+                    <p className="text-[13px] text-[#C1CDE8]">or click to browse</p>
                     <p className="mt-3 text-[11px] text-[#455987]">PDF, DOCX, XLSX, Images — max 100MB</p>
                     <input
                         ref={fileInputRef}
@@ -255,10 +255,10 @@ function UploadZone({
                                     key={file.name + file.size + i}
                                     className="flex items-center gap-3 rounded-lg border border-[#232C43] bg-[#0C1427] px-4 py-3"
                                 >
-                                    <FileText className="size-4 shrink-0 text-[#4468BB]" aria-hidden="true" />
+                                    <FileText className="size-4 shrink-0 text-[#3A54A5]" aria-hidden="true" />
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate text-[13px] text-[#DCE2EF]">{file.name}</p>
-                                        <p className="text-[11px] text-[#576FA8]">{formatBytes(file.size)}</p>
+                                        <p className="text-[11px] text-[#91A7D8]">{formatBytes(file.size)}</p>
                                     </div>
                                     {!processing && (
                                         <button
@@ -286,13 +286,13 @@ function UploadZone({
                             transition={{ duration: 0.2 }}
                             className="mb-6"
                         >
-                            <div className="mb-2 flex justify-between text-[11px] text-[#788CBA]">
+                            <div className="mb-2 flex justify-between text-[11px] text-[#C1CDE8]">
                                 <span>Uploading{selectedFiles.length > 1 ? ` ${selectedFiles.length} files` : ''}…</span>
                                 <span className="font-bold">{progress}%</span>
                             </div>
                             <div className="h-1 w-full overflow-hidden rounded-full bg-[#232C43]">
                                 <motion.div
-                                    className="h-full rounded-full bg-[#4468BB]"
+                                    className="h-full rounded-full bg-[#3A54A5]"
                                     animate={{ width: `${progress}%` }}
                                     transition={{ duration: 0.2, ease: 'easeOut' }}
                                 />
@@ -304,11 +304,11 @@ function UploadZone({
                 {/* Category + upload button row */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-end border-t border-[#232C43] pt-6">
                     <div className="flex-1">
-                        <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-[#576FA8]">
+                        <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
                             Document Category
                         </label>
                         <Select value={category} onValueChange={setCategory} disabled={processing}>
-                            <SelectTrigger className="rounded-lg border-[#232C43] bg-[#0C1427] text-[#ECF0F9] focus:ring-1 focus:ring-[#4468BB]/50">
+                            <SelectTrigger className="rounded-lg border-[#232C43] bg-[#0C1427] text-[#D8E0F3] focus:ring-1 focus:ring-[#3A54A5]/50">
                                 <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                             <SelectContent className="border-[#232C43] bg-[#101623]">
@@ -316,7 +316,7 @@ function UploadZone({
                                     <SelectItem
                                         key={cat.value}
                                         value={cat.value}
-                                        className="text-[#BCC5DC] focus:bg-[#1B294B] focus:text-[#ECF0F9]"
+                                        className="text-[#BCC5DC] focus:bg-[#1B294B] focus:text-[#D8E0F3]"
                                     >
                                         {cat.label}
                                     </SelectItem>
@@ -331,7 +331,7 @@ function UploadZone({
                         className={[
                             'group relative flex h-10 items-center justify-center rounded-lg px-6 text-[13px] font-semibold uppercase tracking-wider transition-all duration-200',
                             canSubmit
-                                ? 'bg-[#4468BB] text-white hover:bg-[#365396] shadow-lg shadow-[#4468BB]/10'
+                                ? 'bg-[#3A54A5] text-white hover:bg-[#365396] shadow-lg shadow-[#3A54A5]/10'
                                 : 'cursor-not-allowed bg-[#232C43] text-[#455987]',
                         ].join(' ')}
                     >
@@ -389,10 +389,10 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
 
             {/* File info */}
             <div className="min-w-0 flex-[2.5]">
-                <p className="truncate text-[13.5px] font-medium text-[#ECF0F9]" title={doc.original_filename}>
+                <p className="truncate text-[13.5px] font-medium text-[#D8E0F3]" title={doc.original_filename}>
                     {doc.original_filename}
                 </p>
-                <div className="mt-1 flex items-center gap-2 text-[11px] text-[#576FA8] sm:hidden">
+                <div className="mt-1 flex items-center gap-2 text-[11px] text-[#91A7D8] sm:hidden">
                     <span>{doc.file_size}</span>
                     <span className="opacity-30">·</span>
                     <span>{doc.created_at}</span>
@@ -400,7 +400,7 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
             </div>
 
             {/* Desktop columns */}
-            <div className="hidden sm:flex flex-1 items-center gap-4 text-[12.5px] text-[#788CBA]">
+            <div className="hidden sm:flex flex-1 items-center gap-4 text-[12.5px] text-[#C1CDE8]">
                 <span className="w-20 shrink-0 text-right">{doc.file_size}</span>
                 <span className="flex-1 text-right opacity-60 font-mono text-[11px]">{doc.created_at}</span>
             </div>
@@ -423,7 +423,7 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
                 <button
                     onClick={handleDownload}
                     title="Download"
-                    className="rounded-md p-1.5 text-[#788CBA] transition-colors hover:bg-[#101623] hover:text-[#ECF0F9]"
+                    className="rounded-md p-1.5 text-[#C1CDE8] transition-colors hover:bg-[#101623] hover:text-[#D8E0F3]"
                 >
                     <Download className="size-4" aria-hidden="true" />
                 </button>
@@ -489,13 +489,13 @@ export default function DocumentsIndex({
                     <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <h1 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">Your Documents</h1>
-                            <p className="mt-2 text-[15px] text-[#788CBA]">
+                            <p className="mt-2 text-[15px] text-[#C1CDE8]">
                                 Upload supporting evidence for your analyst to review.
                             </p>
                         </div>
                         <div className="shrink-0">
-                            <div className="inline-flex items-center rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2 text-[13px] font-medium text-[#ECF0F9]">
-                                <span className="mr-2 font-bold text-[#4468BB]">{total_count}</span>
+                            <div className="inline-flex items-center rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2 text-[13px] font-medium text-[#D8E0F3]">
+                                <span className="mr-2 font-bold text-[#3A54A5]">{total_count}</span>
                                 <span className="opacity-30">/</span>
                                 <span className="ml-2 opacity-50">{max_files} Documents</span>
                             </div>
@@ -549,8 +549,8 @@ export default function DocumentsIndex({
                             <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0C1427] border border-[#232C43]">
                                 <FileText className="size-8 text-[#455987]" aria-hidden="true" />
                             </div>
-                            <p className="text-[17px] font-medium text-[#ECF0F9]">No documents yet</p>
-                            <p className="mt-2 text-[14px] text-[#788CBA] max-w-sm">
+                            <p className="text-[17px] font-medium text-[#D8E0F3]">No documents yet</p>
+                            <p className="mt-2 text-[14px] text-[#C1CDE8] max-w-sm">
                                 Documents you upload will appear here grouped by their category.
                             </p>
                         </ProCard>
@@ -571,7 +571,7 @@ export default function DocumentsIndex({
                                 {Object.entries(grouped).map(([categoryLabel, docs]) => (
                                     <div key={categoryLabel}>
                                         <div className="bg-[#1B294B]/10 px-4 py-2 flex items-center justify-between border-b border-[#232C43]/30">
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#576FA8]">
+                                            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#91A7D8]">
                                                 {categoryLabel}
                                             </p>
                                             <span className="text-[10px] font-medium text-[#455987]">
@@ -601,12 +601,12 @@ export default function DocumentsIndex({
             <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
                 <DialogContent className="border-[#232C43] bg-[#101623] text-white">
                     <DialogHeader>
-                        <DialogTitle className="text-[18px] font-semibold text-[#ECF0F9]">Delete document?</DialogTitle>
+                        <DialogTitle className="text-[18px] font-semibold text-[#D8E0F3]">Delete document?</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
-                        <p className="text-[14px] leading-relaxed text-[#788CBA]">
+                        <p className="text-[14px] leading-relaxed text-[#C1CDE8]">
                             Are you sure you want to delete{' '}
-                            <span className="font-bold text-[#ECF0F9]">{deleteTarget?.original_filename}</span>?
+                            <span className="font-bold text-[#D8E0F3]">{deleteTarget?.original_filename}</span>?
                             This action cannot be undone and will remove it from the analyst's queue.
                         </p>
                     </div>
@@ -614,7 +614,7 @@ export default function DocumentsIndex({
                         <Button
                             variant="ghost"
                             onClick={() => setDeleteTarget(null)}
-                            className="text-[#788CBA] hover:bg-[#1B294B] hover:text-[#ECF0F9]"
+                            className="text-[#C1CDE8] hover:bg-[#1B294B] hover:text-[#D8E0F3]"
                         >
                             Cancel
                         </Button>

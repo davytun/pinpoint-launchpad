@@ -39,15 +39,15 @@ export default function AdminMessagesInbox({ threads, total_unread }: PageProps)
 
                     {/* Header */}
                     <div className="mb-8 flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#4468BB]/30 bg-[#1B294B]">
-                            <Inbox className="size-5 text-[#4468BB]" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#3A54A5]/30 bg-[#1B294B]">
+                            <Inbox className="size-5 text-[#3A54A5]" />
                         </div>
                         <div>
-                            <h1 className="font-display text-2xl font-bold text-[#ECF0F9]">Message Inbox</h1>
-                            <p className="text-sm text-[#788CBA]">Founder messages with the analyst team</p>
+                            <h1 className="font-display text-2xl font-bold text-[#D8E0F3]">Message Inbox</h1>
+                            <p className="text-sm text-[#C1CDE8]">Founder messages with the analyst team</p>
                         </div>
                         {total_unread > 0 && (
-                            <span className="ml-auto inline-flex items-center rounded-full bg-[#1B294B] px-3 py-1 text-xs font-bold text-[#4468BB] border border-[#4468BB]/30">
+                            <span className="ml-auto inline-flex items-center rounded-full bg-[#1B294B] px-3 py-1 text-xs font-bold text-[#3A54A5] border border-[#3A54A5]/30">
                                 {total_unread} unread
                             </span>
                         )}
@@ -56,9 +56,9 @@ export default function AdminMessagesInbox({ threads, total_unread }: PageProps)
                     {/* Thread list */}
                     {threads.length === 0 ? (
                         <div className="rounded-xl border border-[#232C43] bg-[#101623] p-16 text-center">
-                            <MessageSquare className="mx-auto mb-4 size-12 text-[#576FA8]" />
-                            <p className="text-sm font-semibold text-[#788CBA]">No messages yet</p>
-                            <p className="mt-1 text-xs text-[#576FA8]">Founder messages will appear here.</p>
+                            <MessageSquare className="mx-auto mb-4 size-12 text-[#91A7D8]" />
+                            <p className="text-sm font-semibold text-[#C1CDE8]">No messages yet</p>
+                            <p className="mt-1 text-xs text-[#91A7D8]">Founder messages will appear here.</p>
                         </div>
                     ) : (
                         <div className="space-y-2">
@@ -71,27 +71,27 @@ export default function AdminMessagesInbox({ threads, total_unread }: PageProps)
                                         className={[
                                             'group flex items-center gap-4 rounded-xl border px-5 py-4 transition-all duration-200',
                                             hasUnread
-                                                ? 'border-[#4468BB]/50 border-l-[3px] border-l-[#4468BB] bg-[#0C1427] hover:bg-[#1B294B]'
-                                                : 'border-[#232C43] bg-[#101623] hover:border-[#4468BB]/30 hover:bg-[#1B294B]',
+                                                ? 'border-[#3A54A5]/50 border-l-[3px] border-l-[#3A54A5] bg-[#0C1427] hover:bg-[#1B294B]'
+                                                : 'border-[#232C43] bg-[#101623] hover:border-[#3A54A5]/30 hover:bg-[#1B294B]',
                                         ].join(' ')}
                                     >
                                         {/* Avatar */}
-                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#4468BB]/30 bg-[#1B294B] text-sm font-bold text-[#4468BB]">
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#3A54A5]/30 bg-[#1B294B] text-sm font-bold text-[#3A54A5]">
                                             {getInitials(thread.founder_name)}
                                         </div>
 
                                         {/* Content */}
                                         <div className="min-w-0 flex-1">
                                             <div className="flex items-center gap-2">
-                                                <p className={`truncate text-sm ${hasUnread ? 'font-bold text-[#ECF0F9]' : 'font-medium text-[#788CBA]'}`}>
+                                                <p className={`truncate text-sm ${hasUnread ? 'font-bold text-[#D8E0F3]' : 'font-medium text-[#C1CDE8]'}`}>
                                                     {thread.founder_name ?? 'Unknown Founder'}
                                                 </p>
-                                                <span className="shrink-0 text-xs text-[#576FA8]">·</span>
-                                                <p className="shrink-0 truncate text-xs text-[#788CBA]">
+                                                <span className="shrink-0 text-xs text-[#91A7D8]">·</span>
+                                                <p className="shrink-0 truncate text-xs text-[#C1CDE8]">
                                                     {thread.company_name ?? thread.email}
                                                 </p>
                                             </div>
-                                            <p className="mt-0.5 truncate text-xs italic text-[#576FA8]">
+                                            <p className="mt-0.5 truncate text-xs italic text-[#91A7D8]">
                                                 {thread.last_message_preview}
                                             </p>
                                         </div>
@@ -99,10 +99,10 @@ export default function AdminMessagesInbox({ threads, total_unread }: PageProps)
                                         {/* Right side */}
                                         <div className="flex shrink-0 flex-col items-end gap-1.5">
                                             {thread.last_message_at && (
-                                                <span className="text-[10px] text-[#576FA8]">{thread.last_message_at}</span>
+                                                <span className="text-[10px] text-[#91A7D8]">{thread.last_message_at}</span>
                                             )}
                                             {hasUnread && (
-                                                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#4468BB] px-1.5 text-[10px] font-bold text-white">
+                                                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#3A54A5] px-1.5 text-[10px] font-bold text-white">
                                                     {thread.unread_count}
                                                 </span>
                                             )}

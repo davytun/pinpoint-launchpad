@@ -18,9 +18,11 @@ class PathwayBEmail1Mail extends Mailable implements ShouldQueue
 
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: "You're in the top 20% — but the 'Unknown No' is lurking",
-        );
+        $subject = $this->session->score_band === 'mid_low'
+            ? "Your PARAGON score has gaps — here's what to fix before investors see it"
+            : "You're in the top 20% — but the 'Unknown No' is lurking";
+
+        return new Envelope(subject: $subject);
     }
 
     public function content(): Content

@@ -12,7 +12,7 @@
   <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 8px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
     <tr>
       <td style="padding: 24px;">
-        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3C53A8;">Payment Summary</p>
+        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #2F4587;">Payment Summary</p>
         
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr>

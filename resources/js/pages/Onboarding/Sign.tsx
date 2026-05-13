@@ -118,12 +118,12 @@ export default function OnboardingSign({
                             </p>
                         </FadeUp>
                         <FadeUp delay={0.15}>
-                            <h2 className="font-display text-[22px] font-semibold text-[#ECF0F9]">
+                            <h2 className="font-display text-[22px] font-semibold text-[#D8E0F3]">
                                 You declined the agreement
                             </h2>
                         </FadeUp>
                         <FadeUp delay={0.2}>
-                            <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-[#788CBA]">
+                            <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-[#C1CDE8]">
                                 No problem — you can review your details and sign a fresh copy whenever you're ready.
                             </p>
                         </FadeUp>
@@ -132,7 +132,7 @@ export default function OnboardingSign({
                     <FadeUp delay={0.3}>
                         <button
                             onClick={() => router.visit(route('onboarding.sign'))}
-                            className="group flex items-center gap-2 rounded-xl bg-[#1B294B]/40 border border-[#232C43] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.14em] text-[#ECF0F9] transition-all hover:bg-[#1B294B] hover:border-[#4468BB]/50"
+                            className="group flex items-center gap-2 rounded-xl bg-[#1B294B]/40 border border-[#232C43] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.14em] text-[#D8E0F3] transition-all hover:bg-[#1B294B] hover:border-[#3A54A5]/50"
                         >
                             Review &amp; Re-sign
                             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -158,8 +158,8 @@ export default function OnboardingSign({
                         <CheckCircle className="size-8 text-emerald-400" strokeWidth={1.5} />
                     </motion.div>
                     <div className="text-center">
-                        <p className="font-display text-lg font-semibold text-[#ECF0F9]">Agreement Signed</p>
-                        <p className="mt-1 text-[12px] text-[#788CBA]">Confirming your signature…</p>
+                        <p className="font-display text-lg font-semibold text-[#D8E0F3]">Agreement Signed</p>
+                        <p className="mt-1 text-[12px] text-[#C1CDE8]">Confirming your signature…</p>
                     </div>
                 </motion.div>
             )}
@@ -179,11 +179,11 @@ export default function OnboardingSign({
                 />
                 <div className="flex items-center gap-2">
                     <span
-                        className="inline-flex items-center rounded-full border border-[#4468BB]/30 bg-[#4468BB]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#60A5FA]"
+                        className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#60A5FA]"
                     >
                         Step 2 of 3
                     </span>
-                    <span className="text-[11px] text-[#576FA8] hidden sm:inline">{tier_label}</span>
+                    <span className="text-[11px] text-[#91A7D8] hidden sm:inline">{tier_label}</span>
                 </div>
             </header>
 
@@ -212,15 +212,15 @@ export default function OnboardingSign({
                                     <div className={cn(
                                         'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold tabular-nums transition-colors',
                                         step.state === 'done' ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-400' :
-                                        step.state === 'active' ? 'border-[#4468BB]/50 bg-[#4468BB]/10 text-[#6986C9]' :
-                                        'border-[#232C43] bg-[#0C1427] text-[#576FA8]'
+                                        step.state === 'active' ? 'border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[#6986C9]' :
+                                        'border-[#232C43] bg-[#0C1427] text-[#91A7D8]'
                                     )}>
                                         {step.n}
                                     </div>
                                     <span className={cn(
                                         'text-[12px] font-medium transition-colors',
-                                        step.state === 'done'   ? 'text-[#576FA8]/40 line-through' :
-                                        step.state === 'active' ? 'text-[#ECF0F9]' : 'text-[#455987]',
+                                        step.state === 'done'   ? 'text-[#91A7D8]/40 line-through' :
+                                        step.state === 'active' ? 'text-[#D8E0F3]' : 'text-[#455987]',
                                     )}>
                                         {step.label}
                                     </span>
@@ -237,7 +237,7 @@ export default function OnboardingSign({
                             <h1 className="font-display text-[18px] font-semibold leading-snug tracking-tight text-white">
                                 Secure your position in the PIN&nbsp;Network.
                             </h1>
-                            <p className="mt-2 text-[12px] leading-relaxed text-[#788CBA]">
+                            <p className="mt-2 text-[12px] leading-relaxed text-[#C1CDE8]">
                                 Read and sign the Success Fee &amp; Confidentiality Agreement to begin your
                                 analyst-led audit.
                             </p>
@@ -253,8 +253,8 @@ export default function OnboardingSign({
                                         {tp.icon}
                                     </div>
                                     <div>
-                                        <p className="text-[12px] font-semibold text-[#ECF0F9]">{tp.title}</p>
-                                        <p className="mt-0.5 text-[11px] leading-relaxed text-[#576FA8]">{tp.body}</p>
+                                        <p className="text-[12px] font-semibold text-[#D8E0F3]">{tp.title}</p>
+                                        <p className="mt-0.5 text-[11px] leading-relaxed text-[#91A7D8]">{tp.body}</p>
                                     </div>
                                 </div>
                             </FadeUp>
@@ -269,13 +269,13 @@ export default function OnboardingSign({
                         <div className="mt-8 rounded-xl border border-[#232C43] bg-[#101623] p-3">
                             <div className="flex flex-wrap items-center gap-1.5">
                                 <span
-                                    className="inline-flex items-center rounded-full border border-[#4468BB]/30 bg-[#4468BB]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#60A5FA]"
+                                    className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#60A5FA]"
                                 >
                                     {tier_label}
                                 </span>
-                                <span className="min-w-0 truncate text-[11px] text-[#576FA8]">{signer_email}</span>
+                                <span className="min-w-0 truncate text-[11px] text-[#91A7D8]">{signer_email}</span>
                             </div>
-                            <p className="mt-1.5 font-mono text-[9px] text-[#576FA8]/40">ID: {document_id}</p>
+                            <p className="mt-1.5 font-mono text-[9px] text-[#91A7D8]/40">ID: {document_id}</p>
                         </div>
                     </FadeUp>
                 </div>
@@ -289,10 +289,10 @@ export default function OnboardingSign({
                 >
                     {/* Desktop sub-header above iframe */}
                     <div className="hidden shrink-0 items-center justify-between border-b border-[#232C43] bg-[#080B11] px-5 py-2.5 md:flex">
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#576FA8]">
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#91A7D8]">
                             Pinpoint Investment Warrant
                         </span>
-                        <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.16em] text-[#576FA8]/60">
+                        <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.16em] text-[#91A7D8]/60">
                             <Lock className="size-2.5" />
                             <span>BoldSign · SOC 2</span>
                         </div>

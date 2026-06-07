@@ -28,6 +28,7 @@ interface PageProps {
     score_band: 'mid_high' | 'high';
     tiers: Tier[];
     diagnostic_session_id: number;
+    currency_symbol?: string;
 }
 
 // ─── Band meta ────────────────────────────────────────────────────────────────
@@ -104,7 +105,7 @@ function FadeUp({ delay = 0, children }: { delay?: number; children: React.React
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function CheckoutIndex({ score, score_band, tiers, diagnostic_session_id }: PageProps) {
+export default function CheckoutIndex({ score, score_band, tiers, diagnostic_session_id, currency_symbol = '$' }: PageProps) {
     const [selectedTier, setSelectedTier] = useState<string | null>(null);
     const [isLoading, setIsLoading]       = useState(false);
     const [error, setError]               = useState<string | null>(null);
@@ -197,8 +198,8 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                     <FadeUp key={tier.key} delay={0.25 + i * 0.1}>
                                         <div
                                             className={cn(
-                                                "relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-300 group bg-[#101623]",
-                                                tier.is_featured ? 'border-[#3A54A5]/50 shadow-[0_0_40px_rgba(68,104,187,0.15)] md:-mt-4' : 'border-[#232C43] shadow-sm'
+                                                "relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-350 ease-out group bg-[#101623] hover:scale-[1.015] hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)]",
+                                                tier.is_featured ? 'border-[#3A54A5]/60 shadow-[0_0_45px_rgba(68,104,187,0.18)] hover:border-[#3A54A5]/90 md:-mt-4' : 'border-[#232C43] shadow-sm hover:border-[#3A54A5]/30'
                                             )}
                                         >
                                             {/* Ambient tier glow */}
@@ -240,11 +241,11 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                             className="font-display text-[2.75rem] font-bold tracking-tight text-white"
                                                             style={{ color: tier.is_featured ? '#fff' : '#D8E0F3' }}
                                                         >
-                                                            ${tier.base_price}
+                                                            {currency_symbol}{tier.base_price}
                                                         </span>
                                                     </div>
                                                     <p className="mt-2 text-sm font-bold text-[#91A7D8]">
-                                                        + ${tier.gate_fee} Gate Fee
+                                                        + {currency_symbol}{tier.gate_fee} Gate Fee
                                                     </p>
                                                 </div>
 
@@ -306,7 +307,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                         type="button"
                                                         disabled={isLoading}
                                                         onClick={() => handleSelectTier(tier.key)}
-                                                        className="group relative w-full overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                                                        className="group relative w-full overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 shimmer-btn"
                                                         style={{
                                                             background:  tier.is_featured ? '#3A54A5' : 'rgba(68,104,187,0.12)',
                                                             border:      `1px solid ${tier.is_featured ? 'transparent' : 'rgba(68,104,187,0.25)'}`,
@@ -326,7 +327,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                                     Redirecting…
                                                                 </>
                                                             ) : (
-                                                                `Get Started — $${tier.total}`
+                                                                `Get Started — ${currency_symbol}${tier.total}`
                                                             )}
                                                         </span>
                                                     </button>

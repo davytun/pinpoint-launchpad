@@ -99,12 +99,13 @@ function ResendInviteButton({ email }: { email?: string }) {
 
 // ── Confirmed / "check your email" screen
 function ConfirmedScreen({
-    signer_email, tier_label, amount_paid, signed_at 
+    signer_email, tier_label, amount_paid, signed_at, setup_url
 }: { 
     signer_email?: string; 
     tier_label?: string; 
     amount_paid?: string; 
     signed_at?: string;
+    setup_url?: string;
 }) {
     return (
         <div className="min-h-screen overflow-y-auto bg-[#050505] text-white antialiased">
@@ -183,38 +184,68 @@ function ConfirmedScreen({
                     </div>
                 </motion.div>
 
-                {/* Final CTA — account not yet created; setup invite sent by email */}
+                {/* Final CTA */}
                 <motion.div
                     className="mt-10 w-full"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
                 >
-                    {/* Check your email card */}
-                    <div
-                        className="w-full rounded-2xl border border-[#232C43] bg-[#080B11] p-6 text-center"
-                        style={{ boxShadow: '0 0 40px rgba(68,104,187,0.08)' }}
-                    >
-                        <div className="mb-4 flex justify-center">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1B294B]/30 ring-1 ring-[#232C43]">
-                                <Mail className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
+                    {setup_url ? (
+                        <div
+                            className="w-full rounded-2xl border border-[#232C43] bg-[#080B11] p-6 text-center"
+                            style={{ boxShadow: '0 0 40px rgba(68,104,187,0.08)' }}
+                        >
+                            <div className="mb-4 flex justify-center">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1B294B]/30 ring-1 ring-[#232C43]">
+                                    <ArrowRight className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
+                                </div>
                             </div>
+                            <p className="mb-1 text-[12px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
+                                Complete Setup
+                            </p>
+                            <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">
+                                Create your account
+                            </p>
+                            <p className="mb-6 text-[13px] leading-relaxed text-[#C1CDE8]">
+                                Set up your secure password to access your PARAGON Audit dashboard immediately.
+                            </p>
+                            <a
+                                href={setup_url}
+                                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3.5 text-[13px] font-bold uppercase tracking-[0.14em] text-white transition-all hover:bg-[#3b5ba5]"
+                                style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
+                            >
+                                Create Account
+                                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                            </a>
                         </div>
-                        <p className="mb-1 text-[12px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
-                            One more step
-                        </p>
-                        <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">
-                            Check your inbox
-                        </p>
-                        <p className="text-[13px] leading-relaxed text-[#C1CDE8]">
-                            We've sent a secure account setup link to{' '}
-                            <span className="font-medium text-[#D8E0F3]">{signer_email}</span>.
-                            {' '}Open that email to create your password and access your dashboard.
-                        </p>
+                    ) : (
+                        /* Check your email card */
+                        <div
+                            className="w-full rounded-2xl border border-[#232C43] bg-[#080B11] p-6 text-center"
+                            style={{ boxShadow: '0 0 40px rgba(68,104,187,0.08)' }}
+                        >
+                            <div className="mb-4 flex justify-center">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1B294B]/30 ring-1 ring-[#232C43]">
+                                    <Mail className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
+                                </div>
+                            </div>
+                            <p className="mb-1 text-[12px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
+                                One more step
+                            </p>
+                            <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">
+                                Check your inbox
+                            </p>
+                            <p className="text-[13px] leading-relaxed text-[#C1CDE8]">
+                                We've sent a secure account setup link to{' '}
+                                <span className="font-medium text-[#D8E0F3]">{signer_email}</span>.
+                                {' '}Open that email to create your password and access your dashboard.
+                            </p>
 
-                        {/* Resend invite */}
-                        <ResendInviteButton email={signer_email} />
-                    </div>
+                            {/* Resend invite */}
+                            <ResendInviteButton email={signer_email} />
+                        </div>
+                    )}
 
                     <p className="mt-6 text-[11px] text-[#91A7D8]/40">
                         Questions?{' '}
@@ -229,13 +260,14 @@ function ConfirmedScreen({
 }
 
 export default function OnboardingVerifying({
-    signature_verified, signer_email, tier_label, amount_paid, signed_at 
+    signature_verified, signer_email, tier_label, amount_paid, signed_at, setup_url 
 }: { 
     signature_verified: boolean; 
     signer_email?: string;
     tier_label?: string;
     amount_paid?: string;
     signed_at?: string;
+    setup_url?: string;
 }) {
     const [attempts,  setAttempts]  = useState(0);
     const [timedOut,  setTimedOut]  = useState(false);
@@ -270,6 +302,7 @@ export default function OnboardingVerifying({
                 tier_label={tier_label}
                 amount_paid={amount_paid}
                 signed_at={signed_at}
+                setup_url={setup_url}
             />
         );
     }

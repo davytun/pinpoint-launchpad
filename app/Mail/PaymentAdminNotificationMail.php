@@ -18,7 +18,7 @@ class PaymentAdminNotificationMail extends Mailable
     public function envelope(): Envelope
     {
         $tierLabel = ucfirst($this->payment->tier);
-        $total     = $this->payment->total_amount;
+        $total = $this->payment->total_amount;
 
         return new Envelope(
             subject: "New Payment Received — {$tierLabel} | \${$total}",
@@ -30,11 +30,11 @@ class PaymentAdminNotificationMail extends Mailable
         return new Content(
             view: 'emails.payment.admin-notification',
             with: [
-                'tier_label'   => ucfirst($this->payment->tier),
+                'tier_label' => ucfirst($this->payment->tier),
                 'total_amount' => $this->payment->total_amount,
-                'email'        => $this->payment->customer_email,
-                'paid_at'      => $this->payment->paid_at,
-                'tier'         => $this->payment->tier,
+                'email' => $this->payment->customer_email,
+                'paid_at' => $this->payment->paid_at,
+                'tier' => $this->payment->tier,
             ],
         );
     }

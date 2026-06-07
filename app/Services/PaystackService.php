@@ -68,6 +68,7 @@ class PaystackService
         $baseAmount  = $tierData['base'];
         $totalAmount = $tierData['total'];
         $tierLabel   = $tierData['label'];
+        $currency    = strtoupper(config('services.paystack.currency', 'NGN'));
 
         try {
             $response = Http::withHeaders([
@@ -76,7 +77,9 @@ class PaystackService
             ])->timeout(10)->post('https://api.paystack.co/transaction/initialize', [
                 'email'        => $data['email'],
                 'amount'       => $amount,
+                'currency'     => $currency,
                 'callback_url' => $data['callback_url'],
+                'channels'     => ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
                 'metadata'     => [
                     'tier'                  => $tier,
                     'tier_label'            => $tierLabel,
@@ -111,7 +114,7 @@ class PaystackService
             'total_amount'          => $totalAmount,
             'customer_email'        => $data['email'],
             'diagnostic_session_id' => $data['diagnostic_session_id'],
-            'currency'              => 'usd',
+            'currency'              => strtolower($currency),
         ]);
 
         $payment->log('initialized', [
@@ -202,10 +205,18 @@ class PaystackService
             return;
         }
 
+        $amountPaid = isset($data['amount']) ? ($data['amount'] / 100) : $payment->total_amount;
+        $currency   = isset($data['currency']) ? strtolower($data['currency']) : $payment->currency;
+
         // Atomic idempotent update — only proceeds if not already paid
         $affected = Payment::where('id', $payment->id)
             ->where('status', '!=', 'paid')
-            ->update(['status' => 'paid', 'paid_at' => now()]);
+            ->update([
+                'status'       => 'paid',
+                'paid_at'      => now(),
+                'total_amount' => $amountPaid,
+                'currency'     => $currency,
+            ]);
 
         if ($affected === 0) {
             Log::info('Webhook received for already-paid payment', [

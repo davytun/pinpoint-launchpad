@@ -26,6 +26,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import FounderLayout from '@/layouts/founder-layout';
+import DashboardTour from '@/components/dashboard-tour';
+import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -165,7 +167,7 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
                             className={[
                                 'flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold border transition-colors duration-200 shrink-0 relative z-10',
                                 step.done   ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' :
-                                step.active ? 'border-[#3A54A5]/80 bg-[#3A54A5]/10 text-[#6986C9]' :
+                                step.active ? 'border-[#3A54A5]/80 bg-[#3A54A5]/15 text-white stepper-active-pulse' :
                                               'border-[#232C43] bg-[#0C1427] text-[#91A7D8]',
                             ].join(' ')}
                         >
@@ -190,8 +192,8 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
                         <div className="flex-1 px-2">
                             <div
                                 className={[
-                                    'h-[1px] w-full transition-colors duration-300',
-                                    step.done ? 'bg-emerald-500/40' : 'bg-[#232C43]',
+                                    'h-px w-full transition-all duration-300',
+                                    step.done ? 'bg-gradient-to-r from-emerald-500/50 to-[#232C43]' : 'bg-[#232C43]',
                                 ].join(' ')}
                             />
                         </div>
@@ -204,9 +206,9 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
 
 // ─── Card Components ───
 
-function ProCard({ children, className = '' }: { children: React.ReactNode, className?: string }) {
+function ProCard({ children, className = '', id }: { children: React.ReactNode, className?: string, id?: string }) {
     return (
-        <div className={`overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm ${className}`}>
+        <div id={id} className={`overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm ${className}`}>
             {children}
         </div>
     );
@@ -225,6 +227,11 @@ export default function FounderDashboard({
     const statusCfg  = audit_status_config[audit_status] ?? audit_status_config['pending'];
 
     const [accountOpen, setAccountOpen] = useState(false);
+    const [startTourKey, setStartTourKey] = useState(0);
+
+    function restartTour() {
+        setStartTourKey(prev => prev + 1);
+    }
 
     const hasPillarData = Object.values(pillar_scores).some((v) => (v ?? 0) > 0);
     const radarData = PILLAR_KEYS.map((k) => ({
@@ -236,7 +243,7 @@ export default function FounderDashboard({
         <FounderLayout founder={founder}>
             <Head title="Dashboard — Pinpoint Launchpad" />
 
-            <div className="mx-auto max-w-[64rem] space-y-6 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+            <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
 
                 {/* ── Section 1 — Welcome Header ── */}
                 <FadeUp delay={0}>
@@ -246,7 +253,7 @@ export default function FounderDashboard({
                                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: meta.color }} />
                                 {meta.badgeLabel}
                             </div>
-                            <h1 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                            <h1 id="tour-welcome" className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                                 {greeting(founder.full_name)}
                             </h1>
                             <p className="mt-1.5 text-[14px] text-[#C1CDE8]">
@@ -287,7 +294,7 @@ export default function FounderDashboard({
                                 )}
                             </div>
 
-                            <div className="lg:w-[45%] lg:pb-0 pb-4">
+                            <div id="tour-stepper" className="lg:w-[45%] lg:pb-0 pb-4">
                                 <ProgressStepper auditStatus={audit_status} />
                             </div>
                         </div>
@@ -297,7 +304,7 @@ export default function FounderDashboard({
                 {/* ── Section 3 — PARAGON Score & Radar ── */}
                 <div className="grid gap-6 sm:grid-cols-2">
                     <FadeUp delay={0.15}>
-                        <ProCard className="flex h-full flex-col items-center justify-center p-8 text-center relative">
+                        <ProCard id="tour-score" className="flex h-full flex-col items-center justify-center p-8 text-center relative">
                             <p className="mb-6 text-[12px] font-semibold uppercase tracking-wider text-[#C1CDE8]">
                                 PARAGON Score
                             </p>
@@ -334,7 +341,7 @@ export default function FounderDashboard({
                     </FadeUp>
 
                     <FadeUp delay={0.20}>
-                        <ProCard className="h-full p-6 sm:p-8">
+                        <ProCard id="tour-pillar" className="h-full p-6 sm:p-8">
                             <p className="mb-4 text-[12px] font-semibold uppercase tracking-wider text-[#C1CDE8]">
                                 Pillar Breakdown
                             </p>
@@ -401,38 +408,45 @@ export default function FounderDashboard({
                 <FadeUp delay={0.30}>
                     <div className="grid gap-4 sm:grid-cols-3">
                         <Link
+                            id="tour-documents"
                             href={route('founder.documents.index')}
-                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-colors hover:border-[#3A54A5] hover:bg-[#1B294B]"
+                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#3A54A5]/60 hover:bg-[#101623]/95 hover:shadow-[0_12px_28px_rgba(0,0,0,0.45)]"
                         >
-                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
-                                <FileText className="size-4.5 text-[#91A7D8] transition-colors group-hover:text-[#D8E0F3]" />
+                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43] transition-colors group-hover:border-[#3A54A5]/40 group-hover:bg-[#101623]">
+                                <FileText className="size-4.5 text-[#91A7D8] transition-colors group-hover:text-white" />
                             </div>
                             <div>
                                 <h3 className="text-[15px] font-medium text-[#D8E0F3]">Documents</h3>
                                 <p className="mt-1 text-[13px] text-[#C1CDE8]">Manage and upload requested files.</p>
                             </div>
-                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#3A54A5] transition-colors group-hover:text-[#8FA4D6]">
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#3A54A5] transition-colors group-hover:text-[#91A7D8]">
                                 View <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
                         </Link>
 
                         <Link
+                            id="tour-messages"
                             href={route('founder.messages.index')}
-                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-colors hover:border-[#3A54A5] hover:bg-[#1B294B]"
+                            className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#3A54A5]/60 hover:bg-[#101623]/95 hover:shadow-[0_12px_28px_rgba(0,0,0,0.45)]"
                         >
-                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
-                                <MessageSquare className="size-4.5 text-[#91A7D8] transition-colors group-hover:text-[#D8E0F3]" />
+                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43] transition-colors group-hover:border-[#3A54A5]/40 group-hover:bg-[#101623]">
+                                <MessageSquare className="size-4.5 text-[#91A7D8] transition-colors group-hover:text-white" />
                             </div>
                             <div>
                                 <h3 className="text-[15px] font-medium text-[#D8E0F3]">Messages</h3>
                                 <p className="mt-1 text-[13px] text-[#C1CDE8]">Communicate directly with your analyst.</p>
                             </div>
-                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#3A54A5] transition-colors group-hover:text-[#8FA4D6]">
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#3A54A5] transition-colors group-hover:text-[#91A7D8]">
                                 Open <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
                         </Link>
 
-                        <div className="flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5">
+                        <div 
+                            className={cn(
+                                "flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-all duration-300 ease-out",
+                                profile_is_live ? "hover:-translate-y-1 hover:border-emerald-500/40 hover:bg-[#101623]/95 hover:shadow-[0_12px_28px_rgba(0,0,0,0.45)]" : ""
+                            )}
+                        >
                             <div className="mb-4 flex items-center justify-between">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
                                     <ExternalLink className="size-4.5 text-[#91A7D8]" />
@@ -495,7 +509,7 @@ export default function FounderDashboard({
                                     className="overflow-hidden"
                                 >
                                     <div className="border-t border-[#232C43] bg-[#080B11] px-6 py-5">
-                                        <dl className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+                                        <div className="grid gap-4 sm:grid-cols-2">
                                             {[
                                                 { label: 'Full Name',    value: founder.full_name },
                                                 { label: 'Company',      value: founder.company_name },
@@ -503,12 +517,21 @@ export default function FounderDashboard({
                                                 { label: 'Member Since', value: fmtDate(founder.created_at) },
                                                 { label: 'Last Login',   value: fmtDateTime(founder.last_login_at) },
                                             ].map(({ label, value }) => (
-                                                <div key={label} className="flex flex-col">
-                                                    <dt className="text-[12px] font-semibold uppercase tracking-wider text-[#91A7D8]">{label}</dt>
-                                                    <dd className="mt-1.5 text-[14px] text-[#BCC5DC]">{value ?? '—'}</dd>
+                                                <div key={label} className="rounded-xl border border-[#232C43]/45 bg-[#0C121E]/60 p-4 shadow-sm transition-all hover:border-[#232C43]/70">
+                                                    <dt className="text-[10px] font-bold uppercase tracking-wider text-[#91A7D8]">{label}</dt>
+                                                    <dd className="mt-1 font-sans text-[13.5px] font-medium text-white">{value ?? '—'}</dd>
                                                 </div>
                                             ))}
-                                        </dl>
+                                        </div>
+                                        <div className="mt-6 border-t border-[#232C43] pt-5 flex justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={restartTour}
+                                                className="inline-flex items-center gap-2 rounded-lg bg-[#3A54A5]/10 border border-[#3A54A5]/30 px-4 py-2 text-[12px] font-bold uppercase tracking-wider text-[#91A7D8] transition-all hover:bg-[#3A54A5]/25 hover:text-white"
+                                            >
+                                                Restart Guided Tour
+                                            </button>
+                                        </div>
                                     </div>
                                 </motion.div>
                             )}
@@ -517,6 +540,7 @@ export default function FounderDashboard({
                 </FadeUp>
 
             </div>
+            <DashboardTour startTourKey={startTourKey} />
         </FounderLayout>
     );
 }

@@ -14,6 +14,7 @@ interface PageProps {
     tier_label:   string;
     total_amount: number;
     email:        string;
+    currency_symbol?: string;
 }
 
 // ─── Animated SVG checkmark ───────────────────────────────────────────────────
@@ -137,7 +138,7 @@ function Step({ n, label, sub, isLast = false }: { n: number; label: string; sub
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function CheckoutSuccess({ tier_label, total_amount, email }: PageProps) {
+export default function CheckoutSuccess({ tier_label, total_amount, email, currency_symbol = '$' }: PageProps) {
     return (
         <DiagnosticLayout glowColor="#6EBE44" hideWordmark>
             <Head title="Payment Confirmed — PARAGON Certification" />
@@ -184,7 +185,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email }: Pag
                                 </div>
                                 <div className="divide-y divide-dashed divide-[#232C43] px-5 py-1.5">
                                     <Row label="Tier">{tier_label} Audit</Row>
-                                    <Row label="Amount" isTotal>{Number(total_amount).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</Row>
+                                    <Row label="Amount" isTotal>{currency_symbol}{Number(total_amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</Row>
                                     <Row label="Status">
                                         <Badge
                                             className="border border-[#6EBE44]/30 bg-[#6EBE44]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#6EBE44]"

@@ -16,6 +16,7 @@ class SignatureCompleteMail extends Mailable
     public function __construct(
         public Signature $signature,
         public string $tierLabel,
+        public ?string $setupUrl = null,
     ) {}
 
     public function envelope(): Envelope
@@ -33,6 +34,7 @@ class SignatureCompleteMail extends Mailable
                 'tier_label'   => $this->tierLabel,
                 'signer_email' => $this->signature->signer_email,
                 'signed_at'    => $this->signature->signed_at,
+                'setupUrl'     => $this->setupUrl,
             ],
         );
     }

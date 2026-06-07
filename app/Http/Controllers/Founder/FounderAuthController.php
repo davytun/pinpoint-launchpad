@@ -41,7 +41,7 @@ class FounderAuthController extends Controller
                 ->with('error', 'This setup link has expired or is invalid. Please contact support.');
         }
 
-        $founder = Founder::where('email', $email)->first();
+        $founder = Founder::query()->where('email', $email)->first();
 
         if ($founder && $founder->hasSetupAccount()) {
             return redirect()->route('founder.login')
@@ -50,7 +50,7 @@ class FounderAuthController extends Controller
 
         // Pre-fill name/company from most recent signed signature
         /** @var Signature|null $signature */
-        $signature = Signature::where('signer_email', $email)
+        $signature = Signature::query()->where('signer_email', $email)
             ->where('status', 'signed')
             ->latest()->first();
 
@@ -81,20 +81,20 @@ class FounderAuthController extends Controller
             ]);
         }
 
-        $diagnosticSession = DiagnosticSession::where('email', $request->email)
+        $diagnosticSession = DiagnosticSession::query()->where('email', $request->email)
             ->latest()->first();
 
         /** @var Payment|null $payment */
-        $payment = Payment::where('customer_email', $request->email)
+        $payment = Payment::query()->where('customer_email', $request->email)
             ->where('status', 'paid')
             ->latest()->first();
 
         /** @var Signature|null $signature */
-        $signature = Signature::where('signer_email', $request->email)
+        $signature = Signature::query()->where('signer_email', $request->email)
             ->where('status', 'signed')
             ->latest()->first();
 
-        $founder = Founder::firstOrNew(['email' => $request->email]);
+        $founder = Founder::query()->firstOrNew(['email' => $request->email]);
 
         $founder->fill([
             'password'              => $request->password,
@@ -127,8 +127,6 @@ class FounderAuthController extends Controller
             'signer_company_name',
             'pending_payment_reference',
         ]);
-
-        Mail::to($founder->email)->send(new FounderWelcomeMail($founder));
 
         return redirect()->route('founder.dashboard');
     }

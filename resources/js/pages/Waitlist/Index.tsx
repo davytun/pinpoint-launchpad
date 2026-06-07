@@ -7,10 +7,13 @@ import {
     CheckCircle2,
     ChevronDown,
     ChevronLeft,
+    Facebook,
     Landmark,
+    Linkedin,
     Rocket,
     ShieldCheck,
     Sparkles,
+    Twitter,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -733,6 +736,7 @@ function FormPanel({
 export default function Waitlist({ selectedAudience, founderStages, investorRoles, founderStatus, investorStatus }: PageProps) {
     const config = selectedAudience ? AUDIENCES[selectedAudience] : null;
     const status = selectedAudience === 'founder' ? founderStatus : investorStatus;
+    const [legalModal, setLegalModal] = useState<{ title: string; content: string } | null>(null);
 
     return (
         <>
@@ -842,6 +846,89 @@ export default function Waitlist({ selectedAudience, founderStages, investorRole
                                     <SupportPanel config={config} />
                                 </div>
                             </motion.main>
+                        )}
+                    </AnimatePresence>
+
+                    {/* ── Footer ── */}
+                    <footer className="mt-28 border-t border-white/[0.06] pt-12 pb-6">
+                        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="space-y-2">
+                                <p className="text-[12px] text-white/30">
+                                    © {new Date().getFullYear()} Pinpoint Launchpad. All rights reserved.
+                                </p>
+                                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setLegalModal({
+                                            title: 'Terms & Conditions',
+                                            content: 'These terms govern your use of the Pinpoint Launchpad waitlist and readiness assessment program. By signing up, you agree to receive program updates, checklists, and cohort announcements.\n\nAll diagnostic feedback is advisory. Pinpoint Launchpad does not guarantee investment, funding, or specific outcomes. Capital raising involves high risks, and all financial metrics provided by users are subject to independent forensic validation.'
+                                        })}
+                                        className="text-[12px] text-white/45 transition-colors hover:text-white/80 outline-none"
+                                    >
+                                        Terms & Conditions
+                                    </button>
+                                    <span className="text-[12px] text-white/20">•</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setLegalModal({
+                                            title: 'Privacy Policy',
+                                            content: 'Your privacy is critical to us. We collect email addresses, company names, and growth stage inputs to evaluate waitlist eligibility and send relevant PARAGON Diagnostic information.\n\nWe do not sell, rent, or distribute your personal or startup information to third-party brokers. Data shared with institutional investors is subject to explicit consent and NDA boundaries.'
+                                        })}
+                                        className="text-[12px] text-white/45 transition-colors hover:text-white/80 outline-none"
+                                    >
+                                        Privacy Policy
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Social Media Links */}
+                            <div className="flex items-center gap-4">
+                                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="group flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.02] text-white/45 transition-all duration-200 hover:border-white/15 hover:bg-white/[0.05] hover:text-white/80" aria-label="LinkedIn">
+                                    <Linkedin className="h-4 w-4" />
+                                </a>
+                                <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="group flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.02] text-white/45 transition-all duration-200 hover:border-white/15 hover:bg-white/[0.05] hover:text-white/80" aria-label="Twitter (X)">
+                                    <Twitter className="h-4 w-4" />
+                                </a>
+                                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="group flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.02] text-white/45 transition-all duration-200 hover:border-white/15 hover:bg-white/[0.05] hover:text-white/80" aria-label="Facebook">
+                                    <Facebook className="h-4 w-4" />
+                                </a>
+                            </div>
+                        </div>
+                    </footer>
+
+                    {/* ── Legal Modal ── */}
+                    <AnimatePresence>
+                        {legalModal && (
+                            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    onClick={() => setLegalModal(null)}
+                                    className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                                />
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95, y: 16 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.95, y: 16 }}
+                                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                                    className="relative z-10 w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[#0c0c0c] p-8 shadow-[0_0_80px_rgba(0,0,0,0.95)]"
+                                >
+                                    <h3 className="font-display text-xl font-semibold text-white">
+                                        {legalModal.title}
+                                    </h3>
+                                    <div className="mt-4 max-h-[300px] overflow-y-auto text-sm leading-relaxed text-white/50 pr-2">
+                                        <p className="whitespace-pre-line">{legalModal.content}</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setLegalModal(null)}
+                                        className="group relative mt-8 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-white/[0.04] border border-white/[0.08] px-5 py-3 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:bg-white/[0.08] hover:border-white/15"
+                                    >
+                                        Close
+                                    </button>
+                                </motion.div>
+                            </div>
                         )}
                     </AnimatePresence>
                 </div>

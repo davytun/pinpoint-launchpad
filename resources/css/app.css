@@ -147,18 +147,18 @@
     }
 
     .dx-answer-btn {
-        @apply relative flex w-full items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-5 py-4 text-left text-sm font-medium text-white/60 transition-all duration-200 outline-none hover:border-white/20 hover:bg-white/[0.07] hover:text-white focus-visible:ring-2 focus-visible:ring-blue-500/40;
+        @apply relative flex w-full items-center gap-4 rounded-2xl border border-white/8 bg-white/3 px-5 py-4 text-left text-sm font-medium text-white/60 transition-all duration-200 outline-none hover:border-white/20 hover:bg-white/7 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-500/40;
     }
 
     .dx-answer-btn[data-selected='yes'] {
-        @apply border-emerald-500/40 bg-emerald-500/[0.08] text-emerald-300;
+        @apply border-emerald-500/40 bg-emerald-500/8 text-emerald-300;
         box-shadow:
             0 0 0 1px rgba(5, 150, 105, 0.25),
             0 0 24px rgba(5, 150, 105, 0.1);
     }
 
     .dx-answer-btn[data-selected='no'] {
-        @apply border-rose-500/30 bg-rose-500/[0.06] text-rose-300;
+        @apply border-rose-500/30 bg-rose-500/6 text-rose-300;
         box-shadow:
             0 0 0 1px rgba(239, 68, 68, 0.2),
             0 0 16px rgba(239, 68, 68, 0.07);
@@ -341,3 +341,185 @@
     --color-sidebar-ring:
         var(--sidebar-ring);
 }
+
+/* ─── Driver.js Dark Glassmorphic Theme Overrides ────────────────────────────── */
+.driver-popover {
+    background-color: rgba(13, 19, 33, 0.88) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 16px !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+        0 24px 64px rgba(0, 0, 0, 0.65),
+        0 0 40px rgba(58, 84, 165, 0.22) !important;
+    padding: 24px !important;
+    max-width: 335px !important;
+    color: #ffffff !important;
+}
+
+.driver-popover-arrow {
+    border-color: transparent !important;
+}
+
+.driver-popover-arrow-side-left .driver-popover-arrow {
+    border-left-color: rgba(13, 19, 33, 0.88) !important;
+}
+
+.driver-popover-arrow-side-right .driver-popover-arrow {
+    border-right-color: rgba(13, 19, 33, 0.88) !important;
+}
+
+.driver-popover-arrow-side-top .driver-popover-arrow {
+    border-top-color: rgba(13, 19, 33, 0.88) !important;
+}
+
+.driver-popover-arrow-side-bottom .driver-popover-arrow {
+    border-bottom-color: rgba(13, 19, 33, 0.88) !important;
+}
+
+.driver-popover-title {
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    margin-bottom: 8px !important;
+}
+
+.driver-popover-description {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 13.5px !important;
+    line-height: 1.55 !important;
+    color: #C1CDE8 !important;
+}
+
+.driver-popover-footer {
+    margin-top: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.driver-popover-progress-text {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 10px !important;
+    font-weight: 750 !important;
+    text-transform: uppercase !important;
+    color: #91A7D8 !important;
+    letter-spacing: 0.06em !important;
+    background-color: rgba(68, 104, 187, 0.15) !important;
+    border: 1px solid rgba(68, 104, 187, 0.3) !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+}
+
+.driver-popover-next-btn,
+.driver-popover-prev-btn {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+}
+
+/* Default / Back button */
+.driver-popover-prev-btn {
+    background-color: rgba(68, 104, 187, 0.12) !important;
+    border: 1px solid rgba(68, 104, 187, 0.25) !important;
+    color: #91A7D8 !important;
+}
+
+.driver-popover-prev-btn:hover {
+    background-color: rgba(68, 104, 187, 0.2) !important;
+    color: #ffffff !important;
+}
+
+/* Next / Done button */
+.driver-popover-next-btn {
+    background-color: #3A54A5 !important;
+    border: 1px solid transparent !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(58, 84, 165, 0.3) !important;
+}
+
+.driver-popover-next-btn:hover {
+    background-color: #4a67bc !important;
+    box-shadow: 0 4px 16px rgba(58, 84, 165, 0.45) !important;
+}
+
+/* Close/Skip cross-button (usually top right) */
+.driver-popover-close-btn {
+    color: rgba(255, 255, 255, 0.4) !important;
+    transition: color 0.15s ease !important;
+}
+
+.driver-popover-close-btn:hover {
+    color: #ffffff !important;
+}
+
+/* ─── Premium UI Polish Utilities ─────────────────────────────────────────── */
+
+/* Button Shimmer Shine effect */
+.shimmer-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.shimmer-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 30%;
+    height: 200%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.13) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(25deg);
+    animation: shimmer-sweep 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer-sweep {
+    0% { left: -60%; }
+    15% { left: 140%; }
+    100% { left: 140%; }
+}
+
+/* Pulsing Active Step Indicator */
+.stepper-active-pulse {
+    position: relative;
+}
+
+.stepper-active-pulse::after {
+    content: '';
+    position: absolute;
+    inset: -3.5px;
+    border-radius: 9999px;
+    border: 1.5px solid #3A54A5;
+    animation: stepper-ring-ping 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    pointer-events: none;
+}
+
+@keyframes stepper-ring-ping {
+    0% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1.45);
+        opacity: 0;
+    }
+}
+
+

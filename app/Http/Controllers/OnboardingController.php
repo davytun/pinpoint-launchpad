@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Signature;
 use App\Services\BoldSignService;
-use Cache;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Mail;
-use Str;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class OnboardingController extends Controller
 {
@@ -161,11 +161,11 @@ class OnboardingController extends Controller
         $signatureId = $request->session()->get('signature_id');
 
         if ($signatureId) {
-            $signature = Signature::find($signatureId);
+            $signature = Signature::query()->find($signatureId);
         }
 
         if (! $signature && $request->session()->has('payment_id')) {
-            $payment   = Payment::with('signature')->find($request->session()->get('payment_id'));
+            $payment   = Payment::query()->with('signature')->find($request->session()->get('payment_id'));
             $signature = $payment?->signature;
 
             if ($signature) {
@@ -181,12 +181,30 @@ class OnboardingController extends Controller
 
         $payment = $signature->payment;
 
+        $setupUrl = null;
+        if ($signature->isSigned()) {
+            $founder = \App\Models\Founder::query()->where('email', $signature->signer_email)->first();
+            if (! $founder || ! $founder->hasSetupAccount()) {
+                $setupToken = Cache::get('founder_setup_token_' . $signature->signer_email);
+                if (! $setupToken) {
+                    $setupToken = Str::random(64);
+                    Cache::put(
+                        'founder_setup_token_' . $signature->signer_email,
+                        $setupToken,
+                        now()->addHours(48)
+                    );
+                }
+                $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
+            }
+        }
+
         return Inertia::render('Onboarding/Verifying', [
             'signature_verified' => $signature->isSigned(),
             'signer_email'       => $signature->signer_email,
             'tier_label'         => ucfirst($payment?->tier ?? 'Foundation') . ' Audit',
             'amount_paid'        => '$' . number_format($payment?->total_amount ?? 0) . ' USD',
             'signed_at'          => $signature->signed_at?->format('M j, Y, g:i A') ?? now()->format('M j, Y, g:i A'),
+            'setup_url'          => $setupUrl,
         ]);
     }
 
@@ -194,7 +212,7 @@ class OnboardingController extends Controller
     {
         $request->validate(['email' => ['required', 'email']]);
 
-        $signature = Signature::where('signer_email', $request->input('email'))
+        $signature = Signature::query()->where('signer_email', $request->input('email'))
             ->where('status', 'signed')
             ->latest()
             ->first();
@@ -202,10 +220,10 @@ class OnboardingController extends Controller
         if (! $signature) {
             // Try session fallback
             $signatureId = $request->session()->get('signature_id');
-            $signature   = $signatureId ? Signature::find($signatureId) : null;
+            $signature   = $signatureId ? Signature::query()->find($signatureId) : null;
 
             if (! $signature && $request->session()->has('payment_id')) {
-                $payment   = Payment::with('signature')->find($request->session()->get('payment_id'));
+                $payment   = Payment::query()->with('signature')->find($request->session()->get('payment_id'));
                 $signature = $payment?->signature;
             }
         }

@@ -57,9 +57,15 @@
   </div>
 
   <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
-    <a href="{{ url('/dashboard') }}" class="cta-button">
-      Access Your Dashboard
-    </a>
+    @if(!empty($setupUrl))
+      <a href="{{ $setupUrl }}" class="cta-button">
+        Set Up Your Dashboard
+      </a>
+    @else
+      <a href="{{ url('/dashboard') }}" class="cta-button">
+        Access Your Dashboard
+      </a>
+    @endif
   </div>
 
   <p style="margin-bottom: 0;">

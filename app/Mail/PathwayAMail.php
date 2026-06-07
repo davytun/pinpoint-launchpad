@@ -30,6 +30,16 @@ class PathwayAMail extends Mailable implements ShouldQueue
         );
     }
 
+    public function shouldSend(): bool
+    {
+        $hasPaid = \App\Models\Payment::query()->where('customer_email', $this->session->email)
+            ->where('status', 'paid')
+            ->exists();
+        $hasAccount = \App\Models\Founder::query()->where('email', $this->session->email)->exists();
+
+        return ! ($hasPaid || $hasAccount);
+    }
+
     public function attachments(): array
     {
         return [];

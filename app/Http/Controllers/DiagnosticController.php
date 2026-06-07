@@ -181,15 +181,16 @@ class DiagnosticController extends Controller
         // 1. Always send the general result email first (queued — non-blocking)
         Mail::to($session->email)->queue(new DiagnosticResultMail($session));
 
-        // 2. Fire the correct pathway based on score band
+        // 2. Fire the correct pathway based on score band (spaced out to avoid immediate flood)
         if ($session->score_band === 'low') {
-            Mail::to($session->email)->queue(new PathwayAMail($session));
+            Mail::to($session->email)->later(now()->addDay(), new PathwayAMail($session));
         } elseif ($session->score_band === 'mid_low' || $session->score_band === 'mid_high') {
-            Mail::to($session->email)->queue(new PathwayBEmail1Mail($session));
-            Mail::to($session->email)->later(now()->addDays(2), new PathwayBEmail2Mail($session));
-            Mail::to($session->email)->later(now()->addDays(5), new PathwayBEmail3Mail($session));
+            Mail::to($session->email)->later(now()->addDay(), new PathwayBEmail1Mail($session));
+            Mail::to($session->email)->later(now()->addDays(3), new PathwayBEmail2Mail($session));
+            Mail::to($session->email)->later(now()->addDays(6), new PathwayBEmail3Mail($session));
         } elseif ($session->score_band === 'high') {
-            Mail::to($session->email)->queue(new PathwayCFounderMail($session));
+            // Delay by 1 hour so it feels like a real analyst reviewed their rare high score
+            Mail::to($session->email)->later(now()->addHour(), new PathwayCFounderMail($session));
             Mail::to(config('mail.admin_address'))->queue(new UnicornAlertMail($session));
         }
 

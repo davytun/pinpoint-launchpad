@@ -102,12 +102,17 @@ class CheckoutController extends Controller
             return redirect()->route('onboarding.sign');
         }
 
+        $currency = strtoupper(config('services.paystack.currency', 'USD'));
+        $currencySymbol = $currency === 'NGN' ? '₦' : '$';
+
         return Inertia::render('Checkout/Index', [
             'score'                 => $diagnosticSession->score,
             'score_band'            => $diagnosticSession->score_band,
             'tiers'                 => self::TIERS,
             'diagnostic_session_id' => $sessionId,
             'customer_email'        => $diagnosticSession->email,
+            'currency'              => $currency,
+            'currency_symbol'       => $currencySymbol,
         ]);
     }
 
@@ -195,21 +200,38 @@ class CheckoutController extends Controller
         // Cross-check against session pending reference — must exist AND match.
         // Skip this guard when:
         //   (a) the payment is already marked paid (webhook fired before redirect landed), or
-        //   (b) the session already holds a matching payment_id (page refresh after success)
+        //   (b) the session already holds a matching payment_id (page refresh after success), or
+        //   (c) the session reference is missing but the payment exists and is still pending —
+        //       this covers vault/saved-card flows where Paystack's redirect may arrive on a
+        //       new session (cross-origin redirect drops the session cookie on some hosts).
+        //       In that case we fall through to Paystack's own verifyTransaction() API call,
+        //       which is the authoritative check.
         $sessionReference = $request->session()->get('pending_payment_reference');
         $sessionPaymentId = $request->session()->get('payment_id');
 
         $alreadyVerified = $payment->status === 'paid'
             || (int) $sessionPaymentId === (int) $payment->id;
 
-        if (! $alreadyVerified && (! $sessionReference || $sessionReference !== $reference)) {
-            Log::warning('Payment reference mismatch or missing session reference on success page', [
-                'session_ref' => $sessionReference ?? '(none)',
-                'url_ref'     => $reference,
-                'ip'          => $request->ip(),
+        $sessionMissing = ! $sessionReference || $sessionReference !== $reference;
+
+        if (! $alreadyVerified && $sessionMissing) {
+            // If payment is still pending, allow through to verifyTransaction() below —
+            // the Paystack API call will confirm or reject it.
+            if ($payment->status !== 'pending') {
+                Log::warning('Payment reference mismatch on success page for non-pending payment', [
+                    'session_ref'    => $sessionReference ?? '(none)',
+                    'url_ref'        => $reference,
+                    'payment_status' => $payment->status,
+                    'ip'             => $request->ip(),
+                ]);
+                return redirect()->route('checkout.index')
+                    ->with('error', 'Session expired. Please try again.');
+            }
+
+            Log::info('Success page: session reference missing for pending payment — falling through to Paystack verification', [
+                'reference' => $reference,
+                'ip'        => $request->ip(),
             ]);
-            return redirect()->route('checkout.index')
-                ->with('error', 'Session expired. Please try again.');
         }
 
         // Already paid — skip Paystack API call entirely and go straight to render
@@ -218,9 +240,11 @@ class CheckoutController extends Controller
             $request->session()->forget('pending_payment_reference');
 
             return Inertia::render('Checkout/Success', [
-                'tier_label'   => ucfirst($payment->tier),
-                'total_amount' => $payment->total_amount,
-                'email'        => $payment->customer_email,
+                'tier_label'      => ucfirst($payment->tier),
+                'total_amount'    => $payment->total_amount,
+                'email'           => $payment->customer_email,
+                'currency'        => $payment->currency ? strtoupper($payment->currency) : 'USD',
+                'currency_symbol' => $payment->currency && strtoupper($payment->currency) === 'NGN' ? '₦' : '$',
             ]);
         }
 
@@ -230,6 +254,8 @@ class CheckoutController extends Controller
         try {
             $verification   = $paystack->verifyTransaction($reference);
             $paystackStatus = $verification['status'] ?? null;
+            $amountPaid     = isset($verification['amount']) ? ($verification['amount'] / 100) : $payment->total_amount;
+            $currency       = isset($verification['currency']) ? strtolower($verification['currency']) : $payment->currency;
 
             if ($paystackStatus !== 'success') {
                 Log::warning('Paystack verification returned non-success status', [
@@ -253,7 +279,12 @@ class CheckoutController extends Controller
         // This prevents duplicate emails when the webhook fires concurrently
         $affected = Payment::where('id', $payment->id)
             ->where('status', '!=', 'paid')
-            ->update(['status' => 'paid', 'paid_at' => now()]);
+            ->update([
+                'status'       => 'paid',
+                'paid_at'      => now(),
+                'total_amount' => $amountPaid,
+                'currency'     => $currency,
+            ]);
 
         if ($affected === 1) {
             $payment->refresh();
@@ -274,9 +305,11 @@ class CheckoutController extends Controller
         $request->session()->forget('pending_payment_reference');
 
         return Inertia::render('Checkout/Success', [
-            'tier_label'   => ucfirst($payment->tier),
-            'total_amount' => $payment->total_amount,
-            'email'        => $payment->customer_email,
+            'tier_label'      => ucfirst($payment->tier),
+            'total_amount'    => $payment->total_amount,
+            'email'           => $payment->customer_email,
+            'currency'        => $payment->currency ? strtoupper($payment->currency) : 'USD',
+            'currency_symbol' => $payment->currency && strtoupper($payment->currency) === 'NGN' ? '₦' : '$',
         ]);
     }
 

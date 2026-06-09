@@ -21,7 +21,7 @@ use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WaitlistController;
 use Inertia\Inertia;
 
-Route::redirect('/', '/waitlist');
+Route::redirect('/waitlist', '/');
 
 // ── Admin routes ───────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -108,7 +108,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-Route::get('/waitlist', [WaitlistController::class, 'index'])->name('waitlist.index');
+Route::get('/', [WaitlistController::class, 'index'])->name('waitlist.index');
 Route::post('/waitlist/founders',  [WaitlistController::class, 'storeFounder'])->name('waitlist.founders.store');
 Route::post('/waitlist/investors', [WaitlistController::class, 'storeInvestor'])->name('waitlist.investors.store');
 

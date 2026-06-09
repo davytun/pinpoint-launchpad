@@ -61,6 +61,7 @@ interface PageProps {
     is_sample?: boolean;
     slug: string;
     flash?: { success?: string; info?: string; error?: string };
+    [key: string]: any;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────

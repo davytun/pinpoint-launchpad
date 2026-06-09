@@ -197,27 +197,25 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 <span className="opacity-40"> / {total_questions}</span>
                             </span>
                             <Badge
-                                className="rounded-full text-[10px] font-black tracking-[0.2em] uppercase"
+                                className="rounded-sm text-[10px] font-black tracking-[0.2em] uppercase"
                                 style={{
                                     color: pillarColor,
-                                    background: `${pillarColor}18`,
-                                    border: `1px solid ${pillarColor}50`,
-                                    boxShadow: `0 0 16px ${pillarColor}20`,
+                                    background: `${pillarColor}12`,
+                                    border: `1px solid ${pillarColor}30`,
                                 }}
                             >
                                 {PILLAR_LABELS[question.pillar] ?? question.pillar}
                             </Badge>
                         </div>
-                        {/* Custom Glowing Progress */}
-                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5 shadow-[inset_0_1px_1px_rgba(0,0,0,0.5)]">
+                        {/* Flat Editorial Progress */}
+                        <div className="h-[3px] w-full overflow-hidden bg-white/10">
                             <motion.div
-                                className="h-full rounded-full"
+                                className="h-full"
                                 initial={{ width: `${((currentIndex === 0 ? 0 : currentIndex - 1) / total_questions) * 100}%` }}
                                 animate={{ width: `${progressPct}%` }}
                                 transition={{ duration: 0.5, ease: 'easeOut' }}
                                 style={{
-                                    background: `linear-gradient(90deg, #2F4587 0%, #5CA336 100%)`,
-                                    boxShadow: '0 0 10px rgba(92,163,54,0.5)',
+                                    backgroundColor: '#5ca336',
                                 }}
                             />
                         </div>
@@ -227,7 +225,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                     <div className="relative" style={{ minHeight: 280 }}>
                         <AnimatePresence mode="wait" custom={direction}>
                             <motion.div key={question.id} custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit">
-                                <Card className="overflow-hidden rounded-[1.25rem] border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
+                                <Card className="dx-card overflow-hidden rounded-[1.25rem] md:rounded-[1.75rem]">
                                     <CardContent className="p-6 sm:p-10">
                                         {/* Question text */}
                                         <p className="font-display text-xl leading-snug font-bold tracking-tight text-[#D8E0F3] sm:text-2xl">
@@ -245,32 +243,26 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                 type="button"
                                                 onClick={() => selectAnswer(true)}
                                                 className={cn(
-                                                    'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-300 ease-out focus:outline-none sm:py-5',
+                                                    'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-200 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === true
-                                                        ? 'scale-[1.02] border-[#5CA336]/50 bg-[#5CA336]/15 text-[#86efac] shadow-[0_0_30px_rgba(92,163,54,0.2)] ring-1 ring-[#5CA336]/30'
-                                                        : 'border-[#232C43] bg-[#080B11] text-[#C1CDE8] hover:border-[#5CA336]/40 hover:bg-[#5CA336]/5 hover:text-[#D8E0F3]',
+                                                        ? 'scale-[1.01] border-[#5CA336] bg-[#5CA336] text-white shadow-lg font-bold'
+                                                        : 'border-white/10 bg-[#161c28] text-white/60 hover:border-white/20 hover:bg-[#1d2436] hover:text-white',
                                                 )}
                                             >
-                                                {answers[question.id] === true && (
-                                                    <span className="waitlist-shimmer absolute inset-0 opacity-100 mix-blend-overlay" />
-                                                )}
-                                                <span className="relative z-10 text-sm font-bold tracking-[0.1em] uppercase">Yes</span>
+                                                <span className="relative z-10 text-sm font-bold tracking-[0.15em] uppercase">Yes</span>
                                             </button>
 
                                             <button
                                                 type="button"
                                                 onClick={() => selectAnswer(false)}
                                                 className={cn(
-                                                    'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-300 ease-out focus:outline-none sm:py-5',
+                                                    'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-200 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === false
-                                                        ? 'scale-[1.02] border-[#3A54A5]/50 bg-[#3A54A5]/15 text-[#91A7D8] shadow-[0_0_20px_rgba(68,104,187,0.2)] ring-1 ring-[#3A54A5]/30'
-                                                        : 'border-[#232C43] bg-[#080B11] text-[#C1CDE8] hover:border-[#3A54A5]/40 hover:bg-[#3A54A5]/10 hover:text-[#D8E0F3]',
+                                                        ? 'scale-[1.01] border-[#2F4587] bg-[#2F4587] text-white shadow-lg font-bold'
+                                                        : 'border-white/10 bg-[#161c28] text-white/60 hover:border-white/20 hover:bg-[#1d2436] hover:text-white',
                                                 )}
                                             >
-                                                {answers[question.id] === false && (
-                                                    <span className="waitlist-shimmer absolute inset-0 opacity-100 mix-blend-overlay" />
-                                                )}
-                                                <span className="relative z-10 text-sm font-bold tracking-[0.1em] uppercase">No</span>
+                                                <span className="relative z-10 text-sm font-bold tracking-[0.15em] uppercase">No</span>
                                             </button>
                                         </div>
                                     </CardContent>

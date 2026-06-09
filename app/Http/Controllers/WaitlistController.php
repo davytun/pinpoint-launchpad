@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendWaitlistEmail;
 use App\Models\WaitlistEntry;
+use App\Models\DiagnosticSession;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,6 +15,19 @@ class WaitlistController extends Controller
     public function index(Request $request): Response
     {
         $audience = $request->query('audience');
+        $diagnosticSession = null;
+
+        $sessionId = $request->session()->get('diagnostic_session_id');
+        if ($sessionId) {
+            $sessionModel = DiagnosticSession::find($sessionId);
+            if ($sessionModel) {
+                $diagnosticSession = [
+                    'id' => $sessionModel->id,
+                    'score' => $sessionModel->score,
+                    'score_band' => $sessionModel->score_band,
+                ];
+            }
+        }
 
         return Inertia::render('Waitlist/Index', [
             'selectedAudience' => in_array($audience, ['founder', 'investor']) ? $audience : null,
@@ -32,6 +46,7 @@ class WaitlistController extends Controller
             ],
             'founderStatus'  => session('founderStatus'),
             'investorStatus' => session('investorStatus'),
+            'diagnosticSession' => $diagnosticSession,
         ]);
     }
 

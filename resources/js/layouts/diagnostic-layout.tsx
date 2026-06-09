@@ -33,19 +33,8 @@ export default function DiagnosticLayout({
     }, []);
 
     return (
-        <div className="relative min-h-screen overflow-x-hidden bg-[#050505] antialiased text-white">
+        <div className="relative min-h-screen overflow-x-hidden bg-background antialiased text-white">
             <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-wireframe pointer-events-none absolute -left-[15%] top-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-40 mix-blend-overlay md:-left-[5%] md:top-[20%]" />
-            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none absolute -right-[15%] top-[40%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-30 mix-blend-overlay md:-right-[5%] md:top-[45%]" />
-
-            {/* ── Ambient top glow ── */}
-            <div
-                className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[400px]"
-                style={{
-                    background: `radial-gradient(ellipse 70% 45% at 50% 0%, ${glowColor}25 0%, transparent 70%)`,
-                }}
-            />
 
             {/* ── Wordmark header ── */}
             {!hideWordmark && (

@@ -53,15 +53,11 @@ const BAND_META: Record<string, { label: string; bg: string; text: string; borde
 // ─── Tier Styles ──────────────────────────────────────────────────────────────
 
 const FEATURED_ACCENT = {
-    color: '#3A54A5',
-    glow: 'rgba(58,84,165,0.4)',
-    border: 'rgba(58,84,165,0.8)',
+    color: '#2F4587',
 };
 
 const STANDARD_ACCENT = {
-    color: '#6EBE44',
-    glow: 'rgba(110,190,68,0.25)',
-    border: 'rgba(110,190,68,0.4)',
+    color: '#5CA336',
 };
 
 // ─── Rationale items ──────────────────────────────────────────────────────────
@@ -142,19 +138,12 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         {/* ── Wordmark ── */}
                         <header className="mb-10 flex items-center justify-between">
                             <PinpointLogo height={24} variant="dark" />
-                            <span
-                                className="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em]"
-                                style={{ background: bandMeta.bg, color: bandMeta.text, border: `1px solid ${bandMeta.border}` }}
-                            >
-                                {bandMeta.label}
-                            </span>
                         </header>
 
                         {/* ── Hero header ── */}
                         <div className="mb-14 text-center">
                             <FadeUp delay={0.05}>
-                                <span className="inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-[#91A7D8]">
-                                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: bandMeta.text }} />
+                                <span className="text-[10px] font-black uppercase tracking-[0.22em] text-white/40">
                                     PARAGON Certification Programme
                                 </span>
                             </FadeUp>
@@ -198,26 +187,15 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                     <FadeUp key={tier.key} delay={0.25 + i * 0.1}>
                                         <div
                                             className={cn(
-                                                "relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-350 ease-out group bg-[#101623] hover:scale-[1.015] hover:shadow-[0_20px_40px_rgba(0,0,0,0.45)]",
-                                                tier.is_featured ? 'border-[#3A54A5]/60 shadow-[0_0_45px_rgba(68,104,187,0.18)] hover:border-[#3A54A5]/90 md:-mt-4' : 'border-[#232C43] shadow-sm hover:border-[#3A54A5]/30'
+                                                "relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-350 ease-out group bg-[#161c28]",
+                                                tier.is_featured ? 'border-[#5ca336]/40 md:-mt-4' : 'border-white/5 shadow-sm'
                                             )}
                                         >
-                                            {/* Ambient tier glow */}
-                                            {tier.is_featured && (
-                                                <div
-                                                    className="pointer-events-none absolute inset-x-0 top-0 h-40"
-                                                    style={{
-                                                        background: `radial-gradient(ellipse 80% 60% at 50% 0%, rgba(68,104,187,0.15) 0%, transparent 100%)`,
-                                                    }}
-                                                />
-                                            )}
-
                                             {/* Most Popular badge */}
                                             {tier.is_featured && (
                                                 <div className="relative z-10 flex justify-center pt-4">
                                                     <span
-                                                        className="rounded-full px-4 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white"
-                                                        style={{ background: accent.color, boxShadow: `0 0 16px ${accent.glow}` }}
+                                                        className="rounded-sm px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] text-white bg-[#5ca336]"
                                                     >
                                                         Most Popular
                                                     </span>
@@ -260,7 +238,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                                 ) : (
                                                                     <CheckCircle2
                                                                         className="mt-0.5 size-4 shrink-0"
-                                                                        style={{ color: tier.is_featured ? '#3A54A5' : '#91A7D8' }}
+                                                                        style={{ color: tier.is_featured ? '#2F4587' : '#91A7D8' }}
                                                                     />
                                                                 )}
                                                                 <span className={`text-[13px] leading-relaxed ${isEverything ? 'italic text-[#91A7D8]' : 'text-[#91A7D8]'}`}>
@@ -279,10 +257,10 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                                 <button
                                                                     type="button"
                                                                     onClick={(e) => e.preventDefault()}
-                                                                    className="inline-flex cursor-help items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.15em] transition-colors hover:bg-white/[0.04]"
+                                                                    className="inline-flex cursor-help items-center gap-1.5 rounded-sm border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.2em] transition-colors hover:bg-white/[0.04]"
                                                                     style={{
-                                                                        borderColor: 'rgba(52,211,153,0.3)',
-                                                                        color:       '#6ee7b7',
+                                                                        borderColor: 'rgba(92,163,54,0.3)',
+                                                                        color:       '#5ca336',
                                                                     }}
                                                                 >
                                                                     <CheckCircle2 className="size-3" />
@@ -307,19 +285,13 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                         type="button"
                                                         disabled={isLoading}
                                                         onClick={() => handleSelectTier(tier.key)}
-                                                        className="group relative w-full overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] outline-none transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 shimmer-btn"
-                                                        style={{
-                                                            background:  tier.is_featured ? '#3A54A5' : 'rgba(68,104,187,0.12)',
-                                                            border:      `1px solid ${tier.is_featured ? 'transparent' : 'rgba(68,104,187,0.25)'}`,
-                                                            color:       '#fff',
-                                                            boxShadow:   tier.is_featured ? `0 0 28px rgba(68,104,187,0.35)` : 'none',
-                                                        }}
-                                                        onMouseEnter={e => { if (!isLoading && tier.is_featured) (e.currentTarget as HTMLButtonElement).style.filter = 'brightness(1.1)'; else if (!isLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(68,104,187,0.2)'; }}
-                                                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.filter = ''; (e.currentTarget as HTMLButtonElement).style.backgroundColor = tier.is_featured ? '#3A54A5' : 'rgba(68,104,187,0.12)'; }}
-                                                    >
-                                                        {tier.is_featured && (
-                                                            <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
+                                                        className={cn(
+                                                            "group relative w-full rounded-md px-5 py-4 text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 outline-none focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                                                            tier.is_featured
+                                                                ? "bg-[#5ca336] text-white hover:bg-[#5ca336]/90 border border-white/5 shadow-none"
+                                                                : "bg-[#0c121d] border border-[#2F4587]/30 text-[#91A7D8] hover:bg-[#2F4587]/10 hover:border-[#2F4587]/50 hover:text-white"
                                                         )}
+                                                    >
                                                         <span className="relative z-10 flex items-center justify-center gap-2">
                                                             {isSelected && isLoading ? (
                                                                 <>
@@ -355,7 +327,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         <FadeUp delay={0.6}>
                             <div className="mt-24">
                                 <div className="mb-10 text-center">
-                                    <span className="inline-flex items-center gap-2 rounded-md border border-[#232C43] bg-[#101623] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-[#91A7D8]">
+                                    <span className="text-[10px] font-black uppercase tracking-[0.22em] text-white/40">
                                         Radical Transparency
                                     </span>
                                     <h2 className="mt-4 font-display text-2xl font-bold text-white">
@@ -366,11 +338,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                 <div className="grid gap-4 md:grid-cols-2">
                                     {RATIONALE.map((item, i) => (
                                         <FadeUp key={item.num} delay={0.7 + i * 0.08}>
-                                            <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm transition-all duration-500 hover:border-[#3A54A5]/40 hover:bg-[#1B294B]/30">
-                                                
-                                                {/* Subdued top-glow that activates on hover */}
-                                                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3A54A5]/60 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
+                                            <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-white/5 bg-[#161c28] shadow-sm transition-all duration-300 hover:border-white/10 hover:bg-white/[0.02]">
                                                 <div className="flex flex-1 flex-col p-8 sm:p-10 relative z-10">
                                                     <h3 className="mb-3 text-[14px] font-bold uppercase tracking-[0.18em] text-[#D8E0F3]">
                                                         {item.title}

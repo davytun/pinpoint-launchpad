@@ -154,16 +154,16 @@ export default function DiagnosticResult({
 
                     {/* ── Section 1: Score Hero ── */}
                     <FadeUp delay={0.1}>
-                        <Card className="mb-8 overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-0 shadow-md md:rounded-[1.75rem]">
+                        <Card className="mb-8 overflow-hidden rounded-xl border border-white/5 bg-[#161c28] p-0 md:rounded-2xl">
                             <CardContent className="flex flex-col items-center p-6 sm:p-10">
                                 {/* Band badge */}
-                                <Badge
-                                    className="mb-5 rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em]"
-                                    style={{ background: meta.bg, color: meta.textColor, border: `1px solid ${meta.border}` }}
+                                <div
+                                    className="mb-5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.22em]"
+                                    style={{ color: meta.color }}
                                 >
-                                    <meta.Icon className="mr-1.5 size-3" data-icon="inline-start" />
+                                    <meta.Icon className="size-3.5" />
                                     {meta.badgeLabel}
-                                </Badge>
+                                </div>
 
                                 {/* Static score */}
                                 <div className="flex items-end gap-1 leading-none">
@@ -171,7 +171,6 @@ export default function DiagnosticResult({
                                         className="font-display text-[6.5rem] font-black leading-none tracking-tighter sm:text-[8rem]"
                                         style={{
                                             color: meta.color,
-                                            textShadow: `0 0 40px ${meta.color}66`,
                                         }}
                                     >
                                         {score}
@@ -196,17 +195,16 @@ export default function DiagnosticResult({
 
                         {/* Radar chart */}
                         <FadeUp delay={0.2}>
-                            <Card className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
+                            <Card className="overflow-hidden rounded-xl border border-white/5 bg-[#161c28] md:rounded-2xl">
                                 <CardHeader>
                                     <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[#91A7D8]">
                                         Pillar Radar
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="relative">
-                                    <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[60%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[60px]" style={{ background: `radial-gradient(circle, ${meta.color}66, transparent 70%)` }} />
                                     <ResponsiveContainer width="100%" height={280}>
                                         <RadarChart data={radarData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
-                                            <PolarGrid stroke="#232C43" />
+                                            <PolarGrid stroke="rgba(255, 255, 255, 0.08)" />
                                             <PolarAngleAxis
                                                 dataKey="subject"
                                                 tick={{ fill: '#C1CDE8', fontSize: 11, fontWeight: 600 }}
@@ -230,8 +228,7 @@ export default function DiagnosticResult({
                             {/* Section 3: Score band message */}
                             <FadeUp delay={0.25}>
                                 <Card
-                                    className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]"
-                                    style={{ borderLeft: `3px solid ${meta.border}` }}
+                                    className="overflow-hidden rounded-xl border border-white/5 bg-[#161c28] md:rounded-2xl"
                                 >
                                     <CardHeader className="pb-2">
                                         <CardTitle
@@ -256,15 +253,11 @@ export default function DiagnosticResult({
                                     <div>
                                         <a
                                             href="/checkout"
-                                            className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200"
+                                            className="group relative flex w-full items-center justify-center gap-2 rounded-md px-5 py-4 text-xs font-bold uppercase tracking-[0.2em] text-white outline-none transition-all duration-200 hover:opacity-90 border border-white/5 shadow-none"
                                             style={{
-                                                background: meta.color,
-                                                boxShadow: `0 0 28px ${meta.color}66`,
+                                                backgroundColor: meta.color,
                                             }}
-                                            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.filter = 'brightness(1.1)'; }}
-                                            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.filter = ''; }}
                                         >
-                                            <span className="waitlist-shimmer absolute inset-0 opacity-50 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-100" />
                                             <span className="relative z-10 flex items-center gap-2">
                                                 Proceed to Application
                                                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -276,7 +269,7 @@ export default function DiagnosticResult({
                                         <button
                                             type="button"
                                             onClick={() => setChecklistClicked(true)}
-                                            className="w-full rounded-xl border border-[#232C43] bg-[#0C1427]/50 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-[#C1CDE8] transition-colors hover:bg-[#1B294B]/30 hover:text-[#D8E0F3]"
+                                            className="w-full rounded-md border border-white/10 bg-[#0C121D] px-5 py-4 text-xs font-bold uppercase tracking-[0.2em] text-[#C1CDE8] transition-colors hover:bg-white/[0.04] hover:text-[#D8E0F3] focus:outline-none"
                                         >
                                             View Your Readiness Checklist
                                         </button>
@@ -302,7 +295,7 @@ export default function DiagnosticResult({
 
                             {/* Pillar score breakdown */}
                             <FadeUp delay={0.38}>
-                                <Card className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] shadow-md md:rounded-[1.75rem]">
+                                <Card className="overflow-hidden rounded-xl border border-white/5 bg-[#161c28] md:rounded-2xl">
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#91A7D8]">
                                             Pillar Breakdown
@@ -319,9 +312,9 @@ export default function DiagnosticResult({
                                                         {pillar_scores[key]}%
                                                     </span>
                                                 </div>
-                                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#0C1427] shadow-[inset_0_1px_1px_rgba(0,0,0,0.5)]">
+                                                <div className="h-[3px] w-full overflow-hidden bg-white/10">
                                                     <motion.div
-                                                        className="h-full rounded-full"
+                                                        className="h-full"
                                                         initial={{ width: 0 }}
                                                         animate={{ width: `${pillar_scores[key]}%` }}
                                                         transition={{
@@ -330,8 +323,7 @@ export default function DiagnosticResult({
                                                             ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
                                                         }}
                                                         style={{
-                                                            background: `linear-gradient(90deg, #2F4587 0%, #5CA336 100%)`,
-                                                            boxShadow: '0 0 10px rgba(92,163,54,0.5)',
+                                                            backgroundColor: '#5ca336',
                                                         }}
                                                     />
                                                 </div>

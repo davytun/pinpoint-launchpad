@@ -107,7 +107,11 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                     <div>
                         <h1 className="text-2xl font-bold text-[#D8E0F3] flex items-center gap-2">
                             {founder.company_name ?? founder.full_name ?? '—'}
-                            {(founder.score ?? 0) > 85 && <Zap className="size-5 text-amber-400" title="High Velocity" />}
+                            {(founder.score ?? 0) > 85 && (
+                                <span title="High Velocity">
+                                    <Zap className="size-5 text-amber-400" />
+                                </span>
+                            )}
                         </h1>
                         <p className="mt-1 text-sm text-[#C1CDE8]">{founder.full_name} · {founder.email}</p>
                     </div>

@@ -247,7 +247,9 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                                                         {f.score ?? '—'}
                                                     </span>
                                                     {(f.score ?? 0) > 85 && (
-                                                        <Zap className="size-3.5 text-amber-400" title="High Velocity" />
+                                                        <span title="High Velocity">
+                                                            <Zap className="size-3.5 text-amber-400" />
+                                                        </span>
                                                     )}
                                                 </div>
                                             </td>

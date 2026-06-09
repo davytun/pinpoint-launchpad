@@ -11,13 +11,13 @@ import {
 import { ChartConfig, ChartContainer } from '@/components/ui/chart';
 
 const pillars = [
-    { pillar: 'IP Governance',      verified: 88, average: 42 },
-    { pillar: 'Unit Economics',      verified: 82, average: 51 },
-    { pillar: 'Market Validation',   verified: 91, average: 48 },
-    { pillar: 'Cap Table Health',    verified: 85, average: 38 },
-    { pillar: 'Team Depth',          verified: 78, average: 55 },
-    { pillar: 'Financial Forecast',  verified: 86, average: 44 },
-    { pillar: 'Traction Signal',     verified: 79, average: 46 },
+    { pillar: 'Potential & Scale',     verified: 91, average: 48 },
+    { pillar: 'Agility & Execution',   verified: 78, average: 55 },
+    { pillar: 'Risk Mitigation',       verified: 86, average: 44 },
+    { pillar: 'Alignment & Vision',    verified: 85, average: 38 },
+    { pillar: 'Corporate Governance',  verified: 88, average: 42 },
+    { pillar: 'Operational Systems',   verified: 82, average: 51 },
+    { pillar: 'Network & Ecosystem',   verified: 79, average: 46 },
 ];
 
 const chartConfig = {
@@ -75,8 +75,8 @@ function AxisTick({ x, y, payload, cx, cy }: {
     if (!payload || x === undefined || y === undefined) return null;
 
     // Gentle push so text doesn't hit SVG boundary on mobile
-    const dx = (x - (cx ?? 0)) * 0.05;
-    const dy = (y - (cy ?? 0)) * 0.05;
+    const dx = (x - (cx ?? 0)) * 0.08;
+    const dy = (y - (cy ?? 0)) * 0.08;
 
     return (
         <text
@@ -84,11 +84,11 @@ function AxisTick({ x, y, payload, cx, cy }: {
             y={y + dy}
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="rgba(255,255,255,0.45)"
-            fontSize={10}
-            fontFamily="Arial, sans-serif"
-            fontWeight={500}
-            letterSpacing="0.02em"
+            fill="rgba(255,255,255,0.4)"
+            fontSize={9}
+            fontFamily="Inter, system-ui, sans-serif"
+            fontWeight={600}
+            letterSpacing="0.04em"
         >
             {payload.value}
         </text>

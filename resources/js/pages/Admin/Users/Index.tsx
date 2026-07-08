@@ -74,7 +74,7 @@ export default function AdminUsersIndex({ users }: PageProps) {
                         <div className="py-16 text-center text-sm text-[#91A7D8]">No team members yet.</div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                            <table className="w-full min-w-[640px] text-sm">
                                 <thead>
                                     <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                         {['Name', 'Email', 'Role', 'Assigned Founders', 'Joined', 'Actions'].map((h) => (

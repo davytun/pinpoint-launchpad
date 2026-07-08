@@ -267,22 +267,24 @@ export default function AdminDocumentsIndex({ founder, documents, audit_status }
                         </div>
                     ) : (
                         <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
-                                        <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Category</th>
-                                        <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">File</th>
-                                        <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Uploaded</th>
-                                        <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Status</th>
-                                        <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {documents.map((doc) => (
-                                        <DocumentRow key={doc.id} doc={doc} founderId={founder.id} />
-                                    ))}
-                                </tbody>
-                            </table>
+                            <div className="overflow-x-auto">
+                                <table className="w-full min-w-[700px] text-left">
+                                    <thead>
+                                        <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
+                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Category</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">File</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Uploaded</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Status</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {documents.map((doc) => (
+                                            <DocumentRow key={doc.id} doc={doc} founderId={founder.id} />
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                 </div>

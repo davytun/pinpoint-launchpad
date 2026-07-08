@@ -28,11 +28,11 @@ class AdminMessageController extends Controller
             ->withCount(['messages as total_messages'])
             ->orderBy('last_message_at', 'desc')
             ->get()
-            ->map(fn ($thread) => [
+            ->map(fn (MessageThread $thread) => [
                 'id'                   => $thread->id,
-                'founder_name'         => $thread->founder->full_name,
-                'company_name'         => $thread->founder->company_name,
-                'email'                => $thread->founder->email,
+                'founder_name'         => $thread->founder?->full_name ?? 'Deleted Founder',
+                'company_name'         => $thread->founder?->company_name ?? 'N/A',
+                'email'                => $thread->founder?->email ?? 'N/A',
                 'unread_count'         => $thread->admin_unread_count,
                 'total_messages'       => $thread->total_messages,
                 'last_message_at'      => $thread->last_message_at?->diffForHumans(),
@@ -75,17 +75,17 @@ class AdminMessageController extends Controller
         return Inertia::render('Admin/Messages/Show', [
             'thread'   => [
                 'id'            => $thread->id,
-                'founder_id'    => $founder->id,
-                'founder_name'  => $founder->full_name,
-                'company_name'  => $founder->company_name,
-                'email'         => $founder->email,
+                'founder_id'    => $founder?->id,
+                'founder_name'  => $founder?->full_name ?? 'Deleted Founder',
+                'company_name'  => $founder?->company_name ?? 'N/A',
+                'email'         => $founder?->email ?? 'N/A',
             ],
             'messages' => $messages,
             'founder'  => [
-                'id'           => $founder->id,
-                'full_name'    => $founder->full_name,
-                'company_name' => $founder->company_name,
-                'email'        => $founder->email,
+                'id'           => $founder?->id,
+                'full_name'    => $founder?->full_name ?? 'Deleted Founder',
+                'company_name' => $founder?->company_name ?? 'N/A',
+                'email'        => $founder?->email ?? 'N/A',
             ],
         ]);
     }
@@ -120,6 +120,10 @@ class AdminMessageController extends Controller
         }
 
         $thread->load('founder');
+
+        if (!$thread->founder) {
+            return back()->withErrors(['body' => 'Cannot reply to this thread as the founder no longer exists.']);
+        }
 
         Mail::to($thread->founder->email)->queue(
             new NewMessageFounderMail($thread->founder, $message)

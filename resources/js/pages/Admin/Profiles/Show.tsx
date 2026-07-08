@@ -291,7 +291,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                 Investor Access Requests ({access_requests.length})
                             </h2>
                             <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
+                                <table className="w-full min-w-[600px] text-sm">
                                     <thead>
                                         <tr className="border-b border-[#232C43]">
                                             <th className="pb-3 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Investor</th>

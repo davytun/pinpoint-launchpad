@@ -245,7 +245,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             )}
 
             {/* ── Main content ─────────────────────────────────────────────── */}
-            <main className="flex min-h-screen flex-1 flex-col lg:ml-60">
+            <main className="flex min-h-screen flex-1 flex-col lg:ml-60 min-w-0 overflow-x-hidden">
 
                 {/* Mobile top bar */}
                 <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-[#232C43] bg-[#101623]/90 px-4 backdrop-blur-md lg:hidden">
@@ -266,7 +266,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </header>
 
                 {/* Page content */}
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                     {children}
                 </div>
             </main>

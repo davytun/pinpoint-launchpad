@@ -51,12 +51,12 @@ class AdminDocumentController extends Controller
         ]);
     }
 
-    public function download(FounderDocument $document): StreamedResponse
+    public function download(Founder $founder, FounderDocument $document): StreamedResponse
     {
         return $this->documents->download($document);
     }
 
-    public function markReviewed(FounderDocument $document): \Illuminate\Http\RedirectResponse
+    public function markReviewed(Founder $founder, FounderDocument $document): \Illuminate\Http\RedirectResponse
     {
         $isReviewed = !$document->is_reviewed;
 
@@ -69,7 +69,7 @@ class AdminDocumentController extends Controller
         return back()->with('success', $isReviewed ? 'Document marked as reviewed.' : 'Document marked as unreviewed.');
     }
 
-    public function addNote(Request $request, FounderDocument $document): \Illuminate\Http\RedirectResponse
+    public function addNote(Request $request, Founder $founder, FounderDocument $document): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'note' => ['required', 'string', 'max:500'],

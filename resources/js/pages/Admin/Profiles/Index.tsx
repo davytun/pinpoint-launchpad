@@ -80,7 +80,7 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                     ) : (
                         <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                             <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
+                                <table className="w-full min-w-[800px] text-sm">
                                     <thead>
                                         <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                             <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Company</th>

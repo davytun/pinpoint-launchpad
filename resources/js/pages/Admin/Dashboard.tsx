@@ -110,7 +110,7 @@ const revenueChartConfig = {
 function RevenueSparkline({ data, thisMonth }: { data: MonthlyRevenue[]; thisMonth: number }) {
     const max = Math.max(...data.map((d) => d.revenue), 1);
     return (
-        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
+        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5 min-w-0">
             <div className="mb-1 flex items-center justify-between">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Monthly Revenue</p>
                 <DollarSign className="size-4 text-emerald-400 opacity-50" />
@@ -159,7 +159,7 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
     const chartConfig = buildAuditConfig(data);
 
     return (
-        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
+        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5 min-w-0">
             <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Audit Pipeline</p>
             <div className="flex items-center gap-5">
                 {/* Donut */}
@@ -226,7 +226,7 @@ function WaitlistSplit({ founders, investors }: { founders: number; investors: n
     ];
 
     return (
-        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
+        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5 min-w-0">
             <div className="mb-4 flex items-center justify-between">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Waitlist</p>
                 <span className="text-xs font-bold text-[#D8E0F3]">{total} total</span>

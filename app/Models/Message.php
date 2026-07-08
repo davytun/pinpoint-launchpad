@@ -46,10 +46,10 @@ class Message extends Model
         return round($this->attachment_size / 1048576, 1) . ' MB';
     }
 
-    public function senderName(Founder $founder): string
+    public function senderName(?Founder $founder): string
     {
         if ($this->isFromFounder()) {
-            return $founder->full_name ?? 'You';
+            return $founder?->full_name ?? 'Founder';
         }
         return 'Pinpoint Team';
     }

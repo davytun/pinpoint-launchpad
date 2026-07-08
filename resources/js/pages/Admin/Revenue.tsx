@@ -125,7 +125,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
 
                     {/* 6-month trend */}
                     {monthly.length > 0 && (
-                        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-5">
+                        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-5 min-w-0">
                             <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">6-Month Trend</p>
                             <p className="mb-4 text-sm text-[#C1CDE8]">Revenue over the last 6 months</p>
                             <ChartContainer config={trendChartConfig} className="h-[160px] w-full">
@@ -161,7 +161,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                     )}
 
                     {/* Revenue by tier */}
-                    <div className="rounded-xl border border-[#232C43] bg-[#101623] p-5">
+                    <div className="rounded-xl border border-[#232C43] bg-[#101623] p-5 min-w-0">
                         <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Revenue by Tier</p>
                         <p className="mb-4 text-sm text-[#C1CDE8]">Breakdown across all pricing tiers</p>
                         <ChartContainer config={tierChartConfig} className="h-[160px] w-full">
@@ -216,7 +216,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                             <div className="py-12 text-center text-sm text-[#91A7D8]">No payments yet.</div>
                         ) : (
                             <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
+                                <table className="w-full min-w-[700px] text-sm">
                                     <thead>
                                         <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                             {['Email', 'Tier', 'Amount', 'Reference', 'Date'].map((h) => (

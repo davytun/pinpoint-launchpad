@@ -262,7 +262,7 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                         {payment && (
                             <Card title="Payment">
                                 <Field label="Tier"       value={<span className="capitalize">{payment.tier}</span>} />
-                                <Field label="Amount"     value={`${payment.currency} ${(payment.total_amount / 100).toLocaleString()}`} />
+                                <Field label="Amount"     value={`${payment.currency} ${payment.total_amount.toLocaleString()}`} />
                                 <Field label="Status"     value={payment.status} />
                                 <Field label="Paid At"    value={payment.paid_at} />
                                 <Field label="Reference"  value={<span className="font-mono text-xs">{payment.paystack_reference}</span>} />
@@ -290,40 +290,42 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                         {documents.length === 0 ? (
                             <div className="py-16 text-center text-sm text-[#C1CDE8]">No documents uploaded.</div>
                         ) : (
-                            <table className="w-full text-sm">
-                                <thead>
-                                    <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
-                                        {['Filename', 'Type', 'Reviewed', 'Uploaded', 'Actions'].map((h) => (
-                                            <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">{h}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {documents.map((doc) => (
-                                        <tr key={doc.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
-                                            <td className="px-5 py-3.5">
-                                                <div className="flex items-center gap-2">
-                                                    <FileText className="size-4 shrink-0 text-[#91A7D8]" />
-                                                    <span className="text-[#D8E0F3] truncate max-w-[200px]">{doc.original_filename}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-5 py-3.5 capitalize text-[#C1CDE8]">{doc.type}</td>
-                                            <td className="px-5 py-3.5">
-                                                {doc.reviewed
-                                                    ? <CheckCircle2 className="size-4 text-emerald-400" />
-                                                    : <span className="text-xs text-[#91A7D8]">Pending</span>
-                                                }
-                                            </td>
-                                            <td className="px-5 py-3.5 text-[#C1CDE8]">{doc.created_at}</td>
-                                            <td className="px-5 py-3.5">
-                                                <a href={route('admin.documents.download', { founder: founder.id, document: doc.id })} className="text-xs font-bold uppercase tracking-wider text-[#3A54A5] hover:text-[#C1CDE8] transition-colors">
-                                                    Download
-                                                </a>
-                                            </td>
+                            <div className="overflow-x-auto">
+                                <table className="w-full min-w-[700px] text-sm">
+                                    <thead>
+                                        <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
+                                            {['Filename', 'Type', 'Reviewed', 'Uploaded', 'Actions'].map((h) => (
+                                                <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">{h}</th>
+                                            ))}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {documents.map((doc) => (
+                                            <tr key={doc.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
+                                                <td className="px-5 py-3.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="size-4 shrink-0 text-[#91A7D8]" />
+                                                        <span className="text-[#D8E0F3] truncate max-w-[200px]">{doc.original_filename}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-5 py-3.5 capitalize text-[#C1CDE8]">{doc.type}</td>
+                                                <td className="px-5 py-3.5">
+                                                    {doc.reviewed
+                                                        ? <CheckCircle2 className="size-4 text-emerald-400" />
+                                                        : <span className="text-xs text-[#91A7D8]">Pending</span>
+                                                    }
+                                                </td>
+                                                <td className="px-5 py-3.5 text-[#C1CDE8]">{doc.created_at}</td>
+                                                <td className="px-5 py-3.5">
+                                                    <a href={route('admin.documents.download', { founder: founder.id, document: doc.id })} className="text-xs font-bold uppercase tracking-wider text-[#3A54A5] hover:text-[#C1CDE8] transition-colors">
+                                                        Download
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
                     </div>
                 )}

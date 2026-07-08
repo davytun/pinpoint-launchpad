@@ -94,65 +94,69 @@ export default function AdminQuestionsIndex() {
 
                     {/* Table */}
                     <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
-                        {/* Table header */}
-                        <div className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] gap-4 border-b border-[#232C43] bg-[#0C1427]/50 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
-                            <span>#</span>
-                            <span>Pillar</span>
-                            <span>Question</span>
-                            <span className="text-right">Pts</span>
-                            <span className="text-center">Active</span>
-                            <span />
-                        </div>
-
-                        {/* Rows */}
-                        {questions.data.map((q) => (
-                            <div
-                                key={q.id}
-                                className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] items-center gap-4 border-b border-[#232C43] px-5 py-4 transition-colors duration-150 last:border-0 hover:bg-[#1B294B]/30"
-                            >
-                                {/* Order */}
-                                <span className="text-sm font-mono font-semibold text-[#91A7D8]">
-                                    {q.order}
-                                </span>
-
-                                {/* Pillar */}
-                                <PillarBadge pillar={q.pillar} />
-
-                                {/* Question text truncated */}
-                                <p
-                                    className="truncate text-sm text-[#D8E0F3]"
-                                    title={q.question_text}
-                                >
-                                    {q.question_text}
-                                </p>
-
-                                {/* Points */}
-                                <span className="text-right text-sm font-semibold tabular-nums text-[#C1CDE8]">
-                                    {q.points}
-                                </span>
-
-                                {/* Active toggle (read-only indicator — editing happens on edit page) */}
-                                <div className="flex justify-center">
-                                    <span
-                                        className={`inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ${q.is_active ? 'bg-emerald-500/50' : 'bg-[#232C43]'}`}
-                                    >
-                                        <span
-                                            className={`mx-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${q.is_active ? 'translate-x-[16px]' : 'translate-x-0'}`}
-                                        />
-                                    </span>
+                        <div className="overflow-x-auto">
+                            <div className="min-w-[720px]">
+                                {/* Table header */}
+                                <div className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] gap-4 border-b border-[#232C43] bg-[#0C1427]/50 px-5 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
+                                    <span>#</span>
+                                    <span>Pillar</span>
+                                    <span>Question</span>
+                                    <span className="text-right">Pts</span>
+                                    <span className="text-center">Active</span>
+                                    <span />
                                 </div>
 
-                                {/* Edit button */}
-                                <div className="flex justify-end">
-                                    <Link
-                                        href={route('admin.questions.edit', q.id)}
-                                        className="rounded-lg border border-[#232C43] bg-[#1B294B]/50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#C1CDE8] transition-all duration-150 hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                                {/* Rows */}
+                                {questions.data.map((q) => (
+                                    <div
+                                        key={q.id}
+                                        className="grid grid-cols-[40px_120px_1fr_60px_70px_72px] items-center gap-4 border-b border-[#232C43] px-5 py-4 transition-colors duration-150 last:border-0 hover:bg-[#1B294B]/30"
                                     >
-                                        Edit
-                                    </Link>
-                                </div>
+                                        {/* Order */}
+                                        <span className="text-sm font-mono font-semibold text-[#91A7D8]">
+                                            {q.order}
+                                        </span>
+
+                                        {/* Pillar */}
+                                        <PillarBadge pillar={q.pillar} />
+
+                                        {/* Question text truncated */}
+                                        <p
+                                            className="truncate text-sm text-[#D8E0F3]"
+                                            title={q.question_text}
+                                        >
+                                            {q.question_text}
+                                        </p>
+
+                                        {/* Points */}
+                                        <span className="text-right text-sm font-semibold tabular-nums text-[#C1CDE8]">
+                                            {q.points}
+                                        </span>
+
+                                        {/* Active toggle (read-only indicator — editing happens on edit page) */}
+                                        <div className="flex justify-center">
+                                            <span
+                                                className={`inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ${q.is_active ? 'bg-emerald-500/50' : 'bg-[#232C43]'}`}
+                                            >
+                                                <span
+                                                    className={`mx-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${q.is_active ? 'translate-x-[16px]' : 'translate-x-0'}`}
+                                                />
+                                            </span>
+                                        </div>
+
+                                        {/* Edit button */}
+                                        <div className="flex justify-end">
+                                            <Link
+                                                href={route('admin.questions.edit', q.id)}
+                                                className="rounded-lg border border-[#232C43] bg-[#1B294B]/50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#C1CDE8] transition-all duration-150 hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                                            >
+                                                Edit
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </div>
                     </div>
 
                     {/* Pagination */}

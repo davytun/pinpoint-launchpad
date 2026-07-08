@@ -225,7 +225,7 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                         <div className="py-16 text-center text-sm text-[#C1CDE8]">No founders match your filter.</div>
                     ) : (
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                            <table className="w-full min-w-[900px] text-sm">
                                 <thead>
                                     <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                         {['Founder', 'Company', 'Score', 'Tier', 'Audit Status', 'Assigned Analyst', 'Actions'].map((h) => (

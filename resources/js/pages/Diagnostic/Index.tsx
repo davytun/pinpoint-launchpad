@@ -75,13 +75,11 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
     const question = questions[currentIndex];
 
     // Guard: no questions seeded yet — show a placeholder instead of crashing
-    if (! question) {
+    if (!question) {
         return (
             <DiagnosticLayout>
                 <div className="flex min-h-screen items-center justify-center px-4">
-                    <p className="text-center text-sm text-white/50">
-                        No diagnostic questions are available yet. Please check back shortly.
-                    </p>
+                    <p className="text-center text-sm text-white/50">No diagnostic questions are available yet. Please check back shortly.</p>
                 </div>
             </DiagnosticLayout>
         );
@@ -245,7 +243,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                 className={cn(
                                                     'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-200 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === true
-                                                        ? 'scale-[1.01] border-[#5CA336] bg-[#5CA336] text-white shadow-lg font-bold'
+                                                        ? 'scale-[1.01] border-[#5CA336] bg-[#5CA336] font-bold text-white shadow-lg'
                                                         : 'border-white/10 bg-[#161c28] text-white/60 hover:border-white/20 hover:bg-[#1d2436] hover:text-white',
                                                 )}
                                             >
@@ -258,7 +256,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                 className={cn(
                                                     'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-200 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === false
-                                                        ? 'scale-[1.01] border-[#2F4587] bg-[#2F4587] text-white shadow-lg font-bold'
+                                                        ? 'scale-[1.01] border-[#2F4587] bg-[#2F4587] font-bold text-white shadow-lg'
                                                         : 'border-white/10 bg-[#161c28] text-white/60 hover:border-white/20 hover:bg-[#1d2436] hover:text-white',
                                                 )}
                                             >
@@ -278,9 +276,12 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 type="button"
                                 onClick={goBack}
                                 disabled={currentIndex === 0}
-                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-[#232C43] px-4 py-2 text-xs font-bold tracking-widest text-[#C1CDE8] uppercase transition-colors hover:text-[#D8E0F3] hover:bg-[#1B294B]/30 disabled:pointer-events-none disabled:opacity-30"
+                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-[#232C43] px-4 py-2 text-xs font-bold tracking-widest text-[#C1CDE8] uppercase transition-colors hover:bg-[#1B294B]/30 hover:text-[#D8E0F3] disabled:pointer-events-none disabled:opacity-30"
                             >
-                                <span className="transition-transform group-hover:-translate-x-1"><ChevronLeft /></span> Back
+                                <span className="transition-transform group-hover:-translate-x-1">
+                                    <ChevronLeft />
+                                </span>{' '}
+                                Back
                             </button>
 
                             <div className="flex items-center gap-1.5">
@@ -292,7 +293,6 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                             </div>
 
                             <div className="w-16 shrink-0" />
-
                         </div>
                     )}
                 </div>

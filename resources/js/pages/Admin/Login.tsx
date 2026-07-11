@@ -31,7 +31,7 @@ export default function AdminLogin({ status }: { status?: string }) {
 
             {/* Background layers */}
             <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid  pointer-events-none fixed inset-0 z-0" />
+            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
             <div
                 className="pointer-events-none fixed inset-x-0 top-0 z-0 h-72"
                 style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(68,104,187,0.12) 0%, transparent 100%)' }}
@@ -46,8 +46,13 @@ export default function AdminLogin({ status }: { status?: string }) {
                 >
                     {/* Logo + heading */}
                     <div className="mb-8 text-center">
-                        <img src="/pinpoint-logo.png" alt="Pinpoint" className="mx-auto mb-6 block h-6 w-auto select-none opacity-60" style={{ maxWidth: 130 }} />
-                        <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-[#91A7D8]">Internal Access</p>
+                        <img
+                            src="/pinpoint-logo.png"
+                            alt="Pinpoint"
+                            className="mx-auto mb-6 block h-6 w-auto opacity-60 select-none"
+                            style={{ maxWidth: 130 }}
+                        />
+                        <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-[#91A7D8] uppercase">Internal Access</p>
                         <h1 className="text-[22px] font-semibold tracking-tight text-[#D8E0F3]">Admin Sign In</h1>
                     </div>
 
@@ -64,7 +69,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                                 Email address
                             </label>
                             <div className="relative">
-                                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#91A7D8]" />
+                                <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#91A7D8]" />
                                 <input
                                     id="email"
                                     type="email"
@@ -74,7 +79,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                     placeholder="admin@pinpointlaunchpad.com"
-                                    className="w-full rounded-xl border border-[#232C43] bg-[#1B294B]/30 py-2.5 pl-10 pr-4 text-[13px] text-[#D8E0F3] placeholder-[#91A7D8] outline-none transition focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10"
+                                    className="w-full rounded-xl border border-[#232C43] bg-[#1B294B]/30 py-2.5 pr-4 pl-10 text-[13px] text-[#D8E0F3] placeholder-[#91A7D8] transition outline-none focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10"
                                 />
                             </div>
                             {errors.email && <p className="mt-1.5 text-[11px] text-rose-400">{errors.email}</p>}
@@ -86,7 +91,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                                 Password
                             </label>
                             <div className="relative">
-                                <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#91A7D8]" />
+                                <Lock className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#91A7D8]" />
                                 <input
                                     id="password"
                                     type={showPassword ? 'text' : 'password'}
@@ -95,13 +100,13 @@ export default function AdminLogin({ status }: { status?: string }) {
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full rounded-xl border border-[#232C43] bg-[#1B294B]/30 py-2.5 pl-10 pr-10 text-[13px] text-[#D8E0F3] placeholder-[#91A7D8] outline-none transition focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10"
+                                    className="w-full rounded-xl border border-[#232C43] bg-[#1B294B]/30 py-2.5 pr-10 pl-10 text-[13px] text-[#D8E0F3] placeholder-[#91A7D8] transition outline-none focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10"
                                 />
                                 <button
                                     type="button"
                                     tabIndex={-1}
                                     onClick={() => setShowPassword((v) => !v)}
-                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#91A7D8] transition hover:text-[#C1CDE8]"
+                                    className="absolute top-1/2 right-3.5 -translate-y-1/2 text-[#91A7D8] transition hover:text-[#C1CDE8]"
                                 >
                                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                                 </button>
@@ -118,7 +123,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                                 onChange={(e) => setData('remember', e.target.checked)}
                                 className="h-4 w-4 rounded border-[#232C43] bg-[#101623] accent-[#3A54A5]"
                             />
-                            <label htmlFor="remember" className="text-[12px] text-[#C1CDE8] select-none cursor-pointer">
+                            <label htmlFor="remember" className="cursor-pointer text-[12px] text-[#C1CDE8] select-none">
                                 Keep me signed in
                             </label>
                         </div>
@@ -126,7 +131,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold uppercase tracking-[0.14em] text-white transition hover:bg-[#2F4587] disabled:opacity-60"
+                            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition hover:bg-[#2F4587] disabled:opacity-60"
                             style={{ boxShadow: '0 0 28px rgba(68,104,187,0.25)' }}
                         >
                             {processing ? <LoaderCircle className="size-4 animate-spin" /> : null}
@@ -134,9 +139,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                         </button>
                     </form>
 
-                    <p className="mt-8 text-center text-[11px] text-[#91A7D8]">
-                        This portal is for Pinpoint internal staff only.
-                    </p>
+                    <p className="mt-8 text-center text-[11px] text-[#91A7D8]">This portal is for Pinpoint internal staff only.</p>
                 </motion.div>
             </div>
         </div>

@@ -1,18 +1,15 @@
 import { Head, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import {
-    AlertTriangle, ArrowRight, CheckCircle, Lock, Loader2, Percent,
-    RefreshCw, ShieldCheck, XCircle,
-} from 'lucide-react';
+import { AlertTriangle, ArrowRight, CheckCircle, Loader2, Lock, Percent, RefreshCw, ShieldCheck, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { cn } from '@/lib/utils';
 
 interface PageProps {
-    embed_url:    string;
+    embed_url: string;
     signer_email: string;
-    tier_label:   string;
-    document_id:  string;
+    tier_label: string;
+    document_id: string;
 }
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
@@ -31,36 +28,34 @@ function FadeUp({ delay = 0, className, children }: { delay?: number; className?
 }
 
 const STEPS = [
-    { n: '01', label: 'Confirmed your details', state: 'done'    },
-    { n: '02', label: 'Sign your agreement',    state: 'active'  },
+    { n: '01', label: 'Confirmed your details', state: 'done' },
+    { n: '02', label: 'Sign your agreement', state: 'active' },
     { n: '03', label: 'Access the PIN Network', state: 'pending' },
 ] as const;
 
 const TRUST = [
     {
-        icon:  <ShieldCheck className="size-[14px] text-emerald-400" />,
+        icon: <ShieldCheck className="size-[14px] text-emerald-400" />,
         title: 'Why sign now?',
-        body:  'Protects your trade secrets and confirms 100% credit toward the success fee.',
+        body: 'Protects your trade secrets and confirms 100% credit toward the success fee.',
     },
     {
-        icon:  <Percent className="size-[14px] text-blue-400" />,
+        icon: <Percent className="size-[14px] text-blue-400" />,
         title: 'The 2% Rule',
-        body:  'A standard advisory warrant aligning our team as your external Series A department.',
+        body: 'A standard advisory warrant aligning our team as your external Series A department.',
     },
     {
-        icon:  <Lock className="size-[14px] text-white/35" />,
+        icon: <Lock className="size-[14px] text-white/35" />,
         title: 'Secure & Compliant',
-        body:  'Encrypted via BoldSign — SOC 2 Type II and eIDAS certified.',
+        body: 'Encrypted via BoldSign — SOC 2 Type II and eIDAS certified.',
     },
 ] as const;
 
-export default function OnboardingSign({
-    embed_url, signer_email, tier_label, document_id,
-}: PageProps) {
-    const [loaded,   setLoaded]   = useState(false);
+export default function OnboardingSign({ embed_url, signer_email, tier_label, document_id }: PageProps) {
+    const [loaded, setLoaded] = useState(false);
     const [complete, setComplete] = useState(false);
     const [declined, setDeclined] = useState(false);
-    const [error,    setError]    = useState(false);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         function onMessage(e: MessageEvent) {
@@ -92,7 +87,7 @@ export default function OnboardingSign({
 
             {/* Ambient background decorations */}
             <div className="waitlist-shell pointer-events-none absolute inset-0 z-0" />
-            <div className="waitlist-grid  pointer-events-none absolute inset-0 z-0" />
+            <div className="waitlist-grid pointer-events-none absolute inset-0 z-0" />
             <div
                 className="pointer-events-none absolute inset-x-0 top-0 z-0 h-64"
                 style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(37,99,235,0.16) 0%, transparent 100%)' }}
@@ -102,7 +97,8 @@ export default function OnboardingSign({
             {declined && (
                 <motion.div
                     className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[#080B11]/97 px-6 backdrop-blur-xl"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
                 >
                     <FadeUp delay={0}>
@@ -113,14 +109,10 @@ export default function OnboardingSign({
 
                     <div className="text-center">
                         <FadeUp delay={0.1}>
-                            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-500/70">
-                                Document Declined
-                            </p>
+                            <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-amber-500/70 uppercase">Document Declined</p>
                         </FadeUp>
                         <FadeUp delay={0.15}>
-                            <h2 className="font-display text-[22px] font-semibold text-[#D8E0F3]">
-                                You declined the agreement
-                            </h2>
+                            <h2 className="font-display text-[22px] font-semibold text-[#D8E0F3]">You declined the agreement</h2>
                         </FadeUp>
                         <FadeUp delay={0.2}>
                             <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-[#C1CDE8]">
@@ -132,7 +124,7 @@ export default function OnboardingSign({
                     <FadeUp delay={0.3}>
                         <button
                             onClick={() => router.visit(route('onboarding.sign'))}
-                            className="group flex items-center gap-2 rounded-xl bg-[#1B294B]/40 border border-[#232C43] px-6 py-3 text-[13px] font-bold uppercase tracking-[0.14em] text-[#D8E0F3] transition-all hover:bg-[#1B294B] hover:border-[#3A54A5]/50"
+                            className="group flex items-center gap-2 rounded-xl border border-[#232C43] bg-[#1B294B]/40 px-6 py-3 text-[13px] font-bold tracking-[0.14em] text-[#D8E0F3] uppercase transition-all hover:border-[#3A54A5]/50 hover:bg-[#1B294B]"
                         >
                             Review &amp; Re-sign
                             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -145,12 +137,13 @@ export default function OnboardingSign({
             {complete && (
                 <motion.div
                     className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#050505]/95 backdrop-blur-xl"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
                 >
                     <motion.div
                         initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1,   opacity: 1 }}
+                        animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.45, ease }}
                         className="flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10"
                         style={{ boxShadow: '0 0 48px rgba(16,185,129,0.18)' }}
@@ -168,22 +161,13 @@ export default function OnboardingSign({
                 MOBILE header (shown below md)
                 A compact bar: logo + step pill + email
             ════════════════════════════════════════ */}
-            <header
-                className="relative z-10 flex shrink-0 items-center justify-between border-b border-[#232C43] bg-[#080B11] px-4 py-3 md:hidden"
-            >
-                <img
-                    src="/pinpoint-logo.png"
-                    alt="Pinpoint"
-                    className="block h-5 w-auto select-none"
-                    style={{ maxWidth: 120 }}
-                />
+            <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-[#232C43] bg-[#080B11] px-4 py-3 md:hidden">
+                <img src="/pinpoint-logo.png" alt="Pinpoint" className="block h-5 w-auto select-none" style={{ maxWidth: 120 }} />
                 <div className="flex items-center gap-2">
-                    <span
-                        className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#60A5FA]"
-                    >
+                    <span className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2 py-0.5 text-[9px] font-bold tracking-[0.16em] text-[#60A5FA] uppercase">
                         Step 2 of 3
                     </span>
-                    <span className="text-[11px] text-[#91A7D8] hidden sm:inline">{tier_label}</span>
+                    <span className="hidden text-[11px] text-[#91A7D8] sm:inline">{tier_label}</span>
                 </div>
             </header>
 
@@ -191,37 +175,38 @@ export default function OnboardingSign({
                 BODY: sidebar (md+) + iframe
             ════════════════════════════════════════ */}
             <div className="relative z-10 flex min-h-0 flex-1">
-
                 {/* ── Sidebar — hidden on mobile, fixed width on md+ ── */}
-                <div
-                    className="hidden h-full w-[280px] shrink-0 flex-col overflow-y-auto border-r border-[#232C43] bg-[#080B11] px-6 py-8 md:flex xl:w-[300px]"
-                >
+                <div className="hidden h-full w-[280px] shrink-0 flex-col overflow-y-auto border-r border-[#232C43] bg-[#080B11] px-6 py-8 md:flex xl:w-[300px]">
                     <FadeUp delay={0}>
                         {/* Logo — explicit max-width prevents stretching */}
-                        <img
-                            src="/pinpoint-logo.png"
-                            alt="Pinpoint"
-                            className="mb-9 block h-6 w-auto select-none"
-                            style={{ maxWidth: 140 }}
-                        />
+                        <img src="/pinpoint-logo.png" alt="Pinpoint" className="mb-9 block h-6 w-auto select-none" style={{ maxWidth: 140 }} />
 
                         {/* Step tracker */}
                         <div className="mb-7 flex flex-col gap-2">
                             {STEPS.map((step) => (
                                 <div key={step.n} className="flex items-center gap-2.5">
-                                    <div className={cn(
-                                        'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold tabular-nums transition-colors',
-                                        step.state === 'done' ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-400' :
-                                        step.state === 'active' ? 'border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[#6986C9]' :
-                                        'border-[#232C43] bg-[#0C1427] text-[#91A7D8]'
-                                    )}>
+                                    <div
+                                        className={cn(
+                                            'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold tabular-nums transition-colors',
+                                            step.state === 'done'
+                                                ? 'border-emerald-500/35 bg-emerald-500/10 text-emerald-400'
+                                                : step.state === 'active'
+                                                  ? 'border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[#6986C9]'
+                                                  : 'border-[#232C43] bg-[#0C1427] text-[#91A7D8]',
+                                        )}
+                                    >
                                         {step.n}
                                     </div>
-                                    <span className={cn(
-                                        'text-[12px] font-medium transition-colors',
-                                        step.state === 'done'   ? 'text-[#91A7D8]/40 line-through' :
-                                        step.state === 'active' ? 'text-[#D8E0F3]' : 'text-[#455987]',
-                                    )}>
+                                    <span
+                                        className={cn(
+                                            'text-[12px] font-medium transition-colors',
+                                            step.state === 'done'
+                                                ? 'text-[#91A7D8]/40 line-through'
+                                                : step.state === 'active'
+                                                  ? 'text-[#D8E0F3]'
+                                                  : 'text-[#455987]',
+                                        )}
+                                    >
                                         {step.label}
                                     </span>
                                 </div>
@@ -234,12 +219,11 @@ export default function OnboardingSign({
                     {/* Headline + sub */}
                     <FadeUp delay={0.1}>
                         <div className="mb-7">
-                            <h1 className="font-display text-[18px] font-semibold leading-snug tracking-tight text-white">
+                            <h1 className="font-display text-[18px] leading-snug font-semibold tracking-tight text-white">
                                 Secure your position in the PIN&nbsp;Network.
                             </h1>
                             <p className="mt-2 text-[12px] leading-relaxed text-[#C1CDE8]">
-                                Read and sign the Success Fee &amp; Confidentiality Agreement to begin your
-                                analyst-led audit.
+                                Read and sign the Success Fee &amp; Confidentiality Agreement to begin your analyst-led audit.
                             </p>
                         </div>
                     </FadeUp>
@@ -268,9 +252,7 @@ export default function OnboardingSign({
                     <FadeUp delay={0.4}>
                         <div className="mt-8 rounded-xl border border-[#232C43] bg-[#101623] p-3">
                             <div className="flex flex-wrap items-center gap-1.5">
-                                <span
-                                    className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#60A5FA]"
-                                >
+                                <span className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2 py-0.5 text-[9px] font-bold tracking-[0.16em] text-[#60A5FA] uppercase">
                                     {tier_label}
                                 </span>
                                 <span className="min-w-0 truncate text-[11px] text-[#91A7D8]">{signer_email}</span>
@@ -289,10 +271,8 @@ export default function OnboardingSign({
                 >
                     {/* Desktop sub-header above iframe */}
                     <div className="hidden shrink-0 items-center justify-between border-b border-[#232C43] bg-[#080B11] px-5 py-2.5 md:flex">
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#91A7D8]">
-                            Pinpoint Investment Warrant
-                        </span>
-                        <div className="flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-[0.16em] text-[#91A7D8]/60">
+                        <span className="text-[10px] font-semibold tracking-[0.22em] text-[#91A7D8] uppercase">Pinpoint Investment Warrant</span>
+                        <div className="flex items-center gap-1.5 text-[9px] font-medium tracking-[0.16em] text-[#91A7D8]/60 uppercase">
                             <Lock className="size-2.5" />
                             <span>BoldSign · SOC 2</span>
                         </div>
@@ -300,7 +280,6 @@ export default function OnboardingSign({
 
                     {/* iframe — absolutely fills its container */}
                     <div className="relative min-h-0 flex-1">
-
                         {/* Loading overlay */}
                         {!loaded && !error && (
                             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-[#080808]">
@@ -308,7 +287,7 @@ export default function OnboardingSign({
                                     className="flex size-14 items-center justify-center rounded-full border"
                                     style={{
                                         borderColor: 'rgba(37,99,235,0.28)',
-                                        background:  'radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 70%)',
+                                        background: 'radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 70%)',
                                     }}
                                 >
                                     <Loader2 className="size-6 animate-spin text-blue-500" />
@@ -350,7 +329,6 @@ export default function OnboardingSign({
                         )}
                     </div>
                 </motion.section>
-
             </div>
         </div>
     );

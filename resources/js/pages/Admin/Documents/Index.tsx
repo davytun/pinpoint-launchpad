@@ -1,14 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import {
-    CheckCircle2,
-    Clock,
-    Download,
-    FileSpreadsheet,
-    FileText,
-    Image,
-    Loader2,
-    MessageSquare,
-} from 'lucide-react';
+import { CheckCircle2, Clock, Download, FileSpreadsheet, FileText, Image, Loader2, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
@@ -50,12 +41,17 @@ interface PageProps {
 
 function FileIcon({ icon, extension }: { icon: string; extension: string }) {
     const colorClass =
-        extension === 'pdf' ? 'text-red-500' :
-        ['doc', 'docx'].includes(extension) ? 'text-blue-500' :
-        ['xls', 'xlsx', 'csv'].includes(extension) ? 'text-emerald-500' :
-        ['ppt', 'pptx'].includes(extension) ? 'text-orange-500' :
-        ['jpg', 'jpeg', 'png'].includes(extension) ? 'text-purple-500' :
-        'text-slate-400';
+        extension === 'pdf'
+            ? 'text-red-500'
+            : ['doc', 'docx'].includes(extension)
+              ? 'text-blue-500'
+              : ['xls', 'xlsx', 'csv'].includes(extension)
+                ? 'text-emerald-500'
+                : ['ppt', 'pptx'].includes(extension)
+                  ? 'text-orange-500'
+                  : ['jpg', 'jpeg', 'png'].includes(extension)
+                    ? 'text-purple-500'
+                    : 'text-slate-400';
 
     const cls = `size-4 shrink-0 ${colorClass}`;
     if (icon === 'file-spreadsheet') return <FileSpreadsheet className={cls} aria-hidden="true" />;
@@ -80,27 +76,19 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
 
     function toggleReviewed() {
         setTogglingReview(true);
-        router.patch(
-            route('admin.documents.reviewed', { founder: founderId, document: doc.id }),
-            {},
-            { onFinish: () => setTogglingReview(false) }
-        );
+        router.patch(route('admin.documents.reviewed', { founder: founderId, document: doc.id }), {}, { onFinish: () => setTogglingReview(false) });
     }
 
     function saveNote() {
         setSavingNote(true);
-        router.patch(
-            route('admin.documents.note', { founder: founderId, document: doc.id }),
-            { note },
-            { onFinish: () => setSavingNote(false) }
-        );
+        router.patch(route('admin.documents.note', { founder: founderId, document: doc.id }), { note }, { onFinish: () => setSavingNote(false) });
     }
 
     return (
         <>
             <tr className="border-b border-[#232C43] transition-colors hover:bg-[#1B294B]/30">
                 <td className="px-4 py-3">
-                    <span className="inline-block rounded-md bg-[#1B294B] px-2 py-0.5 text-[11px] font-medium text-[#C1CDE8] border border-[#3A54A5]/20">
+                    <span className="inline-block rounded-md border border-[#3A54A5]/20 bg-[#1B294B] px-2 py-0.5 text-[11px] font-medium text-[#C1CDE8]">
                         {doc.category_label}
                     </span>
                 </td>
@@ -108,7 +96,7 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
                     <div className="flex items-center gap-2">
                         <FileIcon icon={doc.file_icon} extension={doc.extension} />
                         <div className="min-w-0">
-                            <p className="truncate text-[13px] font-medium text-[#D8E0F3] max-w-[200px]" title={doc.original_filename}>
+                            <p className="max-w-[200px] truncate text-[13px] font-medium text-[#D8E0F3]" title={doc.original_filename}>
                                 {doc.original_filename}
                             </p>
                             <p className="text-[11px] text-[#91A7D8]">{doc.file_size}</p>
@@ -118,17 +106,15 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
                 <td className="px-4 py-3 text-[12px] text-[#C1CDE8]">{doc.created_at}</td>
                 <td className="px-4 py-3">
                     {doc.is_reviewed ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 text-[11px] font-semibold text-emerald-400">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-400">
                             <CheckCircle2 className="size-3" aria-hidden="true" /> Reviewed
                         </span>
                     ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 text-[11px] font-semibold text-amber-400">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-400">
                             <Clock className="size-3" aria-hidden="true" /> Pending
                         </span>
                     )}
-                    {doc.reviewed_by && (
-                        <p className="mt-0.5 text-[10px] text-[#91A7D8]">by {doc.reviewed_by}</p>
-                    )}
+                    {doc.reviewed_by && <p className="mt-0.5 text-[10px] text-[#91A7D8]">by {doc.reviewed_by}</p>}
                 </td>
                 <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
@@ -150,9 +136,11 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
                                     : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20',
                             ].join(' ')}
                         >
-                            {togglingReview
-                                ? <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
-                                : <CheckCircle2 className="size-3.5" aria-hidden="true" />}
+                            {togglingReview ? (
+                                <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                            ) : (
+                                <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                            )}
                         </button>
                         <button
                             onClick={() => setNoteOpen((v) => !v)}
@@ -176,16 +164,14 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
                     <td colSpan={5} className="px-4 py-3">
                         <div className="flex items-start gap-3">
                             <div className="flex-1">
-                                <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">
-                                    Analyst Note
-                                </label>
+                                <label className="mb-1 block text-[11px] font-semibold tracking-wide text-[#91A7D8] uppercase">Analyst Note</label>
                                 <textarea
                                     value={note}
                                     onChange={(e) => setNote(e.target.value)}
                                     maxLength={500}
                                     rows={3}
                                     placeholder="Add a note about this document..."
-                                    className="w-full rounded-xl border border-[#232C43] bg-[#080B11] px-3 py-2 text-[13px] text-[#D8E0F3] focus:border-[#3A54A5]/50 focus:outline-none resize-none"
+                                    className="w-full resize-none rounded-xl border border-[#232C43] bg-[#080B11] px-3 py-2 text-[13px] text-[#D8E0F3] focus:border-[#3A54A5]/50 focus:outline-none"
                                 />
                                 <p className="mt-0.5 text-[10px] text-[#91A7D8]">{note.length}/500</p>
                             </div>
@@ -218,29 +204,27 @@ export default function AdminDocumentsIndex({ founder, documents, audit_status }
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-5xl">
-
                     {/* Header */}
                     <div className="mb-6">
                         <div className="flex flex-wrap items-start justify-between gap-4">
                             <div>
-                                <p className="text-[12px] font-semibold uppercase tracking-wide text-[#91A7D8]">
-                                    Founder Documents
-                                </p>
-                                <h1 className="mt-0.5 text-2xl font-bold text-[#D8E0F3]">
-                                    {founder.company_name ?? founder.full_name}
-                                </h1>
-                                <p className="text-[13px] text-[#C1CDE8]">
-                                    {founder.email}
-                                </p>
+                                <p className="text-[12px] font-semibold tracking-wide text-[#91A7D8] uppercase">Founder Documents</p>
+                                <h1 className="mt-0.5 text-2xl font-bold text-[#D8E0F3]">{founder.company_name ?? founder.full_name}</h1>
+                                <p className="text-[13px] text-[#C1CDE8]">{founder.email}</p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <span className={[
-                                    'rounded-full px-3 py-1 text-[12px] font-semibold border',
-                                    audit_status === 'complete'    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                    audit_status === 'in_progress' ? 'bg-[#1B294B] text-[#3A54A5] border-[#3A54A5]/30' :
-                                    audit_status === 'needs_info'  ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                    'bg-[#0C1427] text-[#C1CDE8] border-[#232C43]',
-                                ].join(' ')}>
+                                <span
+                                    className={[
+                                        'rounded-full border px-3 py-1 text-[12px] font-semibold',
+                                        audit_status === 'complete'
+                                            ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
+                                            : audit_status === 'in_progress'
+                                              ? 'border-[#3A54A5]/30 bg-[#1B294B] text-[#3A54A5]'
+                                              : audit_status === 'needs_info'
+                                                ? 'border-amber-500/20 bg-amber-500/10 text-amber-400'
+                                                : 'border-[#232C43] bg-[#0C1427] text-[#C1CDE8]',
+                                    ].join(' ')}
+                                >
                                     {audit_status.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                                 </span>
                                 <span className="text-[12px] text-[#91A7D8]">
@@ -271,11 +255,11 @@ export default function AdminDocumentsIndex({ founder, documents, audit_status }
                                 <table className="w-full min-w-[700px] text-left">
                                     <thead>
                                         <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
-                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Category</th>
-                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">File</th>
-                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Uploaded</th>
-                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Status</th>
-                                            <th className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[#91A7D8]">Actions</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold tracking-wide text-[#91A7D8] uppercase">Category</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold tracking-wide text-[#91A7D8] uppercase">File</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold tracking-wide text-[#91A7D8] uppercase">Uploaded</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold tracking-wide text-[#91A7D8] uppercase">Status</th>
+                                            <th className="px-4 py-3 text-[11px] font-semibold tracking-wide text-[#91A7D8] uppercase">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>

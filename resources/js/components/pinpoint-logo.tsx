@@ -12,10 +12,7 @@ interface PinpointLogoProps {
     className?: string;
 }
 
-export function PinpointLogo({
-    height = 28,
-    className,
-}: PinpointLogoProps) {
+export function PinpointLogo({ height = 28, className }: PinpointLogoProps) {
     return (
         <img
             src="/pinpoint-logo.png"

@@ -45,8 +45,11 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                             className="mb-8 flex justify-center"
                         >
                             <div className="relative">
-                                <div className="absolute inset-0 max-w-[80px] blur-[30px] rounded-full" style={{ background: 'radial-gradient(circle, rgba(147,197,253,0.3), transparent 70%)' }} />
-                                <Compass className="size-20 relative z-10" color="#2F4587" strokeWidth={1.25} />
+                                <div
+                                    className="absolute inset-0 max-w-[80px] rounded-full blur-[30px]"
+                                    style={{ background: 'radial-gradient(circle, rgba(147,197,253,0.3), transparent 70%)' }}
+                                />
+                                <Compass className="relative z-10 size-20" color="#2F4587" strokeWidth={1.25} />
                             </div>
                         </motion.div>
 
@@ -55,7 +58,7 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
-                            className="mb-6 font-display text-center text-4xl font-bold leading-tight tracking-tight text-[#D8E0F3]"
+                            className="font-display mb-6 text-center text-4xl leading-tight font-bold tracking-tight text-[#D8E0F3]"
                         >
                             The Best Founders Don't Stop.
                             <br />
@@ -85,10 +88,10 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                                 opacity: { duration: 0.45, delay: 0.24 },
                                 y: { duration: 0.45, delay: 0.24 },
                             }}
-                            className="mb-8 flex justify-center w-full"
+                            className="mb-8 flex w-full justify-center"
                         >
                             <Badge
-                                className="inline-flex items-center justify-center rounded-full px-6 py-3 font-bold uppercase tracking-[0.1em]"
+                                className="inline-flex items-center justify-center rounded-full px-6 py-3 font-bold tracking-[0.1em] uppercase"
                                 style={{
                                     border: '1px solid rgba(68,104,187,0.5)',
                                     background: 'rgba(68,104,187,0.1)',
@@ -97,7 +100,7 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                                 }}
                             >
                                 Return in{' '}
-                                <strong className="ml-1.5 font-display text-lg font-black text-[#D8E0F3]">
+                                <strong className="font-display ml-1.5 text-lg font-black text-[#D8E0F3]">
                                     {days_remaining} {days_remaining === 1 ? 'day' : 'days'}
                                 </strong>
                             </Badge>
@@ -111,7 +114,7 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                                 transition={{ delay: 0.28 }}
                                 className="mb-8 flex justify-center"
                             >
-                                <span className="text-xs uppercase tracking-[0.1em] text-[#91A7D8]">
+                                <span className="text-xs tracking-[0.1em] text-[#91A7D8] uppercase">
                                     Last assessment: <span className="font-bold text-[#C1CDE8]">{score_band_label}</span>
                                 </span>
                             </motion.div>
@@ -155,7 +158,7 @@ export default function DiagnosticBlocked({ days_remaining, score_band_label }: 
                         className="relative mt-8 w-full max-w-lg text-center"
                     >
                         <Separator className="mb-5 bg-[#232C43]" />
-                        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#91A7D8]">Filtering for Quality. Solving for Success.</p>
+                        <p className="text-xs font-bold tracking-[0.2em] text-[#91A7D8] uppercase">Filtering for Quality. Solving for Success.</p>
                     </motion.footer>
                 </div>
             </DiagnosticLayout>

@@ -30,31 +30,15 @@ interface PageProps {
 
 function StatusBadge({ row }: { row: ProfileRow }) {
     if (!row.is_public) {
-        return (
-            <span className="rounded-full bg-[#232C43] px-2.5 py-0.5 text-xs font-semibold text-[#C1CDE8]">
-                Draft
-            </span>
-        );
+        return <span className="rounded-full bg-[#232C43] px-2.5 py-0.5 text-xs font-semibold text-[#C1CDE8]">Draft</span>;
     }
     if (row.is_expired) {
-        return (
-            <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-xs font-semibold text-amber-400">
-                Expired
-            </span>
-        );
+        return <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-xs font-semibold text-amber-400">Expired</span>;
     }
     if (row.is_live) {
-        return (
-            <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">
-                Live
-            </span>
-        );
+        return <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">Live</span>;
     }
-    return (
-        <span className="rounded-full bg-[#232C43] px-2.5 py-0.5 text-xs font-semibold text-[#C1CDE8]">
-            Draft
-        </span>
-    );
+    return <span className="rounded-full bg-[#232C43] px-2.5 py-0.5 text-xs font-semibold text-[#C1CDE8]">Draft</span>;
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -83,38 +67,53 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                                 <table className="w-full min-w-[800px] text-sm">
                                     <thead>
                                         <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Company</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Founder</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Score</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Status</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Badges</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Expires</th>
-                                            <th className="px-5 py-3.5 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Actions</th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">
+                                                Company
+                                            </th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">
+                                                Founder
+                                            </th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">
+                                                Score
+                                            </th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">
+                                                Status
+                                            </th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">
+                                                Badges
+                                            </th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">
+                                                Expires
+                                            </th>
+                                            <th className="px-5 py-3.5 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">
+                                                Actions
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {profiles.map((p) => (
-                                            <tr key={p.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
+                                            <tr
+                                                key={p.id}
+                                                className="border-b border-[#232C43] transition-colors last:border-0 hover:bg-[#1B294B]/30"
+                                            >
                                                 <td className="px-5 py-4">
                                                     <div className="font-semibold text-[#D8E0F3]">{p.company_name ?? '—'}</div>
-                                                    <div className="text-xs text-[#91A7D8]">{p.batch ?? ''}{p.batch && p.sector ? ' · ' : ''}{p.sector ?? ''}</div>
+                                                    <div className="text-xs text-[#91A7D8]">
+                                                        {p.batch ?? ''}
+                                                        {p.batch && p.sector ? ' · ' : ''}
+                                                        {p.sector ?? ''}
+                                                    </div>
                                                 </td>
                                                 <td className="px-5 py-4">
                                                     <div className="text-[#C1CDE8]">{p.founder_name ?? '—'}</div>
                                                     <div className="text-xs text-[#91A7D8]">{p.founder_email}</div>
                                                 </td>
-                                                <td className="px-5 py-4 font-mono font-bold text-[#D8E0F3]">
-                                                    {p.overall_score ?? '—'}
-                                                </td>
+                                                <td className="px-5 py-4 font-mono font-bold text-[#D8E0F3]">{p.overall_score ?? '—'}</td>
                                                 <td className="px-5 py-4">
                                                     <StatusBadge row={p} />
                                                 </td>
-                                                <td className="px-5 py-4 text-[#C1CDE8]">
-                                                    {p.verified_badges_count} / 7
-                                                </td>
-                                                <td className="px-5 py-4 text-[#C1CDE8]">
-                                                    {p.expires_at ?? '—'}
-                                                </td>
+                                                <td className="px-5 py-4 text-[#C1CDE8]">{p.verified_badges_count} / 7</td>
+                                                <td className="px-5 py-4 text-[#C1CDE8]">{p.expires_at ?? '—'}</td>
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center gap-3">
                                                         <a

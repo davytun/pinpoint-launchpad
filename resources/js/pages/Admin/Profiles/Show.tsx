@@ -56,15 +56,13 @@ const PILLAR_KEYS = ['potential', 'agility', 'risk', 'alignment', 'governance', 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminProfilesShow({ profile, founder, badges, access_requests, flash }: PageProps) {
-    const [summary, setSummary]     = useState(profile.analyst_summary ?? '');
-    const [sector, setSector]       = useState(profile.sector ?? '');
-    const [batch, setBatch]         = useState(profile.batch ?? '');
-    const [score, setScore]         = useState<number | ''>(profile.overall_score ?? '');
-    const [isPublic, setIsPublic]   = useState(profile.is_public);
-    const [radarData, setRadarData] = useState<Record<string, number>>(
-        profile.radar_data ?? Object.fromEntries(PILLAR_KEYS.map((k) => [k, 0]))
-    );
-    const [saving, setSaving]       = useState(false);
+    const [summary, setSummary] = useState(profile.analyst_summary ?? '');
+    const [sector, setSector] = useState(profile.sector ?? '');
+    const [batch, setBatch] = useState(profile.batch ?? '');
+    const [score, setScore] = useState<number | ''>(profile.overall_score ?? '');
+    const [isPublic, setIsPublic] = useState(profile.is_public);
+    const [radarData, setRadarData] = useState<Record<string, number>>(profile.radar_data ?? Object.fromEntries(PILLAR_KEYS.map((k) => [k, 0])));
+    const [saving, setSaving] = useState(false);
     const [togglingBadge, setTogglingBadge] = useState<number | null>(null);
 
     function handleSave() {
@@ -73,23 +71,19 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
             `/admin/profiles/${profile.id}`,
             {
                 analyst_summary: summary || null,
-                sector:          sector || null,
-                batch:           batch || null,
-                overall_score:   score === '' ? null : score,
-                radar_data:      radarData,
-                is_public:       isPublic,
+                sector: sector || null,
+                batch: batch || null,
+                overall_score: score === '' ? null : score,
+                radar_data: radarData,
+                is_public: isPublic,
             },
-            { onFinish: () => setSaving(false) }
+            { onFinish: () => setSaving(false) },
         );
     }
 
     function handleBadgeToggle(badge: Badge, newValue: boolean) {
         setTogglingBadge(badge.id);
-        router.patch(
-            `/admin/profiles/badges/${badge.id}`,
-            { is_verified: newValue },
-            { onFinish: () => setTogglingBadge(null) }
-        );
+        router.patch(`/admin/profiles/badges/${badge.id}`, { is_verified: newValue }, { onFinish: () => setTogglingBadge(null) });
     }
 
     const inputClass =
@@ -101,17 +95,16 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-6xl">
-
                     {/* Header */}
                     <div className="mb-8 flex items-center justify-between">
                         <div>
                             <Link href="/admin/profiles" className="mb-2 block text-sm text-[#91A7D8] hover:text-[#C1CDE8]">
                                 &larr; All Profiles
                             </Link>
-                            <h1 className="text-2xl font-bold text-[#D8E0F3]">
-                                {founder.company_name ?? founder.email}
-                            </h1>
-                            <p className="mt-1 text-sm text-[#C1CDE8]">{founder.full_name} · {founder.email}</p>
+                            <h1 className="text-2xl font-bold text-[#D8E0F3]">{founder.company_name ?? founder.email}</h1>
+                            <p className="mt-1 text-sm text-[#C1CDE8]">
+                                {founder.full_name} · {founder.email}
+                            </p>
                         </div>
                         <a
                             href={`/verify/${profile.slug}`}
@@ -131,14 +124,15 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                     )}
 
                     <div className="grid gap-6 lg:grid-cols-2">
-
                         {/* ── Left: Profile Editor ── */}
                         <div className="rounded-xl border border-[#232C43] bg-[#101623] p-6">
-                            <h2 className="mb-5 text-sm font-bold uppercase tracking-widest text-[#C1CDE8]">Profile Editor</h2>
+                            <h2 className="mb-5 text-sm font-bold tracking-widest text-[#C1CDE8] uppercase">Profile Editor</h2>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#91A7D8]">Analyst Summary</label>
+                                    <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">
+                                        Analyst Summary
+                                    </label>
                                     <textarea
                                         rows={6}
                                         maxLength={2000}
@@ -151,7 +145,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#91A7D8]">Sector</label>
+                                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">Sector</label>
                                         <input
                                             type="text"
                                             value={sector}
@@ -161,7 +155,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#91A7D8]">Batch</label>
+                                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">Batch</label>
                                         <input
                                             type="text"
                                             value={batch}
@@ -173,7 +167,9 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#91A7D8]">Overall Score (0–100)</label>
+                                    <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">
+                                        Overall Score (0–100)
+                                    </label>
                                     <input
                                         type="number"
                                         min={0}
@@ -185,24 +181,22 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                 </div>
 
                                 <div>
-                                    <label className="mb-3 block text-xs font-semibold uppercase tracking-widest text-[#91A7D8]">Radar Pillar Scores</label>
+                                    <label className="mb-3 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">
+                                        Radar Pillar Scores
+                                    </label>
                                     <div className="space-y-3">
                                         {PILLAR_KEYS.map((key) => (
                                             <div key={key} className="flex items-center gap-3">
-                                                <span className="w-24 text-xs capitalize text-[#C1CDE8]">{key}</span>
+                                                <span className="w-24 text-xs text-[#C1CDE8] capitalize">{key}</span>
                                                 <input
                                                     type="range"
                                                     min={0}
                                                     max={100}
                                                     value={radarData[key] ?? 0}
-                                                    onChange={(e) =>
-                                                        setRadarData((d) => ({ ...d, [key]: Number(e.target.value) }))
-                                                    }
+                                                    onChange={(e) => setRadarData((d) => ({ ...d, [key]: Number(e.target.value) }))}
                                                     className="flex-1 accent-[#3A54A5]"
                                                 />
-                                                <span className="w-8 text-right font-mono text-xs text-[#C1CDE8]">
-                                                    {radarData[key] ?? 0}
-                                                </span>
+                                                <span className="w-8 text-right font-mono text-xs text-[#C1CDE8]">{radarData[key] ?? 0}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -234,7 +228,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                 <button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#3A54A5] py-2.5 text-sm font-bold text-white hover:bg-[#2F4587] disabled:opacity-60 transition-colors"
+                                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#3A54A5] py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#2F4587] disabled:opacity-60"
                                 >
                                     <Save className="size-4" />
                                     {saving ? 'Saving...' : 'Save Profile'}
@@ -244,7 +238,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
 
                         {/* ── Right: Badge Manager ── */}
                         <div className="rounded-xl border border-[#232C43] bg-[#101623] p-6">
-                            <h2 className="mb-5 text-sm font-bold uppercase tracking-widest text-[#C1CDE8]">Badge Manager</h2>
+                            <h2 className="mb-5 text-sm font-bold tracking-widest text-[#C1CDE8] uppercase">Badge Manager</h2>
 
                             <div className="space-y-3">
                                 {badges.map((badge) => (
@@ -287,28 +281,29 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                     {/* ── Access Requests ── */}
                     {access_requests.length > 0 && (
                         <div className="mt-6 rounded-xl border border-[#232C43] bg-[#101623] p-6">
-                            <h2 className="mb-5 text-sm font-bold uppercase tracking-widest text-[#C1CDE8]">
+                            <h2 className="mb-5 text-sm font-bold tracking-widest text-[#C1CDE8] uppercase">
                                 Investor Access Requests ({access_requests.length})
                             </h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[600px] text-sm">
                                     <thead>
                                         <tr className="border-b border-[#232C43]">
-                                            <th className="pb-3 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Investor</th>
-                                            <th className="pb-3 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Firm</th>
-                                            <th className="pb-3 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Email</th>
-                                            <th className="pb-3 text-left text-xs font-bold uppercase tracking-widest text-[#91A7D8]">Requested</th>
+                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">Investor</th>
+                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">Firm</th>
+                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">Email</th>
+                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">Requested</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {access_requests.map((req) => (
-                                            <tr key={req.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
+                                            <tr
+                                                key={req.id}
+                                                className="border-b border-[#232C43] transition-colors last:border-0 hover:bg-[#1B294B]/30"
+                                            >
                                                 <td className="py-3 pr-4 text-[#D8E0F3]">{req.investor_name}</td>
                                                 <td className="py-3 pr-4 text-[#C1CDE8]">{req.firm_name ?? '—'}</td>
                                                 <td className="py-3 pr-4 text-[#C1CDE8]">{req.investor_email}</td>
-                                                <td className="py-3 text-[#91A7D8]">
-                                                    {new Date(req.created_at).toLocaleDateString()}
-                                                </td>
+                                                <td className="py-3 text-[#91A7D8]">{new Date(req.created_at).toLocaleDateString()}</td>
                                             </tr>
                                         ))}
                                     </tbody>

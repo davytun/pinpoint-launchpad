@@ -1,75 +1,58 @@
-import { Head } from '@inertiajs/react';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
+import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import {
-    AlertCircle,
-    AlertTriangle,
-    ArrowRight,
-    TrendingUp,
-    Zap,
-} from 'lucide-react';
+import { AlertCircle, AlertTriangle, ArrowRight, TrendingUp, Zap } from 'lucide-react';
 import { useState } from 'react';
-import {
-    PolarAngleAxis,
-    PolarGrid,
-    Radar,
-    RadarChart,
-    ResponsiveContainer,
-} from 'recharts';
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
 
-import { Badge } from '@/components/ui/badge';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 interface PillarScores {
-    potential:  number;
-    agility:    number;
-    risk:       number;
-    alignment:  number;
+    potential: number;
+    agility: number;
+    risk: number;
+    alignment: number;
     governance: number;
     operations: number;
-    network:    number;
+    network: number;
 }
 
 interface PageProps {
-    score:              number;
-    score_band:         'low' | 'mid_low' | 'mid_high' | 'high';
-    pillar_scores:      PillarScores;
-    score_band_label:   string;
+    score: number;
+    score_band: 'low' | 'mid_low' | 'mid_high' | 'high';
+    pillar_scores: PillarScores;
+    score_band_label: string;
     score_band_message: string;
-    next_action:        string;
-    completed_at:       string;
+    next_action: string;
+    completed_at: string;
 }
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
-const PILLAR_KEYS: (keyof PillarScores)[] = [
-    'potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'network',
-];
+const PILLAR_KEYS: (keyof PillarScores)[] = ['potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'network'];
 const PILLAR_LABELS: Record<keyof PillarScores, string> = {
-    potential:  'Potential',
-    agility:    'Agility',
-    risk:       'Risk',
-    alignment:  'Alignment',
+    potential: 'Potential',
+    agility: 'Agility',
+    risk: 'Risk',
+    alignment: 'Alignment',
     governance: 'Governance',
     operations: 'Operations',
-    network:    'Network',
+    network: 'Network',
 };
 
-const BAND_META: Record<string, {
-    color: string;
-    border: string;
-    bg: string;
-    textColor: string;
-    badgeLabel: string;
-    Icon: React.ElementType;
-}> = {
+const BAND_META: Record<
+    string,
+    {
+        color: string;
+        border: string;
+        bg: string;
+        textColor: string;
+        badgeLabel: string;
+        Icon: React.ElementType;
+    }
+> = {
     low: {
         color: '#EF4444',
         border: 'rgba(239,68,68,0.5)',
@@ -104,8 +87,6 @@ const BAND_META: Record<string, {
     },
 };
 
-
-
 // ─── Fade-in-up wrapper ────────────────────────────────────────────────────────
 
 function FadeUp({ delay, children }: { delay: number; children: React.ReactNode }) {
@@ -122,20 +103,15 @@ function FadeUp({ delay, children }: { delay: number; children: React.ReactNode 
 
 // ─── Page ───────────────────────────────────────────────────────────────────────
 
-export default function DiagnosticResult({
-    score,
-    score_band,
-    pillar_scores,
-    score_band_message,
-}: PageProps) {
-    const meta    = BAND_META[score_band] ?? BAND_META.mid_high;
+export default function DiagnosticResult({ score, score_band, pillar_scores, score_band_message }: PageProps) {
+    const meta = BAND_META[score_band] ?? BAND_META.mid_high;
     const isReady = score_band === 'mid_high' || score_band === 'high';
     const [checklistClicked, setChecklistClicked] = useState(false);
 
     // Build Recharts data
-    const radarData = PILLAR_KEYS.map(k => ({
+    const radarData = PILLAR_KEYS.map((k) => ({
         subject: PILLAR_LABELS[k],
-        value:   pillar_scores[k],
+        value: pillar_scores[k],
     }));
 
     return (
@@ -143,13 +119,10 @@ export default function DiagnosticResult({
             <Head title="Your PARAGON Results" />
 
             <DiagnosticLayout glowColor={meta.color}>
-                <div className="mx-auto max-w-4xl px-4 pb-24 pt-8 sm:px-8">
-
+                <div className="mx-auto max-w-4xl px-4 pt-8 pb-24 sm:px-8">
                     {/* Heading */}
                     <FadeUp delay={0.05}>
-                        <h1 className="mb-10 text-2xl font-bold text-[#D8E0F3] sm:text-3xl">
-                            Your PARAGON Diagnostic Results
-                        </h1>
+                        <h1 className="mb-10 text-2xl font-bold text-[#D8E0F3] sm:text-3xl">Your PARAGON Diagnostic Results</h1>
                     </FadeUp>
 
                     {/* ── Section 1: Score Hero ── */}
@@ -158,7 +131,7 @@ export default function DiagnosticResult({
                             <CardContent className="flex flex-col items-center p-6 sm:p-10">
                                 {/* Band badge */}
                                 <div
-                                    className="mb-5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.22em]"
+                                    className="mb-5 flex items-center gap-1.5 text-[10px] font-bold tracking-[0.22em] uppercase"
                                     style={{ color: meta.color }}
                                 >
                                     <meta.Icon className="size-3.5" />
@@ -168,22 +141,17 @@ export default function DiagnosticResult({
                                 {/* Static score */}
                                 <div className="flex items-end gap-1 leading-none">
                                     <span
-                                        className="font-display text-[6.5rem] font-black leading-none tracking-tighter sm:text-[8rem]"
+                                        className="font-display text-[6.5rem] leading-none font-black tracking-tighter sm:text-[8rem]"
                                         style={{
                                             color: meta.color,
                                         }}
                                     >
                                         {score}
                                     </span>
-                                    <span className="mb-3 font-display text-2xl font-light text-[#91A7D8] sm:mb-5">
-                                        /100
-                                    </span>
+                                    <span className="font-display mb-3 text-2xl font-light text-[#91A7D8] sm:mb-5">/100</span>
                                 </div>
 
-                                <p
-                                    className="mt-3 text-sm font-semibold uppercase tracking-widest"
-                                    style={{ color: meta.color, opacity: 0.75 }}
-                                >
+                                <p className="mt-3 text-sm font-semibold tracking-widest uppercase" style={{ color: meta.color, opacity: 0.75 }}>
                                     {meta.badgeLabel}
                                 </p>
                             </CardContent>
@@ -192,23 +160,17 @@ export default function DiagnosticResult({
 
                     {/* ── Section 2 + 3 + 4: Radar + Message + CTA grid ── */}
                     <div className="grid gap-6 md:grid-cols-2">
-
                         {/* Radar chart */}
                         <FadeUp delay={0.2}>
                             <Card className="overflow-hidden rounded-xl border border-white/5 bg-[#161c28] md:rounded-2xl">
                                 <CardHeader>
-                                    <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[#91A7D8]">
-                                        Pillar Radar
-                                    </CardTitle>
+                                    <CardTitle className="text-sm font-semibold tracking-widest text-[#91A7D8] uppercase">Pillar Radar</CardTitle>
                                 </CardHeader>
                                 <CardContent className="relative">
                                     <ResponsiveContainer width="100%" height={280}>
                                         <RadarChart data={radarData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
                                             <PolarGrid stroke="rgba(255, 255, 255, 0.08)" />
-                                            <PolarAngleAxis
-                                                dataKey="subject"
-                                                tick={{ fill: '#C1CDE8', fontSize: 11, fontWeight: 600 }}
-                                            />
+                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#C1CDE8', fontSize: 11, fontWeight: 600 }} />
                                             <Radar
                                                 dataKey="value"
                                                 stroke={meta.color}
@@ -224,15 +186,12 @@ export default function DiagnosticResult({
 
                         {/* Right column */}
                         <div className="flex flex-col gap-5">
-
                             {/* Section 3: Score band message */}
                             <FadeUp delay={0.25}>
-                                <Card
-                                    className="overflow-hidden rounded-xl border border-white/5 bg-[#161c28] md:rounded-2xl"
-                                >
+                                <Card className="overflow-hidden rounded-xl border border-white/5 bg-[#161c28] md:rounded-2xl">
                                     <CardHeader className="pb-2">
                                         <CardTitle
-                                            className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.15em]"
+                                            className="flex items-center gap-2 text-sm font-bold tracking-[0.15em] uppercase"
                                             style={{ color: meta.color, opacity: 0.85 }}
                                         >
                                             <meta.Icon className="size-4" />
@@ -240,9 +199,7 @@ export default function DiagnosticResult({
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm leading-relaxed text-[#C1CDE8]">
-                                            {score_band_message}
-                                        </p>
+                                        <p className="text-sm leading-relaxed text-[#C1CDE8]">{score_band_message}</p>
                                     </CardContent>
                                 </Card>
                             </FadeUp>
@@ -253,7 +210,7 @@ export default function DiagnosticResult({
                                     <div>
                                         <a
                                             href="/checkout"
-                                            className="group relative flex w-full items-center justify-center gap-2 rounded-md px-5 py-4 text-xs font-bold uppercase tracking-[0.2em] text-white outline-none transition-all duration-200 hover:opacity-90 border border-white/5 shadow-none"
+                                            className="group relative flex w-full items-center justify-center gap-2 rounded-md border border-white/5 px-5 py-4 text-xs font-bold tracking-[0.2em] text-white uppercase shadow-none transition-all duration-200 outline-none hover:opacity-90"
                                             style={{
                                                 backgroundColor: meta.color,
                                             }}
@@ -269,7 +226,7 @@ export default function DiagnosticResult({
                                         <button
                                             type="button"
                                             onClick={() => setChecklistClicked(true)}
-                                            className="w-full rounded-md border border-white/10 bg-[#0C121D] px-5 py-4 text-xs font-bold uppercase tracking-[0.2em] text-[#C1CDE8] transition-colors hover:bg-white/[0.04] hover:text-[#D8E0F3] focus:outline-none"
+                                            className="w-full rounded-md border border-white/10 bg-[#0C121D] px-5 py-4 text-xs font-bold tracking-[0.2em] text-[#C1CDE8] uppercase transition-colors hover:bg-white/[0.04] hover:text-[#D8E0F3] focus:outline-none"
                                         >
                                             View Your Readiness Checklist
                                         </button>
@@ -281,14 +238,12 @@ export default function DiagnosticResult({
                                                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                                                 className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-center text-xs leading-relaxed text-amber-300/80"
                                             >
-                                                Your Readiness Checklist was sent to the email you provided.
-                                                Check your inbox (and spam folder) for a message from Pinpoint Launchpad.
+                                                Your Readiness Checklist was sent to the email you provided. Check your inbox (and spam folder) for a
+                                                message from Pinpoint Launchpad.
                                             </motion.div>
                                         )}
 
-                                        <p className="mt-1 text-center text-xs text-[#91A7D8]">
-                                            Address these gaps, then retake.
-                                        </p>
+                                        <p className="mt-1 text-center text-xs text-[#91A7D8]">Address these gaps, then retake.</p>
                                     </div>
                                 )}
                             </FadeUp>
@@ -297,7 +252,7 @@ export default function DiagnosticResult({
                             <FadeUp delay={0.38}>
                                 <Card className="overflow-hidden rounded-xl border border-white/5 bg-[#161c28] md:rounded-2xl">
                                     <CardHeader className="pb-3">
-                                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#91A7D8]">
+                                        <CardTitle className="text-[10px] font-bold tracking-[0.2em] text-[#91A7D8] uppercase">
                                             Pillar Breakdown
                                         </CardTitle>
                                     </CardHeader>
@@ -305,12 +260,8 @@ export default function DiagnosticResult({
                                         {PILLAR_KEYS.map((key, i) => (
                                             <div key={key}>
                                                 <div className="mb-1 flex items-center justify-between">
-                                                    <span className="text-xs font-semibold text-[#C1CDE8]">
-                                                        {PILLAR_LABELS[key]}
-                                                    </span>
-                                                    <span className="text-xs text-[#91A7D8]">
-                                                        {pillar_scores[key]}%
-                                                    </span>
+                                                    <span className="text-xs font-semibold text-[#C1CDE8]">{PILLAR_LABELS[key]}</span>
+                                                    <span className="text-xs text-[#91A7D8]">{pillar_scores[key]}%</span>
                                                 </div>
                                                 <div className="h-[3px] w-full overflow-hidden bg-white/10">
                                                     <motion.div

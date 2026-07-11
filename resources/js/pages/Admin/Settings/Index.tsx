@@ -24,102 +24,85 @@ export default function AdminSettingsIndex() {
         form.patch(route('admin.settings.update'));
     }
 
-
-
     return (
         <AdminLayout>
             <Head title="Settings — Admin" />
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <h1 className="text-2xl font-bold text-[#D8E0F3]">Settings</h1>
+                    <p className="mt-1 text-sm text-[#C1CDE8]">Platform configuration</p>
+                </div>
 
-                    {/* Header */}
-                    <div className="mb-8">
-                        <h1 className="text-2xl font-bold text-[#D8E0F3]">Settings</h1>
-                        <p className="mt-1 text-sm text-[#C1CDE8]">Platform configuration</p>
+                {/* Flash */}
+                {flash?.success && (
+                    <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+                        {flash.success}
                     </div>
+                )}
 
-                    {/* Flash */}
-                    {flash?.success && (
-                        <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
-                            {flash.success}
-                        </div>
-                    )}
+                {/* Settings card */}
+                <div className="rounded-xl border border-[#232C43] bg-[#101623] p-7">
+                    <h2 className="mb-6 text-[11px] font-bold tracking-[0.2em] text-[#91A7D8] uppercase">Diagnostic Settings</h2>
 
-                    {/* Settings card */}
-                    <div className="rounded-xl border border-[#232C43] bg-[#101623] p-7">
-                        <h2 className="mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-[#91A7D8]">
-                            Diagnostic Settings
-                        </h2>
-
-                        <form onSubmit={submit} noValidate>
-
-                            {/* Setting row */}
-                            <div className="rounded-xl border border-[#232C43] bg-[#0C1427]/50 p-5">
-                                <div className="mb-4 flex items-start justify-between gap-6">
-                                    <div className="flex-1">
-                                        <p className="text-sm font-semibold text-[#D8E0F3]">
-                                            Diagnostic Cooldown Days
-                                        </p>
-                                        <p className="mt-1 text-xs leading-relaxed text-[#C1CDE8]">
-                                            Number of days a founder must wait before retaking after scoring below 65%
-                                        </p>
-                                    </div>
-
-                                    {/* Current value pill */}
-                                    <span className="shrink-0 rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-3 py-1 text-xs font-semibold tabular-nums text-[#3A54A5]">
-                                        {cooldown_days}d
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        id="cooldown_days"
-                                        type="number"
-                                        min={1}
-                                        max={365}
-                                        value={form.data.diagnostic_cooldown_days}
-                                        onChange={e =>
-                                            form.setData(
-                                                'diagnostic_cooldown_days',
-                                                parseInt(e.target.value, 10) || 1,
-                                            )
-                                        }
-                                        className="w-24 rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm tabular-nums text-[#D8E0F3] transition-colors focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50"
-                                    />
-                                    <span className="text-sm text-[#91A7D8]">
-                                        days
-                                    </span>
-                                </div>
-
-                                {form.errors.diagnostic_cooldown_days && (
-                                    <p className="mt-2 text-xs text-rose-400">
-                                        {form.errors.diagnostic_cooldown_days}
+                    <form onSubmit={submit} noValidate>
+                        {/* Setting row */}
+                        <div className="rounded-xl border border-[#232C43] bg-[#0C1427]/50 p-5">
+                            <div className="mb-4 flex items-start justify-between gap-6">
+                                <div className="flex-1">
+                                    <p className="text-sm font-semibold text-[#D8E0F3]">Diagnostic Cooldown Days</p>
+                                    <p className="mt-1 text-xs leading-relaxed text-[#C1CDE8]">
+                                        Number of days a founder must wait before retaking after scoring below 65%
                                     </p>
+                                </div>
+
+                                {/* Current value pill */}
+                                <span className="shrink-0 rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-3 py-1 text-xs font-semibold text-[#3A54A5] tabular-nums">
+                                    {cooldown_days}d
+                                </span>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <input
+                                    id="cooldown_days"
+                                    type="number"
+                                    min={1}
+                                    max={365}
+                                    value={form.data.diagnostic_cooldown_days}
+                                    onChange={(e) => form.setData('diagnostic_cooldown_days', parseInt(e.target.value, 10) || 1)}
+                                    className="w-24 rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] tabular-nums transition-colors focus:border-[#3A54A5]/50 focus:ring-1 focus:ring-[#3A54A5]/50 focus:outline-none"
+                                />
+                                <span className="text-sm text-[#91A7D8]">days</span>
+                            </div>
+
+                            {form.errors.diagnostic_cooldown_days && (
+                                <p className="mt-2 text-xs text-rose-400">{form.errors.diagnostic_cooldown_days}</p>
+                            )}
+                        </div>
+
+                        {/* Divider */}
+                        <div className="my-6 h-px bg-[#232C43]" />
+
+                        {/* Save */}
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                disabled={form.processing}
+                                className="flex items-center gap-2 rounded-lg bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white transition-all duration-150 hover:bg-[#2F4587] disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {form.processing ? (
+                                    <>
+                                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                                        Saving…
+                                    </>
+                                ) : (
+                                    'Save Settings'
                                 )}
-                            </div>
-
-                            {/* Divider */}
-                            <div className="my-6 h-px bg-[#232C43]" />
-
-                            {/* Save */}
-                            <div className="flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={form.processing}
-                                    className="flex items-center gap-2 rounded-lg bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white transition-all duration-150 hover:bg-[#2F4587] disabled:cursor-not-allowed disabled:opacity-50"
-                                >
-                                    {form.processing ? (
-                                        <>
-                                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                                            Saving…
-                                        </>
-                                    ) : (
-                                        'Save Settings'
-                                    )}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </AdminLayout>
     );

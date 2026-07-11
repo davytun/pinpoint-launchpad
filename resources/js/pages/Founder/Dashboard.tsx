@@ -1,32 +1,26 @@
 import { Head, Link } from '@inertiajs/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
     AlertCircle,
     AlertTriangle,
+    ArrowRight,
     CheckCircle2,
+    ChevronDown,
+    ChevronUp,
     ExternalLink,
     FileText,
     MessageSquare,
     TrendingUp,
+    User,
     Zap,
-    ArrowRight,
-    ChevronDown,
-    ChevronUp,
-    User
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import {
-    PolarAngleAxis,
-    PolarGrid,
-    Radar,
-    RadarChart,
-    ResponsiveContainer,
-} from 'recharts';
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
 
+import DashboardTour from '@/components/dashboard-tour';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import FounderLayout from '@/layouts/founder-layout';
-import DashboardTour from '@/components/dashboard-tour';
 import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -72,21 +66,54 @@ interface PageProps {
 
 const PILLAR_KEYS = ['potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'network'];
 const PILLAR_LABELS: Record<string, string> = {
-    potential: 'Potential', agility: 'Agility', risk: 'Risk',
-    alignment: 'Alignment', governance: 'Governance', operations: 'Operations', network: 'Network',
+    potential: 'Potential',
+    agility: 'Agility',
+    risk: 'Risk',
+    alignment: 'Alignment',
+    governance: 'Governance',
+    operations: 'Operations',
+    network: 'Network',
 };
 
 // Adjusted colors to be slightly more muted for Fintech Pro, maintaining semantic meaning
 const BAND_META: Record<string, { color: string; border: string; bg: string; textColor: string; badgeLabel: string; Icon: React.ElementType }> = {
-    low:      { color: '#EF4444', border: 'rgba(239,68,68,0.3)',   bg: 'rgba(239,68,68,0.1)',   textColor: '#FCA5A5', badgeLabel: 'High Risk Profile',     Icon: AlertCircle  },
-    mid_low:  { color: '#F97316', border: 'rgba(249,115,22,0.3)',  bg: 'rgba(249,115,22,0.1)',  textColor: '#FDBA74', badgeLabel: 'Development Required',   Icon: AlertTriangle },
-    mid_high: { color: '#3A54A5', border: 'rgba(68,104,187,0.4)',  bg: 'rgba(68,104,187,0.15)', textColor: '#91A7D8', badgeLabel: 'Investment Pipeline',    Icon: TrendingUp    },
-    high:     { color: '#5CA336', border: 'rgba(92,163,54,0.4)',   bg: 'rgba(92,163,54,0.15)',  textColor: '#86efac', badgeLabel: 'Top Percentile',         Icon: Zap           },
+    low: {
+        color: '#EF4444',
+        border: 'rgba(239,68,68,0.3)',
+        bg: 'rgba(239,68,68,0.1)',
+        textColor: '#FCA5A5',
+        badgeLabel: 'High Risk Profile',
+        Icon: AlertCircle,
+    },
+    mid_low: {
+        color: '#F97316',
+        border: 'rgba(249,115,22,0.3)',
+        bg: 'rgba(249,115,22,0.1)',
+        textColor: '#FDBA74',
+        badgeLabel: 'Development Required',
+        Icon: AlertTriangle,
+    },
+    mid_high: {
+        color: '#3A54A5',
+        border: 'rgba(68,104,187,0.4)',
+        bg: 'rgba(68,104,187,0.15)',
+        textColor: '#91A7D8',
+        badgeLabel: 'Investment Pipeline',
+        Icon: TrendingUp,
+    },
+    high: {
+        color: '#5CA336',
+        border: 'rgba(92,163,54,0.4)',
+        bg: 'rgba(92,163,54,0.15)',
+        textColor: '#86efac',
+        badgeLabel: 'Top Percentile',
+        Icon: Zap,
+    },
 };
 
 const TIER_LABELS: Record<string, string> = {
-    foundation:    'Foundation',
-    growth:        'Growth',
+    foundation: 'Foundation',
+    growth: 'Growth',
     institutional: 'Institutional',
 };
 
@@ -119,9 +146,9 @@ function CountUp({ target, duration = 1500 }: { target: number; duration?: numbe
     useEffect(() => {
         startTs.current = performance.now();
         function tick(now: number) {
-            const elapsed  = now - startTs.current;
+            const elapsed = now - startTs.current;
             const progress = Math.min(elapsed / duration, 1);
-            const eased    = 1 - Math.pow(1 - progress, 3);
+            const eased = 1 - Math.pow(1 - progress, 3);
             setValue(Math.round(eased * target));
             if (progress < 1) raf.current = requestAnimationFrame(tick);
         }
@@ -150,37 +177,37 @@ function FadeUp({ delay = 0, children }: { delay?: number; children: React.React
 
 function ProgressStepper({ auditStatus }: { auditStatus: string }) {
     const steps = [
-        { label: 'Application', done: true,                              active: false },
-        { label: 'Payment',     done: true,                              active: false },
-        { label: 'Agreement',   done: true,                              active: false },
-        { label: 'Audit',       done: auditStatus === 'complete',        active: auditStatus !== 'complete' },
-        { label: 'Certified',   done: auditStatus === 'complete',        active: false },
+        { label: 'Application', done: true, active: false },
+        { label: 'Payment', done: true, active: false },
+        { label: 'Agreement', done: true, active: false },
+        { label: 'Audit', done: auditStatus === 'complete', active: auditStatus !== 'complete' },
+        { label: 'Certified', done: auditStatus === 'complete', active: false },
     ];
 
     return (
-        <div className="flex w-full items-center justify-between mt-2 sm:mt-6 pb-8">
+        <div className="mt-2 flex w-full items-center justify-between pb-8 sm:mt-6">
             {steps.map((step, i) => (
-                <div key={step.label} className="flex items-center flex-1 last:flex-none">
+                <div key={step.label} className="flex flex-1 items-center last:flex-none">
                     {/* Step Circle */}
-                    <div className="flex flex-col items-center relative">
+                    <div className="relative flex flex-col items-center">
                         <div
                             className={[
-                                'flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold border transition-colors duration-200 shrink-0 relative z-10',
-                                step.done   ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400' :
-                                step.active ? 'border-[#3A54A5]/80 bg-[#3A54A5]/15 text-white stepper-active-pulse' :
-                                              'border-[#232C43] bg-[#0C1427] text-[#91A7D8]',
+                                'relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition-colors duration-200',
+                                step.done
+                                    ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
+                                    : step.active
+                                      ? 'stepper-active-pulse border-[#3A54A5]/80 bg-[#3A54A5]/15 text-white'
+                                      : 'border-[#232C43] bg-[#0C1427] text-[#91A7D8]',
                             ].join(' ')}
                         >
                             {step.done ? <CheckCircle2 className="size-3.5" /> : i + 1}
                         </div>
-                        
+
                         {/* Label */}
                         <span
                             className={[
-                                'mt-3 absolute top-6 whitespace-nowrap text-[11px] font-medium tracking-wide transition-colors duration-200',
-                                step.done   ? 'text-emerald-400' :
-                                step.active ? 'text-[#91A7D8]' :
-                                              'text-[#455987]',
+                                'absolute top-6 mt-3 text-[11px] font-medium tracking-wide whitespace-nowrap transition-colors duration-200',
+                                step.done ? 'text-emerald-400' : step.active ? 'text-[#91A7D8]' : 'text-[#455987]',
                             ].join(' ')}
                         >
                             {step.label}
@@ -206,7 +233,7 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
 
 // ─── Card Components ───
 
-function ProCard({ children, className = '', id }: { children: React.ReactNode, className?: string, id?: string }) {
+function ProCard({ children, className = '', id }: { children: React.ReactNode; className?: string; id?: string }) {
     return (
         <div id={id} className={`overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm ${className}`}>
             {children}
@@ -217,26 +244,34 @@ function ProCard({ children, className = '', id }: { children: React.ReactNode, 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function FounderDashboard({
-    founder, score, score_band, pillar_scores,
-    score_band_message, tier, tier_features,
-    audit_status, audit_status_config,
-    payment, verification_url, profile_is_live,
+    founder,
+    score,
+    score_band,
+    pillar_scores,
+    score_band_message,
+    tier,
+    tier_features,
+    audit_status,
+    audit_status_config,
+    payment,
+    verification_url,
+    profile_is_live,
 }: PageProps) {
-    const meta       = BAND_META[score_band ?? 'mid_high'] ?? BAND_META.mid_high;
-    const tierLabel  = TIER_LABELS[tier ?? ''] ?? (tier ? (tier.charAt(0).toUpperCase() + tier.slice(1)) : 'Foundation');
-    const statusCfg  = audit_status_config[audit_status] ?? audit_status_config['pending'];
+    const meta = BAND_META[score_band ?? 'mid_high'] ?? BAND_META.mid_high;
+    const tierLabel = TIER_LABELS[tier ?? ''] ?? (tier ? tier.charAt(0).toUpperCase() + tier.slice(1) : 'Foundation');
+    const statusCfg = audit_status_config[audit_status] ?? audit_status_config['pending'];
 
     const [accountOpen, setAccountOpen] = useState(false);
     const [startTourKey, setStartTourKey] = useState(0);
 
     function restartTour() {
-        setStartTourKey(prev => prev + 1);
+        setStartTourKey((prev) => prev + 1);
     }
 
     const hasPillarData = Object.values(pillar_scores).some((v) => (v ?? 0) > 0);
     const radarData = PILLAR_KEYS.map((k) => ({
         subject: PILLAR_LABELS[k],
-        value:   pillar_scores[k] ?? 0,
+        value: pillar_scores[k] ?? 0,
     }));
 
     return (
@@ -244,7 +279,6 @@ export default function FounderDashboard({
             <Head title="Dashboard — Pinpoint Launchpad" />
 
             <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-
                 {/* ── Section 1 — Welcome Header ── */}
                 <FadeUp delay={0}>
                     <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -269,32 +303,28 @@ export default function FounderDashboard({
                         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
                             <div className="lg:w-1/2">
                                 <div className="mb-4 flex items-center gap-3">
-                                    <span className="text-[12px] font-semibold uppercase tracking-wider text-[#C1CDE8]">
-                                        Current Phase
-                                    </span>
-                                    <Badge
-                                        className="rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[#232C43] text-[#DCE2EF] border-none"
-                                    >
+                                    <span className="text-[12px] font-semibold tracking-wider text-[#C1CDE8] uppercase">Current Phase</span>
+                                    <Badge className="rounded-sm border-none bg-[#232C43] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#DCE2EF] uppercase">
                                         {statusCfg.label}
                                     </Badge>
                                 </div>
-                                
-                                <p className="text-[15px] leading-relaxed text-[#91A7D8] max-w-lg">
-                                    {statusCfg.description}
-                                </p>
+
+                                <p className="max-w-lg text-[15px] leading-relaxed text-[#91A7D8]">{statusCfg.description}</p>
 
                                 {audit_status === 'needs_info' && (
                                     <div className="mt-5 flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-4">
-                                        <AlertTriangle className="size-4 text-amber-400 shrink-0 mt-0.5" />
+                                        <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" />
                                         <div>
                                             <p className="text-[13px] font-medium text-amber-400">Action Required</p>
-                                            <p className="mt-1 text-[13px] text-amber-400/80">Your analyst requested more details. Please check your Messages.</p>
+                                            <p className="mt-1 text-[13px] text-amber-400/80">
+                                                Your analyst requested more details. Please check your Messages.
+                                            </p>
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            <div id="tour-stepper" className="lg:w-[45%] lg:pb-0 pb-4">
+                            <div id="tour-stepper" className="pb-4 lg:w-[45%] lg:pb-0">
                                 <ProgressStepper auditStatus={audit_status} />
                             </div>
                         </div>
@@ -304,32 +334,26 @@ export default function FounderDashboard({
                 {/* ── Section 3 — PARAGON Score & Radar ── */}
                 <div className="grid gap-6 sm:grid-cols-2">
                     <FadeUp delay={0.15}>
-                        <ProCard id="tour-score" className="flex h-full flex-col items-center justify-center p-8 text-center relative">
-                            <p className="mb-6 text-[12px] font-semibold uppercase tracking-wider text-[#C1CDE8]">
-                                PARAGON Score
-                            </p>
+                        <ProCard id="tour-score" className="relative flex h-full flex-col items-center justify-center p-8 text-center">
+                            <p className="mb-6 text-[12px] font-semibold tracking-wider text-[#C1CDE8] uppercase">PARAGON Score</p>
                             {score != null ? (
                                 <>
                                     <div className="mb-5 flex items-baseline justify-center">
                                         <span
-                                            className="font-display text-[5.5rem] font-bold leading-none tracking-tighter"
+                                            className="font-display text-[5.5rem] leading-none font-bold tracking-tighter"
                                             style={{ color: meta.color }}
                                         >
                                             <CountUp target={score} duration={1500} />
                                         </span>
                                     </div>
                                     <Badge
-                                        className="rounded-sm px-3 py-1 text-[11px] font-bold uppercase tracking-wider"
+                                        className="rounded-sm px-3 py-1 text-[11px] font-bold tracking-wider uppercase"
                                         style={{ background: meta.bg, color: meta.textColor, border: `1px solid ${meta.border}` }}
                                     >
                                         <meta.Icon className="mr-2 inline size-3.5" aria-hidden="true" />
                                         {meta.badgeLabel}
                                     </Badge>
-                                    {score_band_message && (
-                                        <p className="mt-4 text-[13px] leading-relaxed text-[#C1CDE8]">
-                                            {score_band_message}
-                                        </p>
-                                    )}
+                                    {score_band_message && <p className="mt-4 text-[13px] leading-relaxed text-[#C1CDE8]">{score_band_message}</p>}
                                 </>
                             ) : (
                                 <div className="flex flex-col items-center space-y-4 py-6">
@@ -340,20 +364,15 @@ export default function FounderDashboard({
                         </ProCard>
                     </FadeUp>
 
-                    <FadeUp delay={0.20}>
+                    <FadeUp delay={0.2}>
                         <ProCard id="tour-pillar" className="h-full p-6 sm:p-8">
-                            <p className="mb-4 text-[12px] font-semibold uppercase tracking-wider text-[#C1CDE8]">
-                                Pillar Breakdown
-                            </p>
+                            <p className="mb-4 text-[12px] font-semibold tracking-wider text-[#C1CDE8] uppercase">Pillar Breakdown</p>
                             {hasPillarData ? (
                                 <div className="relative h-[220px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <RadarChart data={radarData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
                                             <PolarGrid stroke="#232C43" />
-                                            <PolarAngleAxis
-                                                dataKey="subject"
-                                                tick={{ fill: '#C1CDE8', fontSize: 11, fontWeight: 500 }}
-                                            />
+                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#C1CDE8', fontSize: 11, fontWeight: 500 }} />
                                             <Radar
                                                 dataKey="value"
                                                 stroke={meta.color}
@@ -378,19 +397,15 @@ export default function FounderDashboard({
                 {/* ── Section 4 — Audit Package ── */}
                 <FadeUp delay={0.25}>
                     <ProCard className="p-6 sm:p-8">
-                        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[#232C43] pb-4">
+                        <div className="mb-6 flex flex-col gap-3 border-b border-[#232C43] pb-4 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#1B294B] text-[#91A7D8]">
                                     <FileText className="size-4.5" />
                                 </div>
-                                <h2 className="text-[16px] font-medium text-[#D8E0F3]">
-                                    {tierLabel} Package Inclusions
-                                </h2>
+                                <h2 className="text-[16px] font-medium text-[#D8E0F3]">{tierLabel} Package Inclusions</h2>
                             </div>
                             {payment && (
-                                <span className="text-[14px] font-medium text-[#C1CDE8]">
-                                    Paid: ${Number(payment.total_amount).toLocaleString()}
-                                </span>
+                                <span className="text-[14px] font-medium text-[#C1CDE8]">Paid: ${Number(payment.total_amount).toLocaleString()}</span>
                             )}
                         </div>
                         <ul className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -405,21 +420,21 @@ export default function FounderDashboard({
                 </FadeUp>
 
                 {/* ── Section 5 — Quick Actions ── */}
-                <FadeUp delay={0.30}>
+                <FadeUp delay={0.3}>
                     <div className="grid gap-4 sm:grid-cols-3">
                         <Link
                             id="tour-documents"
                             href={route('founder.documents.index')}
                             className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#3A54A5]/60 hover:bg-[#101623]/95 hover:shadow-[0_12px_28px_rgba(0,0,0,0.45)]"
                         >
-                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43] transition-colors group-hover:border-[#3A54A5]/40 group-hover:bg-[#101623]">
+                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md border border-[#232C43] bg-[#0C1427] transition-colors group-hover:border-[#3A54A5]/40 group-hover:bg-[#101623]">
                                 <FileText className="size-4.5 text-[#91A7D8] transition-colors group-hover:text-white" />
                             </div>
                             <div>
                                 <h3 className="text-[15px] font-medium text-[#D8E0F3]">Documents</h3>
                                 <p className="mt-1 text-[13px] text-[#C1CDE8]">Manage and upload requested files.</p>
                             </div>
-                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#3A54A5] transition-colors group-hover:text-[#91A7D8]">
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold tracking-wider text-[#3A54A5] uppercase transition-colors group-hover:text-[#91A7D8]">
                                 View <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
                         </Link>
@@ -429,30 +444,32 @@ export default function FounderDashboard({
                             href={route('founder.messages.index')}
                             className="group flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#3A54A5]/60 hover:bg-[#101623]/95 hover:shadow-[0_12px_28px_rgba(0,0,0,0.45)]"
                         >
-                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43] transition-colors group-hover:border-[#3A54A5]/40 group-hover:bg-[#101623]">
+                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-md border border-[#232C43] bg-[#0C1427] transition-colors group-hover:border-[#3A54A5]/40 group-hover:bg-[#101623]">
                                 <MessageSquare className="size-4.5 text-[#91A7D8] transition-colors group-hover:text-white" />
                             </div>
                             <div>
                                 <h3 className="text-[15px] font-medium text-[#D8E0F3]">Messages</h3>
                                 <p className="mt-1 text-[13px] text-[#C1CDE8]">Communicate directly with your analyst.</p>
                             </div>
-                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#3A54A5] transition-colors group-hover:text-[#91A7D8]">
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold tracking-wider text-[#3A54A5] uppercase transition-colors group-hover:text-[#91A7D8]">
                                 Open <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                             </div>
                         </Link>
 
-                        <div 
+                        <div
                             className={cn(
-                                "flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-all duration-300 ease-out",
-                                profile_is_live ? "hover:-translate-y-1 hover:border-emerald-500/40 hover:bg-[#101623]/95 hover:shadow-[0_12px_28px_rgba(0,0,0,0.45)]" : ""
+                                'flex flex-col justify-between overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] p-5 transition-all duration-300 ease-out',
+                                profile_is_live
+                                    ? 'hover:-translate-y-1 hover:border-emerald-500/40 hover:bg-[#101623]/95 hover:shadow-[0_12px_28px_rgba(0,0,0,0.45)]'
+                                    : '',
                             )}
                         >
                             <div className="mb-4 flex items-center justify-between">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-md border border-[#232C43] bg-[#0C1427]">
                                     <ExternalLink className="size-4.5 text-[#91A7D8]" />
                                 </div>
                                 {profile_is_live && (
-                                    <span className="rounded-sm bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/20">
+                                    <span className="rounded-sm border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-emerald-400 uppercase">
                                         Live
                                     </span>
                                 )}
@@ -468,12 +485,12 @@ export default function FounderDashboard({
                                     href={verification_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-emerald-400 transition-colors hover:text-emerald-300"
+                                    className="group mt-5 flex items-center gap-1.5 text-[12px] font-semibold tracking-wider text-emerald-400 uppercase transition-colors hover:text-emerald-300"
                                 >
                                     View Link <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
                                 </a>
                             ) : (
-                                <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[#455987]">
+                                <div className="mt-5 flex items-center gap-1.5 text-[12px] font-semibold tracking-wider text-[#455987] uppercase">
                                     Pending Audit
                                 </div>
                             )}
@@ -489,14 +506,12 @@ export default function FounderDashboard({
                             className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors hover:bg-[#1B294B]"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0C1427] border border-[#232C43]">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-md border border-[#232C43] bg-[#0C1427]">
                                     <User className="size-4.5 text-[#91A7D8]" />
                                 </div>
                                 <span className="text-[15px] font-medium text-[#D8E0F3]">Account Details</span>
                             </div>
-                            {accountOpen
-                                ? <ChevronUp   className="size-4.5 text-[#C1CDE8]" />
-                                : <ChevronDown className="size-4.5 text-[#C1CDE8]" />}
+                            {accountOpen ? <ChevronUp className="size-4.5 text-[#C1CDE8]" /> : <ChevronDown className="size-4.5 text-[#C1CDE8]" />}
                         </button>
 
                         <AnimatePresence>
@@ -511,23 +526,26 @@ export default function FounderDashboard({
                                     <div className="border-t border-[#232C43] bg-[#080B11] px-6 py-5">
                                         <div className="grid gap-4 sm:grid-cols-2">
                                             {[
-                                                { label: 'Full Name',    value: founder.full_name },
-                                                { label: 'Company',      value: founder.company_name },
-                                                { label: 'Email',        value: founder.email },
+                                                { label: 'Full Name', value: founder.full_name },
+                                                { label: 'Company', value: founder.company_name },
+                                                { label: 'Email', value: founder.email },
                                                 { label: 'Member Since', value: fmtDate(founder.created_at) },
-                                                { label: 'Last Login',   value: fmtDateTime(founder.last_login_at) },
+                                                { label: 'Last Login', value: fmtDateTime(founder.last_login_at) },
                                             ].map(({ label, value }) => (
-                                                <div key={label} className="rounded-xl border border-[#232C43]/45 bg-[#0C121E]/60 p-4 shadow-sm transition-all hover:border-[#232C43]/70">
-                                                    <dt className="text-[10px] font-bold uppercase tracking-wider text-[#91A7D8]">{label}</dt>
+                                                <div
+                                                    key={label}
+                                                    className="rounded-xl border border-[#232C43]/45 bg-[#0C121E]/60 p-4 shadow-sm transition-all hover:border-[#232C43]/70"
+                                                >
+                                                    <dt className="text-[10px] font-bold tracking-wider text-[#91A7D8] uppercase">{label}</dt>
                                                     <dd className="mt-1 font-sans text-[13.5px] font-medium text-white">{value ?? '—'}</dd>
                                                 </div>
                                             ))}
                                         </div>
-                                        <div className="mt-6 border-t border-[#232C43] pt-5 flex justify-end">
+                                        <div className="mt-6 flex justify-end border-t border-[#232C43] pt-5">
                                             <button
                                                 type="button"
                                                 onClick={restartTour}
-                                                className="inline-flex items-center gap-2 rounded-lg bg-[#3A54A5]/10 border border-[#3A54A5]/30 px-4 py-2 text-[12px] font-bold uppercase tracking-wider text-[#91A7D8] transition-all hover:bg-[#3A54A5]/25 hover:text-white"
+                                                className="inline-flex items-center gap-2 rounded-lg border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-4 py-2 text-[12px] font-bold tracking-wider text-[#91A7D8] uppercase transition-all hover:bg-[#3A54A5]/25 hover:text-white"
                                             >
                                                 Restart Guided Tour
                                             </button>
@@ -538,7 +556,6 @@ export default function FounderDashboard({
                         </AnimatePresence>
                     </ProCard>
                 </FadeUp>
-
             </div>
             <DashboardTour startTourKey={startTourKey} />
         </FounderLayout>

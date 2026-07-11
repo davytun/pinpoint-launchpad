@@ -1,36 +1,21 @@
 import { Head, Link } from '@inertiajs/react';
-import {
-    Activity,
-    AlertTriangle,
-    CheckCircle2,
-    Clock,
-    DollarSign,
-    List,
-    MessageSquare,
-    Users,
-    Zap,
-} from 'lucide-react';
-import {
-    Bar,
-    BarChart,
-    Cell,
-    Pie,
-    PieChart,
-    XAxis,
-} from 'recharts';
+import { Activity, AlertTriangle, CheckCircle2, Clock, DollarSign, List, MessageSquare, Users, Zap } from 'lucide-react';
+import { Bar, BarChart, Cell, Pie, PieChart, XAxis } from 'recharts';
 
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import AdminLayout from '@/layouts/admin-layout';
-import {
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-    type ChartConfig,
-} from '@/components/ui/chart';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface MonthlyRevenue { month: string; revenue: number }
-interface AuditBreakdownItem { label: string; value: number; color: string }
+interface MonthlyRevenue {
+    month: string;
+    revenue: number;
+}
+interface AuditBreakdownItem {
+    label: string;
+    value: number;
+    color: string;
+}
 
 interface Metrics {
     my_open_messages?: number;
@@ -66,22 +51,37 @@ interface PageProps {
 
 function fmtCurrency(amount: number) {
     return new Intl.NumberFormat('en-US', {
-        style: 'currency', currency: 'USD', maximumFractionDigits: 0,
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
     }).format(amount);
 }
 
 // ─── Metric card ─────────────────────────────────────────────────────────────
 
 function MetricCard({
-    icon: Icon, label, value, color, iconBg, pulse = false, href,
+    icon: Icon,
+    label,
+    value,
+    color,
+    iconBg,
+    pulse = false,
+    href,
 }: {
-    icon: React.ElementType; label: string; value: string | number;
-    color: string; iconBg: string; pulse?: boolean; href?: string;
+    icon: React.ElementType;
+    label: string;
+    value: string | number;
+    color: string;
+    iconBg: string;
+    pulse?: boolean;
+    href?: string;
 }) {
     const inner = (
-        <div className={`group rounded-xl border border-[#232C43] bg-[#101623] p-4 transition-all hover:border-[#3A54A5]/40 hover:bg-[#1B294B] sm:p-5 ${href ? 'cursor-pointer' : ''}`}>
+        <div
+            className={`group rounded-xl border border-[#232C43] bg-[#101623] p-4 transition-all hover:border-[#3A54A5]/40 hover:bg-[#1B294B] sm:p-5 ${href ? 'cursor-pointer' : ''}`}
+        >
             <div className="mb-3 flex items-center justify-between gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#91A7D8] leading-tight">{label}</span>
+                <span className="text-[10px] leading-tight font-bold tracking-widest text-[#91A7D8] uppercase">{label}</span>
                 <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconBg}`}>
                     <Icon className={`size-4 ${color}`} />
                 </div>
@@ -110,34 +110,19 @@ const revenueChartConfig = {
 function RevenueSparkline({ data, thisMonth }: { data: MonthlyRevenue[]; thisMonth: number }) {
     const max = Math.max(...data.map((d) => d.revenue), 1);
     return (
-        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5 min-w-0">
+        <div className="min-w-0 rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
             <div className="mb-1 flex items-center justify-between">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Monthly Revenue</p>
+                <p className="text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Monthly Revenue</p>
                 <DollarSign className="size-4 text-emerald-400 opacity-50" />
             </div>
             <p className="mb-4 text-2xl font-bold text-[#D8E0F3]">{fmtCurrency(thisMonth)}</p>
             <ChartContainer config={revenueChartConfig} className="h-[90px] w-full">
                 <BarChart data={data} barCategoryGap="28%">
-                    <XAxis
-                        dataKey="month"
-                        tick={{ fill: '#C1CDE8', fontSize: 10 }}
-                        axisLine={false}
-                        tickLine={false}
-                    />
-                    <ChartTooltip
-                        content={
-                            <ChartTooltipContent
-                                formatter={(v) => fmtCurrency(Number(v))}
-                                hideLabel
-                            />
-                        }
-                    />
+                    <XAxis dataKey="month" tick={{ fill: '#C1CDE8', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtCurrency(Number(v))} hideLabel />} />
                     <Bar dataKey="revenue" radius={[3, 3, 0, 0]}>
                         {data.map((entry, i) => (
-                            <Cell
-                                key={i}
-                                fill={entry.revenue === max ? '#10b981' : 'rgba(16,185,129,0.22)'}
-                            />
+                            <Cell key={i} fill={entry.revenue === max ? '#10b981' : 'rgba(16,185,129,0.22)'} />
                         ))}
                     </Bar>
                 </BarChart>
@@ -149,9 +134,7 @@ function RevenueSparkline({ data, thisMonth }: { data: MonthlyRevenue[]; thisMon
 // ─── Audit donut ──────────────────────────────────────────────────────────────
 
 function buildAuditConfig(data: AuditBreakdownItem[]): ChartConfig {
-    return Object.fromEntries(
-        data.map((d) => [d.label.toLowerCase().replace(' ', '_'), { label: d.label, color: d.color }])
-    );
+    return Object.fromEntries(data.map((d) => [d.label.toLowerCase().replace(' ', '_'), { label: d.label, color: d.color }]));
 }
 
 function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
@@ -159,8 +142,8 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
     const chartConfig = buildAuditConfig(data);
 
     return (
-        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5 min-w-0">
-            <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Audit Pipeline</p>
+        <div className="min-w-0 rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
+            <p className="mb-4 text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Audit Pipeline</p>
             <div className="flex items-center gap-5">
                 {/* Donut */}
                 <ChartContainer config={chartConfig} className="h-[100px] w-[100px] shrink-0">
@@ -181,9 +164,7 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
                                 <Cell key={i} fill={entry.color} stroke="transparent" />
                             ))}
                         </Pie>
-                        <ChartTooltip
-                            content={<ChartTooltipContent nameKey="label" hideLabel />}
-                        />
+                        <ChartTooltip content={<ChartTooltipContent nameKey="label" hideLabel />} />
                     </PieChart>
                 </ChartContainer>
 
@@ -195,12 +176,12 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
                                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: item.color }} />
                                 <span className="truncate text-xs text-[#C1CDE8]">{item.label}</span>
                             </div>
-                            <span className="shrink-0 text-xs font-bold tabular-nums text-[#D8E0F3]">{item.value}</span>
+                            <span className="shrink-0 text-xs font-bold text-[#D8E0F3] tabular-nums">{item.value}</span>
                         </div>
                     ))}
                     <div className="flex items-center justify-between gap-2 border-t border-[#232C43] pt-1.5">
                         <span className="text-xs text-[#91A7D8]">Total</span>
-                        <span className="text-xs font-bold tabular-nums text-[#D8E0F3]">{total}</span>
+                        <span className="text-xs font-bold text-[#D8E0F3] tabular-nums">{total}</span>
                     </div>
                 </div>
             </div>
@@ -211,37 +192,32 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
 // ─── Waitlist split ───────────────────────────────────────────────────────────
 
 const waitlistChartConfig = {
-    founders:  { label: 'Founders',  color: '#3b82f6' },
+    founders: { label: 'Founders', color: '#3b82f6' },
     investors: { label: 'Investors', color: '#8b5cf6' },
 } satisfies ChartConfig;
 
 function WaitlistSplit({ founders, investors }: { founders: number; investors: number }) {
     const total = founders + investors;
-    const founderPct  = total ? Math.round((founders  / total) * 100) : 0;
+    const founderPct = total ? Math.round((founders / total) * 100) : 0;
     const investorPct = total ? 100 - founderPct : 0;
 
     const barData = [
-        { name: 'Founders',  founders,  investors: 0 },
+        { name: 'Founders', founders, investors: 0 },
         { name: 'Investors', founders: 0, investors },
     ];
 
     return (
-        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5 min-w-0">
+        <div className="min-w-0 rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
             <div className="mb-4 flex items-center justify-between">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Waitlist</p>
+                <p className="text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Waitlist</p>
                 <span className="text-xs font-bold text-[#D8E0F3]">{total} total</span>
             </div>
 
             <ChartContainer config={waitlistChartConfig} className="h-[70px] w-full">
-                <BarChart
-                    data={barData}
-                    layout="vertical"
-                    barCategoryGap="25%"
-                    margin={{ left: 0, right: 0 }}
-                >
+                <BarChart data={barData} layout="vertical" barCategoryGap="25%" margin={{ left: 0, right: 0 }}>
                     <XAxis type="number" hide />
                     <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                    <Bar dataKey="founders"  radius={[0, 3, 3, 0]} fill="var(--color-founders)" />
+                    <Bar dataKey="founders" radius={[0, 3, 3, 0]} fill="var(--color-founders)" />
                     <Bar dataKey="investors" radius={[0, 3, 3, 0]} fill="var(--color-investors)" />
                 </BarChart>
             </ChartContainer>
@@ -268,27 +244,26 @@ function WaitlistSplit({ founders, investors }: { founders: number; investors: n
 
 const activityDotColor: Record<string, string> = {
     diagnostic: 'bg-purple-500',
-    payment:    'bg-emerald-500',
-    message:    'bg-blue-500',
+    payment: 'bg-emerald-500',
+    message: 'bg-blue-500',
 };
 const activityTypeLabel: Record<string, string> = {
     diagnostic: 'Diagnostic',
-    payment:    'Payment',
-    message:    'Message',
+    payment: 'Payment',
+    message: 'Message',
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminDashboard({ metrics, recent_activity, user_role }: PageProps) {
     const isSuperAdmin = user_role === 'superadmin';
-    const isAnalyst    = user_role === 'analyst';
+    const isAnalyst = user_role === 'analyst';
 
     return (
         <AdminLayout>
             <Head title="Dashboard — Admin" />
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-
                 <div className="mb-6 lg:mb-8">
                     <h1 className="text-xl font-bold text-[#D8E0F3] sm:text-2xl">Operational Command</h1>
                     <p className="mt-1 text-sm text-[#C1CDE8]">
@@ -300,45 +275,89 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                 {isSuperAdmin && (
                     <>
                         <div className="mb-3 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-                            <MetricCard icon={Users}       label="Total Founders"   value={metrics.total_founders ?? 0}               color="text-blue-400"    iconBg="bg-blue-500/10"    href="/admin/founders" />
-                            <MetricCard icon={DollarSign}  label="Total Revenue"    value={fmtCurrency(metrics.total_revenue ?? 0)}    color="text-emerald-400" iconBg="bg-emerald-500/10" />
-                            <MetricCard icon={Activity}    label="Active Audits"    value={metrics.active_audits ?? 0}                 color="text-amber-400"   iconBg="bg-amber-500/10" />
-                            <MetricCard icon={Zap}         label="High Scorers >85" value={metrics.high_scorers ?? 0}                  color="text-purple-400"  iconBg="bg-purple-500/10" />
+                            <MetricCard
+                                icon={Users}
+                                label="Total Founders"
+                                value={metrics.total_founders ?? 0}
+                                color="text-blue-400"
+                                iconBg="bg-blue-500/10"
+                                href="/admin/founders"
+                            />
+                            <MetricCard
+                                icon={DollarSign}
+                                label="Total Revenue"
+                                value={fmtCurrency(metrics.total_revenue ?? 0)}
+                                color="text-emerald-400"
+                                iconBg="bg-emerald-500/10"
+                            />
+                            <MetricCard
+                                icon={Activity}
+                                label="Active Audits"
+                                value={metrics.active_audits ?? 0}
+                                color="text-amber-400"
+                                iconBg="bg-amber-500/10"
+                            />
+                            <MetricCard
+                                icon={Zap}
+                                label="High Scorers >85"
+                                value={metrics.high_scorers ?? 0}
+                                color="text-purple-400"
+                                iconBg="bg-purple-500/10"
+                            />
                         </div>
                         <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mb-6 lg:grid-cols-4">
-                            <MetricCard icon={Clock}         label="Pending"     value={metrics.pending_audits ?? 0}        color="text-slate-400"   iconBg="bg-slate-500/10" />
-                            <MetricCard icon={AlertTriangle} label="Needs Info"  value={metrics.needs_info_count ?? 0}      color="text-amber-400"   iconBg="bg-amber-500/10" pulse={(metrics.needs_info_count ?? 0) > 0} href="/admin/founders" />
-                            <MetricCard icon={CheckCircle2}  label="Complete"    value={metrics.complete_audits ?? 0}       color="text-emerald-400" iconBg="bg-emerald-500/10" />
-                            <MetricCard icon={List}          label="Waitlist"    value={(metrics.waitlist_count?.founders ?? 0) + (metrics.waitlist_count?.investors ?? 0)} color="text-blue-400" iconBg="bg-blue-500/10" href="/admin/waitlist" />
+                            <MetricCard
+                                icon={Clock}
+                                label="Pending"
+                                value={metrics.pending_audits ?? 0}
+                                color="text-slate-400"
+                                iconBg="bg-slate-500/10"
+                            />
+                            <MetricCard
+                                icon={AlertTriangle}
+                                label="Needs Info"
+                                value={metrics.needs_info_count ?? 0}
+                                color="text-amber-400"
+                                iconBg="bg-amber-500/10"
+                                pulse={(metrics.needs_info_count ?? 0) > 0}
+                                href="/admin/founders"
+                            />
+                            <MetricCard
+                                icon={CheckCircle2}
+                                label="Complete"
+                                value={metrics.complete_audits ?? 0}
+                                color="text-emerald-400"
+                                iconBg="bg-emerald-500/10"
+                            />
+                            <MetricCard
+                                icon={List}
+                                label="Waitlist"
+                                value={(metrics.waitlist_count?.founders ?? 0) + (metrics.waitlist_count?.investors ?? 0)}
+                                color="text-blue-400"
+                                iconBg="bg-blue-500/10"
+                                href="/admin/waitlist"
+                            />
                         </div>
 
                         {/* Charts */}
                         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mb-8 lg:grid-cols-3">
                             {(metrics.monthly_revenue?.length ?? 0) > 0 && (
-                                <RevenueSparkline
-                                    data={metrics.monthly_revenue!}
-                                    thisMonth={metrics.revenue_this_month ?? 0}
-                                />
+                                <RevenueSparkline data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
                             )}
-                            {(metrics.audit_breakdown?.length ?? 0) > 0 && (
-                                <AuditDonut data={metrics.audit_breakdown!} />
-                            )}
+                            {(metrics.audit_breakdown?.length ?? 0) > 0 && <AuditDonut data={metrics.audit_breakdown!} />}
                             {metrics.waitlist_count && (
-                                <WaitlistSplit
-                                    founders={metrics.waitlist_count.founders}
-                                    investors={metrics.waitlist_count.investors}
-                                />
+                                <WaitlistSplit founders={metrics.waitlist_count.founders} investors={metrics.waitlist_count.investors} />
                             )}
                         </div>
 
                         {/* Revenue by tier */}
                         {metrics.revenue_by_tier && (
                             <div className="mb-6 lg:mb-8">
-                                <h2 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Revenue by Tier</h2>
+                                <h2 className="mb-3 text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Revenue by Tier</h2>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                                     {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
                                         <div key={tier} className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
-                                            <p className="mb-1 text-[10px] font-bold capitalize tracking-widest text-[#91A7D8]">{tier}</p>
+                                            <p className="mb-1 text-[10px] font-bold tracking-widest text-[#91A7D8] capitalize">{tier}</p>
                                             <p className="text-xl font-bold text-[#D8E0F3]">{fmtCurrency(metrics.revenue_by_tier![tier])}</p>
                                         </div>
                                     ))}
@@ -351,23 +370,57 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                 {/* ── Analyst ── */}
                 {isAnalyst && (
                     <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mb-8 lg:grid-cols-4">
-                        <MetricCard icon={Users}         label="My Assigned"     value={metrics.my_assigned ?? 0}      color="text-blue-400"    iconBg="bg-blue-500/10"   href="/admin/founders" />
-                        <MetricCard icon={Activity}      label="Active Audits"   value={metrics.active_audits ?? 0}    color="text-amber-400"   iconBg="bg-amber-500/10" />
-                        <MetricCard icon={AlertTriangle} label="Needs Info"      value={metrics.needs_info_count ?? 0} color="text-amber-400"   iconBg="bg-amber-500/10" pulse={(metrics.needs_info_count ?? 0) > 0} />
-                        <MetricCard icon={MessageSquare} label="Unread Messages" value={metrics.my_open_messages ?? 0} color="text-blue-400"    iconBg="bg-blue-500/10"   href="/admin/messages" />
+                        <MetricCard
+                            icon={Users}
+                            label="My Assigned"
+                            value={metrics.my_assigned ?? 0}
+                            color="text-blue-400"
+                            iconBg="bg-blue-500/10"
+                            href="/admin/founders"
+                        />
+                        <MetricCard
+                            icon={Activity}
+                            label="Active Audits"
+                            value={metrics.active_audits ?? 0}
+                            color="text-amber-400"
+                            iconBg="bg-amber-500/10"
+                        />
+                        <MetricCard
+                            icon={AlertTriangle}
+                            label="Needs Info"
+                            value={metrics.needs_info_count ?? 0}
+                            color="text-amber-400"
+                            iconBg="bg-amber-500/10"
+                            pulse={(metrics.needs_info_count ?? 0) > 0}
+                        />
+                        <MetricCard
+                            icon={MessageSquare}
+                            label="Unread Messages"
+                            value={metrics.my_open_messages ?? 0}
+                            color="text-blue-400"
+                            iconBg="bg-blue-500/10"
+                            href="/admin/messages"
+                        />
                     </div>
                 )}
 
                 {/* ── Support ── */}
                 {user_role === 'support' && (
                     <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mb-8">
-                        <MetricCard icon={MessageSquare} label="Unread Messages" value={metrics.my_open_messages ?? 0} color="text-blue-400" iconBg="bg-blue-500/10" href="/admin/messages" />
+                        <MetricCard
+                            icon={MessageSquare}
+                            label="Unread Messages"
+                            value={metrics.my_open_messages ?? 0}
+                            color="text-blue-400"
+                            iconBg="bg-blue-500/10"
+                            href="/admin/messages"
+                        />
                     </div>
                 )}
 
                 {/* ── Recent Activity ── */}
                 <div>
-                    <h2 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">Recent Activity</h2>
+                    <h2 className="mb-3 text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Recent Activity</h2>
                     {recent_activity.length === 0 ? (
                         <div className="rounded-xl border border-[#232C43] bg-[#101623] p-10 text-center text-sm text-[#C1CDE8]">
                             No recent activity.
@@ -375,18 +428,18 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                     ) : (
                         <div className="divide-y divide-[#232C43] overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                             {recent_activity.map((item, i) => (
-                                <div key={i} className="flex items-start gap-3 px-4 py-3.5 sm:px-5 sm:py-4 hover:bg-[#1B294B] transition-colors">
+                                <div key={i} className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-[#1B294B] sm:px-5 sm:py-4">
                                     <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${activityDotColor[item.type] ?? 'bg-[#91A7D8]'}`} />
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-center gap-x-2">
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#91A7D8]">
+                                            <span className="text-[10px] font-bold tracking-wider text-[#91A7D8] uppercase">
                                                 {activityTypeLabel[item.type]}
                                             </span>
                                             <p className="truncate text-sm text-[#D8E0F3]">{item.description}</p>
                                         </div>
                                         {item.email && <p className="mt-0.5 truncate text-xs text-[#C1CDE8]">{item.email}</p>}
                                     </div>
-                                    <span className="shrink-0 whitespace-nowrap text-xs text-[#91A7D8]">{item.time}</span>
+                                    <span className="shrink-0 text-xs whitespace-nowrap text-[#91A7D8]">{item.time}</span>
                                 </div>
                             ))}
                         </div>

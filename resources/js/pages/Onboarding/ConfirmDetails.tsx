@@ -1,22 +1,22 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Building2, Lock, Loader2, Mail, User } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Building2, Loader2, Lock, Mail, User } from 'lucide-react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 import { cn } from '@/lib/utils';
 
 interface PageProps {
-    email:      string;
+    email: string;
     tier_label: string;
-    info?:      string | null;
+    info?: string | null;
 }
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
 const fadeUp = (delay = 0) => ({
-    initial:    { opacity: 0, y: 12 },
-    animate:    { opacity: 1, y: 0 },
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0 },
     transition: { duration: 0.45, ease, delay },
 });
 
@@ -41,27 +41,23 @@ function Field({
     children,
     delay,
 }: {
-    label:    string;
-    hint?:    string;
-    icon:     React.ElementType;
-    error?:   string;
+    label: string;
+    hint?: string;
+    icon: React.ElementType;
+    error?: string;
     children: React.ReactNode;
-    delay:    number;
+    delay: number;
 }) {
     return (
         <FadeUp delay={delay}>
             <div className="space-y-2">
-                <label className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#91A7D8]">
+                <label className="flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.2em] text-[#91A7D8] uppercase">
                     <Icon className="size-3 shrink-0" />
                     {label}
                 </label>
-            {children}
-                {hint && !error && (
-                    <p className="ml-0.5 text-[11px] text-[#91A7D8]/60">{hint}</p>
-                )}
-                {error && (
-                    <p className="ml-0.5 text-[11px] text-rose-400">{error}</p>
-                )}
+                {children}
+                {hint && !error && <p className="ml-0.5 text-[11px] text-[#91A7D8]/60">{hint}</p>}
+                {error && <p className="ml-0.5 text-[11px] text-rose-400">{error}</p>}
             </div>
         </FadeUp>
     );
@@ -69,7 +65,7 @@ function Field({
 
 export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
     const { data, setData, post, processing, errors } = useForm({
-        full_name:    '',
+        full_name: '',
         company_name: '',
     });
 
@@ -83,11 +79,8 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
             <Head title="Confirm Your Details — PARAGON Certification" />
 
             <div className="flex min-h-screen flex-col lg:flex-row">
-
                 {/* ── Sidebar — hidden on mobile, fixed width on md+ ── */}
-                <div
-                    className="flex w-full flex-col justify-between border-b border-[#232C43] bg-[#080B11] px-6 py-10 lg:sticky lg:top-0 lg:h-screen lg:w-[42%] lg:border-b-0 lg:border-r lg:px-14 lg:py-16"
-                >
+                <div className="flex w-full flex-col justify-between border-b border-[#232C43] bg-[#080B11] px-6 py-10 lg:sticky lg:top-0 lg:h-screen lg:w-[42%] lg:border-r lg:border-b-0 lg:px-14 lg:py-16">
                     <FadeUp delay={0} className="flex flex-1 flex-col">
                         <div>
                             <PinpointLogo height={26} variant="dark" />
@@ -96,15 +89,17 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                 {/* Step tracker */}
                                 <div className="mb-10 flex flex-col gap-3">
                                     {[
-                                        { n: '01', label: 'Confirm your details',   state: 'active' },
-                                        { n: '02', label: 'Sign your agreement',    state: 'pending' },
+                                        { n: '01', label: 'Confirm your details', state: 'active' },
+                                        { n: '02', label: 'Sign your agreement', state: 'pending' },
                                         { n: '03', label: 'Access the PIN Network', state: 'pending' },
                                     ].map((step) => (
                                         <div key={step.n} className="flex items-center gap-3">
                                             <div
                                                 className={cn(
                                                     'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold tabular-nums transition-colors',
-                                                    step.state === 'active' ? 'border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[#6986C9]' : 'border-[#232C43] bg-[#0C1427] text-[#91A7D8]'
+                                                    step.state === 'active'
+                                                        ? 'border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[#6986C9]'
+                                                        : 'border-[#232C43] bg-[#0C1427] text-[#91A7D8]',
                                                 )}
                                             >
                                                 {step.n}
@@ -112,7 +107,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                             <span
                                                 className={cn(
                                                     'text-[13px] font-medium transition-colors',
-                                                    step.state === 'active' ? 'text-[#D8E0F3]' : 'text-[#455987]'
+                                                    step.state === 'active' ? 'text-[#D8E0F3]' : 'text-[#455987]',
                                                 )}
                                             >
                                                 {step.label}
@@ -122,12 +117,12 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                 </div>
 
                                 <div className="space-y-5 border-t border-[#232C43] pt-8">
-                                    <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-white">
+                                    <h1 className="font-display text-3xl leading-tight font-semibold tracking-tight text-white">
                                         One step before your audit begins.
                                     </h1>
                                     <p className="text-[14px] leading-relaxed text-[#C1CDE8]">
-                                        Your name and entity will appear on the legally binding Pinpoint Investment
-                                        Warrant. This takes under a minute.
+                                        Your name and entity will appear on the legally binding Pinpoint Investment Warrant. This takes under a
+                                        minute.
                                     </p>
                                 </div>
                             </div>
@@ -138,9 +133,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                     <FadeUp delay={0.25}>
                         <div className="mt-12 hidden rounded-xl border border-[#232C43] bg-[#101623] px-5 py-4 lg:block">
                             <div className="flex items-center gap-2">
-                                <span
-                                    className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#60A5FA]"
-                                >
+                                <span className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2.5 py-1 text-[10px] font-bold tracking-[0.18em] text-[#60A5FA] uppercase">
                                     {tier_label}
                                 </span>
                                 <span className="text-[12px] text-[#91A7D8]">{email}</span>
@@ -151,28 +144,17 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
 
                 {/* ── Right panel — form ── */}
                 <div className="flex w-full flex-1 items-center justify-center px-6 py-12 lg:px-16 lg:py-0">
-                    <motion.div
-                        {...fadeUp(0.1)}
-                        className="w-full max-w-[440px]"
-                    >
+                    <motion.div {...fadeUp(0.1)} className="w-full max-w-[440px]">
                         {/* Mobile header */}
                         <div className="mb-8 lg:hidden">
-                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#91A7D8]">
-                                Step 1 of 2
-                            </p>
-                            <h1 className="font-display text-2xl font-semibold text-[#D8E0F3]">
-                                Confirm Your Details
-                            </h1>
+                            <p className="mb-1.5 text-[10px] font-bold tracking-[0.22em] text-[#91A7D8] uppercase">Step 1 of 2</p>
+                            <h1 className="font-display text-2xl font-semibold text-[#D8E0F3]">Confirm Your Details</h1>
                         </div>
 
                         {/* Desktop heading */}
                         <div className="mb-8 hidden lg:block">
-                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-[#91A7D8]">
-                                Step 1 of 2
-                            </p>
-                            <h2 className="font-display text-2xl font-semibold text-[#D8E0F3]">
-                                Confirm Your Details
-                            </h2>
+                            <p className="mb-1.5 text-[10px] font-bold tracking-[0.22em] text-[#91A7D8] uppercase">Step 1 of 2</p>
+                            <h2 className="font-display text-2xl font-semibold text-[#D8E0F3]">Confirm Your Details</h2>
                             <p className="mt-2 text-[13px] leading-relaxed text-[#C1CDE8]">
                                 These details appear on your signed warrant — enter them exactly as they should read legally.
                             </p>
@@ -198,12 +180,12 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                 <input
                                     type="text"
                                     value={data.full_name}
-                                    onChange={e => setData('full_name', e.target.value)}
+                                    onChange={(e) => setData('full_name', e.target.value)}
                                     placeholder="e.g. John Adeyemi"
                                     disabled={processing}
                                     autoFocus
                                     className={cn(
-                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] placeholder:text-[#91A7D8]/40 outline-none transition-all duration-200',
+                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] transition-all duration-200 outline-none placeholder:text-[#91A7D8]/40',
                                         errors.full_name
                                             ? 'border-rose-500/50 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
                                             : 'border-[#232C43] focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10',
@@ -221,11 +203,11 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                 <input
                                     type="text"
                                     value={data.company_name}
-                                    onChange={e => setData('company_name', e.target.value)}
+                                    onChange={(e) => setData('company_name', e.target.value)}
                                     placeholder="e.g. Acme Technologies Ltd."
                                     disabled={processing}
                                     className={cn(
-                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] placeholder:text-[#91A7D8]/40 outline-none transition-all duration-200',
+                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] transition-all duration-200 outline-none placeholder:text-[#91A7D8]/40',
                                         errors.company_name
                                             ? 'border-rose-500/50 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
                                             : 'border-[#232C43] focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10',
@@ -233,11 +215,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                 />
                             </Field>
 
-                            <Field
-                                label="Email Address"
-                                icon={Mail}
-                                delay={0.25}
-                            >
+                            <Field label="Email Address" icon={Mail} delay={0.25}>
                                 <input
                                     type="email"
                                     value={email}
@@ -251,7 +229,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     <button
                                         type="submit"
                                         disabled={processing}
-                                        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-3.5 text-[13px] font-bold uppercase tracking-[0.15em] text-white outline-none transition-all duration-200 hover:bg-[#3b5ba5] disabled:cursor-not-allowed disabled:opacity-60"
+                                        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-3.5 text-[13px] font-bold tracking-[0.15em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#3b5ba5] disabled:cursor-not-allowed disabled:opacity-60"
                                         style={{ boxShadow: '0 0 30px rgba(68,104,187,0.3)' }}
                                     >
                                         <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
@@ -281,7 +259,6 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                         </FadeUp>
                     </motion.div>
                 </div>
-
             </div>
         </DiagnosticLayout>
     );

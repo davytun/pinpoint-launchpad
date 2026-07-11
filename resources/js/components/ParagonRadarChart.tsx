@@ -1,23 +1,15 @@
-import { useState } from 'react';
-import {
-    PolarAngleAxis,
-    PolarGrid,
-    Radar,
-    RadarChart,
-    ResponsiveContainer,
-    Tooltip,
-    TooltipProps,
-} from 'recharts';
 import { ChartConfig, ChartContainer } from '@/components/ui/chart';
+import { useState } from 'react';
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 
 const pillars = [
-    { pillar: 'Potential & Scale',     verified: 91, average: 48 },
-    { pillar: 'Agility & Execution',   verified: 78, average: 55 },
-    { pillar: 'Risk Mitigation',       verified: 86, average: 44 },
-    { pillar: 'Alignment & Vision',    verified: 85, average: 38 },
-    { pillar: 'Corporate Governance',  verified: 88, average: 42 },
-    { pillar: 'Operational Systems',   verified: 82, average: 51 },
-    { pillar: 'Network & Ecosystem',   verified: 79, average: 46 },
+    { pillar: 'Potential & Scale', verified: 91, average: 48 },
+    { pillar: 'Agility & Execution', verified: 78, average: 55 },
+    { pillar: 'Risk Mitigation', verified: 86, average: 44 },
+    { pillar: 'Alignment & Vision', verified: 85, average: 38 },
+    { pillar: 'Corporate Governance', verified: 88, average: 42 },
+    { pillar: 'Operational Systems', verified: 82, average: 51 },
+    { pillar: 'Network & Ecosystem', verified: 79, average: 46 },
 ];
 
 const chartConfig = {
@@ -38,24 +30,14 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 
     return (
         <div className="rounded-xl border border-white/10 bg-[#0e0e0e]/95 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-xl">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-white/40">
-                {label}
-            </p>
+            <p className="mb-2 text-[11px] font-semibold tracking-[0.15em] text-white/40 uppercase">{label}</p>
             {payload.map((entry) => {
                 const isVerified = entry.dataKey === 'verified';
                 return (
                     <div key={entry.dataKey} className="flex items-center gap-2.5 py-0.5">
-                        <span
-                            className="inline-block size-2 rounded-full"
-                            style={{ backgroundColor: isVerified ? '#5ca336' : '#2F4587' }}
-                        />
-                        <span className="text-[13px] text-white/55">
-                            {isVerified ? 'Pinpoint-Verified' : 'Average Startup'}
-                        </span>
-                        <span
-                            className="ml-auto text-[13px] font-bold tabular-nums"
-                            style={{ color: isVerified ? '#5ca336' : '#7b8fd4' }}
-                        >
+                        <span className="inline-block size-2 rounded-full" style={{ backgroundColor: isVerified ? '#5ca336' : '#2F4587' }} />
+                        <span className="text-[13px] text-white/55">{isVerified ? 'Pinpoint-Verified' : 'Average Startup'}</span>
+                        <span className="ml-auto text-[13px] font-bold tabular-nums" style={{ color: isVerified ? '#5ca336' : '#7b8fd4' }}>
                             {entry.value}
                             <span className="text-[11px] font-normal text-white/30">/100</span>
                         </span>
@@ -68,10 +50,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 
 // ─── Axis tick ────────────────────────────────────────────────────────────────
 
-function AxisTick({ x, y, payload, cx, cy }: {
-    x?: number; y?: number; cx?: number; cy?: number;
-    payload?: { value: string };
-}) {
+function AxisTick({ x, y, payload, cx, cy }: { x?: number; y?: number; cx?: number; cy?: number; payload?: { value: string } }) {
     if (!payload || x === undefined || y === undefined) return null;
 
     // Gentle push so text doesn't hit SVG boundary on mobile
@@ -111,16 +90,11 @@ function Legend({ active, onToggle }: { active: { verified: boolean; average: bo
                         key={key}
                         type="button"
                         onClick={() => onToggle(key)}
-                        className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition-all duration-200 hover:border-white/15 hover:bg-white/[0.06]"
+                        className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.12em] uppercase transition-all duration-200 hover:border-white/15 hover:bg-white/[0.06]"
                         style={{ opacity: isActive ? 1 : 0.35 }}
                     >
-                        <span
-                            className="inline-block size-2 rounded-full"
-                            style={{ backgroundColor: color }}
-                        />
-                        <span style={{ color: isActive ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.35)' }}>
-                            {label}
-                        </span>
+                        <span className="inline-block size-2 rounded-full" style={{ backgroundColor: color }} />
+                        <span style={{ color: isActive ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.35)' }}>{label}</span>
                     </button>
                 );
             })}
@@ -133,27 +107,16 @@ function Legend({ active, onToggle }: { active: { verified: boolean; average: bo
 export function ParagonRadarChart() {
     const [active, setActive] = useState({ verified: true, average: true });
 
-    const toggle = (key: 'verified' | 'average') =>
-        setActive((prev) => ({ ...prev, [key]: !prev[key] }));
+    const toggle = (key: 'verified' | 'average') => setActive((prev) => ({ ...prev, [key]: !prev[key] }));
 
     return (
         <div className="w-full">
             <ChartContainer config={chartConfig} className="mx-auto h-[320px] w-full max-w-[400px] md:h-[400px] md:max-w-none">
                 <ResponsiveContainer width="100%" height="100%">
                     <RadarChart data={pillars} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
-                        <PolarGrid
-                            stroke="rgba(255,255,255,0.07)"
-                            strokeDasharray="3 3"
-                        />
-                        <PolarAngleAxis
-                            dataKey="pillar"
-                            tick={(props) => <AxisTick {...props} />}
-                            stroke="transparent"
-                        />
-                        <Tooltip
-                            content={<CustomTooltip />}
-                            cursor={false}
-                        />
+                        <PolarGrid stroke="rgba(255,255,255,0.07)" strokeDasharray="3 3" />
+                        <PolarAngleAxis dataKey="pillar" tick={(props) => <AxisTick {...props} />} stroke="transparent" />
+                        <Tooltip content={<CustomTooltip />} cursor={false} />
 
                         {/* Average Startup */}
                         {active.average && (

@@ -16,9 +16,9 @@ interface PageProps {
 
 function ProgressDots({ current }: { current: number }) {
     const steps = [
-        { label: 'Payment',  done: true },
-        { label: 'Signing',  done: true },
-        { label: 'Account',  done: current >= 2 },
+        { label: 'Payment', done: true },
+        { label: 'Signing', done: true },
+        { label: 'Account', done: current >= 2 },
     ];
     return (
         <div className="mb-8 flex items-center justify-center gap-3">
@@ -36,22 +36,14 @@ function ProgressDots({ current }: { current: number }) {
                             ].join(' ')}
                         />
                         <span
-                            className={[
-                                'text-[9px] font-bold uppercase tracking-[0.16em]',
-                                step.done ? 'text-blue-400/80' : 'text-white/20',
-                            ].join(' ')}
+                            className={['text-[9px] font-bold tracking-[0.16em] uppercase', step.done ? 'text-blue-400/80' : 'text-white/20'].join(
+                                ' ',
+                            )}
                         >
                             {step.label}
                         </span>
                     </div>
-                    {i < steps.length - 1 && (
-                        <div
-                            className={[
-                                'mb-4 h-px w-8',
-                                step.done ? 'bg-blue-500/40' : 'bg-white/[0.08]',
-                            ].join(' ')}
-                        />
-                    )}
+                    {i < steps.length - 1 && <div className={['mb-4 h-px w-8', step.done ? 'bg-blue-500/40' : 'bg-white/[0.08]'].join(' ')} />}
                 </div>
             ))}
         </div>
@@ -62,14 +54,14 @@ function ProgressDots({ current }: { current: number }) {
 
 export default function FounderSetup({ email, token, full_name, company_name }: PageProps) {
     const [showPassword, setShowPassword] = useState(false);
-    const [showConfirm,  setShowConfirm]  = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
-        token:                 token,
-        email:                 email ?? '',
-        full_name:             full_name ?? '',
-        company_name:          company_name ?? '',
-        password:              '',
+        token: token,
+        email: email ?? '',
+        full_name: full_name ?? '',
+        company_name: company_name ?? '',
+        password: '',
         password_confirmation: '',
     });
 
@@ -84,9 +76,9 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
 
             {/* ── Background ── */}
             <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid  pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-wireframe pointer-events-none absolute -left-[15%] top-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-30 mix-blend-overlay" />
-            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none absolute -right-[15%] top-[40%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-20 mix-blend-overlay" />
+            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
+            <div className="waitlist-wireframe pointer-events-none absolute top-[15%] -left-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-30 mix-blend-overlay" />
+            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none absolute top-[40%] -right-[15%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-20 mix-blend-overlay" />
             <div
                 className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[400px]"
                 style={{ background: 'radial-gradient(ellipse 70% 45% at 50% 0%, rgba(37,99,235,0.15) 0%, transparent 70%)' }}
@@ -100,9 +92,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 >
-                    <div
-                        className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-8 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-10"
-                    >
+                    <div className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-8 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-10">
                         {/* Logo */}
                         <div className="mb-7 flex justify-center">
                             <PinpointLogo height={24} variant="dark" />
@@ -112,13 +102,13 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
 
                         {/* Badge */}
                         <div className="mb-6 flex justify-center">
-                            <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/50 backdrop-blur-sm">
+                            <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[11px] font-semibold tracking-[0.28em] text-white/50 uppercase backdrop-blur-sm">
                                 <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
                                 Final Step
                             </span>
                         </div>
 
-                        <h1 className="font-display mb-1.5 text-center text-[22px] font-semibold leading-tight tracking-tight text-white">
+                        <h1 className="font-display mb-1.5 text-center text-[22px] leading-tight font-semibold tracking-tight text-white">
                             Set Up Your Account
                         </h1>
                         <p className="mb-8 text-center text-[13px] leading-relaxed text-white/40">
@@ -130,10 +120,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
 
                             {/* Full Name */}
                             <div>
-                                <label
-                                    htmlFor="full_name"
-                                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40"
-                                >
+                                <label htmlFor="full_name" className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-white/40 uppercase">
                                     Full Name
                                 </label>
                                 <input
@@ -142,7 +129,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                     value={data.full_name}
                                     onChange={(e) => setData('full_name', e.target.value)}
                                     className={[
-                                        'w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-[14px] text-white outline-none transition-all duration-200 placeholder:text-white/20',
+                                        'w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-[14px] text-white transition-all duration-200 outline-none placeholder:text-white/20',
                                         errors.full_name
                                             ? 'border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
                                             : 'border-white/[0.08] focus:border-blue-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-blue-500/20',
@@ -150,7 +137,9 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                     placeholder="Jane Smith"
                                 />
                                 {errors.full_name && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-400">{errors.full_name}</p>
+                                    <p role="alert" className="mt-1.5 text-[11px] text-red-400">
+                                        {errors.full_name}
+                                    </p>
                                 )}
                             </div>
 
@@ -158,7 +147,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                             <div>
                                 <label
                                     htmlFor="company_name"
-                                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40"
+                                    className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-white/40 uppercase"
                                 >
                                     Company / Venture Name
                                 </label>
@@ -168,7 +157,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                     value={data.company_name}
                                     onChange={(e) => setData('company_name', e.target.value)}
                                     className={[
-                                        'w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-[14px] text-white outline-none transition-all duration-200 placeholder:text-white/20',
+                                        'w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-[14px] text-white transition-all duration-200 outline-none placeholder:text-white/20',
                                         errors.company_name
                                             ? 'border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
                                             : 'border-white/[0.08] focus:border-blue-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-blue-500/20',
@@ -176,16 +165,15 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                     placeholder="Acme Corp"
                                 />
                                 {errors.company_name && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-400">{errors.company_name}</p>
+                                    <p role="alert" className="mt-1.5 text-[11px] text-red-400">
+                                        {errors.company_name}
+                                    </p>
                                 )}
                             </div>
 
                             {/* Email (read-only) */}
                             <div>
-                                <label
-                                    htmlFor="setup_email"
-                                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40"
-                                >
+                                <label htmlFor="setup_email" className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-white/40 uppercase">
                                     Email Address
                                 </label>
                                 <input
@@ -199,10 +187,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
 
                             {/* Password */}
                             <div>
-                                <label
-                                    htmlFor="password"
-                                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40"
-                                >
+                                <label htmlFor="password" className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-white/40 uppercase">
                                     Create Password
                                 </label>
                                 <div className="relative">
@@ -213,7 +198,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                         onChange={(e) => setData('password', e.target.value)}
                                         autoComplete="new-password"
                                         className={[
-                                            'w-full rounded-xl border bg-white/[0.04] px-4 py-3 pr-11 text-[14px] text-white outline-none transition-all duration-200 placeholder:text-white/20',
+                                            'w-full rounded-xl border bg-white/[0.04] px-4 py-3 pr-11 text-[14px] text-white transition-all duration-200 outline-none placeholder:text-white/20',
                                             errors.password
                                                 ? 'border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
                                                 : 'border-white/[0.08] focus:border-blue-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-blue-500/20',
@@ -224,15 +209,19 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                         type="button"
                                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                                         onClick={() => setShowPassword((v) => !v)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 transition-colors hover:text-white/60"
+                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-white/25 transition-colors hover:text-white/60"
                                     >
-                                        {showPassword
-                                            ? <EyeOff className="size-4" aria-hidden="true" />
-                                            : <Eye    className="size-4" aria-hidden="true" />}
+                                        {showPassword ? (
+                                            <EyeOff className="size-4" aria-hidden="true" />
+                                        ) : (
+                                            <Eye className="size-4" aria-hidden="true" />
+                                        )}
                                     </button>
                                 </div>
                                 {errors.password ? (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-400">{errors.password}</p>
+                                    <p role="alert" className="mt-1.5 text-[11px] text-red-400">
+                                        {errors.password}
+                                    </p>
                                 ) : (
                                     <p className="mt-1.5 text-[11px] text-white/20">Minimum 8 characters</p>
                                 )}
@@ -242,7 +231,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                             <div>
                                 <label
                                     htmlFor="password_confirmation"
-                                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40"
+                                    className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-white/40 uppercase"
                                 >
                                     Confirm Password
                                 </label>
@@ -254,7 +243,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
                                         autoComplete="new-password"
                                         className={[
-                                            'w-full rounded-xl border bg-white/[0.04] px-4 py-3 pr-11 text-[14px] text-white outline-none transition-all duration-200 placeholder:text-white/20',
+                                            'w-full rounded-xl border bg-white/[0.04] px-4 py-3 pr-11 text-[14px] text-white transition-all duration-200 outline-none placeholder:text-white/20',
                                             errors.password_confirmation
                                                 ? 'border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
                                                 : 'border-white/[0.08] focus:border-blue-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-blue-500/20',
@@ -265,11 +254,13 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                         type="button"
                                         aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
                                         onClick={() => setShowConfirm((v) => !v)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/25 transition-colors hover:text-white/60"
+                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-white/25 transition-colors hover:text-white/60"
                                     >
-                                        {showConfirm
-                                            ? <EyeOff className="size-4" aria-hidden="true" />
-                                            : <Eye    className="size-4" aria-hidden="true" />}
+                                        {showConfirm ? (
+                                            <EyeOff className="size-4" aria-hidden="true" />
+                                        ) : (
+                                            <Eye className="size-4" aria-hidden="true" />
+                                        )}
                                     </button>
                                 </div>
                                 {errors.password_confirmation && (
@@ -285,7 +276,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                 disabled={processing}
                                 aria-busy={processing}
                                 aria-label={processing ? 'Creating account, please wait' : 'Create My Account'}
-                                className="group relative mt-2 w-full overflow-hidden rounded-xl bg-blue-600 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="group relative mt-2 w-full overflow-hidden rounded-xl bg-blue-600 px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                                 style={{ boxShadow: '0 0 28px rgba(37,99,235,0.35)' }}
                             >
                                 <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
@@ -308,9 +299,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                         {/* Security note */}
                         <div className="mt-5 flex items-center justify-center gap-1.5">
                             <ShieldCheck className="size-3.5 text-emerald-500/60" aria-hidden="true" />
-                            <p className="text-[11px] text-white/20">
-                                Secured with industry-standard encryption.
-                            </p>
+                            <p className="text-[11px] text-white/20">Secured with industry-standard encryption.</p>
                         </div>
                     </div>
                 </motion.div>

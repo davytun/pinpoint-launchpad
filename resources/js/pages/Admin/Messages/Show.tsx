@@ -1,5 +1,5 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
 import AdminLayout from '@/layouts/admin-layout';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, FileText, MessageSquare, Paperclip, Send, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -41,20 +41,20 @@ interface PageProps {
 }
 
 function formatDateLabel(dateStr: string): string {
-    const today     = new Date();
+    const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     const msgDate = new Date(dateStr);
-    if (msgDate.toDateString() === today.toDateString())     return 'Today';
+    if (msgDate.toDateString() === today.toDateString()) return 'Today';
     if (msgDate.toDateString() === yesterday.toDateString()) return 'Yesterday';
     return msgDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function AdminMessagesShow({ thread, messages, founder }: PageProps) {
-    const threadRef    = useRef<HTMLDivElement>(null);
+    const threadRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [attachment, setAttachment] = useState<File | null>(null);
-    const [charCount, setCharCount]   = useState(0);
+    const [charCount, setCharCount] = useState(0);
 
     const { data, setData, post, processing, errors, reset } = useForm<{
         body: string;
@@ -113,10 +113,7 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
 
     const canSend = (data.body.trim().length > 0 || attachment !== null) && !processing;
 
-    const charColor =
-        charCount >= 2000 ? 'text-red-400' :
-        charCount >= 1800 ? 'text-amber-400' :
-        'text-slate-500';
+    const charColor = charCount >= 2000 ? 'text-red-400' : charCount >= 1800 ? 'text-amber-400' : 'text-slate-500';
 
     // Group messages with date separators
     const renderedMessages: Array<{ type: 'date'; label: string } | { type: 'message'; msg: Message }> = [];
@@ -135,7 +132,6 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-6xl">
-
                     {/* Back link */}
                     <Link
                         href={route('admin.messages.inbox')}
@@ -146,14 +142,13 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                     </Link>
 
                     <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-start">
-
                         {/* ── Left: founder info sidebar ── */}
                         <aside className="w-full shrink-0 lg:w-64">
                             <div className="rounded-xl border border-[#232C43] bg-[#101623] p-5">
-                                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#91A7D8]">Founder</p>
+                                <p className="mb-1 text-[10px] font-bold tracking-[0.2em] text-[#91A7D8] uppercase">Founder</p>
                                 <h2 className="text-lg font-bold text-[#D8E0F3]">{founder.full_name ?? '—'}</h2>
                                 <p className="mt-0.5 text-sm text-[#C1CDE8]">{founder.company_name ?? '—'}</p>
-                                <p className="mt-0.5 text-xs text-[#91A7D8] break-all">{founder.email}</p>
+                                <p className="mt-0.5 text-xs break-all text-[#91A7D8]">{founder.email}</p>
 
                                 <div className="my-4 h-px bg-[#232C43]" />
 
@@ -173,15 +168,10 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                         </aside>
 
                         {/* ── Right: message thread ── */}
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
                             <div className="rounded-xl border border-[#232C43] bg-[#101623]">
-
                                 {/* Thread */}
-                                <div
-                                    ref={threadRef}
-                                    className="overflow-y-auto p-6"
-                                    style={{ height: 'calc(100vh - 320px)', minHeight: '400px' }}
-                                >
+                                <div ref={threadRef} className="overflow-y-auto p-6" style={{ height: 'calc(100vh - 320px)', minHeight: '400px' }}>
                                     {renderedMessages.length === 0 ? (
                                         <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
                                             <MessageSquare className="size-12 text-[#91A7D8]" />
@@ -212,21 +202,19 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                         transition={{ duration: 0.2 }}
                                                         className={`flex flex-col ${isAdmin ? 'items-end' : 'items-start'}`}
                                                     >
-                                                        <span className={`mb-1 text-xs ${isAdmin ? 'text-[#3A54A5] text-right' : 'text-[#C1CDE8] text-left'}`}>
+                                                        <span
+                                                            className={`mb-1 text-xs ${isAdmin ? 'text-right text-[#3A54A5]' : 'text-left text-[#C1CDE8]'}`}
+                                                        >
                                                             {msg.sender_name}
                                                         </span>
 
                                                         <div
                                                             className={[
                                                                 'max-w-[75%] rounded-2xl px-4 py-3 text-sm text-[#D8E0F3]',
-                                                                isAdmin
-                                                                    ? 'rounded-br-sm bg-[#3A54A5]'
-                                                                    : 'rounded-bl-sm bg-[#232C43]',
+                                                                isAdmin ? 'rounded-br-sm bg-[#3A54A5]' : 'rounded-bl-sm bg-[#232C43]',
                                                             ].join(' ')}
                                                         >
-                                                            {msg.body && (
-                                                                <p className="leading-relaxed whitespace-pre-wrap">{msg.body}</p>
-                                                            )}
+                                                            {msg.body && <p className="leading-relaxed whitespace-pre-wrap">{msg.body}</p>}
 
                                                             {msg.has_attachment && (
                                                                 <a
@@ -242,7 +230,9 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                             )}
                                                         </div>
 
-                                                        <span className={`mt-1 text-[10px] ${isAdmin ? 'text-[#3A54A5]/70 text-right' : 'text-[#91A7D8] text-left'}`}>
+                                                        <span
+                                                            className={`mt-1 text-[10px] ${isAdmin ? 'text-right text-[#3A54A5]/70' : 'text-left text-[#91A7D8]'}`}
+                                                        >
                                                             {msg.created_at}
                                                         </span>
                                                     </motion.div>
@@ -254,12 +244,15 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
 
                                 {/* Reply compose */}
                                 <div className="border-t border-[#232C43] p-4">
-
                                     {attachment && (
                                         <div className="mb-2 flex items-center gap-2 rounded-lg border border-[#232C43] bg-[#1B294B]/50 px-3 py-2 text-xs text-[#D8E0F3]">
                                             <Paperclip className="size-3.5 shrink-0 text-[#C1CDE8]" />
                                             <span className="truncate">{attachment.name}</span>
-                                            <button type="button" onClick={removeAttachment} className="ml-auto shrink-0 text-[#91A7D8] hover:text-[#D8E0F3]">
+                                            <button
+                                                type="button"
+                                                onClick={removeAttachment}
+                                                className="ml-auto shrink-0 text-[#91A7D8] hover:text-[#D8E0F3]"
+                                            >
                                                 <X className="size-3.5" />
                                             </button>
                                         </div>
@@ -275,12 +268,10 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                 onChange={handleBodyChange}
                                                 onKeyDown={handleKeyDown}
                                                 placeholder="Type your reply..."
-                                                className="min-h-[80px] max-h-[200px] resize-none border-[#232C43] bg-[#1B294B]/30 text-[#D8E0F3] placeholder:text-[#91A7D8] focus:border-[#3A54A5]/50 focus:ring-[#3A54A5]/20"
+                                                className="max-h-[200px] min-h-[80px] resize-none border-[#232C43] bg-[#1B294B]/30 text-[#D8E0F3] placeholder:text-[#91A7D8] focus:border-[#3A54A5]/50 focus:ring-[#3A54A5]/20"
                                                 maxLength={2000}
                                             />
-                                            <div className={`mt-1 text-right text-xs ${charColor}`}>
-                                                {charCount}/2000
-                                            </div>
+                                            <div className={`mt-1 text-right text-xs ${charColor}`}>{charCount}/2000</div>
                                         </div>
 
                                         <div className="flex shrink-0 flex-col items-center gap-2 pb-6">
@@ -305,7 +296,7 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                                 onClick={handleSubmit}
                                                 disabled={!canSend}
                                                 className={[
-                                                    'relative overflow-hidden rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.1em] transition-all duration-200',
+                                                    'relative overflow-hidden rounded-lg px-4 py-2 text-xs font-bold tracking-[0.1em] uppercase transition-all duration-200',
                                                     canSend
                                                         ? 'bg-[#3A54A5] text-white hover:bg-[#2F4587]'
                                                         : 'cursor-not-allowed bg-[#1B294B] text-[#91A7D8]',
@@ -323,9 +314,7 @@ export default function AdminMessagesShow({ thread, messages, founder }: PagePro
                                         </div>
                                     </div>
 
-                                    <p className="mt-1 text-[10px] text-[#91A7D8]">
-                                        Press Enter to send · Shift+Enter for new line
-                                    </p>
+                                    <p className="mt-1 text-[10px] text-[#91A7D8]">Press Enter to send · Shift+Enter for new line</p>
                                 </div>
                             </div>
                         </div>

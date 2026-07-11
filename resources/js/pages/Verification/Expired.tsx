@@ -11,10 +11,7 @@ export default function Expired() {
                 <p className="mb-8 max-w-md text-[#C1CDE8]">
                     PARAGON certifications are valid for 90 days. This founder's certification has not been renewed.
                 </p>
-                <Link
-                    href="/waitlist"
-                    className="group flex items-center gap-1.5 text-sm text-[#91A7D8] hover:text-[#D8E0F3]"
-                >
+                <Link href="/waitlist" className="group flex items-center gap-1.5 text-sm text-[#91A7D8] hover:text-[#D8E0F3]">
                     Learn about Pinpoint
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>

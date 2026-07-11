@@ -24,9 +24,9 @@ export default function FounderForgotPassword({ flash }: PageProps) {
 
             {/* ── Background ── */}
             <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid  pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-wireframe pointer-events-none absolute -left-[15%] top-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-30 mix-blend-overlay" />
-            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none absolute -right-[15%] top-[40%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-20 mix-blend-overlay" />
+            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
+            <div className="waitlist-wireframe pointer-events-none absolute top-[15%] -left-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-30 mix-blend-overlay" />
+            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none absolute top-[40%] -right-[15%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-20 mix-blend-overlay" />
             <div
                 className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[400px]"
                 style={{ background: 'radial-gradient(ellipse 70% 45% at 50% 0%, rgba(37,99,235,0.12) 0%, transparent 70%)' }}
@@ -41,13 +41,12 @@ export default function FounderForgotPassword({ flash }: PageProps) {
                     transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 >
                     <div className="overflow-hidden rounded-3xl border border-[#232C43] bg-[#101623] p-8 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-10">
-
                         {/* Logo */}
                         <div className="mb-8 flex justify-center">
                             <PinpointLogo height={24} variant="dark" />
                         </div>
 
-                        <h1 className="font-display mb-1.5 text-center text-[22px] font-semibold leading-tight tracking-tight text-white">
+                        <h1 className="font-display mb-1.5 text-center text-[22px] leading-tight font-semibold tracking-tight text-white">
                             Reset Password
                         </h1>
                         <p className="mb-8 text-center text-[13px] leading-relaxed text-white/40">
@@ -66,10 +65,7 @@ export default function FounderForgotPassword({ flash }: PageProps) {
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label
-                                    htmlFor="email"
-                                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40"
-                                >
+                                <label htmlFor="email" className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-white/40 uppercase">
                                     Email Address
                                 </label>
                                 <input
@@ -80,7 +76,7 @@ export default function FounderForgotPassword({ flash }: PageProps) {
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                     className={[
-                                        'w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-[14px] text-white outline-none transition-all duration-200 placeholder:text-white/20',
+                                        'w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-[14px] text-white transition-all duration-200 outline-none placeholder:text-white/20',
                                         errors.email
                                             ? 'border-red-500/50 focus:border-red-500 focus:ring-2 focus:ring-red-500/20'
                                             : 'border-white/[0.08] focus:border-blue-500/60 focus:bg-white/[0.06] focus:ring-2 focus:ring-blue-500/20',
@@ -88,7 +84,9 @@ export default function FounderForgotPassword({ flash }: PageProps) {
                                     placeholder="you@example.com"
                                 />
                                 {errors.email && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-400">{errors.email}</p>
+                                    <p role="alert" className="mt-1.5 text-[11px] text-red-400">
+                                        {errors.email}
+                                    </p>
                                 )}
                             </div>
 
@@ -97,7 +95,7 @@ export default function FounderForgotPassword({ flash }: PageProps) {
                                 disabled={processing}
                                 aria-busy={processing}
                                 aria-label={processing ? 'Sending reset link, please wait' : 'Send Reset Link'}
-                                className="group relative w-full overflow-hidden rounded-xl bg-blue-600 px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="group relative w-full overflow-hidden rounded-xl bg-blue-600 px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                                 style={{ boxShadow: '0 0 28px rgba(37,99,235,0.35)' }}
                             >
                                 <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
@@ -115,10 +113,7 @@ export default function FounderForgotPassword({ flash }: PageProps) {
                         </form>
 
                         <div className="mt-7 text-center">
-                            <Link
-                                href={route('founder.login')}
-                                className="text-[12px] text-white/30 transition-colors duration-200 hover:text-white"
-                            >
+                            <Link href={route('founder.login')} className="text-[12px] text-white/30 transition-colors duration-200 hover:text-white">
                                 ← Back to Sign In
                             </Link>
                         </div>

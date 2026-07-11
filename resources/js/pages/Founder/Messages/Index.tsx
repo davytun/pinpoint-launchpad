@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Paperclip, Send, X, FileText, Loader2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { FileText, Loader2, MessageSquare, Paperclip, Send, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Textarea } from '@/components/ui/textarea';
@@ -43,25 +43,21 @@ function formatDateLabel(dateStr: string): string {
 
 function FadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay, ease: [0.25, 1, 0.5, 1] }}
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay, ease: [0.25, 1, 0.5, 1] }}>
             {children}
         </motion.div>
     );
 }
 
 export default function FounderMessages({ messages: initialMessages, founder }: PageProps) {
-    const threadRef      = useRef<HTMLDivElement>(null);
-    const fileInputRef   = useRef<HTMLInputElement>(null);
-    
-    const [messages, setMessages]       = useState<Message[]>(initialMessages);
-    const [body, setBody]               = useState('');
-    const [attachment, setAttachment]   = useState<File | null>(null);
-    const [processing, setProcessing]   = useState(false);
-    const [errors, setErrors]           = useState<Record<string, string>>({});
+    const threadRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
+    const [body, setBody] = useState('');
+    const [attachment, setAttachment] = useState<File | null>(null);
+    const [processing, setProcessing] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     // Update local state when server props change
     useEffect(() => {
@@ -108,7 +104,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
             is_optimistic: true,
         };
 
-        setMessages(prev => [...prev, optimisticMsg]);
+        setMessages((prev) => [...prev, optimisticMsg]);
         setBody('');
         setAttachment(null);
         setProcessing(true);
@@ -121,7 +117,12 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
             if (originalAttachment) formData.append('attachment', originalAttachment);
 
             const xsrf = decodeURIComponent(
-                document.cookie.split('; ').find((c) => c.startsWith('XSRF-TOKEN='))?.split('=').slice(1).join('=') ?? ''
+                document.cookie
+                    .split('; ')
+                    .find((c) => c.startsWith('XSRF-TOKEN='))
+                    ?.split('=')
+                    .slice(1)
+                    .join('=') ?? '',
             );
 
             const response = await fetch(route('founder.messages.store'), {
@@ -130,8 +131,8 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                 headers: {
                     'X-XSRF-TOKEN': xsrf,
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                }
+                    Accept: 'application/json',
+                },
             });
 
             if (response.ok) {
@@ -141,13 +142,13 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                 const data = await response.json();
                 setErrors(data.errors || { body: 'Failed to send message.' });
                 // Rollback optimistic message if failed
-                setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
+                setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
                 setBody(originalBody);
                 setAttachment(originalAttachment);
             }
         } catch {
             setErrors({ body: 'Network error. Please try again.' });
-            setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id));
+            setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
             setBody(originalBody);
             setAttachment(originalAttachment);
         } finally {
@@ -182,7 +183,6 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
             <Head title="Channel — Pinpoint Launchpad" />
 
             <div className="mx-auto max-w-[56rem] px-4 py-8 sm:px-6 sm:py-12">
-
                 {/* Header */}
                 <FadeUp delay={0}>
                     <div className="mb-8 flex items-end justify-between">
@@ -191,7 +191,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                             <p className="mt-2 text-[15px] text-[#C1CDE8]">Direct line to your assigned analytical team for audit coordination.</p>
                         </div>
                         <div className="hidden sm:block">
-                            <div className="flex items-center gap-2 rounded-full border border-[#232C43] bg-[#0C1427] px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[#91A7D8]">
+                            <div className="flex items-center gap-2 rounded-full border border-[#232C43] bg-[#0C1427] px-3 py-1.5 text-[11px] font-bold tracking-widest text-[#91A7D8] uppercase">
                                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                                 Active Thread
                             </div>
@@ -202,16 +202,15 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                 {/* Chat Container */}
                 <FadeUp delay={0.1}>
                     <div className="flex flex-col overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-2xl">
-                        
                         {/* Thread Header */}
                         <div className="flex items-center justify-between border-b border-[#232C43] bg-[#0C1427]/50 px-6 py-4">
                             <div className="flex items-center gap-4">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1B294B] border border-[#3A54A5]/20 text-[#D8E0F3]">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#3A54A5]/20 bg-[#1B294B] text-[#D8E0F3]">
                                     <MessageSquare className="size-5" />
                                 </div>
                                 <div>
                                     <p className="text-[14px] font-medium text-[#D8E0F3]">Analytical Review Team</p>
-                                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#91A7D8]">Official Audit Support</p>
+                                    <p className="text-[11px] font-bold tracking-wider text-[#91A7D8] uppercase">Official Audit Support</p>
                                 </div>
                             </div>
                         </div>
@@ -219,95 +218,105 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                         {/* Message list */}
                         <div
                             ref={threadRef}
-                            className="overflow-y-auto bg-[#080B11]/40 p-6 scroll-smooth scrollbar-thin scrollbar-thumb-[#232C43]"
+                            className="scrollbar-thin scrollbar-thumb-[#232C43] overflow-y-auto scroll-smooth bg-[#080B11]/40 p-6"
                             style={{ height: 'calc(100vh - 480px)', minHeight: '400px' }}
                         >
                             {renderedMessages.length === 0 ? (
                                 <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0C1427] border border-[#232C43]">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#232C43] bg-[#0C1427]">
                                         <MessageSquare className="size-6 text-[#455987]" />
                                     </div>
                                     <div>
                                         <p className="text-[15px] font-medium text-[#C1CDE8]">Engagement Initialized</p>
-                                        <p className="mt-1 text-[13px] text-[#455987] max-w-[240px]">
+                                        <p className="mt-1 max-w-[240px] text-[13px] text-[#455987]">
                                             Transmit your first inquiry or status update to begin the audit coordination.
                                         </p>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-8">
-                                {renderedMessages.map((item, i) => {
-                                    if (item.type === 'date') {
+                                    {renderedMessages.map((item, i) => {
+                                        if (item.type === 'date') {
+                                            return (
+                                                <div key={`date-${i}`} className="flex items-center gap-4 py-2">
+                                                    <div className="h-[1px] flex-1 bg-[#232C43]/40" />
+                                                    <span className="text-[10px] font-bold tracking-widest text-[#455987] uppercase">
+                                                        {item.label}
+                                                    </span>
+                                                    <div className="h-[1px] flex-1 bg-[#232C43]/40" />
+                                                </div>
+                                            );
+                                        }
+
+                                        const { msg } = item;
+                                        const isFounder = msg.is_from_founder;
+
                                         return (
-                                            <div key={`date-${i}`} className="flex items-center gap-4 py-2">
-                                                <div className="h-[1px] flex-1 bg-[#232C43]/40" />
-                                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#455987]">
-                                                    {item.label}
-                                                </span>
-                                                <div className="h-[1px] flex-1 bg-[#232C43]/40" />
+                                            <div key={msg.id} className={`group flex flex-col ${isFounder ? 'items-end' : 'items-start'}`}>
+                                                <div className="mb-2 flex items-center gap-3">
+                                                    {!isFounder && (
+                                                        <span className="text-[11px] font-bold tracking-widest text-[#3A54A5] uppercase">
+                                                            Audit Lead
+                                                        </span>
+                                                    )}
+                                                    <span className="text-[11px] font-medium text-[#455987] opacity-60 transition-opacity group-hover:opacity-100">
+                                                        {msg.created_at}
+                                                    </span>
+                                                    {isFounder && (
+                                                        <span className="text-[11px] font-bold tracking-widest text-[#C1CDE8] uppercase">
+                                                            Authorized Founder
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                <div
+                                                    className={[
+                                                        'relative max-w-[80%] rounded-lg px-5 py-4 text-[14px] leading-relaxed',
+                                                        isFounder
+                                                            ? 'border border-[#3A54A5]/20 bg-[#1B294B] text-[#D8E0F3]'
+                                                            : 'border border-[#232C43] bg-[#0C1427] text-[#BCC5DC]',
+                                                        msg.is_optimistic && 'opacity-60 grayscale-[0.5]',
+                                                    ].join(' ')}
+                                                >
+                                                    {msg.body && <p className="whitespace-pre-wrap">{msg.body}</p>}
+
+                                                    {msg.has_attachment && (
+                                                        <div className="mt-4 flex items-center gap-3 rounded-md border border-[#232C43] bg-[#080B11]/60 p-3 transition-colors hover:border-[#3A54A5]/30">
+                                                            <div className="flex h-10 w-10 items-center justify-center rounded border border-[#232C43] bg-[#101623] shadow-inner">
+                                                                <FileText className="size-5 text-[#3A54A5]" />
+                                                            </div>
+                                                            <div className="min-w-0 flex-1">
+                                                                <p className="truncate text-[13px] font-medium text-[#D8E0F3]">
+                                                                    {msg.attachment_filename}
+                                                                </p>
+                                                                {msg.attachment_size && (
+                                                                    <p className="mt-0.5 text-[11px] font-bold tracking-tighter text-[#455987] uppercase">
+                                                                        {msg.attachment_size}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                            <a
+                                                                href={
+                                                                    msg.is_optimistic
+                                                                        ? '#'
+                                                                        : route('founder.messages.attachment.download', { message: msg.id })
+                                                                }
+                                                                className="rounded-md border border-transparent bg-[#101623] p-2 text-[#C1CDE8] transition-all hover:border-[#232C43] hover:text-white"
+                                                            >
+                                                                <Send className="size-4 rotate-90" />
+                                                            </a>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         );
-                                    }
-
-                                    const { msg } = item;
-                                    const isFounder = msg.is_from_founder;
-
-                                    return (
-                                        <div
-                                            key={msg.id}
-                                            className={`flex flex-col group ${isFounder ? 'items-end' : 'items-start'}`}
-                                        >
-                                            <div className="mb-2 flex items-center gap-3">
-                                                {!isFounder && <span className="text-[11px] font-bold uppercase tracking-widest text-[#3A54A5]">Audit Lead</span>}
-                                                <span className="text-[11px] font-medium text-[#455987] opacity-60 group-hover:opacity-100 transition-opacity">
-                                                    {msg.created_at}
-                                                </span>
-                                                {isFounder && <span className="text-[11px] font-bold uppercase tracking-widest text-[#C1CDE8]">Authorized Founder</span>}
-                                            </div>
-
-                                            <div
-                                                className={[
-                                                    'max-w-[80%] rounded-lg px-5 py-4 text-[14px] leading-relaxed relative',
-                                                    isFounder
-                                                        ? 'bg-[#1B294B] text-[#D8E0F3] border border-[#3A54A5]/20'
-                                                        : 'bg-[#0C1427] text-[#BCC5DC] border border-[#232C43]',
-                                                    msg.is_optimistic && 'opacity-60 grayscale-[0.5]'
-                                                ].join(' ')}
-                                            >
-                                                {msg.body && (
-                                                    <p className="whitespace-pre-wrap">{msg.body}</p>
-                                                )}
-
-                                                {msg.has_attachment && (
-                                                    <div className="mt-4 flex items-center gap-3 rounded-md bg-[#080B11]/60 border border-[#232C43] p-3 transition-colors hover:border-[#3A54A5]/30">
-                                                        <div className="flex h-10 w-10 items-center justify-center rounded bg-[#101623] border border-[#232C43] shadow-inner">
-                                                            <FileText className="size-5 text-[#3A54A5]" />
-                                                        </div>
-                                                        <div className="min-w-0 flex-1">
-                                                            <p className="truncate text-[13px] font-medium text-[#D8E0F3]">{msg.attachment_filename}</p>
-                                                            {msg.attachment_size && (
-                                                                <p className="text-[11px] font-bold text-[#455987] uppercase mt-0.5 tracking-tighter">{msg.attachment_size}</p>
-                                                            )}
-                                                        </div>
-                                                        <a
-                                                            href={msg.is_optimistic ? '#' : route('founder.messages.attachment.download', { message: msg.id })}
-                                                            className="rounded-md bg-[#101623] p-2 text-[#C1CDE8] hover:text-white border border-transparent hover:border-[#232C43] transition-all"
-                                                        >
-                                                            <Send className="size-4 rotate-90" />
-                                                        </a>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                    })}
+                                </div>
                             )}
                         </div>
 
                         {/* Input Zone */}
                         <div className="border-t border-[#232C43] bg-[#0C1427]/40 p-6">
-                            
                             <AnimatePresence>
                                 {attachment && (
                                     <motion.div
@@ -317,7 +326,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                         className="mb-4 inline-flex items-center gap-3 rounded-md border border-[#3A54A5]/40 bg-[#1B294B] px-4 py-2 text-[12px] text-[#D8E0F3]"
                                     >
                                         <Paperclip className="size-4 text-[#3A54A5]" />
-                                        <span className="truncate max-w-[240px] font-medium">{attachment.name}</span>
+                                        <span className="max-w-[240px] truncate font-medium">{attachment.name}</span>
                                         <button
                                             type="button"
                                             onClick={removeAttachment}
@@ -329,28 +338,26 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                 )}
                             </AnimatePresence>
 
-                            {errors.body && <p className="mb-3 text-[13px] text-red-400 font-medium">{errors.body}</p>}
-                            {errors.attachment && <p className="mb-3 text-[13px] text-red-400 font-medium">{errors.attachment}</p>}
+                            {errors.body && <p className="mb-3 text-[13px] font-medium text-red-400">{errors.body}</p>}
+                            {errors.attachment && <p className="mb-3 text-[13px] font-medium text-red-400">{errors.attachment}</p>}
 
-                            <div className="relative group">
+                            <div className="group relative">
                                 <Textarea
                                     value={body}
                                     onChange={(e) => setBody(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     placeholder="Enter audit inquiry or engagement update..."
-                                    className="min-h-[120px] max-h-[300px] w-full resize-none rounded-xl border-[#232C43] bg-[#080B11]/60 p-5 text-[15px] text-[#D8E0F3] placeholder:text-[#455987] focus:ring-1 focus:ring-[#3A54A5]/50 transition-all group-hover:border-[#3A54A5]/20"
+                                    className="max-h-[300px] min-h-[120px] w-full resize-none rounded-xl border-[#232C43] bg-[#080B11]/60 p-5 text-[15px] text-[#D8E0F3] transition-all group-hover:border-[#3A54A5]/20 placeholder:text-[#455987] focus:ring-1 focus:ring-[#3A54A5]/50"
                                 />
-                                
-                                <div className="absolute bottom-5 right-5 flex items-center gap-5">
-                                    <div className="text-[12px] font-bold tracking-tighter text-[#455987]">
-                                        {body.length} / 2000
-                                    </div>
-                                    
+
+                                <div className="absolute right-5 bottom-5 flex items-center gap-5">
+                                    <div className="text-[12px] font-bold tracking-tighter text-[#455987]">{body.length} / 2000</div>
+
                                     <div className="flex items-center gap-3 border-l border-[#232C43] pl-5">
                                         <button
                                             type="button"
                                             onClick={() => fileInputRef.current?.click()}
-                                            className="rounded-lg p-2.5 text-[#91A7D8] transition-all hover:bg-[#1B294B] hover:text-[#D8E0F3] border border-transparent hover:border-[#3A54A5]/20"
+                                            className="rounded-lg border border-transparent p-2.5 text-[#91A7D8] transition-all hover:border-[#3A54A5]/20 hover:bg-[#1B294B] hover:text-[#D8E0F3]"
                                             title="Attach supporting evidence"
                                         >
                                             <Paperclip className="size-5" />
@@ -368,17 +375,13 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                             onClick={handleSubmit}
                                             disabled={(!body.trim() && !attachment) || processing}
                                             className={[
-                                                'flex h-11 items-center justify-center gap-3 rounded-lg px-6 text-[13px] font-bold uppercase tracking-widest transition-all',
+                                                'flex h-11 items-center justify-center gap-3 rounded-lg px-6 text-[13px] font-bold tracking-widest uppercase transition-all',
                                                 (body.trim() || attachment) && !processing
-                                                    ? 'bg-[#3A54A5] text-white hover:bg-[#365396] shadow-lg shadow-[#3A54A5]/20 active:scale-[0.98]'
-                                                    : 'bg-[#232C43] text-[#455987] cursor-not-allowed',
+                                                    ? 'bg-[#3A54A5] text-white shadow-lg shadow-[#3A54A5]/20 hover:bg-[#365396] active:scale-[0.98]'
+                                                    : 'cursor-not-allowed bg-[#232C43] text-[#455987]',
                                             ].join(' ')}
                                         >
-                                            {processing ? (
-                                                <Loader2 className="size-4.5 animate-spin" />
-                                            ) : (
-                                                <Send className="size-4.5" />
-                                            )}
+                                            {processing ? <Loader2 className="size-4.5 animate-spin" /> : <Send className="size-4.5" />}
                                             Post Update
                                         </button>
                                     </div>
@@ -391,7 +394,7 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                                     Secure Connection
                                 </div>
                                 <div>
-                                    Press <kbd className="rounded bg-[#101623] px-1.5 py-0.5 border border-[#232C43] mx-1">Enter</kbd> to post update
+                                    Press <kbd className="mx-1 rounded border border-[#232C43] bg-[#101623] px-1.5 py-0.5">Enter</kbd> to post update
                                 </div>
                             </div>
                         </div>

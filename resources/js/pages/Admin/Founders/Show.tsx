@@ -6,19 +6,34 @@ import AdminLayout from '@/layouts/admin-layout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface Analyst { id: number; name: string; email: string }
+interface Analyst {
+    id: number;
+    name: string;
+    email: string;
+}
 
 interface PageProps {
     founder: {
-        id: number; full_name: string | null; company_name: string | null;
-        email: string; phone: string | null; created_at: string;
-        last_login_at: string | null; score: number | null;
-        score_band: string | null; tier: string | null;
+        id: number;
+        full_name: string | null;
+        company_name: string | null;
+        email: string;
+        phone: string | null;
+        created_at: string;
+        last_login_at: string | null;
+        score: number | null;
+        score_band: string | null;
+        tier: string | null;
         pillar_scores: Record<string, number> | null;
     };
     payment: {
-        id: number; tier: string; total_amount: number; currency: string;
-        status: string; audit_status: string; paid_at: string | null;
+        id: number;
+        tier: string;
+        total_amount: number;
+        currency: string;
+        status: string;
+        audit_status: string;
+        paid_at: string | null;
         paystack_reference: string;
     } | null;
     signature: { id: number; status: string; signed_at: string | null; signer_name: string | null } | null;
@@ -33,21 +48,24 @@ interface PageProps {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const auditStatusColors: Record<string, string> = {
-    pending:     'bg-slate-700 text-slate-300',
+    pending: 'bg-slate-700 text-slate-300',
     in_progress: 'bg-amber-500/20 text-amber-400',
-    needs_info:  'bg-red-500/20 text-red-400',
-    on_hold:     'bg-orange-500/20 text-orange-400',
-    complete:    'bg-emerald-500/20 text-emerald-400',
+    needs_info: 'bg-red-500/20 text-red-400',
+    on_hold: 'bg-orange-500/20 text-orange-400',
+    complete: 'bg-emerald-500/20 text-emerald-400',
 };
 
 const scoreBandColor: Record<string, string> = {
-    low: 'text-red-400', mid_low: 'text-amber-400', mid_high: 'text-[#3A54A5]', high: 'text-emerald-400',
+    low: 'text-red-400',
+    mid_low: 'text-amber-400',
+    mid_high: 'text-[#3A54A5]',
+    high: 'text-emerald-400',
 };
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <div className="rounded-xl border border-[#232C43] bg-[#101623] p-5">
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-[#91A7D8]">{title}</h3>
+            <h3 className="mb-4 text-xs font-bold tracking-widest text-[#91A7D8] uppercase">{title}</h3>
             {children}
         </div>
     );
@@ -55,9 +73,9 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
     return (
-        <div className="flex justify-between gap-4 py-2 border-b border-[#232C43] last:border-0">
-            <span className="text-xs text-[#91A7D8] shrink-0">{label}</span>
-            <span className="text-sm text-[#D8E0F3] text-right">{value ?? '—'}</span>
+        <div className="flex justify-between gap-4 border-b border-[#232C43] py-2 last:border-0">
+            <span className="shrink-0 text-xs text-[#91A7D8]">{label}</span>
+            <span className="text-right text-sm text-[#D8E0F3]">{value ?? '—'}</span>
         </div>
     );
 }
@@ -68,11 +86,21 @@ const TABS = ['Overview', 'Documents', 'Messages', 'Profile'];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function AdminFoundersShow({ founder, payment, signature, documents, message_thread, profile, assignment, analysts, user_role }: PageProps) {
+export default function AdminFoundersShow({
+    founder,
+    payment,
+    signature,
+    documents,
+    message_thread,
+    profile,
+    assignment,
+    analysts,
+    user_role,
+}: PageProps) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const isSuperAdmin = user_role === 'superadmin';
-    const isAnalyst    = user_role === 'analyst';
-    const canEdit      = isSuperAdmin || isAnalyst;
+    const isAnalyst = user_role === 'analyst';
+    const canEdit = isSuperAdmin || isAnalyst;
 
     const [activeTab, setActiveTab] = useState('Overview');
     const [showAssign, setShowAssign] = useState(false);
@@ -98,14 +126,17 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 {/* Back */}
-                <Link href={route('admin.founders.index')} className="mb-6 inline-flex items-center gap-2 text-sm text-[#C1CDE8] hover:text-[#D8E0F3] transition-colors">
+                <Link
+                    href={route('admin.founders.index')}
+                    className="mb-6 inline-flex items-center gap-2 text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
+                >
                     <ArrowLeft className="size-4" /> Back to Founders
                 </Link>
 
                 {/* Header */}
                 <div className="mb-6 flex items-start justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#D8E0F3] flex items-center gap-2">
+                        <h1 className="flex items-center gap-2 text-2xl font-bold text-[#D8E0F3]">
                             {founder.company_name ?? founder.full_name ?? '—'}
                             {(founder.score ?? 0) > 85 && (
                                 <span title="High Velocity">
@@ -113,17 +144,23 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                 </span>
                             )}
                         </h1>
-                        <p className="mt-1 text-sm text-[#C1CDE8]">{founder.full_name} · {founder.email}</p>
+                        <p className="mt-1 text-sm text-[#C1CDE8]">
+                            {founder.full_name} · {founder.email}
+                        </p>
                     </div>
                     {payment?.audit_status && (
-                        <span className={`rounded-full px-3 py-1 text-xs font-bold ${auditStatusColors[payment.audit_status] ?? 'bg-[#0C1427] text-[#C1CDE8]'}`}>
-                            {payment.audit_status.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                        <span
+                            className={`rounded-full px-3 py-1 text-xs font-bold ${auditStatusColors[payment.audit_status] ?? 'bg-[#0C1427] text-[#C1CDE8]'}`}
+                        >
+                            {payment.audit_status.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                         </span>
                     )}
                 </div>
 
                 {(flash?.success || flash?.error) && (
-                    <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${flash.success ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-red-500/30 bg-red-500/10 text-red-400'}`}>
+                    <div
+                        className={`mb-4 rounded-xl border px-4 py-3 text-sm ${flash.success ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-red-500/30 bg-red-500/10 text-red-400'}`}
+                    >
                         {flash.success ?? flash.error}
                     </div>
                 )}
@@ -135,10 +172,8 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={[
-                                'px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors',
-                                activeTab === tab
-                                    ? 'border-[#3A54A5] text-[#D8E0F3]'
-                                    : 'border-transparent text-[#C1CDE8] hover:text-[#D8E0F3]',
+                                '-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors',
+                                activeTab === tab ? 'border-[#3A54A5] text-[#D8E0F3]' : 'border-transparent text-[#C1CDE8] hover:text-[#D8E0F3]',
                             ].join(' ')}
                         >
                             {tab}
@@ -151,23 +186,23 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                     <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                         {/* Founder details */}
                         <Card title="Founder Details">
-                            <Field label="Full Name"    value={founder.full_name} />
-                            <Field label="Company"      value={founder.company_name} />
-                            <Field label="Email"        value={founder.email} />
-                            <Field label="Phone"        value={founder.phone} />
+                            <Field label="Full Name" value={founder.full_name} />
+                            <Field label="Company" value={founder.company_name} />
+                            <Field label="Email" value={founder.email} />
+                            <Field label="Phone" value={founder.phone} />
                             <Field label="Member Since" value={founder.created_at} />
-                            <Field label="Last Login"   value={founder.last_login_at} />
+                            <Field label="Last Login" value={founder.last_login_at} />
                         </Card>
 
                         {/* PARAGON Score */}
                         <Card title="PARAGON Score">
-                            <div className="flex items-center gap-4 mb-4">
+                            <div className="mb-4 flex items-center gap-4">
                                 <span className={`text-5xl font-bold ${scoreBandColor[founder.score_band ?? ''] ?? 'text-[#D8E0F3]'}`}>
                                     {founder.score ?? '—'}
                                 </span>
                                 <div>
                                     <p className="text-xs text-[#91A7D8]">Score Band</p>
-                                    <p className="text-sm font-medium capitalize text-[#D8E0F3]">{founder.score_band?.replace('_', ' ') ?? '—'}</p>
+                                    <p className="text-sm font-medium text-[#D8E0F3] capitalize">{founder.score_band?.replace('_', ' ') ?? '—'}</p>
                                     <p className="text-xs text-[#91A7D8] capitalize">Tier: {founder.tier ?? '—'}</p>
                                 </div>
                             </div>
@@ -175,11 +210,11 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                 <div className="space-y-2">
                                     {Object.entries(founder.pillar_scores).map(([pillar, score]) => (
                                         <div key={pillar} className="flex items-center gap-3">
-                                            <span className="w-24 text-xs capitalize text-[#C1CDE8] shrink-0">{pillar}</span>
-                                            <div className="flex-1 h-1.5 rounded-full bg-[#080B11] border border-[#232C43]">
+                                            <span className="w-24 shrink-0 text-xs text-[#C1CDE8] capitalize">{pillar}</span>
+                                            <div className="h-1.5 flex-1 rounded-full border border-[#232C43] bg-[#080B11]">
                                                 <div className="h-1.5 rounded-full bg-[#3A54A5]" style={{ width: `${Math.round(score)}%` }} />
                                             </div>
-                                            <span className="w-8 text-right text-xs font-mono text-[#C1CDE8]">{Math.round(score)}</span>
+                                            <span className="w-8 text-right font-mono text-xs text-[#C1CDE8]">{Math.round(score)}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -193,7 +228,7 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                     <select
                                         value={auditForm.data.audit_status}
                                         onChange={(e) => auditForm.setData('audit_status', e.target.value)}
-                                        className="w-full rounded-xl border border-[#232C43] bg-[#080B11] px-3 py-2.5 text-sm text-[#D8E0F3] focus:outline-none focus:border-[#3A54A5]/50"
+                                        className="w-full rounded-xl border border-[#232C43] bg-[#080B11] px-3 py-2.5 text-sm text-[#D8E0F3] focus:border-[#3A54A5]/50 focus:outline-none"
                                     >
                                         <option value="pending">Pending</option>
                                         <option value="in_progress">In Progress</option>
@@ -204,7 +239,7 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                     <button
                                         type="submit"
                                         disabled={auditForm.processing}
-                                        className="w-full rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] py-2 text-sm font-bold text-[#3A54A5] hover:bg-[#3A54A5]/20 disabled:opacity-50 transition-colors"
+                                        className="w-full rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] py-2 text-sm font-bold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/20 disabled:opacity-50"
                                     >
                                         {auditForm.processing ? 'Updating…' : 'Update Status'}
                                     </button>
@@ -234,23 +269,42 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                                 required
                                             >
                                                 <option value="">Select analyst…</option>
-                                                {analysts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+                                                {analysts.map((a) => (
+                                                    <option key={a.id} value={a.id}>
+                                                        {a.name}
+                                                    </option>
+                                                ))}
                                             </select>
                                             <textarea
                                                 value={assignForm.data.notes}
                                                 onChange={(e) => assignForm.setData('notes', e.target.value)}
-                                                placeholder="Notes…" rows={2} maxLength={500}
+                                                placeholder="Notes…"
+                                                rows={2}
+                                                maxLength={500}
                                                 className="w-full resize-none rounded-xl border border-[#232C43] bg-[#080B11] px-3 py-2 text-sm text-[#D8E0F3] placeholder:text-[#91A7D8] focus:outline-none"
                                             />
                                             <div className="flex gap-2">
-                                                <button type="button" onClick={() => setShowAssign(false)} className="flex-1 rounded-xl border border-[#232C43] py-2 text-xs text-[#C1CDE8] hover:bg-[#1B294B] transition-colors">Cancel</button>
-                                                <button type="submit" disabled={assignForm.processing} className="flex-1 rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] py-2 text-xs font-bold text-[#3A54A5] hover:bg-[#3A54A5]/20 disabled:opacity-50 transition-colors">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowAssign(false)}
+                                                    className="flex-1 rounded-xl border border-[#232C43] py-2 text-xs text-[#C1CDE8] transition-colors hover:bg-[#1B294B]"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="submit"
+                                                    disabled={assignForm.processing}
+                                                    className="flex-1 rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] py-2 text-xs font-bold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/20 disabled:opacity-50"
+                                                >
                                                     {assignForm.processing ? 'Assigning…' : 'Assign'}
                                                 </button>
                                             </div>
                                         </form>
                                     ) : (
-                                        <button onClick={() => setShowAssign(true)} className="w-full rounded-xl border border-[#232C43] py-2 text-xs font-medium text-[#C1CDE8] hover:bg-[#1B294B] hover:text-[#D8E0F3] transition-colors">
+                                        <button
+                                            onClick={() => setShowAssign(true)}
+                                            className="w-full rounded-xl border border-[#232C43] py-2 text-xs font-medium text-[#C1CDE8] transition-colors hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                                        >
                                             {assignment ? 'Change Analyst' : 'Assign Analyst'}
                                         </button>
                                     )}
@@ -261,11 +315,11 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                         {/* Payment */}
                         {payment && (
                             <Card title="Payment">
-                                <Field label="Tier"       value={<span className="capitalize">{payment.tier}</span>} />
-                                <Field label="Amount"     value={`${payment.currency} ${payment.total_amount.toLocaleString()}`} />
-                                <Field label="Status"     value={payment.status} />
-                                <Field label="Paid At"    value={payment.paid_at} />
-                                <Field label="Reference"  value={<span className="font-mono text-xs">{payment.paystack_reference}</span>} />
+                                <Field label="Tier" value={<span className="capitalize">{payment.tier}</span>} />
+                                <Field label="Amount" value={`${payment.currency} ${payment.total_amount.toLocaleString()}`} />
+                                <Field label="Status" value={payment.status} />
+                                <Field label="Paid At" value={payment.paid_at} />
+                                <Field label="Reference" value={<span className="font-mono text-xs">{payment.paystack_reference}</span>} />
                             </Card>
                         )}
 
@@ -273,7 +327,7 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                         <Card title="Agreement">
                             {signature ? (
                                 <>
-                                    <Field label="Status"    value={signature.status} />
+                                    <Field label="Status" value={signature.status} />
                                     <Field label="Signed By" value={signature.signer_name} />
                                     <Field label="Signed At" value={signature.signed_at} />
                                 </>
@@ -286,7 +340,7 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
 
                 {/* ── Documents ── */}
                 {activeTab === 'Documents' && (
-                    <div className="rounded-xl border border-[#232C43] bg-[#101623] overflow-hidden">
+                    <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
                         {documents.length === 0 ? (
                             <div className="py-16 text-center text-sm text-[#C1CDE8]">No documents uploaded.</div>
                         ) : (
@@ -295,29 +349,41 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                     <thead>
                                         <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                             {['Filename', 'Type', 'Reviewed', 'Uploaded', 'Actions'].map((h) => (
-                                                <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">{h}</th>
+                                                <th
+                                                    key={h}
+                                                    className="px-5 py-3.5 text-left text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase"
+                                                >
+                                                    {h}
+                                                </th>
                                             ))}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {documents.map((doc) => (
-                                            <tr key={doc.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
+                                            <tr
+                                                key={doc.id}
+                                                className="border-b border-[#232C43] transition-colors last:border-0 hover:bg-[#1B294B]/30"
+                                            >
                                                 <td className="px-5 py-3.5">
                                                     <div className="flex items-center gap-2">
                                                         <FileText className="size-4 shrink-0 text-[#91A7D8]" />
-                                                        <span className="text-[#D8E0F3] truncate max-w-[200px]">{doc.original_filename}</span>
+                                                        <span className="max-w-[200px] truncate text-[#D8E0F3]">{doc.original_filename}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-5 py-3.5 capitalize text-[#C1CDE8]">{doc.type}</td>
+                                                <td className="px-5 py-3.5 text-[#C1CDE8] capitalize">{doc.type}</td>
                                                 <td className="px-5 py-3.5">
-                                                    {doc.reviewed
-                                                        ? <CheckCircle2 className="size-4 text-emerald-400" />
-                                                        : <span className="text-xs text-[#91A7D8]">Pending</span>
-                                                    }
+                                                    {doc.reviewed ? (
+                                                        <CheckCircle2 className="size-4 text-emerald-400" />
+                                                    ) : (
+                                                        <span className="text-xs text-[#91A7D8]">Pending</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-5 py-3.5 text-[#C1CDE8]">{doc.created_at}</td>
                                                 <td className="px-5 py-3.5">
-                                                    <a href={route('admin.documents.download', { founder: founder.id, document: doc.id })} className="text-xs font-bold uppercase tracking-wider text-[#3A54A5] hover:text-[#C1CDE8] transition-colors">
+                                                    <a
+                                                        href={route('admin.documents.download', { founder: founder.id, document: doc.id })}
+                                                        className="text-xs font-bold tracking-wider text-[#3A54A5] uppercase transition-colors hover:text-[#C1CDE8]"
+                                                    >
                                                         Download
                                                     </a>
                                                 </td>
@@ -336,13 +402,13 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                         {message_thread ? (
                             <>
                                 <MessageSquare className="mx-auto mb-3 size-10 text-[#91A7D8]" />
-                                <p className="text-[#D8E0F3] font-medium">{message_thread.total_messages} messages</p>
+                                <p className="font-medium text-[#D8E0F3]">{message_thread.total_messages} messages</p>
                                 {message_thread.unread_count > 0 && (
                                     <p className="mt-1 text-sm text-amber-400">{message_thread.unread_count} unread</p>
                                 )}
                                 <Link
                                     href={route('admin.messages.show', { thread: message_thread.id })}
-                                    className="mt-4 inline-block rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] px-5 py-2 text-sm font-bold text-[#3A54A5] hover:bg-[#3A54A5]/20 transition-colors"
+                                    className="mt-4 inline-block rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] px-5 py-2 text-sm font-bold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/20"
                                 >
                                     <span className="flex items-center gap-2">
                                         Open Thread
@@ -364,18 +430,35 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                     <div className="rounded-xl border border-[#232C43] bg-[#101623] p-6">
                         {profile ? (
                             <div className="space-y-4">
-                                <Field label="Status"    value={profile.is_live ? <span className="text-emerald-400">Live</span> : profile.is_public ? 'Public (not live)' : 'Draft'} />
-                                <Field label="Slug"      value={<span className="font-mono text-xs">{profile.slug}</span>} />
+                                <Field
+                                    label="Status"
+                                    value={
+                                        profile.is_live ? (
+                                            <span className="text-emerald-400">Live</span>
+                                        ) : profile.is_public ? (
+                                            'Public (not live)'
+                                        ) : (
+                                            'Draft'
+                                        )
+                                    }
+                                />
+                                <Field label="Slug" value={<span className="font-mono text-xs">{profile.slug}</span>} />
                                 <div className="flex gap-3 pt-2">
-                                    <a href={`/verify/${profile.slug}`} target="_blank" rel="noopener noreferrer"
-                                        className="group rounded-xl border border-[#232C43] px-4 py-2 text-xs text-[#C1CDE8] hover:bg-[#1B294B] hover:text-[#D8E0F3] transition-colors">
+                                    <a
+                                        href={`/verify/${profile.slug}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group rounded-xl border border-[#232C43] px-4 py-2 text-xs text-[#C1CDE8] transition-colors hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                                    >
                                         <span className="flex items-center gap-1.5">
                                             View Public Page
                                             <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
                                         </span>
                                     </a>
-                                    <Link href={route('admin.profiles.show', { profile: profile.id })}
-                                        className="group rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] px-4 py-2 text-xs font-bold text-[#3A54A5] hover:bg-[#3A54A5]/20 transition-colors">
+                                    <Link
+                                        href={route('admin.profiles.show', { profile: profile.id })}
+                                        className="group rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] px-4 py-2 text-xs font-bold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/20"
+                                    >
                                         <span className="flex items-center gap-1.5">
                                             Edit Profile
                                             <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
@@ -384,7 +467,9 @@ export default function AdminFoundersShow({ founder, payment, signature, documen
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-sm text-[#C1CDE8]">No investor profile yet. It is created automatically when the audit is marked complete.</p>
+                            <p className="text-sm text-[#C1CDE8]">
+                                No investor profile yet. It is created automatically when the audit is marked complete.
+                            </p>
                         )}
                     </div>
                 )}

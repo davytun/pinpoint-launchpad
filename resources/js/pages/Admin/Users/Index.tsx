@@ -24,14 +24,14 @@ interface PageProps {
 
 const roleBadge: Record<string, string> = {
     superadmin: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
-    analyst:    'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-    support:    'bg-slate-500/20 text-slate-400 border border-slate-500/30',
+    analyst: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+    support: 'bg-slate-500/20 text-slate-400 border border-slate-500/30',
 };
 
 const roleLabel: Record<string, string> = {
     superadmin: 'Super Admin',
-    analyst:    'Analyst',
-    support:    'Support',
+    analyst: 'Analyst',
+    support: 'Support',
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -52,7 +52,9 @@ export default function AdminUsersIndex({ users }: PageProps) {
                 <div className="mb-6 flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold text-[#D8E0F3]">Team</h1>
-                        <p className="mt-1 text-sm text-[#C1CDE8]">{users.length} member{users.length !== 1 ? 's' : ''}</p>
+                        <p className="mt-1 text-sm text-[#C1CDE8]">
+                            {users.length} member{users.length !== 1 ? 's' : ''}
+                        </p>
                     </div>
                     <Link
                         href={route('admin.users.create')}
@@ -64,7 +66,9 @@ export default function AdminUsersIndex({ users }: PageProps) {
                 </div>
 
                 {(flash?.success || flash?.error) && (
-                    <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${flash.success ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-red-500/30 bg-red-500/10 text-red-400'}`}>
+                    <div
+                        className={`mb-4 rounded-xl border px-4 py-3 text-sm ${flash.success ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-red-500/30 bg-red-500/10 text-red-400'}`}
+                    >
                         {flash.success ?? flash.error}
                     </div>
                 )}
@@ -78,13 +82,18 @@ export default function AdminUsersIndex({ users }: PageProps) {
                                 <thead>
                                     <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
                                         {['Name', 'Email', 'Role', 'Assigned Founders', 'Joined', 'Actions'].map((h) => (
-                                            <th key={h} className="px-5 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#91A7D8]">{h}</th>
+                                            <th
+                                                key={h}
+                                                className="px-5 py-3.5 text-left text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase"
+                                            >
+                                                {h}
+                                            </th>
                                         ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {users.map((u) => (
-                                        <tr key={u.id} className="border-b border-[#232C43] last:border-0 hover:bg-[#1B294B]/30 transition-colors">
+                                        <tr key={u.id} className="border-b border-[#232C43] transition-colors last:border-0 hover:bg-[#1B294B]/30">
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center gap-2">
                                                     <span className="font-medium text-[#D8E0F3]">{u.name}</span>

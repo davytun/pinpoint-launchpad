@@ -11,20 +11,20 @@ import { cn } from '@/lib/utils';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PageProps {
-    tier_label:   string;
+    tier_label: string;
     total_amount: number;
-    email:        string;
+    email: string;
     currency_symbol?: string;
 }
 
 // ─── Animated SVG checkmark ───────────────────────────────────────────────────
 
 const CIRCLE_LEN = 2 * Math.PI * 36; // 226.19…
-const CHECK_LEN  = 40;               // approximate; getTotalLength overrides at runtime
+const CHECK_LEN = 40; // approximate; getTotalLength overrides at runtime
 
 function AnimatedCheck() {
     const circleRef = useRef<SVGCircleElement>(null);
-    const checkRef  = useRef<SVGPathElement>(null);
+    const checkRef = useRef<SVGPathElement>(null);
 
     useEffect(() => {
         // Circle: start hidden, animate to full
@@ -39,7 +39,7 @@ function AnimatedCheck() {
         // Check: start hidden, animate after circle finishes
         if (checkRef.current) {
             const len = checkRef.current.getTotalLength?.() ?? CHECK_LEN;
-            checkRef.current.style.strokeDasharray  = String(len);
+            checkRef.current.style.strokeDasharray = String(len);
             checkRef.current.style.strokeDashoffset = String(len);
             checkRef.current.style.transition = 'stroke-dashoffset 0.45s cubic-bezier(0.16,1,0.3,1) 0.55s';
             requestAnimationFrame(() => {
@@ -57,13 +57,15 @@ function AnimatedCheck() {
             {/* Animated ring — initially hidden via inline style */}
             <circle
                 ref={circleRef}
-                cx="40" cy="40" r="36"
+                cx="40"
+                cy="40"
+                r="36"
                 stroke="#6EBE44"
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
                 style={{
-                    strokeDasharray:  CIRCLE_LEN,
+                    strokeDasharray: CIRCLE_LEN,
                     strokeDashoffset: CIRCLE_LEN,
                 }}
             />
@@ -77,7 +79,7 @@ function AnimatedCheck() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 style={{
-                    strokeDasharray:  CHECK_LEN,
+                    strokeDasharray: CHECK_LEN,
                     strokeDashoffset: CHECK_LEN,
                 }}
             />
@@ -89,11 +91,7 @@ const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
 function FadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease, delay }}
-        >
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease, delay }}>
             {children}
         </motion.div>
     );
@@ -105,10 +103,12 @@ function Row({ label, children, isTotal = false }: { label: string; children: Re
     return (
         <div className="flex items-center justify-between py-3">
             <span className="text-[13px] text-[#91A7D8]">{label}</span>
-            <span className={cn(
-                'text-[13px]',
-                isTotal ? 'font-mono text-[14px] font-bold tracking-tight text-[#D8E0F3]' : 'font-medium text-[#D8E0F3]/90'
-            )}>
+            <span
+                className={cn(
+                    'text-[13px]',
+                    isTotal ? 'font-mono text-[14px] font-bold tracking-tight text-[#D8E0F3]' : 'font-medium text-[#D8E0F3]/90',
+                )}
+            >
                 {children}
             </span>
         </div>
@@ -120,12 +120,8 @@ function Row({ label, children, isTotal = false }: { label: string; children: Re
 function Step({ n, label, sub, isLast = false }: { n: number; label: string; sub: string; isLast?: boolean }) {
     return (
         <div className="relative flex items-start gap-4 pb-5">
-            {!isLast && (
-                <div className="absolute left-[0.6rem] top-7 bottom-0 w-[1.5px] bg-[#232C43]" />
-            )}
-            <div
-                className="relative z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-full border border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[10px] font-bold text-[#6986C9] tabular-nums"
-            >
+            {!isLast && <div className="absolute top-7 bottom-0 left-[0.6rem] w-[1.5px] bg-[#232C43]" />}
+            <div className="relative z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-full border border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[10px] font-bold text-[#6986C9] tabular-nums">
                 {n}
             </div>
             <div className="-mt-0.5">
@@ -144,7 +140,6 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
             <Head title="Payment Confirmed — PARAGON Certification" />
 
             <div className="flex min-h-screen flex-col items-center justify-center px-4 py-16">
-
                 {/* Wordmark */}
                 <FadeUp delay={0}>
                     <div className="mb-8 flex items-center gap-3">
@@ -155,7 +150,6 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                 <div className="w-full max-w-[440px]">
                     {/* Main card */}
                     <div className="relative overflow-hidden rounded-[2rem] border border-[#232C43] bg-[#101623] p-8 shadow-2xl sm:p-10">
-
                         {/* Status Icon */}
                         <FadeUp delay={0.1}>
                             <div className="mb-6 flex justify-center">
@@ -166,12 +160,8 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         {/* Heading */}
                         <FadeUp delay={0.2}>
                             <div className="relative z-10 mb-8 text-center">
-                                <p
-                                    className="mb-2 text-[10px] font-bold uppercase tracking-[0.25em] text-[#6EBE44]"
-                                >
-                                    Payment Authorized
-                                </p>
-                                <h1 className="font-display text-[26px] font-semibold leading-tight tracking-tight text-[#D8E0F3] sm:text-[28px]">
+                                <p className="mb-2 text-[10px] font-bold tracking-[0.25em] text-[#6EBE44] uppercase">Payment Authorized</p>
+                                <h1 className="font-display text-[26px] leading-tight font-semibold tracking-tight text-[#D8E0F3] sm:text-[28px]">
                                     Commitment Secured
                                 </h1>
                             </div>
@@ -181,15 +171,16 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         <FadeUp delay={0.3}>
                             <div className="mb-7 overflow-hidden rounded-2xl border border-[#232C43] bg-[#0C1427]/50">
                                 <div className="border-b border-dashed border-[#232C43] bg-[#1B294B]/10 px-5 py-3">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#91A7D8]">Invoice Details</p>
+                                    <p className="text-[10px] font-bold tracking-[0.2em] text-[#91A7D8] uppercase">Invoice Details</p>
                                 </div>
                                 <div className="divide-y divide-dashed divide-[#232C43] px-5 py-1.5">
                                     <Row label="Tier">{tier_label} Audit</Row>
-                                    <Row label="Amount" isTotal>{currency_symbol}{Number(total_amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</Row>
+                                    <Row label="Amount" isTotal>
+                                        {currency_symbol}
+                                        {Number(total_amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                                    </Row>
                                     <Row label="Status">
-                                        <Badge
-                                            className="border border-[#6EBE44]/30 bg-[#6EBE44]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] text-[#6EBE44]"
-                                        >
+                                        <Badge className="border border-[#6EBE44]/30 bg-[#6EBE44]/10 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.15em] text-[#6EBE44] uppercase">
                                             Paid
                                         </Badge>
                                     </Row>
@@ -212,18 +203,14 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         {/* Next steps Timeline */}
                         <FadeUp delay={0.5}>
                             <div className="mb-8">
-                                <h2 className="mb-5 text-[11px] font-bold uppercase tracking-[0.15em] text-[#91A7D8]">Action Required</h2>
+                                <h2 className="mb-5 text-[11px] font-bold tracking-[0.15em] text-[#91A7D8] uppercase">Action Required</h2>
                                 <div className="pl-1">
                                     <Step
                                         n={1}
                                         label="Sign Your Agreement"
                                         sub="A 2-minute digital signature to formally establish your success fee terms."
                                     />
-                                    <Step
-                                        n={2}
-                                        label="Analyst Onboarding Call"
-                                        sub="Scheduled within 48h to synchronize with your Lead Analyst."
-                                    />
+                                    <Step n={2} label="Analyst Onboarding Call" sub="Scheduled within 48h to synchronize with your Lead Analyst." />
                                     <Step
                                         n={3}
                                         label="Audit Execution"
@@ -238,7 +225,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         <FadeUp delay={0.6}>
                             <Link
                                 href={route('onboarding.sign')}
-                                className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold uppercase tracking-[0.18em] text-white outline-none transition-all duration-200 hover:bg-[#3b5ba5]"
+                                className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#3b5ba5]"
                                 style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
                             >
                                 <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
@@ -246,7 +233,6 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                                 <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                             </Link>
                         </FadeUp>
-
                     </div>
 
                     {/* Info chip */}
@@ -254,7 +240,8 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#232C43] bg-[#101623]/50 px-5 py-4">
                             <Info className="mt-0.5 size-4 shrink-0 text-[#91A7D8]/40" />
                             <p className="text-[12px] leading-relaxed text-[#91A7D8]/60">
-                                Protected transaction. If the program fails to commence within 10 business days, you are fully entitled to our risk-free, zero-questions refund policy.
+                                Protected transaction. If the program fails to commence within 10 business days, you are fully entitled to our
+                                risk-free, zero-questions refund policy.
                             </p>
                         </div>
                     </FadeUp>

@@ -29,7 +29,7 @@ class WaitlistController extends Controller
             }
         }
 
-        return Inertia::render('Waitlist/Index', [
+        return Inertia::render('Welcome', [
             'selectedAudience' => in_array($audience, ['founder', 'investor']) ? $audience : null,
             'founderStages' => [
                 ['value' => 'idea',        'label' => 'Idea Stage'],

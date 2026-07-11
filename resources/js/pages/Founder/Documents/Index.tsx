@@ -2,6 +2,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     AlertTriangle,
+    ArrowRight,
     CheckCircle2,
     Download,
     File,
@@ -12,7 +13,6 @@ import {
     Trash2,
     Upload,
     X,
-    ArrowRight
 } from 'lucide-react';
 import { useRef, useState } from 'react';
 
@@ -63,11 +63,7 @@ interface PageProps {
 
 function FadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay, ease: [0.25, 1, 0.5, 1] }}
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay, ease: [0.25, 1, 0.5, 1] }}>
             {children}
         </motion.div>
     );
@@ -75,12 +71,17 @@ function FadeUp({ delay = 0, children }: { delay?: number; children: React.React
 
 function FileIcon({ icon, extension }: { icon: string; extension: string }) {
     const colorClass =
-        extension === 'pdf' ? 'text-red-400' :
-        ['doc', 'docx'].includes(extension) ? 'text-blue-400' :
-        ['xls', 'xlsx', 'csv'].includes(extension) ? 'text-emerald-400' :
-        ['ppt', 'pptx'].includes(extension) ? 'text-orange-400' :
-        ['jpg', 'jpeg', 'png'].includes(extension) ? 'text-purple-400' :
-        'text-slate-400';
+        extension === 'pdf'
+            ? 'text-red-400'
+            : ['doc', 'docx'].includes(extension)
+              ? 'text-blue-400'
+              : ['xls', 'xlsx', 'csv'].includes(extension)
+                ? 'text-emerald-400'
+                : ['ppt', 'pptx'].includes(extension)
+                  ? 'text-orange-400'
+                  : ['jpg', 'jpeg', 'png'].includes(extension)
+                    ? 'text-purple-400'
+                    : 'text-slate-400';
 
     const cls = `size-4.5 shrink-0 ${colorClass}`;
 
@@ -96,30 +97,20 @@ function formatBytes(bytes: number): string {
     return (bytes / 1048576).toFixed(1) + ' MB';
 }
 
-function ProCard({ children, className = '' }: { children: React.ReactNode, className?: string }) {
-    return (
-        <div className={`overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm ${className}`}>
-            {children}
-        </div>
-    );
+function ProCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+    return <div className={`overflow-hidden rounded-xl border border-[#232C43] bg-[#101623] shadow-sm ${className}`}>{children}</div>;
 }
 
 // ─── Upload Zone ──────────────────────────────────────────────────────────────
 
-function UploadZone({
-    categories,
-    onSuccess,
-}: {
-    categories: Category[];
-    onSuccess: () => void;
-}) {
+function UploadZone({ categories, onSuccess }: { categories: Category[]; onSuccess: () => void }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-    const [category, setCategory]           = useState('');
-    const [dragOver, setDragOver]           = useState(false);
-    const [uploadError, setUploadError]     = useState<string | null>(null);
-    const [processing, setProcessing]       = useState(false);
-    const [progress, setProgress]           = useState(0);
+    const [category, setCategory] = useState('');
+    const [dragOver, setDragOver] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const [processing, setProcessing] = useState(false);
+    const [progress, setProgress] = useState(0);
 
     function addFiles(incoming: FileList | null) {
         if (!incoming) return;
@@ -154,7 +145,12 @@ function UploadZone({
         formData.append('category', category);
 
         const xsrf = decodeURIComponent(
-            document.cookie.split('; ').find((c) => c.startsWith('XSRF-TOKEN='))?.split('=').slice(1).join('=') ?? ''
+            document.cookie
+                .split('; ')
+                .find((c) => c.startsWith('XSRF-TOKEN='))
+                ?.split('=')
+                .slice(1)
+                .join('=') ?? '',
         );
 
         const xhr = new XMLHttpRequest();
@@ -183,7 +179,7 @@ function UploadZone({
                 try {
                     const body = JSON.parse(xhr.responseText);
                     const errs = body?.props?.errors ?? body?.errors ?? {};
-                    const msg  = errs.files ?? errs['files.0'] ?? errs['files.1'] ?? body?.message ?? 'Upload failed.';
+                    const msg = errs.files ?? errs['files.0'] ?? errs['files.1'] ?? body?.message ?? 'Upload failed.';
                     setUploadError(Array.isArray(msg) ? msg[0] : msg);
                 } catch {
                     setUploadError('Upload failed. Please try again.');
@@ -205,9 +201,7 @@ function UploadZone({
     return (
         <form onSubmit={handleSubmit}>
             <ProCard className="mb-6 p-6">
-                <p className="mb-5 text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
-                    Upload Supporting Documents
-                </p>
+                <p className="mb-5 text-[11px] font-semibold tracking-wider text-[#91A7D8] uppercase">Upload Supporting Documents</p>
 
                 {/* Drop zone */}
                 <div
@@ -216,7 +210,10 @@ function UploadZone({
                     aria-label="Click or drop files to upload"
                     onClick={() => fileInputRef.current?.click()}
                     onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
-                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                    onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOver(true);
+                    }}
                     onDragLeave={() => setDragOver(false)}
                     onDrop={handleDrop}
                     className={[
@@ -224,7 +221,7 @@ function UploadZone({
                         dragOver ? 'border-[#3A54A5] bg-[#1B294B]/50' : 'border-[#232C43] hover:border-[#3A54A5] hover:bg-[#1B294B]/20',
                     ].join(' ')}
                 >
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#0C1427] border border-[#232C43]">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border border-[#232C43] bg-[#0C1427]">
                         <Upload className="size-6 text-[#91A7D8]" aria-hidden="true" />
                     </div>
                     <p className="text-[14px] font-medium text-[#D8E0F3]">Drop your files here</p>
@@ -263,7 +260,10 @@ function UploadZone({
                                     {!processing && (
                                         <button
                                             type="button"
-                                            onClick={(e) => { e.stopPropagation(); removeFile(i); }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeFile(i);
+                                            }}
                                             className="rounded-md p-1 text-[#455987] transition-colors hover:bg-red-500/10 hover:text-red-400"
                                             aria-label={`Remove ${file.name}`}
                                         >
@@ -302,22 +302,16 @@ function UploadZone({
                 </AnimatePresence>
 
                 {/* Category + upload button row */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end border-t border-[#232C43] pt-6">
+                <div className="flex flex-col gap-4 border-t border-[#232C43] pt-6 sm:flex-row sm:items-end">
                     <div className="flex-1">
-                        <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
-                            Document Category
-                        </label>
+                        <label className="mb-2 block text-[11px] font-semibold tracking-wider text-[#91A7D8] uppercase">Document Category</label>
                         <Select value={category} onValueChange={setCategory} disabled={processing}>
                             <SelectTrigger className="rounded-lg border-[#232C43] bg-[#0C1427] text-[#D8E0F3] focus:ring-1 focus:ring-[#3A54A5]/50">
                                 <SelectValue placeholder="Select a category" />
                             </SelectTrigger>
                             <SelectContent className="border-[#232C43] bg-[#101623]">
                                 {categories.map((cat) => (
-                                    <SelectItem
-                                        key={cat.value}
-                                        value={cat.value}
-                                        className="text-[#BCC5DC] focus:bg-[#1B294B] focus:text-[#D8E0F3]"
-                                    >
+                                    <SelectItem key={cat.value} value={cat.value} className="text-[#BCC5DC] focus:bg-[#1B294B] focus:text-[#D8E0F3]">
                                         {cat.label}
                                     </SelectItem>
                                 ))}
@@ -329,9 +323,9 @@ function UploadZone({
                         type="submit"
                         disabled={!canSubmit}
                         className={[
-                            'group relative flex h-10 items-center justify-center rounded-lg px-6 text-[13px] font-semibold uppercase tracking-wider transition-all duration-200',
+                            'group relative flex h-10 items-center justify-center rounded-lg px-6 text-[13px] font-semibold tracking-wider uppercase transition-all duration-200',
                             canSubmit
-                                ? 'bg-[#3A54A5] text-white hover:bg-[#365396] shadow-lg shadow-[#3A54A5]/10'
+                                ? 'bg-[#3A54A5] text-white shadow-lg shadow-[#3A54A5]/10 hover:bg-[#365396]'
                                 : 'cursor-not-allowed bg-[#232C43] text-[#455987]',
                         ].join(' ')}
                     >
@@ -342,7 +336,10 @@ function UploadZone({
                                     Uploading…
                                 </>
                             ) : (
-                                <>Upload {selectedFiles.length > 1 ? `${selectedFiles.length} Files` : 'Document'} <ArrowRight className="size-3.5" /></>
+                                <>
+                                    Upload {selectedFiles.length > 1 ? `${selectedFiles.length} Files` : 'Document'}{' '}
+                                    <ArrowRight className="size-3.5" />
+                                </>
                             )}
                         </span>
                     </button>
@@ -380,7 +377,7 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="group flex items-center gap-4 py-3 transition-all duration-150 hover:bg-[#1B294B]/20 px-4"
+            className="group flex items-center gap-4 px-4 py-3 transition-all duration-150 hover:bg-[#1B294B]/20"
         >
             {/* File icon */}
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-[#232C43] bg-[#0C1427]">
@@ -400,21 +397,17 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
             </div>
 
             {/* Desktop columns */}
-            <div className="hidden sm:flex flex-1 items-center gap-4 text-[12.5px] text-[#C1CDE8]">
+            <div className="hidden flex-1 items-center gap-4 text-[12.5px] text-[#C1CDE8] sm:flex">
                 <span className="w-20 shrink-0 text-right">{doc.file_size}</span>
-                <span className="flex-1 text-right opacity-60 font-mono text-[11px]">{doc.created_at}</span>
+                <span className="flex-1 text-right font-mono text-[11px] opacity-60">{doc.created_at}</span>
             </div>
 
             {/* Status badge */}
-            <div className="w-32 shrink-0 flex justify-end">
+            <div className="flex w-32 shrink-0 justify-end">
                 {doc.is_reviewed ? (
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500/80">
-                        Reviewed
-                    </span>
+                    <span className="text-[10px] font-bold tracking-wider text-emerald-500/80 uppercase">Reviewed</span>
                 ) : (
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#455987]">
-                        Pending
-                    </span>
+                    <span className="text-[10px] font-bold tracking-wider text-[#455987] uppercase">Pending</span>
                 )}
             </div>
 
@@ -443,15 +436,7 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function DocumentsIndex({
-    founder,
-    documents,
-    can_upload,
-    audit_status,
-    categories,
-    total_count,
-    max_files,
-}: PageProps) {
+export default function DocumentsIndex({ founder, documents, can_upload, audit_status, categories, total_count, max_files }: PageProps) {
     const { props } = usePage<PageProps>();
     const flash = props.flash;
 
@@ -483,15 +468,12 @@ export default function DocumentsIndex({
             <Head title="Documents — Pinpoint Launchpad" />
 
             <div className="mx-auto max-w-[64rem] px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-
                 {/* ── Header ── */}
                 <FadeUp delay={0}>
                     <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <h1 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">Your Documents</h1>
-                            <p className="mt-2 text-[15px] text-[#C1CDE8]">
-                                Upload supporting evidence for your analyst to review.
-                            </p>
+                            <p className="mt-2 text-[15px] text-[#C1CDE8]">Upload supporting evidence for your analyst to review.</p>
                         </div>
                         <div className="shrink-0">
                             <div className="inline-flex items-center rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2 text-[13px] font-medium text-[#D8E0F3]">
@@ -546,46 +528,38 @@ export default function DocumentsIndex({
                 <FadeUp delay={showUpload ? 0.2 : 0.1}>
                     {documents.length === 0 ? (
                         <ProCard className="flex flex-col items-center justify-center px-6 py-20 text-center">
-                            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0C1427] border border-[#232C43]">
+                            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#232C43] bg-[#0C1427]">
                                 <FileText className="size-8 text-[#455987]" aria-hidden="true" />
                             </div>
                             <p className="text-[17px] font-medium text-[#D8E0F3]">No documents yet</p>
-                            <p className="mt-2 text-[14px] text-[#C1CDE8] max-w-sm">
+                            <p className="mt-2 max-w-sm text-[14px] text-[#C1CDE8]">
                                 Documents you upload will appear here grouped by their category.
                             </p>
                         </ProCard>
                     ) : (
                         <ProCard className="overflow-visible">
-                            <div className="hidden sm:flex items-center gap-4 border-b border-[#232C43] px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#455987]">
+                            <div className="hidden items-center gap-4 border-b border-[#232C43] px-4 py-3 text-[10px] font-bold tracking-widest text-[#455987] uppercase sm:flex">
                                 <div className="w-8 shrink-0" /> {/* Icon spacer */}
                                 <div className="flex-[2.5]">Document Name</div>
-                                <div className="flex-1 flex items-center gap-4">
+                                <div className="flex flex-1 items-center gap-4">
                                     <div className="w-20 text-right">Size</div>
                                     <div className="flex-1 text-right">Uploaded</div>
                                 </div>
                                 <div className="w-32 text-right">Status</div>
                                 <div className="w-24 shrink-0" /> {/* Actions spacer */}
                             </div>
-                            
+
                             <div className="divide-y divide-[#232C43]/50">
                                 {Object.entries(grouped).map(([categoryLabel, docs]) => (
                                     <div key={categoryLabel}>
-                                        <div className="bg-[#1B294B]/10 px-4 py-2 flex items-center justify-between border-b border-[#232C43]/30">
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#91A7D8]">
-                                                {categoryLabel}
-                                            </p>
-                                            <span className="text-[10px] font-medium text-[#455987]">
-                                                {docs.length} Items
-                                            </span>
+                                        <div className="flex items-center justify-between border-b border-[#232C43]/30 bg-[#1B294B]/10 px-4 py-2">
+                                            <p className="text-[10px] font-bold tracking-[0.1em] text-[#91A7D8] uppercase">{categoryLabel}</p>
+                                            <span className="text-[10px] font-medium text-[#455987]">{docs.length} Items</span>
                                         </div>
                                         <div className="divide-y divide-[#232C43]/30">
                                             <AnimatePresence mode="popLayout">
                                                 {docs.map((doc) => (
-                                                    <DocumentRow
-                                                        key={doc.id}
-                                                        doc={doc}
-                                                        onDelete={setDeleteTarget}
-                                                    />
+                                                    <DocumentRow key={doc.id} doc={doc} onDelete={setDeleteTarget} />
                                                 ))}
                                             </AnimatePresence>
                                         </div>
@@ -605,9 +579,8 @@ export default function DocumentsIndex({
                     </DialogHeader>
                     <div className="py-4">
                         <p className="text-[14px] leading-relaxed text-[#C1CDE8]">
-                            Are you sure you want to delete{' '}
-                            <span className="font-bold text-[#D8E0F3]">{deleteTarget?.original_filename}</span>?
-                            This action cannot be undone and will remove it from the analyst's queue.
+                            Are you sure you want to delete <span className="font-bold text-[#D8E0F3]">{deleteTarget?.original_filename}</span>? This
+                            action cannot be undone and will remove it from the analyst's queue.
                         </p>
                     </div>
                     <DialogFooter className="gap-3 sm:gap-0">
@@ -621,7 +594,7 @@ export default function DocumentsIndex({
                         <Button
                             onClick={confirmDelete}
                             disabled={deleting}
-                            className="bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
+                            className="border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20"
                         >
                             {deleting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Trash2 className="mr-2 size-4" />}
                             Delete Document

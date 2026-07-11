@@ -11,15 +11,9 @@ interface DiagnosticLayoutProps {
     glowColor?: string;
 }
 
-export default function DiagnosticLayout({
-    children,
-    hideWordmark = false,
-    glowColor = '#3A54A5',
-}: DiagnosticLayoutProps) {
+export default function DiagnosticLayout({ children, hideWordmark = false, glowColor = '#3A54A5' }: DiagnosticLayoutProps) {
     // Key changes on route so AnimatePresence remounts on navigation
-    const [routeKey, setRouteKey] = useState(() =>
-        typeof window !== 'undefined' ? window.location.pathname : '/',
-    );
+    const [routeKey, setRouteKey] = useState(() => (typeof window !== 'undefined' ? window.location.pathname : '/'));
 
     useEffect(() => {
         const handler = () => setRouteKey(window.location.pathname);
@@ -33,7 +27,7 @@ export default function DiagnosticLayout({
     }, []);
 
     return (
-        <div className="relative min-h-screen overflow-x-hidden bg-background antialiased text-white">
+        <div className="bg-background relative min-h-screen overflow-x-hidden text-white antialiased">
             <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
 
             {/* ── Wordmark header ── */}

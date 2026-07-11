@@ -22,7 +22,10 @@ export default function AdminUsersCreate() {
             <Head title="Add Team Member — Admin" />
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-                <Link href={route('admin.users.index')} className="mb-6 inline-flex items-center gap-2 text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]">
+                <Link
+                    href={route('admin.users.index')}
+                    className="mb-6 inline-flex items-center gap-2 text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
+                >
                     <ArrowLeft className="size-4" /> Back to Team
                 </Link>
 
@@ -33,13 +36,13 @@ export default function AdminUsersCreate() {
 
                 <form onSubmit={submit} className="max-w-lg space-y-5">
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#C1CDE8]">Full Name</label>
+                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#C1CDE8] uppercase">Full Name</label>
                         <input
                             type="text"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             maxLength={100}
-                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] placeholder-[#91A7D8] transition-colors focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50"
+                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] placeholder-[#91A7D8] transition-colors focus:border-[#3A54A5]/50 focus:ring-1 focus:ring-[#3A54A5]/50 focus:outline-none"
                             placeholder="Jane Smith"
                             required
                         />
@@ -47,12 +50,12 @@ export default function AdminUsersCreate() {
                     </div>
 
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#C1CDE8]">Email Address</label>
+                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#C1CDE8] uppercase">Email Address</label>
                         <input
                             type="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
-                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] placeholder-[#91A7D8] transition-colors focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50"
+                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] placeholder-[#91A7D8] transition-colors focus:border-[#3A54A5]/50 focus:ring-1 focus:ring-[#3A54A5]/50 focus:outline-none"
                             placeholder="jane@example.com"
                             required
                         />
@@ -60,11 +63,11 @@ export default function AdminUsersCreate() {
                     </div>
 
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#C1CDE8]">Role</label>
+                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#C1CDE8] uppercase">Role</label>
                         <select
                             value={data.role}
                             onChange={(e) => setData('role', e.target.value as typeof data.role)}
-                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] transition-colors focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50"
+                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] transition-colors focus:border-[#3A54A5]/50 focus:ring-1 focus:ring-[#3A54A5]/50 focus:outline-none"
                         >
                             <option value="analyst">Analyst</option>
                             <option value="support">Support</option>
@@ -74,12 +77,12 @@ export default function AdminUsersCreate() {
                     </div>
 
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#C1CDE8]">Password</label>
+                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#C1CDE8] uppercase">Password</label>
                         <input
                             type="password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
-                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] placeholder-[#91A7D8] transition-colors focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50"
+                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] placeholder-[#91A7D8] transition-colors focus:border-[#3A54A5]/50 focus:ring-1 focus:ring-[#3A54A5]/50 focus:outline-none"
                             placeholder="Min 8 characters"
                             required
                         />
@@ -87,18 +90,21 @@ export default function AdminUsersCreate() {
                     </div>
 
                     <div>
-                        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-[#C1CDE8]">Confirm Password</label>
+                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#C1CDE8] uppercase">Confirm Password</label>
                         <input
                             type="password"
                             value={data.password_confirmation}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
-                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] transition-colors focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50"
+                            className="w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] transition-colors focus:border-[#3A54A5]/50 focus:ring-1 focus:ring-[#3A54A5]/50 focus:outline-none"
                             required
                         />
                     </div>
 
                     <div className="flex gap-3 pt-4">
-                        <Link href={route('admin.users.index')} className="flex-1 rounded-lg border border-[#232C43] py-2.5 text-center text-sm font-semibold text-[#C1CDE8] transition-colors hover:bg-[#1B294B]/30 hover:text-[#D8E0F3]">
+                        <Link
+                            href={route('admin.users.index')}
+                            className="flex-1 rounded-lg border border-[#232C43] py-2.5 text-center text-sm font-semibold text-[#C1CDE8] transition-colors hover:bg-[#1B294B]/30 hover:text-[#D8E0F3]"
+                        >
                             Cancel
                         </Link>
                         <button

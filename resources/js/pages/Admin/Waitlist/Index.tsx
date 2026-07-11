@@ -1,6 +1,6 @@
+import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import AdminLayout from '@/layouts/admin-layout';
 import {
     ArrowUpDown,
     CheckCircle2,
@@ -86,14 +86,14 @@ function humanize(str: string | null): string {
 
 function buildParams(overrides: Record<string, string | undefined>, current: Partial<PageProps>) {
     const p: Record<string, string> = {};
-    const type = overrides.type   !== undefined ? overrides.type   : current.activeType !== 'all' ? current.activeType : undefined;
+    const type = overrides.type !== undefined ? overrides.type : current.activeType !== 'all' ? current.activeType : undefined;
     const srch = overrides.search !== undefined ? overrides.search : current.search;
-    const srt  = overrides.sort   !== undefined ? overrides.sort   : current.sort;
-    const dir  = overrides.dir    !== undefined ? overrides.dir    : current.dir;
-    if (type)                p.type   = type;
-    if (srch)                p.search = srch;
+    const srt = overrides.sort !== undefined ? overrides.sort : current.sort;
+    const dir = overrides.dir !== undefined ? overrides.dir : current.dir;
+    if (type) p.type = type;
+    if (srch) p.search = srch;
     if (srt && srt !== 'created_at') p.sort = srt;
-    if (dir && dir !== 'desc')       p.dir  = dir;
+    if (dir && dir !== 'desc') p.dir = dir;
     return p;
 }
 
@@ -102,7 +102,7 @@ function buildParams(overrides: Record<string, string | undefined>, current: Par
 function FlashBanner() {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
     const [visible, setVisible] = useState(false);
-    const [msg, setMsg]         = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+    const [msg, setMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
     const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     useEffect(() => {
@@ -118,12 +118,14 @@ function FlashBanner() {
     if (!msg || !visible) return null;
 
     return (
-        <div className={cn(
-            'mb-4 flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm',
-            msg.type === 'success'
-                ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300'
-                : 'border-rose-500/25 bg-rose-500/10 text-rose-300',
-        )}>
+        <div
+            className={cn(
+                'mb-4 flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm',
+                msg.type === 'success'
+                    ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300'
+                    : 'border-rose-500/25 bg-rose-500/10 text-rose-300',
+            )}
+        >
             <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 shrink-0" />
                 {msg.text}
@@ -137,18 +139,16 @@ function FlashBanner() {
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
 
-function StatCard({
-    label, value, sub, icon: Icon,
-}: { label: string; value: number; sub?: string; icon: React.ElementType }) {
+function StatCard({ label, value, sub, icon: Icon }: { label: string; value: number; sub?: string; icon: React.ElementType }) {
     return (
         <div className="flex items-center gap-3.5 rounded-xl border border-[#232C43] bg-[#101623] px-4 py-4">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0C1427]">
                 <Icon className="h-4 w-4 text-[#91A7D8]" />
             </div>
             <div className="min-w-0">
-                <p className="truncate text-[11px] font-medium uppercase tracking-widest text-[#91A7D8]">{label}</p>
+                <p className="truncate text-[11px] font-medium tracking-widest text-[#91A7D8] uppercase">{label}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
-                    <span className="text-xl font-semibold tabular-nums text-[#D8E0F3]">{value.toLocaleString()}</span>
+                    <span className="text-xl font-semibold text-[#D8E0F3] tabular-nums">{value.toLocaleString()}</span>
                     {sub && <span className="text-xs text-[#C1CDE8]">{sub}</span>}
                 </div>
             </div>
@@ -160,12 +160,14 @@ function StatCard({
 
 function TypeBadge({ type }: { type: 'founder' | 'investor' }) {
     return (
-        <span className={cn(
-            'inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider',
-            type === 'founder'
-                ? 'bg-[#5CA336]/15 text-[#8fd168] ring-1 ring-[#5CA336]/25'
-                : 'bg-[#2F4587]/15 text-[#8da4e8] ring-1 ring-[#2F4587]/25',
-        )}>
+        <span
+            className={cn(
+                'inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold tracking-wider uppercase',
+                type === 'founder'
+                    ? 'bg-[#5CA336]/15 text-[#8fd168] ring-1 ring-[#5CA336]/25'
+                    : 'bg-[#2F4587]/15 text-[#8da4e8] ring-1 ring-[#2F4587]/25',
+            )}
+        >
             {type}
         </span>
     );
@@ -175,12 +177,12 @@ function TypeBadge({ type }: { type: 'founder' | 'investor' }) {
 
 function StatusPill({ value, label }: { value: boolean; label: string }) {
     return (
-        <span className={cn(
-            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium',
-            value
-                ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20'
-                : 'bg-[#0C1427] text-[#91A7D8] ring-1 ring-[#232C43]',
-        )}>
+        <span
+            className={cn(
+                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium',
+                value ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20' : 'bg-[#0C1427] text-[#91A7D8] ring-1 ring-[#232C43]',
+            )}
+        >
             {value ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
             {label}
         </span>
@@ -190,23 +192,38 @@ function StatusPill({ value, label }: { value: boolean; label: string }) {
 // ─── Sort header ──────────────────────────────────────────────────────────────
 
 function SortTh({
-    column, label, sort, dir, onClick, className,
-}: { column: string; label: string; sort: string; dir: string; onClick: (col: string) => void; className?: string }) {
+    column,
+    label,
+    sort,
+    dir,
+    onClick,
+    className,
+}: {
+    column: string;
+    label: string;
+    sort: string;
+    dir: string;
+    onClick: (col: string) => void;
+    className?: string;
+}) {
     const active = sort === column;
     return (
         <th className={cn('px-4 py-3', className)}>
             <button
                 onClick={() => onClick(column)}
-                className="flex items-center gap-1 text-left text-[11px] font-semibold uppercase tracking-wider transition-colors hover:text-[#D8E0F3]"
+                className="flex items-center gap-1 text-left text-[11px] font-semibold tracking-wider uppercase transition-colors hover:text-[#D8E0F3]"
                 style={{ color: active ? '#D8E0F3' : '#91A7D8' }}
             >
                 {label}
-                {active
-                    ? (dir === 'asc'
-                        ? <ChevronUp className="h-3 w-3" />
-                        : <ChevronDown className="h-3 w-3" />)
-                    : <ArrowUpDown className="h-3 w-3 opacity-30" />
-                }
+                {active ? (
+                    dir === 'asc' ? (
+                        <ChevronUp className="h-3 w-3" />
+                    ) : (
+                        <ChevronDown className="h-3 w-3" />
+                    )
+                ) : (
+                    <ArrowUpDown className="h-3 w-3 opacity-30" />
+                )}
             </button>
         </th>
     );
@@ -214,14 +231,10 @@ function SortTh({
 
 // ─── Filter tabs ──────────────────────────────────────────────────────────────
 
-function FilterTabs({ activeType, totals, currentProps }: {
-    activeType: PageProps['activeType'];
-    totals: Totals;
-    currentProps: Partial<PageProps>;
-}) {
+function FilterTabs({ activeType, totals, currentProps }: { activeType: PageProps['activeType']; totals: Totals; currentProps: Partial<PageProps> }) {
     const tabs: { key: PageProps['activeType']; label: string; count: number }[] = [
-        { key: 'all',      label: 'All',       count: totals.all },
-        { key: 'founder',  label: 'Founders',  count: totals.founder },
+        { key: 'all', label: 'All', count: totals.all },
+        { key: 'founder', label: 'Founders', count: totals.founder },
         { key: 'investor', label: 'Investors', count: totals.investor },
     ];
 
@@ -230,21 +243,23 @@ function FilterTabs({ activeType, totals, currentProps }: {
             {tabs.map(({ key, label, count }) => (
                 <button
                     key={key}
-                    onClick={() => router.get(
-                        route('admin.waitlist.index'),
-                        buildParams({ type: key === 'all' ? '' : key }, currentProps),
-                        { preserveScroll: true },
-                    )}
+                    onClick={() =>
+                        router.get(route('admin.waitlist.index'), buildParams({ type: key === 'all' ? '' : key }, currentProps), {
+                            preserveScroll: true,
+                        })
+                    }
                     className={cn(
                         'flex items-center gap-2 rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors duration-150',
                         activeType === key ? 'bg-[#1B294B] text-[#D8E0F3] shadow-sm' : 'text-[#C1CDE8] hover:text-[#D8E0F3]',
                     )}
                 >
                     {label}
-                    <span className={cn(
-                        'rounded-full px-1.5 py-px text-[10px] font-bold tabular-nums',
-                        activeType === key ? 'bg-[#3A54A5]/30 text-[#D8E0F3]' : 'bg-[#0C1427] text-[#91A7D8]',
-                    )}>
+                    <span
+                        className={cn(
+                            'rounded-full px-1.5 py-px text-[10px] font-bold tabular-nums',
+                            activeType === key ? 'bg-[#3A54A5]/30 text-[#D8E0F3]' : 'bg-[#0C1427] text-[#91A7D8]',
+                        )}
+                    >
                         {count}
                     </span>
                 </button>
@@ -258,16 +273,16 @@ function FilterTabs({ activeType, totals, currentProps }: {
 function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
     return (
         <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#91A7D8]" />
+            <Search className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-[#91A7D8]" />
             <input
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="Search name, email, company…"
-                className="h-9 w-full rounded-lg border border-[#232C43] bg-[#101623] pl-8 pr-8 text-sm text-[#D8E0F3] placeholder:text-[#91A7D8] focus:border-[#3A54A5]/50 focus:outline-none focus:ring-0"
+                className="h-9 w-full rounded-lg border border-[#232C43] bg-[#101623] pr-8 pl-8 text-sm text-[#D8E0F3] placeholder:text-[#91A7D8] focus:border-[#3A54A5]/50 focus:ring-0 focus:outline-none"
             />
             {value && (
-                <button onClick={() => onChange('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#91A7D8] hover:text-[#C1CDE8]">
+                <button onClick={() => onChange('')} className="absolute top-1/2 right-2.5 -translate-y-1/2 text-[#91A7D8] hover:text-[#C1CDE8]">
                     <X className="h-3.5 w-3.5" />
                 </button>
             )}
@@ -286,10 +301,14 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
 
     function handleResend() {
         setResending(true);
-        router.post(route('admin.waitlist.resend', entry.id), {}, {
-            preserveScroll: true,
-            onFinish: () => setResending(false),
-        });
+        router.post(
+            route('admin.waitlist.resend', entry.id),
+            {},
+            {
+                preserveScroll: true,
+                onFinish: () => setResending(false),
+            },
+        );
     }
 
     function handleDelete() {
@@ -344,14 +363,16 @@ function Pagination({ entries }: { entries: Paginated<WaitlistEntry> }) {
 
     const { current_page, total, per_page } = entries;
     const from = (current_page - 1) * per_page + 1;
-    const to   = Math.min(current_page * per_page, total);
+    const to = Math.min(current_page * per_page, total);
 
     return (
         <div className="flex items-center justify-between border-t border-[#232C43] px-1 pt-4">
-            <p className="text-xs text-[#91A7D8]">Showing {from}–{to} of {total}</p>
+            <p className="text-xs text-[#91A7D8]">
+                Showing {from}–{to} of {total}
+            </p>
             <div className="flex gap-1">
                 {entries.links.map((link, i) => {
-                    const isNav     = i === 0 || i === entries.links.length - 1;
+                    const isNav = i === 0 || i === entries.links.length - 1;
                     const isDisabled = link.url === null;
                     if (isDisabled && isNav) return null;
                     return link.url ? (
@@ -388,22 +409,17 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
     useEffect(() => {
         const t = setTimeout(() => {
             if (searchValue === search) return;
-            router.get(
-                route('admin.waitlist.index'),
-                buildParams({ search: searchValue || '' }, { activeType, search, sort, dir }),
-                { preserveScroll: true, replace: true },
-            );
+            router.get(route('admin.waitlist.index'), buildParams({ search: searchValue || '' }, { activeType, search, sort, dir }), {
+                preserveScroll: true,
+                replace: true,
+            });
         }, 380);
         return () => clearTimeout(t);
     }, [searchValue, search, activeType, sort, dir]);
 
     function handleSort(column: string) {
         const newDir = sort === column && dir === 'asc' ? 'desc' : 'asc';
-        router.get(
-            route('admin.waitlist.index'),
-            buildParams({ sort: column, dir: newDir }, currentProps),
-            { preserveScroll: true },
-        );
+        router.get(route('admin.waitlist.index'), buildParams({ sort: column, dir: newDir }, currentProps), { preserveScroll: true });
     }
 
     return (
@@ -412,11 +428,10 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-7xl">
-
                     {/* Header */}
                     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
                         <div>
-                            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#91A7D8]">Admin</p>
+                            <p className="text-[11px] font-semibold tracking-widest text-[#91A7D8] uppercase">Admin</p>
                             <h1 className="mt-1 text-2xl font-semibold text-[#D8E0F3]">Waitlist</h1>
                         </div>
                         <a
@@ -433,17 +448,17 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
 
                     {/* Stats */}
                     <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                        <StatCard label="Total"       value={totals.all}        icon={Users} />
-                        <StatCard label="Founders"    value={totals.founder}    icon={User} />
-                        <StatCard label="Investors"   value={totals.investor}   icon={User} />
+                        <StatCard label="Total" value={totals.all} icon={Users} />
+                        <StatCard label="Founders" value={totals.founder} icon={User} />
+                        <StatCard label="Investors" value={totals.investor} icon={User} />
                         <StatCard label="Emails Sent" value={totals.email_sent} sub={pct(totals.email_sent, totals.all)} icon={Mail} />
-                        <StatCard label="Converted"   value={totals.converted}  sub={pct(totals.converted, totals.all)}  icon={TrendingUp} />
+                        <StatCard label="Converted" value={totals.converted} sub={pct(totals.converted, totals.all)} icon={TrendingUp} />
                     </div>
 
                     {/* Toolbar */}
                     <div className="mb-3 flex flex-wrap items-center gap-3">
                         <FilterTabs activeType={activeType} totals={totals} currentProps={currentProps} />
-                        <div className="flex-1 min-w-[220px] max-w-sm">
+                        <div className="max-w-sm min-w-[220px] flex-1">
                             <SearchInput value={searchValue} onChange={setSearchValue} />
                         </div>
                     </div>
@@ -460,18 +475,18 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                                 <table className="w-full min-w-[820px] text-sm">
                                     <thead>
                                         <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
-                                            <SortTh column="name"         label="Name"           sort={sort} dir={dir} onClick={handleSort} className="w-[22%]" />
-                                            <SortTh column="type"         label="Type"           sort={sort} dir={dir} onClick={handleSort} />
-                                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
+                                            <SortTh column="name" label="Name" sort={sort} dir={dir} onClick={handleSort} className="w-[22%]" />
+                                            <SortTh column="type" label="Type" sort={sort} dir={dir} onClick={handleSort} />
+                                            <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wider text-[#91A7D8] uppercase">
                                                 Company / Firm
                                             </th>
-                                            <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
+                                            <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wider text-[#91A7D8] uppercase">
                                                 Stage / Role
                                             </th>
-                                            <SortTh column="created_at"   label="Signed Up"      sort={sort} dir={dir} onClick={handleSort} />
-                                            <SortTh column="email_sent_at" label="Email"          sort={sort} dir={dir} onClick={handleSort} />
-                                            <SortTh column="converted_at" label="Converted"       sort={sort} dir={dir} onClick={handleSort} />
-                                            <th className="px-4 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-[#91A7D8]">
+                                            <SortTh column="created_at" label="Signed Up" sort={sort} dir={dir} onClick={handleSort} />
+                                            <SortTh column="email_sent_at" label="Email" sort={sort} dir={dir} onClick={handleSort} />
+                                            <SortTh column="converted_at" label="Converted" sort={sort} dir={dir} onClick={handleSort} />
+                                            <th className="px-4 py-3 text-right text-[11px] font-semibold tracking-wider text-[#91A7D8] uppercase">
                                                 Actions
                                             </th>
                                         </tr>
@@ -486,20 +501,17 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                                                 <td className="px-4 py-3.5">
                                                     <TypeBadge type={entry.type} />
                                                 </td>
-                                                <td className="px-4 py-3.5 text-[#C1CDE8]">
-                                                    {entry.company_name ?? entry.firm_name ?? '—'}
-                                                </td>
-                                                <td className="px-4 py-3.5 text-[#C1CDE8]">
-                                                    {humanize(entry.stage ?? entry.role)}
-                                                </td>
-                                                <td className="px-4 py-3.5 text-[#91A7D8] tabular-nums">
-                                                    {fmt(entry.created_at)}
-                                                </td>
+                                                <td className="px-4 py-3.5 text-[#C1CDE8]">{entry.company_name ?? entry.firm_name ?? '—'}</td>
+                                                <td className="px-4 py-3.5 text-[#C1CDE8]">{humanize(entry.stage ?? entry.role)}</td>
+                                                <td className="px-4 py-3.5 text-[#91A7D8] tabular-nums">{fmt(entry.created_at)}</td>
                                                 <td className="px-4 py-3.5">
                                                     <StatusPill value={!!entry.email_sent_at} label={entry.email_sent_at ? 'Sent' : 'Pending'} />
                                                 </td>
                                                 <td className="px-4 py-3.5">
-                                                    <StatusPill value={!!entry.converted_at} label={entry.converted_at ? fmt(entry.converted_at) : 'No'} />
+                                                    <StatusPill
+                                                        value={!!entry.converted_at}
+                                                        label={entry.converted_at ? fmt(entry.converted_at) : 'No'}
+                                                    />
                                                 </td>
                                                 <td className="px-4 py-3.5">
                                                     <div className="flex justify-end">
@@ -518,7 +530,6 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                     <div className="mt-4">
                         <Pagination entries={entries} />
                     </div>
-
                 </div>
             </div>
         </AdminLayout>

@@ -1,16 +1,8 @@
+import { cn } from '@/lib/utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-    ExternalLink,
-    FileText,
-    LayoutDashboard,
-    LogOut,
-    Menu,
-    MessageSquare,
-    X,
-} from 'lucide-react';
+import { ExternalLink, FileText, LayoutDashboard, LogOut, Menu, MessageSquare, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { cn } from '@/lib/utils';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -74,12 +66,8 @@ function SidebarContent({
                     )}
                 </div>
                 <div className="mt-5 px-1">
-                    <p className="truncate text-[14px] font-semibold tracking-tight text-[#D8E0F3]">
-                        {founder.full_name ?? 'Founder'}
-                    </p>
-                    <p className="truncate text-[11px] font-medium text-[#91A7D8]">
-                        {founder.company_name ?? founder.email}
-                    </p>
+                    <p className="truncate text-[14px] font-semibold tracking-tight text-[#D8E0F3]">{founder.full_name ?? 'Founder'}</p>
+                    <p className="truncate text-[11px] font-medium text-[#91A7D8]">{founder.company_name ?? founder.email}</p>
                 </div>
             </div>
 
@@ -123,13 +111,16 @@ function SidebarContent({
                                     'group flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-300',
                                     isActive
                                         ? 'bg-[#1B294B]/40 text-[#D8E0F3] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] ring-1 ring-[#3A54A5]/30'
-                                        : 'text-[#91A7D8] hover:bg-white/[0.03] hover:text-[#D8E0F3]'
+                                        : 'text-[#91A7D8] hover:bg-white/[0.03] hover:text-[#D8E0F3]',
                                 )}
                             >
-                                <Icon className={cn(
-                                    "size-4 shrink-0 transition-colors duration-300",
-                                    isActive ? "text-[#3A54A5]" : "text-[#91A7D8] group-hover:text-[#C1CDE8]"
-                                )} aria-hidden="true" />
+                                <Icon
+                                    className={cn(
+                                        'size-4 shrink-0 transition-colors duration-300',
+                                        isActive ? 'text-[#3A54A5]' : 'text-[#91A7D8] group-hover:text-[#C1CDE8]',
+                                    )}
+                                    aria-hidden="true"
+                                />
                                 <span className="text-[13.5px] font-medium tracking-tight">{label}</span>
                                 {isActive && (
                                     <motion.div
@@ -163,12 +154,15 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
     const { url } = usePage();
     const trapRef = useRef<HTMLDivElement | null>(null);
 
-    const navItems = useMemo<NavItem[]>(() => [
-        { icon: LayoutDashboard, label: 'Dashboard',       href: route('founder.dashboard'), disabled: false },
-        { icon: FileText,        label: 'Documents',        href: route('founder.documents.index'), disabled: false },
-        { icon: MessageSquare,   label: 'Messages',         href: route('founder.messages.index'), disabled: false },
-        { icon: ExternalLink,    label: 'My Investor Page', href: '#',                        disabled: true,  disabledReason: 'Available after PARAGON certification' },
-    ], []);
+    const navItems = useMemo<NavItem[]>(
+        () => [
+            { icon: LayoutDashboard, label: 'Dashboard', href: route('founder.dashboard'), disabled: false },
+            { icon: FileText, label: 'Documents', href: route('founder.documents.index'), disabled: false },
+            { icon: MessageSquare, label: 'Messages', href: route('founder.messages.index'), disabled: false },
+            { icon: ExternalLink, label: 'My Investor Page', href: '#', disabled: true, disabledReason: 'Available after PARAGON certification' },
+        ],
+        [],
+    );
 
     // Focus trap for mobile sidebar
     useEffect(() => {
@@ -177,17 +171,24 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
         if (container) container.focus();
 
         function handleKeyDown(e: KeyboardEvent) {
-            if (e.key === 'Escape') { setSidebarOpen(false); return; }
+            if (e.key === 'Escape') {
+                setSidebarOpen(false);
+                return;
+            }
             if (e.key !== 'Tab' || !container) return;
-            const focusable = container.querySelectorAll<HTMLElement>(
-                'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-            );
+            const focusable = container.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
             const first = focusable[0];
-            const last  = focusable[focusable.length - 1];
+            const last = focusable[focusable.length - 1];
             if (e.shiftKey) {
-                if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+                if (document.activeElement === first) {
+                    e.preventDefault();
+                    last?.focus();
+                }
             } else {
-                if (document.activeElement === last)  { e.preventDefault(); first?.focus(); }
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    first?.focus();
+                }
             }
         }
         document.addEventListener('keydown', handleKeyDown);
@@ -200,12 +201,11 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
 
     return (
         <div className="relative min-h-screen overflow-x-hidden bg-[#050505] text-white antialiased">
-
             {/* ── Background treatment (same as DiagnosticLayout) ── */}
             <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid  pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-wireframe pointer-events-none fixed -left-[15%] top-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-20 mix-blend-overlay md:-left-[5%] md:top-[20%]" />
-            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none fixed -right-[15%] top-[40%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-15 mix-blend-overlay md:-right-[5%] md:top-[45%]" />
+            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
+            <div className="waitlist-wireframe pointer-events-none fixed top-[15%] -left-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-20 mix-blend-overlay md:top-[20%] md:-left-[5%]" />
+            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none fixed top-[40%] -right-[15%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-15 mix-blend-overlay md:top-[45%] md:-right-[5%]" />
             <div
                 className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[400px]"
                 style={{ background: 'radial-gradient(ellipse 70% 45% at 50% 0%, rgba(37,99,235,0.10) 0%, transparent 70%)' }}
@@ -213,12 +213,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
 
             {/* ── Desktop sidebar ── */}
             <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] flex-col border-r border-[#232C43] bg-[#0B0E14] lg:flex">
-                <SidebarContent
-                    founder={founder}
-                    navItems={navItems}
-                    currentUrl={url}
-                    onLogout={handleLogout}
-                />
+                <SidebarContent founder={founder} navItems={navItems} currentUrl={url} onLogout={handleLogout} />
             </aside>
 
             {/* ── Mobile sidebar overlay ── */}
@@ -279,9 +274,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
             </header>
 
             {/* ── Main content ── */}
-            <main className="relative z-10 min-h-screen pt-14 lg:ml-[260px] lg:pt-0">
-                {children}
-            </main>
+            <main className="relative z-10 min-h-screen pt-14 lg:ml-[260px] lg:pt-0">{children}</main>
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Clock, Mail, MailCheck, Send } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -12,11 +12,7 @@ const MAX_ATTEMPTS = 40; // 40 × 3s = 2 min
 function ProtocolRing() {
     return (
         <div className="relative flex h-24 w-24 items-center justify-center">
-            <motion.div
-                className="absolute inset-0 rounded-full border-2 border-[#3A54A5]/10"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-            />
+            <motion.div className="absolute inset-0 rounded-full border-2 border-[#3A54A5]/10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
             <motion.div
                 className="absolute inset-0 rounded-full border-t-2 border-r-2 border-[#3A54A5]"
                 animate={{ rotate: 360 }}
@@ -43,7 +39,7 @@ const PROTOCOL_STEPS = [
 
 // ── Resend invite button with cooldown
 function ResendInviteButton({ email }: { email?: string }) {
-    const [status, setStatus]   = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+    const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
     const [cooldown, setCooldown] = useState(0);
 
     useEffect(() => {
@@ -86,12 +82,16 @@ function ResendInviteButton({ email }: { email?: string }) {
                 className="inline-flex items-center gap-2 rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2.5 text-[12px] font-semibold text-[#91A7D8] transition-all hover:border-[#3A54A5]/40 hover:text-[#D8E0F3] disabled:cursor-not-allowed disabled:opacity-40"
             >
                 {status === 'sending' && <span className="size-3.5 animate-spin rounded-full border-2 border-[#3A54A5] border-t-transparent" />}
-                {status === 'sent'    && <span className="text-emerald-400">✓</span>}
-                {status === 'sending' ? 'Sending…'
-                    : status === 'sent' ? 'Email sent!'
-                    : status === 'error' ? 'Failed — try again'
-                    : cooldown > 0 ? `Resend in ${cooldown}s`
-                    : 'Resend setup email'}
+                {status === 'sent' && <span className="text-emerald-400">✓</span>}
+                {status === 'sending'
+                    ? 'Sending…'
+                    : status === 'sent'
+                      ? 'Email sent!'
+                      : status === 'error'
+                        ? 'Failed — try again'
+                        : cooldown > 0
+                          ? `Resend in ${cooldown}s`
+                          : 'Resend setup email'}
             </button>
         </div>
     );
@@ -99,11 +99,15 @@ function ResendInviteButton({ email }: { email?: string }) {
 
 // ── Confirmed / "check your email" screen
 function ConfirmedScreen({
-    signer_email, tier_label, amount_paid, signed_at, setup_url
-}: { 
-    signer_email?: string; 
-    tier_label?: string; 
-    amount_paid?: string; 
+    signer_email,
+    tier_label,
+    amount_paid,
+    signed_at,
+    setup_url,
+}: {
+    signer_email?: string;
+    tier_label?: string;
+    amount_paid?: string;
     signed_at?: string;
     setup_url?: string;
 }) {
@@ -111,7 +115,7 @@ function ConfirmedScreen({
         <div className="min-h-screen overflow-y-auto bg-[#050505] text-white antialiased">
             <Head title="Agreement Confirmed — PARAGON Certification" />
             <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid  pointer-events-none fixed inset-0 z-0" />
+            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
             <div
                 className="pointer-events-none fixed inset-x-0 top-0 z-0 h-96"
                 style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(68,104,187,0.15) 0%, transparent 100%)' }}
@@ -120,7 +124,12 @@ function ConfirmedScreen({
             <div className="relative z-10 mx-auto flex w-full max-w-[440px] flex-col items-center px-6 py-16 text-center lg:py-24">
                 {/* Logo */}
                 <div className="mb-10">
-                    <img src="/pinpoint-logo.png" alt="Pinpoint" className="block h-6 w-auto opacity-50 transition-opacity hover:opacity-100" style={{ maxWidth: 130 }} />
+                    <img
+                        src="/pinpoint-logo.png"
+                        alt="Pinpoint"
+                        className="block h-6 w-auto opacity-50 transition-opacity hover:opacity-100"
+                        style={{ maxWidth: 130 }}
+                    />
                 </div>
 
                 {/* Main Success Card */}
@@ -136,12 +145,8 @@ function ConfirmedScreen({
                         </div>
                     </div>
 
-                    <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-[#91A7D8]">
-                        Agreement Confirmed
-                    </p>
-                    <h1 className="font-display mb-4 text-2xl font-semibold tracking-tight text-[#D8E0F3]">
-                        You're in.
-                    </h1>
+                    <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-[#91A7D8] uppercase">Agreement Confirmed</p>
+                    <h1 className="font-display mb-4 text-2xl font-semibold tracking-tight text-[#D8E0F3]">You're in.</h1>
                     <p className="mb-8 text-[14px] leading-relaxed text-[#C1CDE8]">
                         Your Pinpoint Investment Warrant has been signed and your PARAGON audit has been queued.
                     </p>
@@ -155,19 +160,15 @@ function ConfirmedScreen({
                             { label: 'Signed', value: signed_at },
                         ].map((item) => (
                             <div key={item.label} className="flex flex-col gap-1">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-[#91A7D8]">
-                                    {item.label}
-                                </span>
-                                <span className="text-[13px] font-medium text-[#D8E0F3]">
-                                    {item.value || '—'}
-                                </span>
+                                <span className="text-[10px] font-bold tracking-wider text-[#91A7D8] uppercase">{item.label}</span>
+                                <span className="text-[13px] font-medium text-[#D8E0F3]">{item.value || '—'}</span>
                             </div>
                         ))}
                     </div>
 
                     {/* What happens next */}
                     <div className="space-y-6 text-left">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">What happens next</p>
+                        <p className="text-[10px] font-bold tracking-[0.18em] text-[#91A7D8] uppercase">What happens next</p>
                         {[
                             { title: 'Confirmation sent', text: 'Your signed agreement has been emailed to your inbox.' },
                             { title: 'Analyst assigned', text: 'An analyst will reach out within 2–3 business days to begin your audit.' },
@@ -185,12 +186,7 @@ function ConfirmedScreen({
                 </motion.div>
 
                 {/* Final CTA */}
-                <motion.div
-                    className="mt-10 w-full"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                >
+                <motion.div className="mt-10 w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
                     {setup_url ? (
                         <div
                             className="w-full rounded-2xl border border-[#232C43] bg-[#080B11] p-6 text-center"
@@ -201,18 +197,14 @@ function ConfirmedScreen({
                                     <ArrowRight className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
                                 </div>
                             </div>
-                            <p className="mb-1 text-[12px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
-                                Complete Setup
-                            </p>
-                            <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">
-                                Create your account
-                            </p>
+                            <p className="mb-1 text-[12px] font-bold tracking-[0.18em] text-[#91A7D8] uppercase">Complete Setup</p>
+                            <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">Create your account</p>
                             <p className="mb-6 text-[13px] leading-relaxed text-[#C1CDE8]">
                                 Set up your secure password to access your PARAGON Audit dashboard immediately.
                             </p>
                             <a
                                 href={setup_url}
-                                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3.5 text-[13px] font-bold uppercase tracking-[0.14em] text-white transition-all hover:bg-[#3b5ba5]"
+                                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3.5 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#3b5ba5]"
                                 style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
                             >
                                 Create Account
@@ -230,16 +222,11 @@ function ConfirmedScreen({
                                     <Mail className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
                                 </div>
                             </div>
-                            <p className="mb-1 text-[12px] font-bold uppercase tracking-[0.18em] text-[#91A7D8]">
-                                One more step
-                            </p>
-                            <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">
-                                Check your inbox
-                            </p>
+                            <p className="mb-1 text-[12px] font-bold tracking-[0.18em] text-[#91A7D8] uppercase">One more step</p>
+                            <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">Check your inbox</p>
                             <p className="text-[13px] leading-relaxed text-[#C1CDE8]">
-                                We've sent a secure account setup link to{' '}
-                                <span className="font-medium text-[#D8E0F3]">{signer_email}</span>.
-                                {' '}Open that email to create your password and access your dashboard.
+                                We've sent a secure account setup link to <span className="font-medium text-[#D8E0F3]">{signer_email}</span>. Open
+                                that email to create your password and access your dashboard.
                             </p>
 
                             {/* Resend invite */}
@@ -260,17 +247,22 @@ function ConfirmedScreen({
 }
 
 export default function OnboardingVerifying({
-    signature_verified, signer_email, tier_label, amount_paid, signed_at, setup_url 
-}: { 
-    signature_verified: boolean; 
+    signature_verified,
+    signer_email,
+    tier_label,
+    amount_paid,
+    signed_at,
+    setup_url,
+}: {
+    signature_verified: boolean;
     signer_email?: string;
     tier_label?: string;
     amount_paid?: string;
     signed_at?: string;
     setup_url?: string;
 }) {
-    const [attempts,  setAttempts]  = useState(0);
-    const [timedOut,  setTimedOut]  = useState(false);
+    const [attempts, setAttempts] = useState(0);
+    const [timedOut, setTimedOut] = useState(false);
     const [confirmed, setConfirmed] = useState(signature_verified);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -292,13 +284,15 @@ export default function OnboardingVerifying({
                 },
             });
         }, 3000);
-        return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+        return () => {
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
     }, [confirmed, attempts]);
 
     if (confirmed) {
         return (
-            <ConfirmedScreen 
-                signer_email={signer_email} 
+            <ConfirmedScreen
+                signer_email={signer_email}
                 tier_label={tier_label}
                 amount_paid={amount_paid}
                 signed_at={signed_at}
@@ -312,12 +306,13 @@ export default function OnboardingVerifying({
             <Head title="Verifying Signature — PARAGON Certification" />
 
             <div className="waitlist-shell pointer-events-none absolute inset-0 z-0" />
-            <div className="waitlist-grid  pointer-events-none absolute inset-0 z-0" />
+            <div className="waitlist-grid pointer-events-none absolute inset-0 z-0" />
             <div
                 className="pointer-events-none absolute inset-x-0 top-0 z-0 h-96"
-                style={{ background: timedOut
-                    ? 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 100%)'
-                    : 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(68,104,187,0.15) 0%, transparent 100%)'
+                style={{
+                    background: timedOut
+                        ? 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 100%)'
+                        : 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(68,104,187,0.15) 0%, transparent 100%)',
                 }}
             />
 
@@ -341,29 +336,25 @@ export default function OnboardingVerifying({
                                 </div>
                             </div>
 
-                            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-500/60">
-                                Network Latency
-                            </p>
-                            <h1 className="font-display mb-3 text-xl font-semibold text-[#D8E0F3]">
-                                Still confirming
-                            </h1>
+                            <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-amber-500/60 uppercase">Network Latency</p>
+                            <h1 className="font-display mb-3 text-xl font-semibold text-[#D8E0F3]">Still confirming</h1>
                             <p className="mb-8 text-[13px] leading-relaxed text-[#C1CDE8]">
                                 Our system is awaiting BoldSign confirmation. This occasionally takes an extra minute.
                             </p>
 
                             <div className="flex flex-col gap-3">
                                 <button
-                                    onClick={() => { setTimedOut(false); setAttempts(0); }}
-                                    className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold uppercase tracking-[0.14em] text-white transition-all hover:bg-[#3b5ba5]"
+                                    onClick={() => {
+                                        setTimedOut(false);
+                                        setAttempts(0);
+                                    }}
+                                    className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#3b5ba5]"
                                     style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
                                 >
                                     Check Again
                                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                                 </button>
-                                <a
-                                    href="mailto:hello@pinpointlaunchpad.com"
-                                    className="py-2 text-[12px] text-[#91A7D8] hover:text-[#D8E0F3]"
-                                >
+                                <a href="mailto:hello@pinpointlaunchpad.com" className="py-2 text-[12px] text-[#91A7D8] hover:text-[#D8E0F3]">
                                     Contact Support
                                 </a>
                             </div>
@@ -380,32 +371,32 @@ export default function OnboardingVerifying({
                                 <ProtocolRing />
                             </div>
 
-                            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.24em] text-[#3A54A5]">
-                                Protocol
-                            </p>
-                            <h1 className="font-display mb-6 text-2xl font-semibold tracking-tight text-[#D8E0F3]">
-                                Finalizing
-                            </h1>
+                            <p className="mb-2 text-[10px] font-bold tracking-[0.24em] text-[#3A54A5] uppercase">Protocol</p>
+                            <h1 className="font-display mb-6 text-2xl font-semibold tracking-tight text-[#D8E0F3]">Finalizing</h1>
 
                             <div className="space-y-4 text-left">
                                 {PROTOCOL_STEPS.map((step, idx) => {
                                     const isActive = idx === Math.min(Math.floor(attempts / 2), PROTOCOL_STEPS.length - 1);
-                                    const isDone   = idx < Math.min(Math.floor(attempts / 2), PROTOCOL_STEPS.length - 1);
+                                    const isDone = idx < Math.min(Math.floor(attempts / 2), PROTOCOL_STEPS.length - 1);
 
                                     return (
                                         <div key={step.id} className="flex items-center gap-3">
-                                            <div className={cn(
-                                                "h-2 w-2 rounded-full ring-2 ring-offset-2 ring-offset-[#101623] transition-all duration-500",
-                                                isDone ? "bg-[#3A54A5] ring-[#3A54A5]/30" :
-                                                isActive ? "bg-white animate-pulse ring-white/20" :
-                                                "bg-[#232C43] ring-transparent"
-                                            )} />
-                                            <p className={cn(
-                                                "text-[12px] font-medium transition-colors duration-500",
-                                                isDone ? "text-[#D8E0F3]" :
-                                                isActive ? "text-[#D8E0F3]" :
-                                                "text-[#91A7D8]"
-                                            )}>
+                                            <div
+                                                className={cn(
+                                                    'h-2 w-2 rounded-full ring-2 ring-offset-2 ring-offset-[#101623] transition-all duration-500',
+                                                    isDone
+                                                        ? 'bg-[#3A54A5] ring-[#3A54A5]/30'
+                                                        : isActive
+                                                          ? 'animate-pulse bg-white ring-white/20'
+                                                          : 'bg-[#232C43] ring-transparent',
+                                                )}
+                                            />
+                                            <p
+                                                className={cn(
+                                                    'text-[12px] font-medium transition-colors duration-500',
+                                                    isDone ? 'text-[#D8E0F3]' : isActive ? 'text-[#D8E0F3]' : 'text-[#91A7D8]',
+                                                )}
+                                            >
                                                 {step.label}
                                             </p>
                                         </div>
@@ -413,9 +404,7 @@ export default function OnboardingVerifying({
                                 })}
                             </div>
 
-                            <p className="mt-10 text-[11px] text-[#91A7D8]/60">
-                                This process is automated. Please keep this session active.
-                            </p>
+                            <p className="mt-10 text-[11px] text-[#91A7D8]/60">This process is automated. Please keep this session active.</p>
                         </motion.div>
                     )}
                 </AnimatePresence>

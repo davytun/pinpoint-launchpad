@@ -1,5 +1,5 @@
-import { Head, Link, useForm } from '@inertiajs/react';
 import AdminLayout from '@/layouts/admin-layout';
+import { Head, Link, useForm } from '@inertiajs/react';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -22,9 +22,9 @@ interface PageProps {
 export default function AdminQuestionsEdit({ question }: PageProps) {
     const form = useForm({
         question_text: question.question_text,
-        sub_text:      question.sub_text ?? '',
-        points:        question.points,
-        is_active:     question.is_active,
+        sub_text: question.sub_text ?? '',
+        points: question.points,
+        is_active: question.is_active,
     });
 
     function submit(e: React.FormEvent) {
@@ -41,7 +41,6 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mx-auto max-w-2xl">
-
                     {/* Back link */}
                     <Link
                         href={route('admin.questions.index')}
@@ -52,69 +51,51 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
 
                     {/* Header */}
                     <div className="mb-8">
-                        <p className="mb-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#91A7D8]">
+                        <p className="mb-0.5 text-[11px] font-semibold tracking-[0.2em] text-[#91A7D8] uppercase">
                             Admin · Question {question.order}
                         </p>
-                        <h1 className="text-2xl font-bold text-[#D8E0F3]">
-                            Edit Question
-                        </h1>
-                        <p className="mt-1 text-sm capitalize text-[#C1CDE8]">
-                            Pillar: {question.pillar}
-                        </p>
+                        <h1 className="text-2xl font-bold text-[#D8E0F3]">Edit Question</h1>
+                        <p className="mt-1 text-sm text-[#C1CDE8] capitalize">Pillar: {question.pillar}</p>
                     </div>
 
                     {/* Form card */}
                     <div className="rounded-xl border border-[#232C43] bg-[#101623] p-7">
                         <form onSubmit={submit} noValidate className="space-y-6">
-
                             {/* question_text */}
                             <div className="space-y-1.5">
-                                <label
-                                    htmlFor="question_text"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C1CDE8]"
-                                >
+                                <label htmlFor="question_text" className="block text-[11px] font-semibold tracking-[0.18em] text-[#C1CDE8] uppercase">
                                     Question Text
                                 </label>
                                 <textarea
                                     id="question_text"
                                     rows={3}
                                     value={form.data.question_text}
-                                    onChange={e => form.setData('question_text', e.target.value)}
+                                    onChange={(e) => form.setData('question_text', e.target.value)}
                                     className={`${inputClass} resize-y leading-relaxed`}
                                 />
-                                {form.errors.question_text && (
-                                    <p className="text-xs text-rose-400">{form.errors.question_text}</p>
-                                )}
+                                {form.errors.question_text && <p className="text-xs text-rose-400">{form.errors.question_text}</p>}
                             </div>
 
                             {/* sub_text */}
                             <div className="space-y-1.5">
-                                <label
-                                    htmlFor="sub_text"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C1CDE8]"
-                                >
-                                    Sub Text <span className="font-normal normal-case tracking-normal text-[#91A7D8]">optional</span>
+                                <label htmlFor="sub_text" className="block text-[11px] font-semibold tracking-[0.18em] text-[#C1CDE8] uppercase">
+                                    Sub Text <span className="font-normal tracking-normal text-[#91A7D8] normal-case">optional</span>
                                 </label>
                                 <input
                                     id="sub_text"
                                     type="text"
                                     value={form.data.sub_text}
-                                    onChange={e => form.setData('sub_text', e.target.value)}
+                                    onChange={(e) => form.setData('sub_text', e.target.value)}
                                     placeholder="Clarifying context shown below the question"
                                     className={inputClass}
                                 />
-                                {form.errors.sub_text && (
-                                    <p className="text-xs text-rose-400">{form.errors.sub_text}</p>
-                                )}
+                                {form.errors.sub_text && <p className="text-xs text-rose-400">{form.errors.sub_text}</p>}
                             </div>
 
                             {/* points */}
                             <div className="space-y-1.5">
-                                <label
-                                    htmlFor="points"
-                                    className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C1CDE8]"
-                                >
-                                    Points <span className="font-normal normal-case tracking-normal text-[#91A7D8]">(1–20)</span>
+                                <label htmlFor="points" className="block text-[11px] font-semibold tracking-[0.18em] text-[#C1CDE8] uppercase">
+                                    Points <span className="font-normal tracking-normal text-[#91A7D8] normal-case">(1–20)</span>
                                 </label>
                                 <input
                                     id="points"
@@ -122,21 +103,17 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     min={1}
                                     max={20}
                                     value={form.data.points}
-                                    onChange={e => form.setData('points', parseInt(e.target.value, 10) || 1)}
+                                    onChange={(e) => form.setData('points', parseInt(e.target.value, 10) || 1)}
                                     className={`${inputClass} w-28 tabular-nums`}
                                 />
-                                {form.errors.points && (
-                                    <p className="text-xs text-rose-400">{form.errors.points}</p>
-                                )}
+                                {form.errors.points && <p className="text-xs text-rose-400">{form.errors.points}</p>}
                             </div>
 
                             {/* is_active toggle */}
                             <div className="flex items-center justify-between rounded-xl border border-[#232C43] bg-[#0C1427]/50 px-4 py-3.5">
                                 <div>
                                     <p className="text-sm font-medium text-[#D8E0F3]">Active</p>
-                                    <p className="text-xs text-[#91A7D8]">
-                                        Inactive questions are hidden from the diagnostic
-                                    </p>
+                                    <p className="text-xs text-[#91A7D8]">Inactive questions are hidden from the diagnostic</p>
                                 </div>
                                 <button
                                     type="button"
@@ -156,10 +133,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
 
                             {/* Save */}
                             <div className="flex items-center justify-between">
-                                <Link
-                                    href={route('admin.questions.index')}
-                                    className="text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
-                                >
+                                <Link href={route('admin.questions.index')} className="text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]">
                                     Cancel
                                 </Link>
 

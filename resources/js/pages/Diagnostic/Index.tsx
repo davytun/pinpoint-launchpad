@@ -1,11 +1,10 @@
 import { Head, router } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, Loader2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 import { cn } from '@/lib/utils';
 
@@ -55,26 +54,9 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
     const [direction, setDirection] = useState<1 | -1>(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Single ref-based gate: prevents ANY interaction during transitions or submit.
-    // Using a ref (not state) so the guard takes effect synchronously on the same
-    // event tick — no 380ms window where a second tap can sneak through.
     const lockedRef = useRef(false);
-
-    // Trap the browser back button — prevent navigating away mid-quiz
-    useEffect(() => {
-        window.history.pushState(null, '', window.location.href);
-        const handlePopState = () => {
-            window.history.pushState(null, '', window.location.href);
-        };
-        window.addEventListener('popstate', handlePopState);
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-        };
-    }, []);
-
     const question = questions[currentIndex];
 
-    // Guard: no questions seeded yet — show a placeholder instead of crashing
     if (!question) {
         return (
             <DiagnosticLayout>
@@ -104,8 +86,6 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
             setTimeout(() => {
                 router.post(
                     route('diagnostic.submit'),
-                    // Explicitly cast each value to boolean so JSON.stringify
-                    // sends true/false, never "true"/"false" strings
                     { answers: Object.fromEntries(Object.entries(newAnswers).map(([k, v]) => [k, Boolean(v)])) },
                     {
                         onError: () => {
@@ -116,7 +96,6 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                 );
             }, 200);
         } else {
-            // Advance to next question after answer flash
             setDirection(1);
             setTimeout(() => {
                 setCurrentIndex((i) => i + 1);
@@ -164,20 +143,20 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.25 }}
-                            className="bg-background/95 fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 backdrop-blur-md"
+                            className="bg-white/95 fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 backdrop-blur-md"
                         >
                             <div
                                 className="flex size-20 items-center justify-center rounded-full border"
                                 style={{
-                                    borderColor: 'rgba(37,99,235,0.35)',
-                                    background: 'radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)',
+                                    borderColor: 'rgba(58, 84, 165, 0.25)',
+                                    background: 'radial-gradient(circle, rgba(58, 84, 165, 0.1) 0%, transparent 70%)',
                                 }}
                             >
-                                <Loader2 className="text-primary size-9 animate-spin" />
+                                <Loader2 className="text-[#3A54A5] size-9 animate-spin" />
                             </div>
                             <div className="text-center">
-                                <p className="text-foreground text-base font-semibold">Analysing your venture profile…</p>
-                                <p className="text-muted-foreground mt-1.5 text-sm">This takes just a moment.</p>
+                                <p className="text-zinc-900 text-base font-semibold">Analysing your venture profile…</p>
+                                <p className="text-zinc-500 mt-1.5 text-sm">This takes just a moment.</p>
                             </div>
                         </motion.div>
                     )}
@@ -190,7 +169,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
 
                     <div className="mb-6 flex flex-col gap-2">
                         <div className="flex items-center justify-between">
-                            <span className="font-display text-sm font-bold tracking-widest text-white/50 uppercase">
+                            <span className="font-display text-sm font-bold tracking-widest text-zinc-500 uppercase">
                                 Question {currentIndex + 1}
                                 <span className="opacity-40"> / {total_questions}</span>
                             </span>
@@ -206,14 +185,14 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                             </Badge>
                         </div>
                         {/* Flat Editorial Progress */}
-                        <div className="h-[3px] w-full overflow-hidden bg-white/10">
+                        <div className="h-[3px] w-full overflow-hidden bg-zinc-200">
                             <motion.div
                                 className="h-full"
                                 initial={{ width: `${((currentIndex === 0 ? 0 : currentIndex - 1) / total_questions) * 100}%` }}
                                 animate={{ width: `${progressPct}%` }}
                                 transition={{ duration: 0.5, ease: 'easeOut' }}
                                 style={{
-                                    backgroundColor: '#5ca336',
+                                    backgroundColor: '#3A54A5',
                                 }}
                             />
                         </div>
@@ -223,16 +202,16 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                     <div className="relative" style={{ minHeight: 280 }}>
                         <AnimatePresence mode="wait" custom={direction}>
                             <motion.div key={question.id} custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit">
-                                <Card className="dx-card overflow-hidden rounded-[1.25rem] md:rounded-[1.75rem]">
-                                    <CardContent className="p-6 sm:p-10">
+                                <div className="dx-card overflow-hidden rounded-[1.25rem] md:rounded-[1.75rem]">
+                                    <div className="p-6 sm:p-10">
                                         {/* Question text */}
-                                        <p className="font-display text-xl leading-snug font-bold tracking-tight text-[#D8E0F3] sm:text-2xl">
+                                        <p className="font-display text-xl leading-snug font-bold tracking-tight text-zinc-900 sm:text-2xl">
                                             {question.question_text}
                                         </p>
 
                                         {/* Sub text */}
                                         {question.sub_text && (
-                                            <p className="mt-3 text-sm leading-relaxed text-[#C1CDE8] italic">{question.sub_text}</p>
+                                            <p className="mt-3 text-sm leading-relaxed text-zinc-500 italic">{question.sub_text}</p>
                                         )}
 
                                         {/* ── Answer buttons ── */}
@@ -241,10 +220,10 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                 type="button"
                                                 onClick={() => selectAnswer(true)}
                                                 className={cn(
-                                                    'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-200 ease-out focus:outline-none sm:py-5',
+                                                    'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-300 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === true
-                                                        ? 'scale-[1.01] border-[#5CA336] bg-[#5CA336] font-bold text-white shadow-lg'
-                                                        : 'border-white/10 bg-[#161c28] text-white/60 hover:border-white/20 hover:bg-[#1d2436] hover:text-white',
+                                                        ? 'scale-[1.01] border-[#3A54A5] bg-[#3A54A5] font-bold text-white shadow-[0_8px_20px_rgba(58,84,165,0.25)]'
+                                                        : 'border-zinc-200 bg-white/50 text-zinc-700 backdrop-blur-xs shadow-xs hover:-translate-y-0.5 hover:border-[#3A54A5]/30 hover:bg-white hover:text-[#3A54A5] hover:shadow-[0_8px_20px_rgba(58,84,165,0.04)]',
                                                 )}
                                             >
                                                 <span className="relative z-10 text-sm font-bold tracking-[0.15em] uppercase">Yes</span>
@@ -254,17 +233,17 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                 type="button"
                                                 onClick={() => selectAnswer(false)}
                                                 className={cn(
-                                                    'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-200 ease-out focus:outline-none sm:py-5',
+                                                    'group relative flex items-center justify-center overflow-hidden rounded-xl border py-4 transition-all duration-300 ease-out focus:outline-none sm:py-5',
                                                     answers[question.id] === false
-                                                        ? 'scale-[1.01] border-[#2F4587] bg-[#2F4587] font-bold text-white shadow-lg'
-                                                        : 'border-white/10 bg-[#161c28] text-white/60 hover:border-white/20 hover:bg-[#1d2436] hover:text-white',
+                                                        ? 'scale-[1.01] border-[#3A54A5] bg-[#3A54A5] font-bold text-white shadow-[0_8px_20px_rgba(58,84,165,0.25)]'
+                                                        : 'border-zinc-200 bg-white/50 text-zinc-700 backdrop-blur-xs shadow-xs hover:-translate-y-0.5 hover:border-[#3A54A5]/30 hover:bg-white hover:text-[#3A54A5] hover:shadow-[0_8px_20px_rgba(58,84,165,0.04)]',
                                                 )}
                                             >
                                                 <span className="relative z-10 text-sm font-bold tracking-[0.15em] uppercase">No</span>
                                             </button>
                                         </div>
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </div>
                             </motion.div>
                         </AnimatePresence>
                     </div>
@@ -276,7 +255,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 type="button"
                                 onClick={goBack}
                                 disabled={currentIndex === 0}
-                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-[#232C43] px-4 py-2 text-xs font-bold tracking-widest text-[#C1CDE8] uppercase transition-colors hover:bg-[#1B294B]/30 hover:text-[#D8E0F3] disabled:pointer-events-none disabled:opacity-30"
+                                className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white/60 px-4 py-2 text-xs font-bold tracking-widest text-zinc-600 uppercase transition-all duration-300 hover:border-[#3A54A5]/30 hover:bg-[#3A54A5]/5 hover:text-[#3A54A5] disabled:pointer-events-none disabled:opacity-30 shadow-xs"
                             >
                                 <span className="transition-transform group-hover:-translate-x-1">
                                     <ChevronLeft />
@@ -285,11 +264,11 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                             </button>
 
                             <div className="flex items-center gap-1.5">
-                                <span className="text-sm font-bold tabular-nums" style={{ color: '#5CA336' }}>
+                                <span className="text-sm font-bold tabular-nums" style={{ color: '#3A54A5' }}>
                                     {currentIndex + 1}
                                 </span>
-                                <span className="text-xs text-[#91A7D8]">/</span>
-                                <span className="text-xs text-[#C1CDE8] tabular-nums">{total_questions}</span>
+                                <span className="text-xs text-zinc-400">/</span>
+                                <span className="text-xs text-zinc-500 tabular-nums">{total_questions}</span>
                             </div>
 
                             <div className="w-16 shrink-0" />

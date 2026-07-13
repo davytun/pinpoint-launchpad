@@ -53,14 +53,14 @@ function AnimatedCheck() {
     return (
         <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true" className="mx-auto">
             {/* Soft background fill */}
-            <circle cx="40" cy="40" r="36" fill="rgba(110,190,68,0.05)" />
-            {/* Animated ring — initially hidden via inline style */}
+            <circle cx="40" cy="40" r="36" fill="rgba(16,185,129,0.05)" />
+            {/* Animated ring */}
             <circle
                 ref={circleRef}
                 cx="40"
                 cy="40"
                 r="36"
-                stroke="#6EBE44"
+                stroke="#10B981"
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
@@ -69,11 +69,11 @@ function AnimatedCheck() {
                     strokeDashoffset: CIRCLE_LEN,
                 }}
             />
-            {/* Animated checkmark — initially hidden via inline style */}
+            {/* Animated checkmark */}
             <path
                 ref={checkRef}
                 d="M24 40 L35 51 L56 30"
-                stroke="#6EBE44"
+                stroke="#10B981"
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
@@ -102,11 +102,11 @@ function FadeUp({ delay = 0, children }: { delay?: number; children: React.React
 function Row({ label, children, isTotal = false }: { label: string; children: React.ReactNode; isTotal?: boolean }) {
     return (
         <div className="flex items-center justify-between py-3">
-            <span className="text-[13px] text-[#91A7D8]">{label}</span>
+            <span className="text-[13px] text-zinc-500">{label}</span>
             <span
                 className={cn(
                     'text-[13px]',
-                    isTotal ? 'font-mono text-[14px] font-bold tracking-tight text-[#D8E0F3]' : 'font-medium text-[#D8E0F3]/90',
+                    isTotal ? 'font-mono text-[14px] font-extrabold tracking-tight text-zinc-950' : 'font-medium text-zinc-800',
                 )}
             >
                 {children}
@@ -120,13 +120,13 @@ function Row({ label, children, isTotal = false }: { label: string; children: Re
 function Step({ n, label, sub, isLast = false }: { n: number; label: string; sub: string; isLast?: boolean }) {
     return (
         <div className="relative flex items-start gap-4 pb-5">
-            {!isLast && <div className="absolute top-7 bottom-0 left-[0.6rem] w-[1.5px] bg-[#232C43]" />}
-            <div className="relative z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-full border border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[10px] font-bold text-[#6986C9] tabular-nums">
+            {!isLast && <div className="absolute top-7 bottom-0 left-[0.6rem] w-[1.5px] bg-zinc-200" />}
+            <div className="relative z-10 mt-1 flex size-5 shrink-0 items-center justify-center rounded-full border border-[#3A54A5]/25 bg-[#3A54A5]/5 text-[10px] font-bold text-[#3A54A5] tabular-nums shadow-xs">
                 {n}
             </div>
             <div className="-mt-0.5">
-                <p className="text-[13.5px] font-semibold text-[#D8E0F3]">{label}</p>
-                <p className="mt-1 max-w-[280px] text-[12px] leading-relaxed text-[#C1CDE8]">{sub}</p>
+                <p className="text-[13.5px] font-bold text-zinc-950 leading-tight">{label}</p>
+                <p className="mt-1 max-w-[280px] text-[12px] leading-relaxed text-zinc-500">{sub}</p>
             </div>
         </div>
     );
@@ -134,9 +134,9 @@ function Step({ n, label, sub, isLast = false }: { n: number; label: string; sub
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function CheckoutSuccess({ tier_label, total_amount, email, currency_symbol = '$' }: PageProps) {
+export default function CheckoutSuccess({ tier_label, total_amount, email, currency_symbol = '₦' }: PageProps) {
     return (
-        <DiagnosticLayout glowColor="#6EBE44" hideWordmark>
+        <DiagnosticLayout glowColor="#10B981" hideWordmark>
             <Head title="Payment Confirmed — PARAGON Certification" />
 
             <div className="flex min-h-screen flex-col items-center justify-center px-4 py-16">
@@ -149,7 +149,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
 
                 <div className="w-full max-w-[440px]">
                     {/* Main card */}
-                    <div className="relative overflow-hidden rounded-[2rem] border border-[#232C43] bg-[#101623] p-8 shadow-2xl sm:p-10">
+                    <div className="relative overflow-hidden dx-card p-8 sm:p-10 rounded-[2rem] hover:shadow-md transition-all duration-300">
                         {/* Status Icon */}
                         <FadeUp delay={0.1}>
                             <div className="mb-6 flex justify-center">
@@ -160,8 +160,8 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         {/* Heading */}
                         <FadeUp delay={0.2}>
                             <div className="relative z-10 mb-8 text-center">
-                                <p className="mb-2 text-[10px] font-bold tracking-[0.25em] text-[#6EBE44] uppercase">Payment Authorized</p>
-                                <h1 className="font-display text-[26px] leading-tight font-semibold tracking-tight text-[#D8E0F3] sm:text-[28px]">
+                                <p className="mb-2 text-[10px] font-extrabold tracking-[0.25em] text-[#10B981] uppercase">Payment Authorized</p>
+                                <h1 className="font-display text-[26px] leading-tight font-extrabold tracking-tight text-zinc-950 sm:text-[28px]">
                                     Commitment Secured
                                 </h1>
                             </div>
@@ -169,18 +169,18 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
 
                         {/* Receipt Invoice */}
                         <FadeUp delay={0.3}>
-                            <div className="mb-7 overflow-hidden rounded-2xl border border-[#232C43] bg-[#0C1427]/50">
-                                <div className="border-b border-dashed border-[#232C43] bg-[#1B294B]/10 px-5 py-3">
-                                    <p className="text-[10px] font-bold tracking-[0.2em] text-[#91A7D8] uppercase">Invoice Details</p>
+                            <div className="mb-7 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50/50">
+                                <div className="border-b border-dashed border-zinc-200 bg-zinc-100/40 px-5 py-3">
+                                    <p className="text-[10px] font-extrabold tracking-[0.2em] text-zinc-400 uppercase">Invoice Details</p>
                                 </div>
-                                <div className="divide-y divide-dashed divide-[#232C43] px-5 py-1.5">
+                                <div className="divide-y divide-dashed divide-zinc-200 px-5 py-1.5">
                                     <Row label="Tier">{tier_label} Audit</Row>
                                     <Row label="Amount" isTotal>
                                         {currency_symbol}
                                         {Number(total_amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                                     </Row>
                                     <Row label="Status">
-                                        <Badge className="border border-[#6EBE44]/30 bg-[#6EBE44]/10 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.15em] text-[#6EBE44] uppercase">
+                                        <Badge className="border border-[#10B981]/30 bg-[#10B981]/10 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.15em] text-[#10B981] uppercase shadow-none">
                                             Paid
                                         </Badge>
                                     </Row>
@@ -190,12 +190,12 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
 
                         {/* Email notice */}
                         <FadeUp delay={0.4}>
-                            <div className="mb-8 flex items-center gap-3.5 rounded-xl border border-[#232C43] bg-[#1B294B]/10 p-4">
-                                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#1B294B]/20">
-                                    <MailCheck className="size-3.5 text-[#91A7D8]" />
+                            <div className="mb-8 flex items-center gap-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 p-4">
+                                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-zinc-150/80">
+                                    <MailCheck className="size-3.5 text-zinc-500" />
                                 </div>
-                                <p className="text-[13px] leading-tight text-[#C1CDE8]">
-                                    Receipt delivered to <span className="font-semibold text-[#D8E0F3]/80">{email}</span>.
+                                <p className="text-[13px] leading-tight text-zinc-650">
+                                    Receipt delivered to <span className="font-semibold text-zinc-950">{email}</span>.
                                 </p>
                             </div>
                         </FadeUp>
@@ -203,7 +203,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         {/* Next steps Timeline */}
                         <FadeUp delay={0.5}>
                             <div className="mb-8">
-                                <h2 className="mb-5 text-[11px] font-bold tracking-[0.15em] text-[#91A7D8] uppercase">Action Required</h2>
+                                <h2 className="mb-5 text-[11px] font-extrabold tracking-[0.15em] text-zinc-400 uppercase">Action Required</h2>
                                 <div className="pl-1">
                                     <Step
                                         n={1}
@@ -225,10 +225,8 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         <FadeUp delay={0.6}>
                             <Link
                                 href={route('onboarding.sign')}
-                                className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#3b5ba5]"
-                                style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
+                                className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase shadow-none transition-all duration-300 outline-none hover:bg-[#2D4182] hover:shadow-[0_8px_25px_rgba(58,84,165,0.25)] hover:scale-[1.005] active:scale-[0.99]"
                             >
-                                <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
                                 Proceed to Agreement
                                 <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                             </Link>
@@ -237,9 +235,9 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
 
                     {/* Info chip */}
                     <FadeUp delay={0.75}>
-                        <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#232C43] bg-[#101623]/50 px-5 py-4">
-                            <Info className="mt-0.5 size-4 shrink-0 text-[#91A7D8]/40" />
-                            <p className="text-[12px] leading-relaxed text-[#91A7D8]/60">
+                        <div className="mt-6 flex items-start gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 py-4">
+                            <Info className="mt-0.5 size-4 shrink-0 text-zinc-400" />
+                            <p className="text-[12px] leading-relaxed text-zinc-550">
                                 Protected transaction. If the program fails to commence within 10 business days, you are fully entitled to our
                                 risk-free, zero-questions refund policy.
                             </p>

@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, CheckCircle2, FileText, MessageSquare, Zap } fro
 import { useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
+import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -48,24 +49,24 @@ interface PageProps {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const auditStatusColors: Record<string, string> = {
-    pending: 'bg-slate-700 text-slate-300',
-    in_progress: 'bg-amber-500/20 text-amber-400',
-    needs_info: 'bg-red-500/20 text-red-400',
-    on_hold: 'bg-orange-500/20 text-orange-400',
-    complete: 'bg-emerald-500/20 text-emerald-400',
+    pending: 'bg-zinc-100 text-zinc-650 border border-zinc-200',
+    in_progress: 'bg-amber-50 text-amber-700 border border-amber-250',
+    needs_info: 'bg-red-50 text-red-700 border border-red-250',
+    on_hold: 'bg-orange-50 text-orange-700 border border-orange-250',
+    complete: 'bg-emerald-50 text-emerald-700 border border-emerald-250',
 };
 
 const scoreBandColor: Record<string, string> = {
-    low: 'text-red-400',
-    mid_low: 'text-amber-400',
-    mid_high: 'text-[#3A54A5]',
-    high: 'text-emerald-400',
+    low: 'text-red-650 font-bold',
+    mid_low: 'text-amber-605 font-bold',
+    mid_high: 'text-[#3A54A5] font-bold',
+    high: 'text-emerald-650 font-bold',
 };
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-5">
-            <h3 className="mb-4 text-xs font-bold tracking-widest text-[#91A7D8] uppercase">{title}</h3>
+        <div className="rounded-2xl border border-white/80 bg-white/30 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
+            <h3 className="mb-4 text-xs font-bold tracking-widest text-zinc-500 uppercase">{title}</h3>
             {children}
         </div>
     );
@@ -73,9 +74,9 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
     return (
-        <div className="flex justify-between gap-4 border-b border-[#232C43] py-2 last:border-0">
-            <span className="shrink-0 text-xs text-[#91A7D8]">{label}</span>
-            <span className="text-right text-sm text-[#D8E0F3]">{value ?? '—'}</span>
+        <div className="flex justify-between gap-4 border-b border-zinc-200/60 py-2.5 last:border-0">
+            <span className="shrink-0 text-xs text-zinc-500 font-semibold">{label}</span>
+            <span className="text-right text-sm text-zinc-950 font-bold">{value ?? '—'}</span>
         </div>
     );
 }
@@ -128,7 +129,7 @@ export default function AdminFoundersShow({
                 {/* Back */}
                 <Link
                     href={route('admin.founders.index')}
-                    className="mb-6 inline-flex items-center gap-2 text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
+                    className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-550 font-bold transition-colors hover:text-zinc-950"
                 >
                     <ArrowLeft className="size-4" /> Back to Founders
                 </Link>
@@ -136,45 +137,55 @@ export default function AdminFoundersShow({
                 {/* Header */}
                 <div className="mb-6 flex items-start justify-between gap-4">
                     <div>
-                        <h1 className="flex items-center gap-2 text-2xl font-bold text-[#D8E0F3]">
+                        <h1 className="flex items-center gap-2 text-2xl font-extrabold text-zinc-955">
                             {founder.company_name ?? founder.full_name ?? '—'}
                             {(founder.score ?? 0) > 85 && (
                                 <span title="High Velocity">
-                                    <Zap className="size-5 text-amber-400" />
+                                    <Zap className="size-5 text-amber-550" />
                                 </span>
                             )}
                         </h1>
-                        <p className="mt-1 text-sm text-[#C1CDE8]">
+                        <p className="mt-1 text-sm text-zinc-550 font-medium">
                             {founder.full_name} · {founder.email}
                         </p>
                     </div>
                     {payment?.audit_status && (
                         <span
-                            className={`rounded-full px-3 py-1 text-xs font-bold ${auditStatusColors[payment.audit_status] ?? 'bg-[#0C1427] text-[#C1CDE8]'}`}
+                            className={cn(
+                                'rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wide border shadow-xs',
+                                auditStatusColors[payment.audit_status] ?? 'bg-zinc-100 text-zinc-500 border-zinc-200',
+                            )}
                         >
-                            {payment.audit_status.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                            {payment.audit_status.replace('_', ' ')}
                         </span>
                     )}
                 </div>
 
                 {(flash?.success || flash?.error) && (
                     <div
-                        className={`mb-4 rounded-xl border px-4 py-3 text-sm ${flash.success ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-red-500/30 bg-red-500/10 text-red-400'}`}
+                        className={cn(
+                            'mb-4 rounded-xl border px-4 py-3 text-sm font-semibold',
+                            flash.success
+                                ? 'border-emerald-500/25 bg-emerald-50 text-emerald-700'
+                                : 'border-rose-500/25 bg-rose-50 text-rose-700',
+                        )}
                     >
                         {flash.success ?? flash.error}
                     </div>
                 )}
 
                 {/* Tabs */}
-                <div className="mb-6 flex gap-1 border-b border-[#232C43]">
+                <div className="mb-6 flex gap-1 border-b border-zinc-200">
                     {TABS.map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={[
-                                '-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors',
-                                activeTab === tab ? 'border-[#3A54A5] text-[#D8E0F3]' : 'border-transparent text-[#C1CDE8] hover:text-[#D8E0F3]',
-                            ].join(' ')}
+                            className={cn(
+                                '-mb-px border-b-2 px-4 py-2.5 text-sm font-bold transition-colors',
+                                activeTab === tab
+                                    ? 'border-[#3A54A5] text-[#3A54A5]'
+                                    : 'border-transparent text-zinc-550 hover:text-zinc-950 hover:border-zinc-300',
+                            )}
                         >
                             {tab}
                         </button>
@@ -197,24 +208,24 @@ export default function AdminFoundersShow({
                         {/* PARAGON Score */}
                         <Card title="PARAGON Score">
                             <div className="mb-4 flex items-center gap-4">
-                                <span className={`text-5xl font-bold ${scoreBandColor[founder.score_band ?? ''] ?? 'text-[#D8E0F3]'}`}>
+                                <span className={`text-5xl font-extrabold ${scoreBandColor[founder.score_band ?? ''] ?? 'text-zinc-800'}`}>
                                     {founder.score ?? '—'}
                                 </span>
                                 <div>
-                                    <p className="text-xs text-[#91A7D8]">Score Band</p>
-                                    <p className="text-sm font-medium text-[#D8E0F3] capitalize">{founder.score_band?.replace('_', ' ') ?? '—'}</p>
-                                    <p className="text-xs text-[#91A7D8] capitalize">Tier: {founder.tier ?? '—'}</p>
+                                    <p className="text-xs text-zinc-500 font-bold">Score Band</p>
+                                    <p className="text-sm font-extrabold text-zinc-950 capitalize mt-0.5">{founder.score_band?.replace('_', ' ') ?? '—'}</p>
+                                    <p className="text-xs text-zinc-450 font-semibold capitalize mt-0.5">Tier: {founder.tier ?? '—'}</p>
                                 </div>
                             </div>
                             {founder.pillar_scores && (
-                                <div className="space-y-2">
+                                <div className="space-y-2.5">
                                     {Object.entries(founder.pillar_scores).map(([pillar, score]) => (
                                         <div key={pillar} className="flex items-center gap-3">
-                                            <span className="w-24 shrink-0 text-xs text-[#C1CDE8] capitalize">{pillar}</span>
-                                            <div className="h-1.5 flex-1 rounded-full border border-[#232C43] bg-[#080B11]">
+                                            <span className="w-24 shrink-0 text-xs text-zinc-650 font-semibold capitalize">{pillar}</span>
+                                            <div className="h-1.5 flex-1 rounded-full border border-zinc-200 bg-zinc-100/50">
                                                 <div className="h-1.5 rounded-full bg-[#3A54A5]" style={{ width: `${Math.round(score)}%` }} />
                                             </div>
-                                            <span className="w-8 text-right font-mono text-xs text-[#C1CDE8]">{Math.round(score)}</span>
+                                            <span className="w-8 text-right font-mono text-xs text-zinc-700 font-bold">{Math.round(score)}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -228,7 +239,7 @@ export default function AdminFoundersShow({
                                     <select
                                         value={auditForm.data.audit_status}
                                         onChange={(e) => auditForm.setData('audit_status', e.target.value)}
-                                        className="w-full rounded-xl border border-[#232C43] bg-[#080B11] px-3 py-2.5 text-sm text-[#D8E0F3] focus:border-[#3A54A5]/50 focus:outline-none"
+                                        className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-955 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
                                     >
                                         <option value="pending">Pending</option>
                                         <option value="in_progress">In Progress</option>
@@ -239,7 +250,7 @@ export default function AdminFoundersShow({
                                     <button
                                         type="submit"
                                         disabled={auditForm.processing}
-                                        className="w-full rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] py-2 text-sm font-bold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/20 disabled:opacity-50"
+                                        className="w-full rounded-xl bg-[#3A54A5] py-2 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors disabled:opacity-50"
                                     >
                                         {auditForm.processing ? 'Updating…' : 'Update Status'}
                                     </button>
@@ -251,12 +262,12 @@ export default function AdminFoundersShow({
                         <Card title="Assigned Analyst">
                             {assignment ? (
                                 <div className="mb-4">
-                                    <p className="font-medium text-[#D8E0F3]">{assignment.analyst_name ?? '—'}</p>
-                                    <p className="text-xs text-[#91A7D8]">Assigned {assignment.assigned_at}</p>
-                                    {assignment.notes && <p className="mt-2 text-xs text-[#C1CDE8] italic">{assignment.notes}</p>}
+                                    <p className="font-bold text-zinc-900">{assignment.analyst_name ?? '—'}</p>
+                                    <p className="text-xs text-zinc-500 mt-0.5">Assigned {assignment.assigned_at}</p>
+                                    {assignment.notes && <p className="mt-2 text-xs text-zinc-600 italic bg-zinc-50 border border-zinc-200/80 p-2.5 rounded-lg">{assignment.notes}</p>}
                                 </div>
                             ) : (
-                                <p className="mb-4 text-sm text-[#91A7D8]">No analyst assigned yet.</p>
+                                <p className="mb-4 text-sm text-zinc-500 font-semibold">No analyst assigned yet.</p>
                             )}
                             {isSuperAdmin && (
                                 <>
@@ -265,7 +276,7 @@ export default function AdminFoundersShow({
                                             <select
                                                 value={assignForm.data.analyst_id}
                                                 onChange={(e) => assignForm.setData('analyst_id', e.target.value)}
-                                                className="w-full rounded-xl border border-[#232C43] bg-[#080B11] px-3 py-2.5 text-sm text-[#D8E0F3] focus:outline-none"
+                                                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-955 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
                                                 required
                                             >
                                                 <option value="">Select analyst…</option>
@@ -281,20 +292,20 @@ export default function AdminFoundersShow({
                                                 placeholder="Notes…"
                                                 rows={2}
                                                 maxLength={500}
-                                                className="w-full resize-none rounded-xl border border-[#232C43] bg-[#080B11] px-3 py-2 text-sm text-[#D8E0F3] placeholder:text-[#91A7D8] focus:outline-none"
+                                                className="w-full resize-none rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-955 placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
                                             />
                                             <div className="flex gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={() => setShowAssign(false)}
-                                                    className="flex-1 rounded-xl border border-[#232C43] py-2 text-xs text-[#C1CDE8] transition-colors hover:bg-[#1B294B]"
+                                                    className="flex-1 rounded-xl border border-zinc-200 bg-white py-2 text-xs text-zinc-650 font-semibold shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                                                 >
                                                     Cancel
                                                 </button>
                                                 <button
                                                     type="submit"
                                                     disabled={assignForm.processing}
-                                                    className="flex-1 rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] py-2 text-xs font-bold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/20 disabled:opacity-50"
+                                                    className="flex-1 rounded-xl bg-[#3A54A5] py-2 text-xs font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors disabled:opacity-50"
                                                 >
                                                     {assignForm.processing ? 'Assigning…' : 'Assign'}
                                                 </button>
@@ -303,7 +314,7 @@ export default function AdminFoundersShow({
                                     ) : (
                                         <button
                                             onClick={() => setShowAssign(true)}
-                                            className="w-full rounded-xl border border-[#232C43] py-2 text-xs font-medium text-[#C1CDE8] transition-colors hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                                            className="w-full rounded-xl border border-zinc-200 bg-white py-2 text-xs font-bold text-zinc-650 shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                                         >
                                             {assignment ? 'Change Analyst' : 'Assign Analyst'}
                                         </button>
@@ -332,7 +343,7 @@ export default function AdminFoundersShow({
                                     <Field label="Signed At" value={signature.signed_at} />
                                 </>
                             ) : (
-                                <p className="text-sm text-[#91A7D8]">No signature on record.</p>
+                                <p className="text-sm text-zinc-500 font-semibold">No signature on record.</p>
                             )}
                         </Card>
                     </div>
@@ -340,49 +351,49 @@ export default function AdminFoundersShow({
 
                 {/* ── Documents ── */}
                 {activeTab === 'Documents' && (
-                    <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
+                    <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
                         {documents.length === 0 ? (
-                            <div className="py-16 text-center text-sm text-[#C1CDE8]">No documents uploaded.</div>
+                            <div className="py-16 text-center text-sm text-zinc-550 font-medium">No documents uploaded.</div>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[700px] text-sm">
                                     <thead>
-                                        <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
+                                        <tr className="border-b border-zinc-200 bg-zinc-50/50">
                                             {['Filename', 'Type', 'Reviewed', 'Uploaded', 'Actions'].map((h) => (
                                                 <th
                                                     key={h}
-                                                    className="px-5 py-3.5 text-left text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase"
+                                                    className="px-5 py-3.5 text-left text-[10px] font-bold tracking-widest text-zinc-500 uppercase"
                                                 >
                                                     {h}
                                                 </th>
                                             ))}
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="divide-y divide-zinc-200/80">
                                         {documents.map((doc) => (
                                             <tr
                                                 key={doc.id}
-                                                className="border-b border-[#232C43] transition-colors last:border-0 hover:bg-[#1B294B]/30"
+                                                className="group transition-colors hover:bg-zinc-50/40"
                                             >
                                                 <td className="px-5 py-3.5">
                                                     <div className="flex items-center gap-2">
-                                                        <FileText className="size-4 shrink-0 text-[#91A7D8]" />
-                                                        <span className="max-w-[200px] truncate text-[#D8E0F3]">{doc.original_filename}</span>
+                                                        <FileText className="size-4 shrink-0 text-zinc-400" />
+                                                        <span className="max-w-[200px] truncate text-zinc-900 font-semibold">{doc.original_filename}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-5 py-3.5 text-[#C1CDE8] capitalize">{doc.type}</td>
+                                                <td className="px-5 py-3.5 text-zinc-650 font-medium capitalize">{doc.type}</td>
                                                 <td className="px-5 py-3.5">
                                                     {doc.reviewed ? (
-                                                        <CheckCircle2 className="size-4 text-emerald-400" />
+                                                        <CheckCircle2 className="size-4 text-emerald-650" />
                                                     ) : (
-                                                        <span className="text-xs text-[#91A7D8]">Pending</span>
+                                                        <span className="text-xs text-zinc-450 font-bold">Pending</span>
                                                     )}
                                                 </td>
-                                                <td className="px-5 py-3.5 text-[#C1CDE8]">{doc.created_at}</td>
+                                                <td className="px-5 py-3.5 text-zinc-650 font-medium">{doc.created_at}</td>
                                                 <td className="px-5 py-3.5">
                                                     <a
                                                         href={route('admin.documents.download', { founder: founder.id, document: doc.id })}
-                                                        className="text-xs font-bold tracking-wider text-[#3A54A5] uppercase transition-colors hover:text-[#C1CDE8]"
+                                                        className="text-xs font-extrabold tracking-wider text-[#3A54A5] uppercase transition-colors hover:text-[#2D4182]"
                                                     >
                                                         Download
                                                     </a>
@@ -398,17 +409,17 @@ export default function AdminFoundersShow({
 
                 {/* ── Messages ── */}
                 {activeTab === 'Messages' && (
-                    <div className="rounded-xl border border-[#232C43] bg-[#101623] p-6 text-center">
+                    <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)] p-6 text-center">
                         {message_thread ? (
                             <>
-                                <MessageSquare className="mx-auto mb-3 size-10 text-[#91A7D8]" />
-                                <p className="font-medium text-[#D8E0F3]">{message_thread.total_messages} messages</p>
+                                <MessageSquare className="mx-auto mb-3 size-10 text-zinc-400" />
+                                <p className="font-bold text-zinc-900">{message_thread.total_messages} messages</p>
                                 {message_thread.unread_count > 0 && (
-                                    <p className="mt-1 text-sm text-amber-400">{message_thread.unread_count} unread</p>
+                                    <p className="mt-1 text-sm text-amber-600 font-semibold">{message_thread.unread_count} unread</p>
                                 )}
                                 <Link
                                     href={route('admin.messages.show', { thread: message_thread.id })}
-                                    className="mt-4 inline-block rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] px-5 py-2 text-sm font-bold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/20"
+                                    className="mt-4 inline-block rounded-xl bg-[#3A54A5] px-5 py-2 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors"
                                 >
                                     <span className="flex items-center gap-2">
                                         Open Thread
@@ -418,8 +429,8 @@ export default function AdminFoundersShow({
                             </>
                         ) : (
                             <>
-                                <MessageSquare className="mx-auto mb-3 size-10 text-[#91A7D8]" />
-                                <p className="text-sm text-[#C1CDE8]">No messages yet.</p>
+                                <MessageSquare className="mx-auto mb-3 size-10 text-zinc-400" />
+                                <p className="text-sm text-zinc-550 font-semibold">No messages yet.</p>
                             </>
                         )}
                     </div>
@@ -427,14 +438,14 @@ export default function AdminFoundersShow({
 
                 {/* ── Profile ── */}
                 {activeTab === 'Profile' && (
-                    <div className="rounded-xl border border-[#232C43] bg-[#101623] p-6">
+                    <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)] p-6">
                         {profile ? (
                             <div className="space-y-4">
                                 <Field
                                     label="Status"
                                     value={
                                         profile.is_live ? (
-                                            <span className="text-emerald-400">Live</span>
+                                            <span className="text-emerald-650">Live</span>
                                         ) : profile.is_public ? (
                                             'Public (not live)'
                                         ) : (
@@ -442,13 +453,13 @@ export default function AdminFoundersShow({
                                         )
                                     }
                                 />
-                                <Field label="Slug" value={<span className="font-mono text-xs">{profile.slug}</span>} />
+                                <Field label="Slug" value={<span className="font-mono text-xs text-zinc-800 font-bold bg-zinc-100/60 px-2 py-1 rounded">{profile.slug}</span>} />
                                 <div className="flex gap-3 pt-2">
                                     <a
                                         href={`/verify/${profile.slug}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="group rounded-xl border border-[#232C43] px-4 py-2 text-xs text-[#C1CDE8] transition-colors hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                                        className="group rounded-xl border border-zinc-200 bg-white px-4 py-2 text-xs text-zinc-650 font-semibold shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                                     >
                                         <span className="flex items-center gap-1.5">
                                             View Public Page
@@ -457,7 +468,7 @@ export default function AdminFoundersShow({
                                     </a>
                                     <Link
                                         href={route('admin.profiles.show', { profile: profile.id })}
-                                        className="group rounded-xl border border-[#3A54A5]/30 bg-[#1B294B] px-4 py-2 text-xs font-bold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/20"
+                                        className="group rounded-xl bg-[#3A54A5] px-4 py-2 text-xs font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors"
                                     >
                                         <span className="flex items-center gap-1.5">
                                             Edit Profile
@@ -467,7 +478,7 @@ export default function AdminFoundersShow({
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-sm text-[#C1CDE8]">
+                            <p className="text-sm text-zinc-550 font-medium">
                                 No investor profile yet. It is created automatically when the audit is marked complete.
                             </p>
                         )}

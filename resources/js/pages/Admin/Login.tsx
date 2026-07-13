@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff, LoaderCircle, Lock, Mail } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
+import { PinpointLogo } from '@/components/pinpoint-logo';
+import SideRays from '@/components/SideRays';
+
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
 interface LoginForm {
@@ -22,19 +25,36 @@ export default function AdminLogin({ status }: { status?: string }) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('login'), { onFinish: () => reset('password') });
+        post(route('admin.login.store'), { onFinish: () => reset('password') });
     };
 
     return (
-        <div className="min-h-screen bg-[#080B11] text-[#D8E0F3] antialiased">
+        <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900 antialiased">
             <Head title="Admin Sign In — Pinpoint" />
 
-            {/* Background layers */}
-            <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
+            {/* Background SideRays */}
+            <div className="pointer-events-none fixed inset-0 z-0">
+                <SideRays
+                    rayColor1="#3A54A5"
+                    rayColor2="#93C5FD"
+                    origin="top-left"
+                    speed={1.8}
+                    intensity={1.2}
+                    spread={2}
+                    tilt={0}
+                    saturation={1.5}
+                    blend={0.35}
+                    falloff={2.3}
+                    opacity={0.35}
+                />
+            </div>
+
+            {/* Ambient top glow */}
             <div
-                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-72"
-                style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(68,104,187,0.12) 0%, transparent 100%)' }}
+                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[400px] opacity-15"
+                style={{
+                    background: 'radial-gradient(circle at top, #3A54A5, transparent 70%)',
+                }}
             />
 
             <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-16">
@@ -44,102 +64,100 @@ export default function AdminLogin({ status }: { status?: string }) {
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     transition={{ duration: 0.5, ease }}
                 >
-                    {/* Logo + heading */}
-                    <div className="mb-8 text-center">
-                        <img
-                            src="/pinpoint-logo.png"
-                            alt="Pinpoint"
-                            className="mx-auto mb-6 block h-6 w-auto opacity-60 select-none"
-                            style={{ maxWidth: 130 }}
-                        />
-                        <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-[#91A7D8] uppercase">Internal Access</p>
-                        <h1 className="text-[22px] font-semibold tracking-tight text-[#D8E0F3]">Admin Sign In</h1>
+                    <div className="w-full overflow-hidden rounded-[2.5rem] border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-10">
+                        {/* Logo + heading */}
+                        <div className="mb-8 text-center">
+                            <div className="mb-6 flex justify-center">
+                                <PinpointLogo height={24} />
+                            </div>
+                            <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-[#3A54A5] uppercase">Internal Access</p>
+                            <h1 className="text-[22px] font-extrabold tracking-tight text-zinc-950">Admin Sign In</h1>
+                        </div>
+
+                        {status && (
+                            <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-[13px] font-bold text-emerald-700">
+                                {status}
+                            </div>
+                        )}
+
+                        <form onSubmit={submit} className="space-y-4">
+                            {/* Email */}
+                            <div>
+                                <label htmlFor="email" className="mb-1.5 block text-[12px] font-bold text-zinc-500">
+                                    Email address
+                                </label>
+                                <div className="relative">
+                                    <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        autoFocus
+                                        autoComplete="email"
+                                        value={data.email}
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        placeholder="admin@pinpointlaunchpad.com"
+                                        className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-4 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 transition outline-none focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 shadow-xs"
+                                    />
+                                </div>
+                                {errors.email && <p className="mt-1.5 text-[11px] text-red-650">{errors.email}</p>}
+                            </div>
+
+                            {/* Password */}
+                            <div>
+                                <label htmlFor="password" className="mb-1.5 block text-[12px] font-bold text-zinc-500">
+                                    Password
+                                </label>
+                                <div className="relative">
+                                    <Lock className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
+                                    <input
+                                        id="password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        required
+                                        autoComplete="current-password"
+                                        value={data.password}
+                                        onChange={(e) => setData('password', e.target.value)}
+                                        placeholder="••••••••"
+                                        className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-10 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 transition outline-none focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 shadow-xs"
+                                    />
+                                    <button
+                                        type="button"
+                                        tabIndex={-1}
+                                        onClick={() => setShowPassword((v) => !v)}
+                                        className="absolute top-1/2 right-3.5 -translate-y-1/2 text-zinc-400 transition hover:text-zinc-650"
+                                    >
+                                        {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                    </button>
+                                </div>
+                                {errors.password && <p className="mt-1.5 text-[11px] text-red-650">{errors.password}</p>}
+                            </div>
+
+                            {/* Remember */}
+                            <div className="flex items-center gap-2.5">
+                                <input
+                                    id="remember"
+                                    type="checkbox"
+                                    checked={data.remember}
+                                    onChange={(e) => setData('remember', e.target.checked)}
+                                    className="h-4 w-4 rounded border-zinc-200 bg-white accent-[#3A54A5]"
+                                />
+                                <label htmlFor="remember" className="cursor-pointer text-[12px] font-semibold text-zinc-500 select-none">
+                                    Keep me signed in
+                                </label>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition hover:bg-[#2D4182] shadow-md shadow-[#3A54A5]/20 hover:shadow-lg active:scale-[0.98] disabled:opacity-60"
+                            >
+                                {processing ? <LoaderCircle className="size-4 animate-spin" /> : null}
+                                {processing ? 'Signing in…' : 'Sign In'}
+                            </button>
+                        </form>
                     </div>
 
-                    {status && (
-                        <div className="mb-4 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-[13px] text-emerald-400">
-                            {status}
-                        </div>
-                    )}
-
-                    <form onSubmit={submit} className="space-y-4">
-                        {/* Email */}
-                        <div>
-                            <label htmlFor="email" className="mb-1.5 block text-[12px] font-medium text-[#C1CDE8]">
-                                Email address
-                            </label>
-                            <div className="relative">
-                                <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#91A7D8]" />
-                                <input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    autoFocus
-                                    autoComplete="email"
-                                    value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
-                                    placeholder="admin@pinpointlaunchpad.com"
-                                    className="w-full rounded-xl border border-[#232C43] bg-[#1B294B]/30 py-2.5 pr-4 pl-10 text-[13px] text-[#D8E0F3] placeholder-[#91A7D8] transition outline-none focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10"
-                                />
-                            </div>
-                            {errors.email && <p className="mt-1.5 text-[11px] text-rose-400">{errors.email}</p>}
-                        </div>
-
-                        {/* Password */}
-                        <div>
-                            <label htmlFor="password" className="mb-1.5 block text-[12px] font-medium text-[#C1CDE8]">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <Lock className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#91A7D8]" />
-                                <input
-                                    id="password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    required
-                                    autoComplete="current-password"
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="••••••••"
-                                    className="w-full rounded-xl border border-[#232C43] bg-[#1B294B]/30 py-2.5 pr-10 pl-10 text-[13px] text-[#D8E0F3] placeholder-[#91A7D8] transition outline-none focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10"
-                                />
-                                <button
-                                    type="button"
-                                    tabIndex={-1}
-                                    onClick={() => setShowPassword((v) => !v)}
-                                    className="absolute top-1/2 right-3.5 -translate-y-1/2 text-[#91A7D8] transition hover:text-[#C1CDE8]"
-                                >
-                                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                                </button>
-                            </div>
-                            {errors.password && <p className="mt-1.5 text-[11px] text-rose-400">{errors.password}</p>}
-                        </div>
-
-                        {/* Remember */}
-                        <div className="flex items-center gap-2.5">
-                            <input
-                                id="remember"
-                                type="checkbox"
-                                checked={data.remember}
-                                onChange={(e) => setData('remember', e.target.checked)}
-                                className="h-4 w-4 rounded border-[#232C43] bg-[#101623] accent-[#3A54A5]"
-                            />
-                            <label htmlFor="remember" className="cursor-pointer text-[12px] text-[#C1CDE8] select-none">
-                                Keep me signed in
-                            </label>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={processing}
-                            className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition hover:bg-[#2F4587] disabled:opacity-60"
-                            style={{ boxShadow: '0 0 28px rgba(68,104,187,0.25)' }}
-                        >
-                            {processing ? <LoaderCircle className="size-4 animate-spin" /> : null}
-                            {processing ? 'Signing in…' : 'Sign In'}
-                        </button>
-                    </form>
-
-                    <p className="mt-8 text-center text-[11px] text-[#91A7D8]">This portal is for Pinpoint internal staff only.</p>
+                    <p className="mt-8 text-center text-[11px] font-medium text-zinc-400">This portal is for Pinpoint internal staff only.</p>
                 </motion.div>
             </div>
         </div>

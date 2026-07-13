@@ -19,6 +19,9 @@ use App\Http\Controllers\Founder\FounderMessageController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WaitlistController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 Route::redirect('/waitlist', '/');
@@ -26,13 +29,22 @@ Route::redirect('/waitlist', '/');
 // ── Admin routes ───────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', function () {
-        if (auth()->check() && auth()->user()->isAdmin()) {
+        if (Auth::guard('founder')->check()) {
+            Auth::guard('founder')->logout();
+            session()->invalidate();
+            session()->regenerateToken();
+            return redirect()->route('admin.login');
+        }
+        if (Auth::guard('web')->check() && Auth::guard('web')->user()->isAdmin()) {
             return redirect()->route('admin.dashboard');
         }
         return Inertia::render('Admin/Login', [
             'status' => session('status'),
         ]);
-    })->name('login')->middleware('guest');
+    })->name('login');
+
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+        ->name('login.store');
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -111,8 +123,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('waitlist.index');
+Route::get('/orbit-demo', function () {
+    return Inertia::render('OrbitDemo');
+})->name('orbit.demo');
 Route::post('/waitlist/founders',  [WaitlistController::class, 'storeFounder'])->name('waitlist.founders.store');
 Route::post('/waitlist/investors', [WaitlistController::class, 'storeInvestor'])->name('waitlist.investors.store');
+Route::post('/contact',            [ContactController::class, 'storeContact'])->name('contact.store');
+Route::post('/newsletter',         [ContactController::class, 'storeNewsletter'])->name('newsletter.store');
 
 Route::prefix('diagnostic')->name('diagnostic.')->group(function () {
     Route::get('/',              [DiagnosticController::class, 'index'])->name('index');
@@ -178,6 +195,9 @@ Route::prefix('founder')->name('founder.')->group(function () {
             Route::post('/',                     [FounderMessageController::class, 'store'])->name('store')->middleware('throttle:20,1');
             Route::get('/attachment/{message}',  [FounderMessageController::class, 'downloadAttachment'])->name('attachment.download');
         });
+
+        Route::patch('/access-requests/{accessRequest}/status', [FounderDashboardController::class, 'updateRequestStatus'])
+            ->name('access-requests.status');
     });
 });
 
@@ -188,6 +208,8 @@ Route::prefix('verify')->name('verify.')->group(function () {
     Route::post('/{slug}/request-access', [VerificationController::class, 'requestAccess'])
         ->name('request-access')
         ->middleware('throttle:3,10');
+    Route::get('/{slug}/document/{document}/download', [VerificationController::class, 'downloadDocument'])
+        ->name('document.download');
 });
 
 

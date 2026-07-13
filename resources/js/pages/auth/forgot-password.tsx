@@ -1,14 +1,11 @@
-// Components
-import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
+import { PinpointLogo } from '@/components/pinpoint-logo';
+import SideRays from '@/components/SideRays';
+import { cn } from '@/lib/utils';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -17,47 +14,123 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         post(route('password.email'));
     };
 
+    const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
     return (
-        <AuthLayout title="Forgot password" description="Enter your email to receive a password reset link">
-            <Head title="Forgot password" />
+        <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900 antialiased">
+            <Head title="Forgot password — Pinpoint" />
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
-
-            <div className="space-y-6">
-                <form onSubmit={submit}>
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            autoComplete="off"
-                            value={data.email}
-                            autoFocus
-                            onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
-                        />
-
-                        <InputError message={errors.email} />
-                    </div>
-
-                    <div className="my-6 flex items-center justify-start">
-                        <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Email password reset link
-                        </Button>
-                    </div>
-                </form>
-
-                <div className="text-muted-foreground space-x-1 text-center text-sm">
-                    <span>Or, return to</span>
-                    <TextLink href={route('login')}>log in</TextLink>
-                </div>
+            {/* ── Background SideRays ── */}
+            <div className="pointer-events-none fixed inset-0 z-0">
+                <SideRays
+                    rayColor1="#3A54A5"
+                    rayColor2="#93C5FD"
+                    origin="top-left"
+                    speed={1.8}
+                    intensity={1.2}
+                    spread={2}
+                    tilt={0}
+                    saturation={1.5}
+                    blend={0.35}
+                    falloff={2.3}
+                    opacity={0.35}
+                />
             </div>
-        </AuthLayout>
+
+            {/* Ambient top glow */}
+            <div
+                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[400px] opacity-15"
+                style={{
+                    background: 'radial-gradient(circle at top, #3A54A5, transparent 70%)',
+                }}
+            />
+
+            {/* ── Card ── */}
+            <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-12">
+                <motion.div
+                    className="w-full max-w-md"
+                    initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    transition={{ duration: 0.5, ease }}
+                >
+                    <div className="overflow-hidden rounded-[2.5rem] border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-10">
+                        {/* Logo */}
+                        <div className="mb-8 flex justify-center">
+                            <PinpointLogo height={24} />
+                        </div>
+
+                        <h1 className="font-display mb-1.5 text-center text-[22px] leading-tight font-extrabold tracking-tight text-zinc-950">
+                            Forgot password
+                        </h1>
+                        <p className="mb-8 text-center text-[13px] leading-relaxed text-zinc-555 font-medium">
+                            Enter your email to receive a password reset link
+                        </p>
+
+                        {status && (
+                            <div className="mb-5 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-center text-[13px] font-bold text-emerald-700 shadow-xs animate-fade-in">
+                                {status}
+                            </div>
+                        )}
+
+                        <form onSubmit={submit} className="space-y-4">
+                            <div>
+                                <label htmlFor="email" className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-zinc-500 uppercase">
+                                    Email address
+                                </label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    autoComplete="off"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    className={cn(
+                                        'w-full rounded-xl border bg-white px-4 py-3 text-[14px] text-zinc-955 transition-all duration-200 outline-none placeholder:text-zinc-400 shadow-xs focus:ring-2 focus:ring-[#3A54A5]/10',
+                                        errors.email
+                                            ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
+                                            : 'border-zinc-200 focus:border-[#3A54A5]/60',
+                                    )}
+                                    placeholder="email@example.com"
+                                    autoFocus
+                                    required
+                                />
+                                {errors.email && (
+                                    <p role="alert" className="mt-1.5 text-[11px] text-red-600 font-semibold">
+                                        {errors.email}
+                                    </p>
+                                )}
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="group relative mt-2 w-full overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#2D4182] disabled:cursor-not-allowed disabled:opacity-50 shadow-md shadow-[#3A54A5]/25 hover:shadow-lg"
+                            >
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    {processing ? (
+                                        <>
+                                            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                                            Sending Link…
+                                        </>
+                                    ) : (
+                                        'Email password reset link'
+                                    )}
+                                </span>
+                            </button>
+                        </form>
+
+                        <div className="mt-7 text-center text-sm font-semibold text-zinc-555">
+                            <span>Or, return to </span>
+                            <Link href={route('login')} className="text-[#3A54A5] underline underline-offset-2 hover:text-[#2D4182] transition-colors font-bold">
+                                log in
+                            </Link>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+        </div>
     );
 }

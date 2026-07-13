@@ -51,13 +51,13 @@ function Field({
     return (
         <FadeUp delay={delay}>
             <div className="space-y-2">
-                <label className="flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.2em] text-[#91A7D8] uppercase">
-                    <Icon className="size-3 shrink-0" />
+                <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">
+                    <Icon className="size-3 shrink-0 text-[#3A54A5]" />
                     {label}
                 </label>
                 {children}
-                {hint && !error && <p className="ml-0.5 text-[11px] text-[#91A7D8]/60">{hint}</p>}
-                {error && <p className="ml-0.5 text-[11px] text-rose-400">{error}</p>}
+                {hint && !error && <p className="ml-0.5 text-[11px] text-zinc-400">{hint}</p>}
+                {error && <p className="ml-0.5 text-[11px] text-rose-500">{error}</p>}
             </div>
         </FadeUp>
     );
@@ -75,15 +75,15 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
     }
 
     return (
-        <DiagnosticLayout glowColor="#2563EB" hideWordmark>
+        <DiagnosticLayout glowColor="#3A54A5" hideWordmark>
             <Head title="Confirm Your Details — PARAGON Certification" />
 
             <div className="flex min-h-screen flex-col lg:flex-row">
                 {/* ── Sidebar — hidden on mobile, fixed width on md+ ── */}
-                <div className="flex w-full flex-col justify-between border-b border-[#232C43] bg-[#080B11] px-6 py-10 lg:sticky lg:top-0 lg:h-screen lg:w-[42%] lg:border-r lg:border-b-0 lg:px-14 lg:py-16">
+                <div className="flex w-full flex-col justify-between border-b border-zinc-200 bg-white/40 backdrop-blur-md px-6 py-10 lg:min-h-screen lg:w-[42%] lg:border-r lg:border-b-0 lg:px-14 lg:py-16">
                     <FadeUp delay={0} className="flex flex-1 flex-col">
                         <div>
-                            <PinpointLogo height={26} variant="dark" />
+                            <PinpointLogo height={26} />
 
                             <div className="mt-14 hidden lg:block">
                                 {/* Step tracker */}
@@ -98,8 +98,8 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                                 className={cn(
                                                     'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold tabular-nums transition-colors',
                                                     step.state === 'active'
-                                                        ? 'border-[#3A54A5]/50 bg-[#3A54A5]/10 text-[#6986C9]'
-                                                        : 'border-[#232C43] bg-[#0C1427] text-[#91A7D8]',
+                                                        ? 'border-[#3A54A5]/30 bg-white shadow-xs text-[#3A54A5]'
+                                                        : 'border-zinc-200 bg-zinc-50 text-zinc-400',
                                                 )}
                                             >
                                                 {step.n}
@@ -107,7 +107,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                             <span
                                                 className={cn(
                                                     'text-[13px] font-medium transition-colors',
-                                                    step.state === 'active' ? 'text-[#D8E0F3]' : 'text-[#455987]',
+                                                    step.state === 'active' ? 'text-zinc-900 font-bold' : 'text-zinc-400',
                                                 )}
                                             >
                                                 {step.label}
@@ -116,11 +116,11 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     ))}
                                 </div>
 
-                                <div className="space-y-5 border-t border-[#232C43] pt-8">
-                                    <h1 className="font-display text-3xl leading-tight font-semibold tracking-tight text-white">
+                                <div className="space-y-5 border-t border-zinc-200 pt-8">
+                                    <h1 className="font-display text-3xl leading-tight font-extrabold tracking-tight text-zinc-950">
                                         One step before your audit begins.
                                     </h1>
-                                    <p className="text-[14px] leading-relaxed text-[#C1CDE8]">
+                                    <p className="text-[14px] leading-relaxed text-zinc-550">
                                         Your name and entity will appear on the legally binding Pinpoint Investment Warrant. This takes under a
                                         minute.
                                     </p>
@@ -131,12 +131,12 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
 
                     {/* Tier pill — desktop only */}
                     <FadeUp delay={0.25}>
-                        <div className="mt-12 hidden rounded-xl border border-[#232C43] bg-[#101623] px-5 py-4 lg:block">
+                        <div className="mt-12 hidden rounded-2xl border border-zinc-200 bg-white/60 px-5 py-4 shadow-xs lg:block">
                             <div className="flex items-center gap-2">
-                                <span className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2.5 py-1 text-[10px] font-bold tracking-[0.18em] text-[#60A5FA] uppercase">
+                                <span className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2.5 py-1 text-[10px] font-bold tracking-[0.18em] text-[#3A54A5] uppercase">
                                     {tier_label}
                                 </span>
-                                <span className="text-[12px] text-[#91A7D8]">{email}</span>
+                                <span className="text-[12px] text-zinc-500">{email}</span>
                             </div>
                         </div>
                     </FadeUp>
@@ -147,24 +147,24 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                     <motion.div {...fadeUp(0.1)} className="w-full max-w-[440px]">
                         {/* Mobile header */}
                         <div className="mb-8 lg:hidden">
-                            <p className="mb-1.5 text-[10px] font-bold tracking-[0.22em] text-[#91A7D8] uppercase">Step 1 of 2</p>
-                            <h1 className="font-display text-2xl font-semibold text-[#D8E0F3]">Confirm Your Details</h1>
+                            <p className="mb-1.5 text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Step 1 of 2</p>
+                            <h1 className="font-display text-2xl font-extrabold text-zinc-950">Confirm Your Details</h1>
                         </div>
 
                         {/* Desktop heading */}
                         <div className="mb-8 hidden lg:block">
-                            <p className="mb-1.5 text-[10px] font-bold tracking-[0.22em] text-[#91A7D8] uppercase">Step 1 of 2</p>
-                            <h2 className="font-display text-2xl font-semibold text-[#D8E0F3]">Confirm Your Details</h2>
-                            <p className="mt-2 text-[13px] leading-relaxed text-[#C1CDE8]">
+                            <p className="mb-1.5 text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Step 1 of 2</p>
+                            <h2 className="font-display text-2xl font-extrabold text-zinc-950">Confirm Your Details</h2>
+                            <p className="mt-2 text-[13px] leading-relaxed text-zinc-550">
                                 These details appear on your signed warrant — enter them exactly as they should read legally.
                             </p>
                         </div>
 
                         {info && (
                             <FadeUp delay={0.12}>
-                                <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
-                                    <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" />
-                                    <p className="text-[13px] leading-relaxed text-amber-400/90">{info}</p>
+                                <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/50 px-4 py-3">
+                                    <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-600" />
+                                    <p className="text-[13px] leading-relaxed text-amber-700">{info}</p>
                                 </div>
                             </FadeUp>
                         )}
@@ -185,10 +185,8 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     disabled={processing}
                                     autoFocus
                                     className={cn(
-                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] transition-all duration-200 outline-none placeholder:text-[#91A7D8]/40',
-                                        errors.full_name
-                                            ? 'border-rose-500/50 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
-                                            : 'border-[#232C43] focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10',
+                                        'w-full rounded-xl border bg-white px-4 py-3 text-[14px] text-zinc-950 transition-all duration-200 outline-none placeholder:text-zinc-400/80 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10',
+                                        errors.full_name ? 'border-rose-500/50 focus:border-rose-500' : 'border-zinc-200/80',
                                     )}
                                 />
                             </Field>
@@ -207,10 +205,8 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     placeholder="e.g. Acme Technologies Ltd."
                                     disabled={processing}
                                     className={cn(
-                                        'w-full rounded-xl border bg-[#1B294B]/20 px-4 py-3 text-[14px] text-[#D8E0F3] transition-all duration-200 outline-none placeholder:text-[#91A7D8]/40',
-                                        errors.company_name
-                                            ? 'border-rose-500/50 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10'
-                                            : 'border-[#232C43] focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10',
+                                        'w-full rounded-xl border bg-white px-4 py-3 text-[14px] text-zinc-950 transition-all duration-200 outline-none placeholder:text-zinc-400/80 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10',
+                                        errors.company_name ? 'border-rose-500/50 focus:border-rose-500' : 'border-zinc-200/80',
                                     )}
                                 />
                             </Field>
@@ -220,7 +216,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     type="email"
                                     value={email}
                                     readOnly
-                                    className="w-full cursor-not-allowed rounded-xl border border-[#232C43] bg-[#0C1427] px-4 py-3 text-[14px] text-[#91A7D8] outline-none"
+                                    className="w-full cursor-not-allowed rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-[14px] text-zinc-500 outline-none"
                                 />
                             </Field>
 
@@ -229,10 +225,8 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     <button
                                         type="submit"
                                         disabled={processing}
-                                        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-3.5 text-[13px] font-bold tracking-[0.15em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#3b5ba5] disabled:cursor-not-allowed disabled:opacity-60"
-                                        style={{ boxShadow: '0 0 30px rgba(68,104,187,0.3)' }}
+                                        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-3.5 text-[13px] font-bold tracking-[0.15em] text-white uppercase shadow-none transition-all duration-300 outline-none hover:bg-[#2D4182] hover:shadow-[0_8px_25px_rgba(58,84,165,0.25)] hover:scale-[1.005] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
                                     >
-                                        <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
                                         {processing ? (
                                             <>
                                                 <Loader2 className="size-4 animate-spin" />
@@ -251,8 +245,8 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
 
                         <FadeUp delay={0.35}>
                             <div className="mt-5 flex items-center justify-center gap-2">
-                                <Lock className="size-3 shrink-0 text-[#91A7D8]/40" />
-                                <p className="text-[11px] text-[#91A7D8]/60">
+                                <Lock className="size-3 shrink-0 text-zinc-400" />
+                                <p className="text-[11px] text-zinc-400">
                                     Your details are used only for the legal agreement and are never shared.
                                 </p>
                             </div>

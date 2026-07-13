@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -37,27 +37,17 @@ const BAND_META: Record<string, { label: string; bg: string; text: string; borde
     mid_high: {
         label: 'Investment Pipeline',
         bg: 'rgba(60,83,168,0.12)',
-        text: '#93C5FD',
+        text: '#3A54A5',
         border: 'rgba(60,83,168,0.45)',
         glow: 'rgba(60,83,168,0.18)',
     },
     high: {
         label: 'Top Percentile',
-        bg: 'rgba(92,163,54,0.12)',
-        text: '#86EFAC',
-        border: 'rgba(92,163,54,0.45)',
-        glow: 'rgba(92,163,54,0.18)',
+        bg: 'rgba(16,185,129,0.12)',
+        text: '#10B981',
+        border: 'rgba(16,185,129,0.45)',
+        glow: 'rgba(16,185,129,0.18)',
     },
-};
-
-// ─── Tier Styles ──────────────────────────────────────────────────────────────
-
-const FEATURED_ACCENT = {
-    color: '#2F4587',
-};
-
-const STANDARD_ACCENT = {
-    color: '#5CA336',
 };
 
 // ─── Rationale items ──────────────────────────────────────────────────────────
@@ -97,7 +87,7 @@ function FadeUp({ delay = 0, children }: { delay?: number; children: React.React
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function CheckoutIndex({ score, score_band, tiers, diagnostic_session_id, currency_symbol = '$' }: PageProps) {
+export default function CheckoutIndex({ score, score_band, tiers, diagnostic_session_id, currency_symbol = '₦' }: PageProps) {
     const [selectedTier, setSelectedTier] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -129,29 +119,29 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
 
             <DiagnosticLayout hideWordmark glowColor={bandMeta.glow}>
                 <TooltipProvider delayDuration={100} skipDelayDuration={0}>
-                    <div className="mx-auto max-w-6xl px-4 pt-8 pb-28 sm:px-8">
+                    <div className="mx-auto max-w-5xl px-6 pt-8 pb-28 md:px-8">
                         {/* ── Wordmark ── */}
                         <header className="mb-10 flex items-center justify-between">
                             <PinpointLogo height={24} variant="dark" />
                         </header>
 
                         {/* ── Hero header ── */}
-                        <div className="mb-14 text-center">
+                        <div className="mb-16 text-center">
                             <FadeUp delay={0.05}>
-                                <span className="text-[10px] font-black tracking-[0.22em] text-white/40 uppercase">
+                                <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">
                                     PARAGON Certification Programme
                                 </span>
                             </FadeUp>
 
                             <FadeUp delay={0.12}>
-                                <h1 className="font-display mt-5 text-3xl leading-tight font-semibold tracking-tight text-white md:text-4xl">
+                                <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-zinc-950 sm:text-5xl">
                                     Audit Tier Selection
                                 </h1>
                             </FadeUp>
 
                             <FadeUp delay={0.18}>
-                                <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[#C1CDE8]">
-                                    Your score of <span className="font-bold text-white">{score}/100</span> qualifies you for the following credential
+                                <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-zinc-500">
+                                    Your score of <span className="font-bold text-zinc-950">{score}/100</span> qualifies you for the following credential
                                     programmes.
                                 </p>
                             </FadeUp>
@@ -171,9 +161,8 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         )}
 
                         {/* ── Pricing cards ── */}
-                        <div className="grid gap-5 md:grid-cols-3">
+                        <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-3">
                             {tiers.map((tier, i) => {
-                                const accent = tier.is_featured ? FEATURED_ACCENT : STANDARD_ACCENT;
                                 const isSelected = selectedTier === tier.key;
                                 const isOther = isLoading && !isSelected;
 
@@ -181,110 +170,54 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                     <FadeUp key={tier.key} delay={0.25 + i * 0.1}>
                                         <div
                                             className={cn(
-                                                'group relative flex h-full flex-col overflow-hidden rounded-xl border bg-[#161c28] transition-all duration-350 ease-out',
-                                                tier.is_featured ? 'border-[#5ca336]/40 md:-mt-4' : 'border-white/5 shadow-sm',
+                                                'relative flex flex-col justify-between p-8 transition-all duration-300 hover:-translate-y-1',
+                                                tier.is_featured 
+                                                    ? 'rounded-4xl bg-[#2D4182] shadow-md hover:bg-[#25366D] md:-mt-4 text-white' 
+                                                    : 'rounded-4xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(58,84,165,0.02)] backdrop-blur-md hover:bg-white/50 text-zinc-900',
                                             )}
                                         >
                                             {/* Most Popular badge */}
                                             {tier.is_featured && (
-                                                <div className="relative z-10 flex justify-center pt-4">
-                                                    <span className="rounded-sm bg-[#5ca336] px-2.5 py-1 text-[9px] font-bold tracking-[0.2em] text-white uppercase">
-                                                        Most Popular
+                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                                                    <span className="rounded-full bg-emerald-500 px-3 py-0.5 text-[9px] font-black tracking-widest text-white uppercase shadow-sm">
+                                                        Recommended
                                                     </span>
                                                 </div>
                                             )}
 
-                                            <div className={`relative z-10 flex flex-1 flex-col p-6 sm:p-8 ${tier.is_featured ? 'pt-5' : 'pt-8'}`}>
-                                                {/* Tier name + tagline */}
-                                                <h2 className="font-display text-[1.35rem] font-semibold tracking-tight text-white">{tier.label}</h2>
-                                                <p className="mt-2 text-[13px] leading-relaxed text-[#C1CDE8]">
-                                                    <strong className="font-bold text-[#D8E0F3]">Best for:</strong> {tier.tagline}
+                                            <div className="flex flex-1 flex-col">
+                                                {/* Tier label + name + tagline */}
+                                                <span className={cn('text-xs font-bold tracking-widest uppercase', tier.is_featured ? 'text-[#93C5FD]' : 'text-[#3A54A5]')}>
+                                                    Stage 0{i + 1}
+                                                </span>
+                                                <h3 className="mt-1 text-2xl font-bold">{tier.label}</h3>
+                                                <p className={cn('mt-3 text-sm leading-relaxed', tier.is_featured ? 'text-white/70' : 'text-zinc-500')}>
+                                                    <strong className={tier.is_featured ? 'text-white' : 'text-zinc-800'}>Best for:</strong> {tier.tagline}
                                                 </p>
 
-                                                <div className="my-6 h-px bg-[#232C43]" />
-
                                                 {/* Price block */}
-                                                <div className="mb-7">
-                                                    <div className="flex items-end gap-1 leading-none">
-                                                        <span
-                                                            className="font-display text-[2.75rem] font-bold tracking-tight text-white"
-                                                            style={{ color: tier.is_featured ? '#fff' : '#D8E0F3' }}
-                                                        >
-                                                            {currency_symbol}
-                                                            {tier.base_price}
-                                                        </span>
+                                                <div className="mt-6">
+                                                    <span className={cn('text-xs font-medium', tier.is_featured ? 'text-white/50' : 'text-zinc-400')}>Starting at</span>
+                                                    <div className="mt-1 flex items-baseline gap-1">
+                                                        <span className="text-4xl font-extrabold tracking-tight">{currency_symbol}{tier.base_price}</span>
+                                                        <span className={cn('text-xs', tier.is_featured ? 'text-white/50' : 'text-zinc-400')}>/ base</span>
                                                     </div>
-                                                    <p className="mt-2 text-sm font-bold text-[#91A7D8]">
-                                                        + {currency_symbol}
-                                                        {tier.gate_fee} Gate Fee
+                                                    <p className={cn('mt-1.5 text-[10px] font-bold tracking-widest uppercase', tier.is_featured ? 'text-white/60' : 'text-zinc-400')}>
+                                                        + {currency_symbol}{tier.gate_fee} Gate Fee
                                                     </p>
                                                 </div>
 
-                                                {/* Features list */}
-                                                <ul className="mb-8 flex flex-1 flex-col gap-3.5">
-                                                    {tier.features.map((feature, fi) => {
-                                                        const isEverything = feature.toLowerCase().startsWith('everything in');
-                                                        return (
-                                                            <li key={fi} className="flex items-start gap-3">
-                                                                {isEverything ? (
-                                                                    <ArrowRight className="mt-0.5 size-4 shrink-0 text-[#91A7D8]" />
-                                                                ) : (
-                                                                    <CheckCircle2
-                                                                        className="mt-0.5 size-4 shrink-0"
-                                                                        style={{ color: tier.is_featured ? '#2F4587' : '#91A7D8' }}
-                                                                    />
-                                                                )}
-                                                                <span
-                                                                    className={`text-[13px] leading-relaxed ${isEverything ? 'text-[#91A7D8] italic' : 'text-[#91A7D8]'}`}
-                                                                >
-                                                                    {feature}
-                                                                </span>
-                                                            </li>
-                                                        );
-                                                    })}
-                                                </ul>
-
-                                                {/* Redeemable badge */}
-                                                {tier.redeemable && tier.redeemable_tooltip && (
-                                                    <div className="mb-4">
-                                                        <Tooltip delayDuration={50}>
-                                                            <TooltipTrigger asChild>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={(e) => e.preventDefault()}
-                                                                    className="inline-flex cursor-help items-center gap-1.5 rounded-sm border px-2.5 py-1 text-[9px] font-bold tracking-[0.2em] uppercase transition-colors hover:bg-white/[0.04]"
-                                                                    style={{
-                                                                        borderColor: 'rgba(92,163,54,0.3)',
-                                                                        color: '#5ca336',
-                                                                    }}
-                                                                >
-                                                                    <CheckCircle2 className="size-3" />
-                                                                    Redeemable
-                                                                </button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent
-                                                                className="z-[100] max-w-[280px] rounded-xl border border-[#232C43] bg-[#101623] p-4 text-[13px] leading-relaxed text-[#C1CDE8] shadow-2xl"
-                                                                side="top"
-                                                                align="start"
-                                                                sideOffset={12}
-                                                            >
-                                                                {tier.redeemable_tooltip}
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </div>
-                                                )}
-
-                                                {/* CTA button */}
-                                                <div className="relative mt-auto">
+                                                {/* Button */}
+                                                <div className="relative mt-6">
                                                     <button
                                                         type="button"
                                                         disabled={isLoading}
                                                         onClick={() => handleSelectTier(tier.key)}
                                                         className={cn(
-                                                            'group relative w-full rounded-md px-5 py-4 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 outline-none focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                                                            'group flex h-11 w-full items-center justify-center rounded-full text-sm font-bold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
                                                             tier.is_featured
-                                                                ? 'border border-white/5 bg-[#5ca336] text-white shadow-none hover:bg-[#5ca336]/90'
-                                                                : 'border border-[#2F4587]/30 bg-[#0c121d] text-[#91A7D8] hover:border-[#2F4587]/50 hover:bg-[#2F4587]/10 hover:text-white',
+                                                                ? 'bg-white text-[#2D4182] hover:bg-zinc-150'
+                                                                : 'border border-[#3A54A5] bg-transparent text-[#3A54A5] hover:bg-[#3A54A5] hover:text-white',
                                                         )}
                                                     >
                                                         <span className="relative z-10 flex items-center justify-center gap-2">
@@ -298,19 +231,69 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                                                             )}
                                                         </span>
                                                     </button>
-
-                                                    {/* Dim overlay on non-selected cards while loading */}
-                                                    <AnimatePresence>
-                                                        {isOther && (
-                                                            <motion.div
-                                                                className="pointer-events-none absolute inset-0 rounded-xl bg-black/50"
-                                                                initial={{ opacity: 0 }}
-                                                                animate={{ opacity: 1 }}
-                                                                exit={{ opacity: 0 }}
-                                                            />
-                                                        )}
-                                                    </AnimatePresence>
                                                 </div>
+
+                                                {/* Features list */}
+                                                <ul className={cn('mt-8 space-y-4 border-t pt-6 text-xs', tier.is_featured ? 'border-white/10 text-white/80' : 'border-zinc-200/50 text-zinc-650')}>
+                                                    {tier.features.map((feature, fi) => {
+                                                        const isEverything = feature.toLowerCase().startsWith('everything in');
+                                                        return (
+                                                            <li key={fi} className="flex items-start gap-2.5">
+                                                                {isEverything ? (
+                                                                    <ArrowRight className="h-3 w-3 mt-0.5 shrink-0" />
+                                                                ) : (
+                                                                    <span className={cn('flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full', tier.is_featured ? 'bg-white/15 text-white' : 'bg-[#3A54A5]/10 text-[#3A54A5]')}>
+                                                                        <Check className="h-3 w-3 stroke-[3]" />
+                                                                    </span>
+                                                                )}
+                                                                <span className={cn('leading-relaxed', isEverything ? 'italic' : '')}>
+                                                                    {feature}
+                                                                </span>
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+
+                                                {/* Redeemable badge */}
+                                                {tier.redeemable && tier.redeemable_tooltip && (
+                                                    <div className="mt-5 pt-4 border-t border-dashed border-zinc-200/40">
+                                                        <Tooltip delayDuration={50}>
+                                                            <TooltipTrigger asChild>
+                                                                <button
+                                                                    type="button"
+                                                                    className={cn(
+                                                                        'inline-flex cursor-help items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[9px] font-bold tracking-widest uppercase transition-colors',
+                                                                        tier.is_featured
+                                                                            ? 'border-white/30 text-white bg-white/5 hover:bg-white/10'
+                                                                            : 'border-[#3A54A5]/25 text-[#3A54A5] bg-[#3A54A5]/5 hover:bg-[#3A54A5]/10'
+                                                                    )}
+                                                                >
+                                                                    Redeemable
+                                                                </button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent
+                                                                className="z-[100] max-w-[280px] rounded-xl border border-zinc-200 bg-white p-4 text-[13px] leading-relaxed text-zinc-650 shadow-xl"
+                                                                side="top"
+                                                                align="start"
+                                                                sideOffset={12}
+                                                            >
+                                                                {tier.redeemable_tooltip}
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </div>
+                                                )}
+
+                                                {/* Dim overlay on non-selected cards while loading */}
+                                                <AnimatePresence>
+                                                    {isOther && (
+                                                        <motion.div
+                                                            className="pointer-events-none absolute inset-0 rounded-4xl bg-black/10"
+                                                            initial={{ opacity: 0 }}
+                                                            animate={{ opacity: 1 }}
+                                                            exit={{ opacity: 0 }}
+                                                        />
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
                                         </div>
                                     </FadeUp>
@@ -321,20 +304,20 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
                         {/* ── Rationale section ── */}
                         <FadeUp delay={0.6}>
                             <div className="mt-24">
-                                <div className="mb-10 text-center">
-                                    <span className="text-[10px] font-black tracking-[0.22em] text-white/40 uppercase">Radical Transparency</span>
-                                    <h2 className="font-display mt-4 text-2xl font-bold text-white">Why we charge what we charge</h2>
+                                <div className="mb-16 text-center space-y-3">
+                                    <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Radical Transparency</span>
+                                    <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">Why we charge what we charge</h2>
                                 </div>
 
-                                <div className="grid gap-4 md:grid-cols-2">
+                                <div className="grid gap-6 md:grid-cols-2">
                                     {RATIONALE.map((item, i) => (
                                         <FadeUp key={item.num} delay={0.7 + i * 0.08}>
-                                            <div className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-white/5 bg-[#161c28] shadow-sm transition-all duration-300 hover:border-white/10 hover:bg-white/[0.02]">
-                                                <div className="relative z-10 flex flex-1 flex-col p-8 sm:p-10">
-                                                    <h3 className="mb-3 text-[14px] font-bold tracking-[0.18em] text-[#D8E0F3] uppercase">
+                                            <div className="group relative flex h-full flex-col overflow-hidden rounded-4xl border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.02)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/50 hover:shadow-md">
+                                                <div className="relative z-10 flex flex-1 flex-col">
+                                                    <h3 className="mb-3 text-[12px] font-bold tracking-[0.18em] text-[#3A54A5] uppercase">
                                                         {item.title}
                                                     </h3>
-                                                    <p className="text-[15px] leading-relaxed text-[#C1CDE8]">{item.body}</p>
+                                                    <p className="text-[14px] leading-relaxed text-zinc-650">{item.body}</p>
                                                 </div>
                                             </div>
                                         </FadeUp>
@@ -345,7 +328,7 @@ export default function CheckoutIndex({ score, score_band, tiers, diagnostic_ses
 
                         {/* ── Refund note ── */}
                         <FadeUp delay={1.1}>
-                            <p className="mt-10 text-center text-xs text-[#91A7D8]">
+                            <p className="mt-10 text-center text-xs text-zinc-400">
                                 Full refund available if your audit has not yet commenced. Once analyst work begins, no refund is applicable.
                             </p>
                         </FadeUp>

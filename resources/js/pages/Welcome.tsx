@@ -1,15 +1,86 @@
+import SideRays from '@/components/SideRays';
+import About from '@/components/landing/about';
+import { ScrollReveal } from '@/components/landing/animations';
+import AudienceSplit from '@/components/landing/audience-split';
+import Blueprint from '@/components/landing/blueprint';
+import Contact from '@/components/landing/contact';
+import CtaQuote from '@/components/landing/cta-quote';
+import DashboardPreview from '@/components/landing/dashboard-preview';
+import Faq from '@/components/landing/faq';
+import Footer from '@/components/landing/footer';
+import Header from '@/components/landing/header';
+import Hero from '@/components/landing/hero';
+import ParagonModel from '@/components/landing/paragon-model';
+import ProgramsPricing from '@/components/landing/programs-pricing';
+import WhyPinpoint from '@/components/landing/why-pinpoint';
 import { Head } from '@inertiajs/react';
 
 export default function Welcome() {
     return (
         <>
             <Head title="Welcome" />
-            <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-6">
-                <div className="text-center space-y-4">
-                    <h1 className="text-4xl font-display font-bold tracking-tight">Welcome</h1>
-                    <p className="text-muted-foreground max-w-sm mx-auto">
-                        This is your new landing page template.
-                    </p>
+            <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900">
+                {/* Background SideRays */}
+                <div className="pointer-events-none fixed inset-0 z-0">
+                    <SideRays
+                        rayColor1="#3A54A5"
+                        rayColor2="#93C5FD"
+                        origin="top-left"
+                        speed={1.8}
+                        intensity={1.2}
+                        spread={2}
+                        tilt={0}
+                        saturation={1.5}
+                        blend={0.35}
+                        falloff={2.3}
+                        opacity={0.42}
+                    />
+                </div>
+
+                {/* Page Content / Sections */}
+                <div className="relative z-10 flex min-h-screen w-full flex-col">
+                    <Header />
+                    <main className="flex w-full flex-1 flex-col items-center">
+                        <Hero />
+                        <DashboardPreview />
+
+                        <ScrollReveal>
+                            <About />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <WhyPinpoint />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <AudienceSplit />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <ParagonModel />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <Blueprint />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <ProgramsPricing />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <Faq />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <CtaQuote />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <Contact />
+                        </ScrollReveal>
+                    </main>
+                    <Footer />
                 </div>
             </div>
         </>

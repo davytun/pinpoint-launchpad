@@ -14,9 +14,9 @@ interface AdminLayoutProps {
 }
 
 const roleBadge: Record<string, { label: string; className: string }> = {
-    superadmin: { label: 'Super Admin', className: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' },
-    analyst: { label: 'Analyst', className: 'bg-blue-500/20 text-blue-400 border border-blue-500/30' },
-    support: { label: 'Support', className: 'bg-slate-500/20 text-slate-400 border border-slate-500/30' },
+    superadmin: { label: 'Super Admin', className: 'bg-emerald-50 text-emerald-700 border border-emerald-250' },
+    analyst: { label: 'Analyst', className: 'bg-[#3A54A5]/10 text-[#3A54A5] border border-[#3A54A5]/25' },
+    support: { label: 'Support', className: 'bg-zinc-105 text-zinc-650 border border-zinc-200' },
 };
 
 function NavItem({
@@ -39,16 +39,16 @@ function NavItem({
             href={href}
             onClick={onClick}
             className={[
-                'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150',
+                'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-150',
                 active
-                    ? 'border border-[#3A54A5]/20 bg-[#1B294B] text-[#D8E0F3]'
-                    : 'border border-transparent text-[#C1CDE8] hover:bg-[#1B294B] hover:text-[#D8E0F3]',
+                    ? 'border border-[#3A54A5]/25 bg-[#3A54A5]/10 text-[#3A54A5] shadow-xs'
+                    : 'border border-transparent text-zinc-550 hover:bg-zinc-100 hover:text-zinc-950',
             ].join(' ')}
         >
-            <Icon className={`size-[18px] shrink-0 transition-colors ${active ? 'text-[#3A54A5]' : 'text-[#8FA4D4] group-hover:text-[#A7B8DD]'}`} />
+            <Icon className={`size-[18px] shrink-0 transition-colors ${active ? 'text-[#3A54A5]' : 'text-zinc-400 group-hover:text-zinc-650'}`} />
             <span className="flex-1 truncate">{label}</span>
             {badge != null && badge > 0 && (
-                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#3A54A5] px-1.5 text-[10px] font-bold text-white shadow-lg shadow-[#3A54A5]/20">
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#3A54A5] px-1.5 text-[10px] font-bold text-white">
                     {badge > 99 ? '99+' : badge}
                 </span>
             )}
@@ -57,7 +57,7 @@ function NavItem({
 }
 
 function NavSection({ label }: { label: string }) {
-    return <p className="mt-4 mb-1 px-3 text-[10px] font-bold tracking-[0.15em] text-[#91A7D8] uppercase first:mt-0">{label}</p>;
+    return <p className="mt-4 mb-1 px-3 text-[10px] font-bold tracking-[0.15em] text-zinc-400 uppercase first:mt-0">{label}</p>;
 }
 
 function SidebarContent({
@@ -84,15 +84,15 @@ function SidebarContent({
     const badge = roleBadge[role] ?? roleBadge.support;
 
     return (
-        <div className="flex h-full flex-col">
+        <div className="flex h-full flex-col bg-white">
             {/* Wordmark */}
-            <div className="flex items-center gap-3 border-b border-[#232C43] bg-[#080B11]/50 px-5 py-4">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#3A54A5]/20 bg-[#1B294B]">
-                    <span className="text-sm font-black text-[#D8E0F3]">P</span>
+            <div className="flex items-center gap-3 border-b border-zinc-200 bg-zinc-50/50 px-5 py-4">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#3A54A5]/25 bg-[#3A54A5]">
+                    <span className="text-sm font-black text-white">P</span>
                 </div>
                 <div className="min-w-0">
-                    <p className="truncate text-sm font-bold tracking-tight text-[#D8E0F3]">Pinpoint Command</p>
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase ${badge.className}`}>
+                    <p className="truncate text-sm font-extrabold tracking-tight text-zinc-950">Pinpoint Command</p>
+                    <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase mt-0.5 ${badge.className}`}>
                         {badge.label}
                     </span>
                 </div>
@@ -137,19 +137,19 @@ function SidebarContent({
             </nav>
 
             {/* User footer */}
-            <div className="border-t border-[#232C43] bg-[#080B11]/50 px-4 py-3">
+            <div className="border-t border-zinc-200 bg-zinc-50/50 px-4 py-3">
                 <div className="mb-2 flex items-center gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#232C43] bg-[#101623] text-xs font-bold text-[#C1CDE8] uppercase">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-xs font-bold text-zinc-650 uppercase shadow-xs">
                         {user?.name?.[0] ?? '?'}
                     </div>
                     <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm leading-tight font-medium text-[#D8E0F3]">{user?.name ?? '—'}</p>
-                        <p className="truncate text-[11px] leading-tight text-[#91A7D8]">{user?.email ?? ''}</p>
+                        <p className="truncate text-sm leading-tight font-bold text-zinc-950">{user?.name ?? '—'}</p>
+                        <p className="truncate text-[11px] leading-tight text-zinc-500 mt-0.5">{user?.email ?? ''}</p>
                     </div>
                 </div>
                 <button
                     onClick={logout}
-                    className="flex w-full items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-xs font-medium text-[#C1CDE8] transition-colors hover:border-[#232C43] hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                    className="flex w-full items-center gap-2 rounded-lg border border-zinc-200/60 bg-white px-2.5 py-1.5 text-xs font-semibold text-zinc-650 shadow-xs transition-colors hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-950"
                 >
                     <LogOut className="size-3.5" />
                     Secure Sign Out
@@ -207,9 +207,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const sidebarProps = { user, role, isSuperAdmin, isAnalyst, isSupport, unreadMessages, isActive, logout };
 
     return (
-        <div className="flex min-h-screen bg-[#080B11] text-[#D8E0F3] antialiased selection:bg-[#3A54A5]/30 selection:text-white">
+        <div className="flex min-h-screen bg-slate-50 text-zinc-900 antialiased selection:bg-[#3A54A5]/20 selection:text-zinc-800">
             {/* ── Desktop sidebar (always visible ≥ lg) ───────────────────── */}
-            <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-[#232C43] bg-[#101623] lg:flex">
+            <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-zinc-200 bg-white lg:flex">
                 <SidebarContent {...sidebarProps} />
             </aside>
 
@@ -217,12 +217,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {sidebarOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden" aria-modal="true">
                     {/* Backdrop */}
-                    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
                     {/* Drawer */}
-                    <aside className="absolute inset-y-0 left-0 flex w-72 flex-col border-r border-[#232C43] bg-[#101623] shadow-2xl">
+                    <aside className="absolute inset-y-0 left-0 flex w-72 flex-col border-r border-zinc-200 bg-white shadow-xl">
                         <button
                             onClick={() => setSidebarOpen(false)}
-                            className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg text-[#91A7D8] hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                            className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
                         >
                             <X className="size-4" />
                         </button>
@@ -234,19 +234,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {/* ── Main content ─────────────────────────────────────────────── */}
             <main className="flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden lg:ml-60">
                 {/* Mobile top bar */}
-                <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-[#232C43] bg-[#101623]/90 px-4 backdrop-blur-md lg:hidden">
+                <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white/90 px-4 backdrop-blur-md lg:hidden">
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#232C43] text-[#C1CDE8] hover:text-[#D8E0F3]"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 text-zinc-650 bg-white hover:text-zinc-850 hover:bg-zinc-50 shadow-xs"
                         aria-label="Open menu"
                     >
                         <Menu className="size-5" />
                     </button>
-                    <span className="text-sm font-bold text-[#D8E0F3]">Pinpoint Command</span>
+                    <span className="text-sm font-extrabold text-zinc-950">Pinpoint Command</span>
                     {unreadMessages > 0 && (
                         <Link
                             href="/admin/messages"
-                            className="ml-auto flex items-center gap-1.5 rounded-full border border-[#3A54A5]/20 bg-[#1B294B] px-2.5 py-1 text-[11px] font-bold text-[#3A54A5]"
+                            className="ml-auto flex items-center gap-1.5 rounded-full border border-[#3A54A5]/25 bg-[#3A54A5]/10 px-2.5 py-1 text-[11px] font-bold text-[#3A54A5]"
                         >
                             <MessageSquare className="size-3.5" />
                             {unreadMessages}

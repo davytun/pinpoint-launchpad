@@ -1,5 +1,7 @@
-import AdminLayout from '@/layouts/admin-layout';
 import { Head, Link, useForm } from '@inertiajs/react';
+
+import AdminLayout from '@/layouts/admin-layout';
+import { cn } from '@/lib/utils';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -33,7 +35,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
     }
 
     const inputClass =
-        'w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-3 text-sm text-[#D8E0F3] placeholder-[#91A7D8] focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50 transition-colors';
+        'w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-955 placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs transition-colors';
 
     return (
         <AdminLayout>
@@ -44,26 +46,26 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                     {/* Back link */}
                     <Link
                         href={route('admin.questions.index')}
-                        className="mb-8 inline-flex items-center gap-1.5 text-xs font-medium text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]"
+                        className="mb-8 inline-flex items-center gap-1.5 text-xs font-bold text-zinc-555 transition-colors hover:text-zinc-955"
                     >
                         ← Back to Questions
                     </Link>
 
                     {/* Header */}
-                    <div className="mb-8">
-                        <p className="mb-0.5 text-[11px] font-semibold tracking-[0.2em] text-[#91A7D8] uppercase">
+                    <div className="mb-8 animate-fade-in">
+                        <p className="mb-0.5 text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">
                             Admin · Question {question.order}
                         </p>
-                        <h1 className="text-2xl font-bold text-[#D8E0F3]">Edit Question</h1>
-                        <p className="mt-1 text-sm text-[#C1CDE8] capitalize">Pillar: {question.pillar}</p>
+                        <h1 className="text-2xl font-extrabold text-zinc-950">Edit Question</h1>
+                        <p className="mt-1 text-sm text-zinc-555 font-semibold capitalize">Pillar: {question.pillar}</p>
                     </div>
 
                     {/* Form card */}
-                    <div className="rounded-xl border border-[#232C43] bg-[#101623] p-7">
+                    <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)] p-7 animate-fade-in">
                         <form onSubmit={submit} noValidate className="space-y-6">
                             {/* question_text */}
                             <div className="space-y-1.5">
-                                <label htmlFor="question_text" className="block text-[11px] font-semibold tracking-[0.18em] text-[#C1CDE8] uppercase">
+                                <label htmlFor="question_text" className="block text-[11px] font-bold tracking-[0.18em] text-zinc-500 uppercase">
                                     Question Text
                                 </label>
                                 <textarea
@@ -73,13 +75,13 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     onChange={(e) => form.setData('question_text', e.target.value)}
                                     className={`${inputClass} resize-y leading-relaxed`}
                                 />
-                                {form.errors.question_text && <p className="text-xs text-rose-400">{form.errors.question_text}</p>}
+                                {form.errors.question_text && <p className="text-xs text-rose-600 font-semibold">{form.errors.question_text}</p>}
                             </div>
 
                             {/* sub_text */}
                             <div className="space-y-1.5">
-                                <label htmlFor="sub_text" className="block text-[11px] font-semibold tracking-[0.18em] text-[#C1CDE8] uppercase">
-                                    Sub Text <span className="font-normal tracking-normal text-[#91A7D8] normal-case">optional</span>
+                                <label htmlFor="sub_text" className="block text-[11px] font-bold tracking-[0.18em] text-zinc-500 uppercase">
+                                    Sub Text <span className="font-normal tracking-normal text-zinc-400 normal-case">optional</span>
                                 </label>
                                 <input
                                     id="sub_text"
@@ -89,13 +91,13 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     placeholder="Clarifying context shown below the question"
                                     className={inputClass}
                                 />
-                                {form.errors.sub_text && <p className="text-xs text-rose-400">{form.errors.sub_text}</p>}
+                                {form.errors.sub_text && <p className="text-xs text-rose-600 font-semibold">{form.errors.sub_text}</p>}
                             </div>
 
                             {/* points */}
                             <div className="space-y-1.5">
-                                <label htmlFor="points" className="block text-[11px] font-semibold tracking-[0.18em] text-[#C1CDE8] uppercase">
-                                    Points <span className="font-normal tracking-normal text-[#91A7D8] normal-case">(1–20)</span>
+                                <label htmlFor="points" className="block text-[11px] font-bold tracking-[0.18em] text-zinc-500 uppercase">
+                                    Points <span className="font-normal tracking-normal text-zinc-400 normal-case">(1–20)</span>
                                 </label>
                                 <input
                                     id="points"
@@ -106,41 +108,47 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     onChange={(e) => form.setData('points', parseInt(e.target.value, 10) || 1)}
                                     className={`${inputClass} w-28 tabular-nums`}
                                 />
-                                {form.errors.points && <p className="text-xs text-rose-400">{form.errors.points}</p>}
+                                {form.errors.points && <p className="text-xs text-rose-600 font-semibold">{form.errors.points}</p>}
                             </div>
 
                             {/* is_active toggle */}
-                            <div className="flex items-center justify-between rounded-xl border border-[#232C43] bg-[#0C1427]/50 px-4 py-3.5">
+                            <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3.5 shadow-xs">
                                 <div>
-                                    <p className="text-sm font-medium text-[#D8E0F3]">Active</p>
-                                    <p className="text-xs text-[#91A7D8]">Inactive questions are hidden from the diagnostic</p>
+                                    <p className="text-sm font-bold text-zinc-900">Active</p>
+                                    <p className="text-xs text-zinc-500 font-medium">Inactive questions are hidden from the diagnostic</p>
                                 </div>
                                 <button
                                     type="button"
                                     role="switch"
                                     aria-checked={form.data.is_active}
                                     onClick={() => form.setData('is_active', !form.data.is_active)}
-                                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none ${form.data.is_active ? 'bg-emerald-500' : 'bg-[#232C43]'}`}
+                                    className={cn(
+                                        'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200 focus:outline-none',
+                                        form.data.is_active ? 'bg-emerald-600' : 'bg-zinc-200',
+                                    )}
                                 >
                                     <span
-                                        className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${form.data.is_active ? 'translate-x-[20px]' : 'translate-x-[2px]'}`}
+                                        className={cn(
+                                            'inline-block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200',
+                                            form.data.is_active ? 'translate-x-[20px]' : 'translate-x-[2px]',
+                                        )}
                                     />
                                 </button>
                             </div>
 
                             {/* Divider */}
-                            <div className="h-px bg-[#232C43]" />
+                            <div className="h-px bg-zinc-200" />
 
                             {/* Save */}
                             <div className="flex items-center justify-between">
-                                <Link href={route('admin.questions.index')} className="text-sm text-[#C1CDE8] transition-colors hover:text-[#D8E0F3]">
+                                <Link href={route('admin.questions.index')} className="text-sm text-zinc-550 transition-colors hover:text-zinc-950 font-bold">
                                     Cancel
                                 </Link>
 
                                 <button
                                     type="submit"
                                     disabled={form.processing}
-                                    className="flex items-center gap-2 rounded-lg bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white transition-all duration-150 hover:bg-[#2F4587] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex items-center gap-2 rounded-xl bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {form.processing ? (
                                         <>

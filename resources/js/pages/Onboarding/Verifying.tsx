@@ -4,6 +4,7 @@ import { ArrowRight, Clock, Mail, MailCheck, Send } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import { cn } from '@/lib/utils';
+import DiagnosticLayout from '@/layouts/diagnostic-layout';
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 const MAX_ATTEMPTS = 40; // 40 × 3s = 2 min
@@ -23,8 +24,8 @@ function ProtocolRing() {
                 animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             />
-            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#1B294B]/20 ring-1 ring-[#232C43]">
-                <Send className="size-5 text-[#91A7D8]" />
+            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#3A54A5]/10 border border-[#3A54A5]/25">
+                <Send className="size-5 text-[#3A54A5]" />
             </div>
         </div>
     );
@@ -79,10 +80,10 @@ function ResendInviteButton({ email }: { email?: string }) {
             <button
                 onClick={handleResend}
                 disabled={status === 'sending' || cooldown > 0}
-                className="inline-flex items-center gap-2 rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2.5 text-[12px] font-semibold text-[#91A7D8] transition-all hover:border-[#3A54A5]/40 hover:text-[#D8E0F3] disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-[12px] font-semibold text-zinc-700 shadow-xs transition-all hover:bg-zinc-50 hover:border-zinc-300 disabled:cursor-not-allowed disabled:opacity-40"
             >
                 {status === 'sending' && <span className="size-3.5 animate-spin rounded-full border-2 border-[#3A54A5] border-t-transparent" />}
-                {status === 'sent' && <span className="text-emerald-400">✓</span>}
+                {status === 'sent' && <span className="text-emerald-500">✓</span>}
                 {status === 'sending'
                     ? 'Sending…'
                     : status === 'sent'
@@ -112,14 +113,8 @@ function ConfirmedScreen({
     setup_url?: string;
 }) {
     return (
-        <div className="min-h-screen overflow-y-auto bg-[#050505] text-white antialiased">
+        <DiagnosticLayout glowColor="#3A54A5" hideWordmark>
             <Head title="Agreement Confirmed — PARAGON Certification" />
-            <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
-            <div
-                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-96"
-                style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(68,104,187,0.15) 0%, transparent 100%)' }}
-            />
 
             <div className="relative z-10 mx-auto flex w-full max-w-[440px] flex-col items-center px-6 py-16 text-center lg:py-24">
                 {/* Logo */}
@@ -127,32 +122,32 @@ function ConfirmedScreen({
                     <img
                         src="/pinpoint-logo.png"
                         alt="Pinpoint"
-                        className="block h-6 w-auto opacity-50 transition-opacity hover:opacity-100"
+                        className="block h-6 w-auto opacity-75 transition-opacity hover:opacity-100"
                         style={{ maxWidth: 130 }}
                     />
                 </div>
 
                 {/* Main Success Card */}
                 <motion.div
-                    className="w-full overflow-hidden rounded-[2.5rem] border border-[#232C43] bg-[#101623] p-8 shadow-2xl sm:p-10"
+                    className="w-full overflow-hidden rounded-[2.5rem] border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-10"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.55, ease }}
                 >
                     <div className="mb-7 flex justify-center">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1B294B]/20 ring-1 ring-[#232C43]">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#3A54A5]/10 border border-[#3A54A5]/25">
                             <MailCheck className="size-8 text-[#3A54A5]" strokeWidth={1.5} />
                         </div>
                     </div>
 
-                    <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-[#91A7D8] uppercase">Agreement Confirmed</p>
-                    <h1 className="font-display mb-4 text-2xl font-semibold tracking-tight text-[#D8E0F3]">You're in.</h1>
-                    <p className="mb-8 text-[14px] leading-relaxed text-[#C1CDE8]">
+                    <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-[#3A54A5] uppercase">Agreement Confirmed</p>
+                    <h1 className="font-display mb-4 text-2xl font-extrabold tracking-tight text-zinc-950">You're in.</h1>
+                    <p className="mb-8 text-[14px] leading-relaxed text-zinc-650">
                         Your Pinpoint Investment Warrant has been signed and your PARAGON audit has been queued.
                     </p>
 
                     {/* Receipt Details */}
-                    <div className="mb-10 space-y-4 rounded-2xl border border-[#232C43] bg-[#080B11] p-6 text-left">
+                    <div className="mb-10 space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-6 text-left">
                         {[
                             { label: 'Audit Tier', value: tier_label },
                             { label: 'Amount Paid', value: amount_paid },
@@ -160,25 +155,25 @@ function ConfirmedScreen({
                             { label: 'Signed', value: signed_at },
                         ].map((item) => (
                             <div key={item.label} className="flex flex-col gap-1">
-                                <span className="text-[10px] font-bold tracking-wider text-[#91A7D8] uppercase">{item.label}</span>
-                                <span className="text-[13px] font-medium text-[#D8E0F3]">{item.value || '—'}</span>
+                                <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">{item.label}</span>
+                                <span className="text-[13px] font-medium text-zinc-800">{item.value || '—'}</span>
                             </div>
                         ))}
                     </div>
 
                     {/* What happens next */}
                     <div className="space-y-6 text-left">
-                        <p className="text-[10px] font-bold tracking-[0.18em] text-[#91A7D8] uppercase">What happens next</p>
+                        <p className="text-[10px] font-bold tracking-[0.18em] text-zinc-500 uppercase">What happens next</p>
                         {[
                             { title: 'Confirmation sent', text: 'Your signed agreement has been emailed to your inbox.' },
                             { title: 'Analyst assigned', text: 'An analyst will reach out within 2–3 business days to begin your audit.' },
                             { title: 'PARAGON Certification', text: 'Your certification is issued upon successful audit completion.' },
                         ].map((s, idx) => (
                             <div key={idx} className="flex items-start gap-4">
-                                <div className="mt-1 flex size-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
+                                <div className="mt-1.5 flex size-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
                                 <div className="space-y-1">
-                                    <p className="text-[13px] font-bold text-[#D8E0F3]">{s.title}</p>
-                                    <p className="text-[12px] leading-relaxed text-[#C1CDE8]">{s.text}</p>
+                                    <p className="text-[13px] font-bold text-zinc-850">{s.title}</p>
+                                    <p className="text-[12px] leading-relaxed text-zinc-550">{s.text}</p>
                                 </div>
                             </div>
                         ))}
@@ -189,23 +184,23 @@ function ConfirmedScreen({
                 <motion.div className="mt-10 w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
                     {setup_url ? (
                         <div
-                            className="w-full rounded-2xl border border-[#232C43] bg-[#080B11] p-6 text-center"
-                            style={{ boxShadow: '0 0 40px rgba(68,104,187,0.08)' }}
+                            className="w-full rounded-2xl border border-zinc-200 bg-white/70 p-6 text-center shadow-xs"
+                            style={{ boxShadow: '0 8px 32px rgba(58,84,165,0.03)' }}
                         >
                             <div className="mb-4 flex justify-center">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1B294B]/30 ring-1 ring-[#232C43]">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#3A54A5]/10 border border-[#3A54A5]/20">
                                     <ArrowRight className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
                                 </div>
                             </div>
-                            <p className="mb-1 text-[12px] font-bold tracking-[0.18em] text-[#91A7D8] uppercase">Complete Setup</p>
-                            <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">Create your account</p>
-                            <p className="mb-6 text-[13px] leading-relaxed text-[#C1CDE8]">
+                            <p className="mb-1 text-[12px] font-bold tracking-[0.18em] text-[#3A54A5] uppercase">Complete Setup</p>
+                            <p className="mb-3 text-[15px] font-extrabold text-zinc-950">Create your account</p>
+                            <p className="mb-6 text-[13px] leading-relaxed text-zinc-650">
                                 Set up your secure password to access your PARAGON Audit dashboard immediately.
                             </p>
                             <a
                                 href={setup_url}
-                                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3.5 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#3b5ba5]"
-                                style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
+                                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3.5 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#2D4182]"
+                                style={{ boxShadow: '0 4px 14px rgba(58,84,165,0.25)' }}
                             >
                                 Create Account
                                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -214,18 +209,18 @@ function ConfirmedScreen({
                     ) : (
                         /* Check your email card */
                         <div
-                            className="w-full rounded-2xl border border-[#232C43] bg-[#080B11] p-6 text-center"
-                            style={{ boxShadow: '0 0 40px rgba(68,104,187,0.08)' }}
+                            className="w-full rounded-2xl border border-zinc-200 bg-white/70 p-6 text-center shadow-xs"
+                            style={{ boxShadow: '0 8px 32px rgba(58,84,165,0.03)' }}
                         >
                             <div className="mb-4 flex justify-center">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#1B294B]/30 ring-1 ring-[#232C43]">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#3A54A5]/10 border border-[#3A54A5]/20">
                                     <Mail className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
                                 </div>
                             </div>
-                            <p className="mb-1 text-[12px] font-bold tracking-[0.18em] text-[#91A7D8] uppercase">One more step</p>
-                            <p className="mb-3 text-[15px] font-semibold text-[#D8E0F3]">Check your inbox</p>
-                            <p className="text-[13px] leading-relaxed text-[#C1CDE8]">
-                                We've sent a secure account setup link to <span className="font-medium text-[#D8E0F3]">{signer_email}</span>. Open
+                            <p className="mb-1 text-[12px] font-bold tracking-[0.18em] text-[#3A54A5] uppercase">One more step</p>
+                            <p className="mb-3 text-[15px] font-extrabold text-zinc-950">Check your inbox</p>
+                            <p className="text-[13px] leading-relaxed text-zinc-650">
+                                We've sent a secure account setup link to <span className="font-semibold text-zinc-950">{signer_email}</span>. Open
                                 that email to create your password and access your dashboard.
                             </p>
 
@@ -234,7 +229,7 @@ function ConfirmedScreen({
                         </div>
                     )}
 
-                    <p className="mt-6 text-[11px] text-[#91A7D8]/40">
+                    <p className="mt-6 text-[11px] text-zinc-400">
                         Questions?{' '}
                         <a href="mailto:support@pinpointlaunchpad.com" className="text-[#3A54A5] hover:underline">
                             support@pinpointlaunchpad.com
@@ -242,7 +237,7 @@ function ConfirmedScreen({
                     </p>
                 </motion.div>
             </div>
-        </div>
+        </DiagnosticLayout>
     );
 }
 
@@ -302,43 +297,32 @@ export default function OnboardingVerifying({
     }
 
     return (
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-[#050505] text-white antialiased">
+        <DiagnosticLayout glowColor={timedOut ? '#F59E0B' : '#3A54A5'} hideWordmark>
             <Head title="Verifying Signature — PARAGON Certification" />
 
-            <div className="waitlist-shell pointer-events-none absolute inset-0 z-0" />
-            <div className="waitlist-grid pointer-events-none absolute inset-0 z-0" />
-            <div
-                className="pointer-events-none absolute inset-x-0 top-0 z-0 h-96"
-                style={{
-                    background: timedOut
-                        ? 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 100%)'
-                        : 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(68,104,187,0.15) 0%, transparent 100%)',
-                }}
-            />
-
-            <div className="relative z-10 flex w-full max-w-sm flex-col items-center px-6 text-center">
+            <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12 text-center">
                 <div className="mb-12">
-                    <img src="/pinpoint-logo.png" alt="Pinpoint" className="block h-6 w-auto opacity-50" style={{ maxWidth: 130 }} />
+                    <img src="/pinpoint-logo.png" alt="Pinpoint" className="block h-6 w-auto opacity-75" style={{ maxWidth: 130 }} />
                 </div>
 
                 <AnimatePresence mode="wait">
                     {timedOut ? (
                         <motion.div
                             key="timeout"
-                            className="w-full rounded-[2rem] border border-[#232C43] bg-[#101623] p-8 shadow-2xl sm:p-10"
+                            className="w-full max-w-sm overflow-hidden rounded-[2.5rem] border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-10"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                         >
                             <div className="mb-7 flex justify-center">
-                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1B294B]/20 ring-1 ring-[#232C43]">
-                                    <Clock className="size-8 text-amber-400" strokeWidth={1.5} />
+                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 border border-amber-200">
+                                    <Clock className="size-8 text-amber-650" strokeWidth={1.5} />
                                 </div>
                             </div>
 
-                            <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-amber-500/60 uppercase">Network Latency</p>
-                            <h1 className="font-display mb-3 text-xl font-semibold text-[#D8E0F3]">Still confirming</h1>
-                            <p className="mb-8 text-[13px] leading-relaxed text-[#C1CDE8]">
+                            <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-amber-600 uppercase">Network Latency</p>
+                            <h1 className="font-display mb-3 text-xl font-extrabold text-zinc-950">Still confirming</h1>
+                            <p className="mb-8 text-[13px] leading-relaxed text-zinc-650">
                                 Our system is awaiting BoldSign confirmation. This occasionally takes an extra minute.
                             </p>
 
@@ -348,13 +332,13 @@ export default function OnboardingVerifying({
                                         setTimedOut(false);
                                         setAttempts(0);
                                     }}
-                                    className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#3b5ba5]"
-                                    style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
+                                    className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#2D4182]"
+                                    style={{ boxShadow: '0 4px 14px rgba(58,84,165,0.25)' }}
                                 >
                                     Check Again
                                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                                 </button>
-                                <a href="mailto:hello@pinpointlaunchpad.com" className="py-2 text-[12px] text-[#91A7D8] hover:text-[#D8E0F3]">
+                                <a href="mailto:hello@pinpointlaunchpad.com" className="py-2 text-[12px] text-[#3A54A5] hover:text-[#2D4182] font-semibold">
                                     Contact Support
                                 </a>
                             </div>
@@ -362,7 +346,7 @@ export default function OnboardingVerifying({
                     ) : (
                         <motion.div
                             key="verifying"
-                            className="w-full rounded-[2rem] border border-[#232C43] bg-[#101623] p-8 shadow-2xl sm:p-10"
+                            className="w-full max-w-sm overflow-hidden rounded-[2.5rem] border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-10"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
@@ -372,7 +356,7 @@ export default function OnboardingVerifying({
                             </div>
 
                             <p className="mb-2 text-[10px] font-bold tracking-[0.24em] text-[#3A54A5] uppercase">Protocol</p>
-                            <h1 className="font-display mb-6 text-2xl font-semibold tracking-tight text-[#D8E0F3]">Finalizing</h1>
+                            <h1 className="font-display mb-6 text-2xl font-extrabold tracking-tight text-zinc-950">Finalizing</h1>
 
                             <div className="space-y-4 text-left">
                                 {PROTOCOL_STEPS.map((step, idx) => {
@@ -383,18 +367,18 @@ export default function OnboardingVerifying({
                                         <div key={step.id} className="flex items-center gap-3">
                                             <div
                                                 className={cn(
-                                                    'h-2 w-2 rounded-full ring-2 ring-offset-2 ring-offset-[#101623] transition-all duration-500',
+                                                    'h-2 w-2 rounded-full ring-2 ring-offset-2 ring-offset-white transition-all duration-500',
                                                     isDone
                                                         ? 'bg-[#3A54A5] ring-[#3A54A5]/30'
                                                         : isActive
-                                                          ? 'animate-pulse bg-white ring-white/20'
-                                                          : 'bg-[#232C43] ring-transparent',
+                                                          ? 'animate-pulse bg-[#3A54A5] ring-[#3A54A5]/25'
+                                                          : 'bg-zinc-200 ring-transparent',
                                                 )}
                                             />
                                             <p
                                                 className={cn(
                                                     'text-[12px] font-medium transition-colors duration-500',
-                                                    isDone ? 'text-[#D8E0F3]' : isActive ? 'text-[#D8E0F3]' : 'text-[#91A7D8]',
+                                                    isDone ? 'text-zinc-900 font-medium' : isActive ? 'text-zinc-900 font-bold' : 'text-zinc-400',
                                                 )}
                                             >
                                                 {step.label}
@@ -404,11 +388,11 @@ export default function OnboardingVerifying({
                                 })}
                             </div>
 
-                            <p className="mt-10 text-[11px] text-[#91A7D8]/60">This process is automated. Please keep this session active.</p>
+                            <p className="mt-10 text-[11px] text-zinc-400">This process is automated. Please keep this session active.</p>
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
-        </div>
+        </DiagnosticLayout>
     );
 }

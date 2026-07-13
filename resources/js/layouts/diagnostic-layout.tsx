@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import SideRays from '@/components/SideRays';
 
 interface DiagnosticLayoutProps {
     children: React.ReactNode;
@@ -27,8 +28,31 @@ export default function DiagnosticLayout({ children, hideWordmark = false, glowC
     }, []);
 
     return (
-        <div className="bg-background relative min-h-screen overflow-x-hidden text-white antialiased">
-            <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
+        <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900 antialiased">
+            {/* Background SideRays */}
+            <div className="pointer-events-none fixed inset-0 z-0">
+                <SideRays
+                    rayColor1="#3A54A5"
+                    rayColor2="#93C5FD"
+                    origin="top-left"
+                    speed={1.8}
+                    intensity={1.2}
+                    spread={2}
+                    tilt={0}
+                    saturation={1.5}
+                    blend={0.35}
+                    falloff={2.3}
+                    opacity={0.35}
+                />
+            </div>
+
+            {/* Ambient top glow */}
+            <div
+                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[400px] opacity-15"
+                style={{
+                    background: `radial-gradient(circle at top, ${glowColor}, transparent 70%)`,
+                }}
+            />
 
             {/* ── Wordmark header ── */}
             {!hideWordmark && (

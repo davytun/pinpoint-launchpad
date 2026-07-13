@@ -1,6 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 
 import AdminLayout from '@/layouts/admin-layout';
+import { cn } from '@/lib/utils';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -31,34 +32,34 @@ export default function AdminSettingsIndex() {
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-[#D8E0F3]">Settings</h1>
-                    <p className="mt-1 text-sm text-[#C1CDE8]">Platform configuration</p>
+                    <h1 className="text-2xl font-extrabold text-zinc-950">Settings</h1>
+                    <p className="mt-1 text-sm text-zinc-555 font-medium">Platform configuration</p>
                 </div>
 
                 {/* Flash */}
                 {flash?.success && (
-                    <div className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+                    <div className="mb-6 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 font-semibold">
                         {flash.success}
                     </div>
                 )}
 
                 {/* Settings card */}
-                <div className="rounded-xl border border-[#232C43] bg-[#101623] p-7">
-                    <h2 className="mb-6 text-[11px] font-bold tracking-[0.2em] text-[#91A7D8] uppercase">Diagnostic Settings</h2>
+                <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)] p-7">
+                    <h2 className="mb-6 text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Diagnostic Settings</h2>
 
                     <form onSubmit={submit} noValidate>
                         {/* Setting row */}
-                        <div className="rounded-xl border border-[#232C43] bg-[#0C1427]/50 p-5">
+                        <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-5 shadow-xs">
                             <div className="mb-4 flex items-start justify-between gap-6">
                                 <div className="flex-1">
-                                    <p className="text-sm font-semibold text-[#D8E0F3]">Diagnostic Cooldown Days</p>
-                                    <p className="mt-1 text-xs leading-relaxed text-[#C1CDE8]">
+                                    <p className="text-sm font-bold text-zinc-900">Diagnostic Cooldown Days</p>
+                                    <p className="mt-1 text-xs leading-relaxed text-zinc-555 font-medium">
                                         Number of days a founder must wait before retaking after scoring below 65%
                                     </p>
                                 </div>
 
                                 {/* Current value pill */}
-                                <span className="shrink-0 rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-3 py-1 text-xs font-semibold text-[#3A54A5] tabular-nums">
+                                <span className="shrink-0 rounded-full border border-[#3A54A5]/25 bg-[#3A54A5]/10 px-3 py-1 text-xs font-bold text-[#3A54A5] tabular-nums shadow-xs">
                                     {cooldown_days}d
                                 </span>
                             </div>
@@ -71,25 +72,25 @@ export default function AdminSettingsIndex() {
                                     max={365}
                                     value={form.data.diagnostic_cooldown_days}
                                     onChange={(e) => form.setData('diagnostic_cooldown_days', parseInt(e.target.value, 10) || 1)}
-                                    className="w-24 rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-4 py-2.5 text-sm text-[#D8E0F3] tabular-nums transition-colors focus:border-[#3A54A5]/50 focus:ring-1 focus:ring-[#3A54A5]/50 focus:outline-none"
+                                    className="w-24 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-955 placeholder:text-zinc-400 tabular-nums focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
                                 />
-                                <span className="text-sm text-[#91A7D8]">days</span>
+                                <span className="text-sm text-zinc-500 font-semibold">days</span>
                             </div>
 
                             {form.errors.diagnostic_cooldown_days && (
-                                <p className="mt-2 text-xs text-rose-400">{form.errors.diagnostic_cooldown_days}</p>
+                                <p className="mt-2 text-xs text-rose-600 font-semibold">{form.errors.diagnostic_cooldown_days}</p>
                             )}
                         </div>
 
                         {/* Divider */}
-                        <div className="my-6 h-px bg-[#232C43]" />
+                        <div className="my-6 h-px bg-zinc-200" />
 
                         {/* Save */}
                         <div className="flex justify-end">
                             <button
                                 type="submit"
                                 disabled={form.processing}
-                                className="flex items-center gap-2 rounded-lg bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white transition-all duration-150 hover:bg-[#2F4587] disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex items-center gap-2 rounded-xl bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {form.processing ? (
                                     <>

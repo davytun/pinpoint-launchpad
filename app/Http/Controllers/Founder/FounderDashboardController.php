@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Founder;
 
 use App\Http\Controllers\Controller;
+use App\Mail\InvestorAccessApprovedMail;
+use App\Models\InvestorAccessRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,7 +19,7 @@ class FounderDashboardController extends Controller
     {
         /** @var \App\Models\Founder $founder */
         $founder = Auth::guard('founder')->user()->load([
-            'diagnosticSession:id,pillar_scores',
+            'diagnosticSession:id,pillar_scores,score,score_band',
             'payment:id,tier,total_amount,paid_at,audit_status',
             'signature:id,status,signed_at',
             'profile:id,founder_id,slug,is_public,verified_at,expires_at',
@@ -92,6 +97,23 @@ class FounderDashboardController extends Controller
         $auditStatus = $founder->payment?->audit_status ?? 'pending';
         $tier        = $founder->tier;
 
+        $accessRequests = $founder->profile
+            ? $founder->profile->investorAccessRequests()
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(fn ($req) => [
+                    'id'             => $req->id,
+                    'investor_name'  => $req->investor_name,
+                    'investor_email' => $req->investor_email,
+                    'firm_name'      => $req->firm_name,
+                    'linkedin_url'   => $req->linkedin_url,
+                    'message'        => $req->message,
+                    'status'         => $req->status,
+                    'created_at'     => $req->created_at->toISOString(),
+                ])
+                ->toArray()
+            : [];
+
         return Inertia::render('Founder/Dashboard', [
             'founder' => [
                 'id'           => $founder->id,
@@ -123,6 +145,50 @@ class FounderDashboardController extends Controller
                 ? route('verify.show', $founder->profile->slug)
                 : null,
             'profile_is_live'  => $founder->profile?->isLive() ?? false,
+            'access_requests'  => $accessRequests,
         ]);
+    }
+
+    public function updateRequestStatus(Request $request, InvestorAccessRequest $accessRequest): RedirectResponse
+    {
+        $request->validate([
+            'status' => ['required', 'string', 'in:approved,rejected'],
+        ]);
+
+        $profile = $accessRequest->founderProfile;
+        if (! $profile || $profile->founder_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $accessRequest->update([
+            'status' => $request->input('status'),
+        ]);
+
+        if ($request->input('status') === 'approved') {
+            if (empty($accessRequest->token)) {
+                $token = \Illuminate\Support\Str::random(32);
+                $accessRequest->update([
+                    'token' => $token,
+                ]);
+                $accessRequest->token = $token;
+            }
+
+            // Send the approval email notification to the investor
+            Mail::to($accessRequest->investor_email)->send(
+                new InvestorAccessApprovedMail(
+                    $profile->founder,
+                    $profile,
+                    $accessRequest->investor_name,
+                    $accessRequest->investor_email,
+                    $accessRequest->token
+                )
+            );
+        }
+
+        $msg = $request->input('status') === 'approved'
+            ? 'Access request approved. The investor has been emailed their secure link.'
+            : 'Access request rejected.';
+
+        return back()->with('success', $msg);
     }
 }

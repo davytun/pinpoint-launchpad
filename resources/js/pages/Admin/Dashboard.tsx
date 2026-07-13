@@ -4,6 +4,7 @@ import { Bar, BarChart, Cell, Pie, PieChart, XAxis } from 'recharts';
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import AdminLayout from '@/layouts/admin-layout';
+import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -78,20 +79,23 @@ function MetricCard({
 }) {
     const inner = (
         <div
-            className={`group rounded-xl border border-[#232C43] bg-[#101623] p-4 transition-all hover:border-[#3A54A5]/40 hover:bg-[#1B294B] sm:p-5 ${href ? 'cursor-pointer' : ''}`}
+            className={cn(
+                'group rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md transition-all hover:border-zinc-300 hover:bg-white/50 sm:p-5',
+                href && 'cursor-pointer',
+            )}
         >
             <div className="mb-3 flex items-center justify-between gap-2">
-                <span className="text-[10px] leading-tight font-bold tracking-widest text-[#91A7D8] uppercase">{label}</span>
+                <span className="text-[10px] leading-tight font-bold tracking-widest text-zinc-500 uppercase">{label}</span>
                 <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconBg}`}>
                     <Icon className={`size-4 ${color}`} />
                 </div>
             </div>
             <div className="flex items-end gap-2">
-                <span className="text-xl font-bold text-[#D8E0F3] sm:text-2xl">{value}</span>
+                <span className="text-xl font-extrabold text-zinc-950 sm:text-2xl">{value}</span>
                 {pulse && (
                     <span className="relative mb-1 flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-60" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400" />
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 opacity-60" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
                     </span>
                 )}
             </div>
@@ -110,15 +114,15 @@ const revenueChartConfig = {
 function RevenueSparkline({ data, thisMonth }: { data: MonthlyRevenue[]; thisMonth: number }) {
     const max = Math.max(...data.map((d) => d.revenue), 1);
     return (
-        <div className="min-w-0 rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
+        <div className="min-w-0 rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
             <div className="mb-1 flex items-center justify-between">
-                <p className="text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Monthly Revenue</p>
-                <DollarSign className="size-4 text-emerald-400 opacity-50" />
+                <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Monthly Revenue</p>
+                <DollarSign className="size-4 text-emerald-650 opacity-50" />
             </div>
-            <p className="mb-4 text-2xl font-bold text-[#D8E0F3]">{fmtCurrency(thisMonth)}</p>
+            <p className="mb-4 text-2xl font-extrabold text-zinc-950">{fmtCurrency(thisMonth)}</p>
             <ChartContainer config={revenueChartConfig} className="h-[90px] w-full">
                 <BarChart data={data} barCategoryGap="28%">
-                    <XAxis dataKey="month" tick={{ fill: '#C1CDE8', fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} />
                     <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtCurrency(Number(v))} hideLabel />} />
                     <Bar dataKey="revenue" radius={[3, 3, 0, 0]}>
                         {data.map((entry, i) => (
@@ -142,8 +146,8 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
     const chartConfig = buildAuditConfig(data);
 
     return (
-        <div className="min-w-0 rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
-            <p className="mb-4 text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Audit Pipeline</p>
+        <div className="min-w-0 rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
+            <p className="mb-4 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Audit Pipeline</p>
             <div className="flex items-center gap-5">
                 {/* Donut */}
                 <ChartContainer config={chartConfig} className="h-[100px] w-[100px] shrink-0">
@@ -174,14 +178,14 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
                         <div key={item.label} className="flex items-center justify-between gap-2">
                             <div className="flex min-w-0 items-center gap-1.5">
                                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: item.color }} />
-                                <span className="truncate text-xs text-[#C1CDE8]">{item.label}</span>
+                                <span className="truncate text-xs text-zinc-650 font-semibold">{item.label}</span>
                             </div>
-                            <span className="shrink-0 text-xs font-bold text-[#D8E0F3] tabular-nums">{item.value}</span>
+                            <span className="shrink-0 text-xs font-bold text-zinc-800 tabular-nums">{item.value}</span>
                         </div>
                     ))}
-                    <div className="flex items-center justify-between gap-2 border-t border-[#232C43] pt-1.5">
-                        <span className="text-xs text-[#91A7D8]">Total</span>
-                        <span className="text-xs font-bold text-[#D8E0F3] tabular-nums">{total}</span>
+                    <div className="flex items-center justify-between gap-2 border-t border-zinc-200 pt-1.5">
+                        <span className="text-xs text-zinc-400 font-semibold">Total</span>
+                        <span className="text-xs font-extrabold text-zinc-950 tabular-nums">{total}</span>
                     </div>
                 </div>
             </div>
@@ -192,8 +196,8 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
 // ─── Waitlist split ───────────────────────────────────────────────────────────
 
 const waitlistChartConfig = {
-    founders: { label: 'Founders', color: '#3b82f6' },
-    investors: { label: 'Investors', color: '#8b5cf6' },
+    founders: { label: 'Founders', color: '#3B82F6' },
+    investors: { label: 'Investors', color: '#8B5CF6' },
 } satisfies ChartConfig;
 
 function WaitlistSplit({ founders, investors }: { founders: number; investors: number }) {
@@ -207,10 +211,10 @@ function WaitlistSplit({ founders, investors }: { founders: number; investors: n
     ];
 
     return (
-        <div className="min-w-0 rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
+        <div className="min-w-0 rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
             <div className="mb-4 flex items-center justify-between">
-                <p className="text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Waitlist</p>
-                <span className="text-xs font-bold text-[#D8E0F3]">{total} total</span>
+                <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Waitlist</p>
+                <span className="text-xs font-extrabold text-zinc-950">{total} total</span>
             </div>
 
             <ChartContainer config={waitlistChartConfig} className="h-[70px] w-full">
@@ -225,14 +229,14 @@ function WaitlistSplit({ founders, investors }: { founders: number; investors: n
             <div className="mt-3 flex gap-4">
                 <div className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-blue-500" />
-                    <span className="text-xs text-[#C1CDE8]">
-                        Founders <span className="font-bold text-[#D8E0F3]">{founderPct}%</span>
+                    <span className="text-xs text-zinc-650 font-semibold">
+                        Founders <span className="font-bold text-zinc-950">{founderPct}%</span>
                     </span>
                 </div>
                 <div className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-violet-500" />
-                    <span className="text-xs text-[#C1CDE8]">
-                        Investors <span className="font-bold text-[#D8E0F3]">{investorPct}%</span>
+                    <span className="text-xs text-zinc-650 font-semibold">
+                        Investors <span className="font-bold text-zinc-950">{investorPct}%</span>
                     </span>
                 </div>
             </div>
@@ -243,9 +247,9 @@ function WaitlistSplit({ founders, investors }: { founders: number; investors: n
 // ─── Activity feed ────────────────────────────────────────────────────────────
 
 const activityDotColor: Record<string, string> = {
-    diagnostic: 'bg-purple-500',
-    payment: 'bg-emerald-500',
-    message: 'bg-blue-500',
+    diagnostic: 'bg-purple-650',
+    payment: 'bg-emerald-650',
+    message: 'bg-[#3A54A5]',
 };
 const activityTypeLabel: Record<string, string> = {
     diagnostic: 'Diagnostic',
@@ -265,8 +269,8 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mb-6 lg:mb-8">
-                    <h1 className="text-xl font-bold text-[#D8E0F3] sm:text-2xl">Operational Command</h1>
-                    <p className="mt-1 text-sm text-[#C1CDE8]">
+                    <h1 className="text-xl font-extrabold text-zinc-955 sm:text-2xl">Operational Command</h1>
+                    <p className="mt-1 text-sm text-zinc-550">
                         {isSuperAdmin ? 'Full platform overview' : isAnalyst ? 'Your assigned engagements' : 'Support overview'}
                     </p>
                 </div>
@@ -279,30 +283,30 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                                 icon={Users}
                                 label="Total Founders"
                                 value={metrics.total_founders ?? 0}
-                                color="text-blue-400"
-                                iconBg="bg-blue-500/10"
+                                color="text-[#3A54A5]"
+                                iconBg="bg-[#3A54A5]/10"
                                 href="/admin/founders"
                             />
                             <MetricCard
                                 icon={DollarSign}
                                 label="Total Revenue"
                                 value={fmtCurrency(metrics.total_revenue ?? 0)}
-                                color="text-emerald-400"
-                                iconBg="bg-emerald-500/10"
+                                color="text-emerald-650"
+                                iconBg="bg-emerald-50"
                             />
                             <MetricCard
                                 icon={Activity}
                                 label="Active Audits"
                                 value={metrics.active_audits ?? 0}
-                                color="text-amber-400"
-                                iconBg="bg-amber-500/10"
+                                color="text-amber-700"
+                                iconBg="bg-amber-50"
                             />
                             <MetricCard
                                 icon={Zap}
                                 label="High Scorers >85"
                                 value={metrics.high_scorers ?? 0}
-                                color="text-purple-400"
-                                iconBg="bg-purple-500/10"
+                                color="text-purple-650"
+                                iconBg="bg-purple-50"
                             />
                         </div>
                         <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mb-6 lg:grid-cols-4">
@@ -310,15 +314,15 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                                 icon={Clock}
                                 label="Pending"
                                 value={metrics.pending_audits ?? 0}
-                                color="text-slate-400"
-                                iconBg="bg-slate-500/10"
+                                color="text-zinc-500"
+                                iconBg="bg-zinc-100"
                             />
                             <MetricCard
                                 icon={AlertTriangle}
                                 label="Needs Info"
                                 value={metrics.needs_info_count ?? 0}
-                                color="text-amber-400"
-                                iconBg="bg-amber-500/10"
+                                color="text-amber-700"
+                                iconBg="bg-amber-50"
                                 pulse={(metrics.needs_info_count ?? 0) > 0}
                                 href="/admin/founders"
                             />
@@ -326,15 +330,15 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                                 icon={CheckCircle2}
                                 label="Complete"
                                 value={metrics.complete_audits ?? 0}
-                                color="text-emerald-400"
-                                iconBg="bg-emerald-500/10"
+                                color="text-emerald-650"
+                                iconBg="bg-emerald-50"
                             />
                             <MetricCard
                                 icon={List}
                                 label="Waitlist"
                                 value={(metrics.waitlist_count?.founders ?? 0) + (metrics.waitlist_count?.investors ?? 0)}
-                                color="text-blue-400"
-                                iconBg="bg-blue-500/10"
+                                color="text-[#3A54A5]"
+                                iconBg="bg-[#3A54A5]/10"
                                 href="/admin/waitlist"
                             />
                         </div>
@@ -353,12 +357,12 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                         {/* Revenue by tier */}
                         {metrics.revenue_by_tier && (
                             <div className="mb-6 lg:mb-8">
-                                <h2 className="mb-3 text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Revenue by Tier</h2>
+                                <h2 className="mb-3 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Revenue by Tier</h2>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                                     {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
-                                        <div key={tier} className="rounded-xl border border-[#232C43] bg-[#101623] p-4 sm:p-5">
-                                            <p className="mb-1 text-[10px] font-bold tracking-widest text-[#91A7D8] capitalize">{tier}</p>
-                                            <p className="text-xl font-bold text-[#D8E0F3]">{fmtCurrency(metrics.revenue_by_tier![tier])}</p>
+                                        <div key={tier} className="rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
+                                            <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 capitalize">{tier}</p>
+                                            <p className="text-xl font-extrabold text-zinc-950">{fmtCurrency(metrics.revenue_by_tier![tier])}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -374,31 +378,31 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                             icon={Users}
                             label="My Assigned"
                             value={metrics.my_assigned ?? 0}
-                            color="text-blue-400"
-                            iconBg="bg-blue-500/10"
+                            color="text-[#3A54A5]"
+                            iconBg="bg-[#3A54A5]/10"
                             href="/admin/founders"
                         />
                         <MetricCard
                             icon={Activity}
                             label="Active Audits"
                             value={metrics.active_audits ?? 0}
-                            color="text-amber-400"
-                            iconBg="bg-amber-500/10"
+                            color="text-amber-700"
+                            iconBg="bg-amber-50"
                         />
                         <MetricCard
                             icon={AlertTriangle}
                             label="Needs Info"
                             value={metrics.needs_info_count ?? 0}
-                            color="text-amber-400"
-                            iconBg="bg-amber-500/10"
+                            color="text-amber-700"
+                            iconBg="bg-amber-50"
                             pulse={(metrics.needs_info_count ?? 0) > 0}
                         />
                         <MetricCard
                             icon={MessageSquare}
                             label="Unread Messages"
                             value={metrics.my_open_messages ?? 0}
-                            color="text-blue-400"
-                            iconBg="bg-blue-500/10"
+                            color="text-[#3A54A5]"
+                            iconBg="bg-[#3A54A5]/10"
                             href="/admin/messages"
                         />
                     </div>
@@ -411,8 +415,8 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                             icon={MessageSquare}
                             label="Unread Messages"
                             value={metrics.my_open_messages ?? 0}
-                            color="text-blue-400"
-                            iconBg="bg-blue-500/10"
+                            color="text-[#3A54A5]"
+                            iconBg="bg-[#3A54A5]/10"
                             href="/admin/messages"
                         />
                     </div>
@@ -420,26 +424,26 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
 
                 {/* ── Recent Activity ── */}
                 <div>
-                    <h2 className="mb-3 text-[10px] font-bold tracking-widest text-[#91A7D8] uppercase">Recent Activity</h2>
+                    <h2 className="mb-3 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Recent Activity</h2>
                     {recent_activity.length === 0 ? (
-                        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-10 text-center text-sm text-[#C1CDE8]">
+                        <div className="rounded-xl border border-white/80 bg-white/30 p-10 text-center text-sm text-zinc-500 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                             No recent activity.
                         </div>
                     ) : (
-                        <div className="divide-y divide-[#232C43] overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
+                        <div className="divide-y divide-zinc-200/80 overflow-hidden rounded-xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                             {recent_activity.map((item, i) => (
-                                <div key={i} className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-[#1B294B] sm:px-5 sm:py-4">
-                                    <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${activityDotColor[item.type] ?? 'bg-[#91A7D8]'}`} />
+                                <div key={i} className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-[#3A54A5]/5 sm:px-5 sm:py-4">
+                                    <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${activityDotColor[item.type] ?? 'bg-zinc-400'}`} />
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-center gap-x-2">
-                                            <span className="text-[10px] font-bold tracking-wider text-[#91A7D8] uppercase">
+                                            <span className="text-[10px] font-bold tracking-wider text-zinc-450 uppercase">
                                                 {activityTypeLabel[item.type]}
                                             </span>
-                                            <p className="truncate text-sm text-[#D8E0F3]">{item.description}</p>
+                                            <p className="truncate text-sm font-semibold text-zinc-900">{item.description}</p>
                                         </div>
-                                        {item.email && <p className="mt-0.5 truncate text-xs text-[#C1CDE8]">{item.email}</p>}
+                                        {item.email && <p className="mt-0.5 truncate text-xs text-zinc-500">{item.email}</p>}
                                     </div>
-                                    <span className="shrink-0 text-xs whitespace-nowrap text-[#91A7D8]">{item.time}</span>
+                                    <span className="shrink-0 text-xs whitespace-nowrap text-zinc-450">{item.time}</span>
                                 </div>
                             ))}
                         </div>

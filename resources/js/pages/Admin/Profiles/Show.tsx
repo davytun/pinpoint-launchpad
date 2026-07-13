@@ -3,6 +3,7 @@ import { CheckCircle2, ExternalLink, Save } from 'lucide-react';
 import { useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
+import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -87,7 +88,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
     }
 
     const inputClass =
-        'w-full rounded-lg border border-[#232C43] bg-[#1B294B]/30 px-3 py-2 text-sm text-[#D8E0F3] placeholder-[#91A7D8] focus:border-[#3A54A5]/50 focus:outline-none focus:ring-1 focus:ring-[#3A54A5]/50';
+        'w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-955 placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs';
 
     return (
         <AdminLayout>
@@ -98,11 +99,11 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                     {/* Header */}
                     <div className="mb-8 flex items-center justify-between">
                         <div>
-                            <Link href="/admin/profiles" className="mb-2 block text-sm text-[#91A7D8] hover:text-[#C1CDE8]">
+                            <Link href="/admin/profiles" className="mb-2 block text-sm text-zinc-550 hover:text-zinc-955 font-bold">
                                 &larr; All Profiles
                             </Link>
-                            <h1 className="text-2xl font-bold text-[#D8E0F3]">{founder.company_name ?? founder.email}</h1>
-                            <p className="mt-1 text-sm text-[#C1CDE8]">
+                            <h1 className="text-2xl font-extrabold text-zinc-950">{founder.company_name ?? founder.email}</h1>
+                            <p className="mt-1 text-sm text-zinc-555 font-medium">
                                 {founder.full_name} · {founder.email}
                             </p>
                         </div>
@@ -110,14 +111,14 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                             href={`/verify/${profile.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 rounded-lg border border-[#232C43] px-4 py-2 text-sm text-[#C1CDE8] hover:border-[#3A54A5]/50 hover:text-[#D8E0F3]"
+                            className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-650 hover:border-zinc-350 hover:text-zinc-955 shadow-xs font-semibold"
                         >
                             View Public Page <ExternalLink className="size-4" />
                         </a>
                     </div>
 
                     {flash?.success && (
-                        <div className="mb-6 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+                        <div className="mb-6 flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 font-semibold">
                             <CheckCircle2 className="size-4" />
                             {flash.success}
                         </div>
@@ -125,12 +126,12 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
 
                     <div className="grid gap-6 lg:grid-cols-2">
                         {/* ── Left: Profile Editor ── */}
-                        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-6">
-                            <h2 className="mb-5 text-sm font-bold tracking-widest text-[#C1CDE8] uppercase">Profile Editor</h2>
+                        <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                            <h2 className="mb-5 text-sm font-bold tracking-widest text-zinc-500 uppercase">Profile Editor</h2>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">
+                                    <label className="mb-1.5 block text-xs font-bold tracking-widest text-zinc-500 uppercase">
                                         Analyst Summary
                                     </label>
                                     <textarea
@@ -145,7 +146,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">Sector</label>
+                                        <label className="mb-1.5 block text-xs font-bold tracking-widest text-zinc-500 uppercase">Sector</label>
                                         <input
                                             type="text"
                                             value={sector}
@@ -155,7 +156,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                         />
                                     </div>
                                     <div>
-                                        <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">Batch</label>
+                                        <label className="mb-1.5 block text-xs font-bold tracking-widest text-zinc-500 uppercase">Batch</label>
                                         <input
                                             type="text"
                                             value={batch}
@@ -167,7 +168,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                 </div>
 
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">
+                                    <label className="mb-1.5 block text-xs font-bold tracking-widest text-zinc-500 uppercase">
                                         Overall Score (0–100)
                                     </label>
                                     <input
@@ -181,13 +182,13 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                 </div>
 
                                 <div>
-                                    <label className="mb-3 block text-xs font-semibold tracking-widest text-[#91A7D8] uppercase">
+                                    <label className="mb-3 block text-xs font-bold tracking-widest text-zinc-500 uppercase">
                                         Radar Pillar Scores
                                     </label>
                                     <div className="space-y-3">
                                         {PILLAR_KEYS.map((key) => (
                                             <div key={key} className="flex items-center gap-3">
-                                                <span className="w-24 text-xs text-[#C1CDE8] capitalize">{key}</span>
+                                                <span className="w-24 text-xs text-zinc-650 font-semibold capitalize">{key}</span>
                                                 <input
                                                     type="range"
                                                     min={0}
@@ -196,7 +197,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                                     onChange={(e) => setRadarData((d) => ({ ...d, [key]: Number(e.target.value) }))}
                                                     className="flex-1 accent-[#3A54A5]"
                                                 />
-                                                <span className="w-8 text-right font-mono text-xs text-[#C1CDE8]">{radarData[key] ?? 0}</span>
+                                                <span className="w-8 text-right font-mono text-xs text-zinc-700 font-bold">{radarData[key] ?? 0}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -208,19 +209,19 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                         role="switch"
                                         aria-checked={isPublic}
                                         onClick={() => setIsPublic((v) => !v)}
-                                        className={[
+                                        className={cn(
                                             'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none',
-                                            isPublic ? 'bg-emerald-500' : 'bg-[#232C43]',
-                                        ].join(' ')}
+                                            isPublic ? 'bg-emerald-600' : 'bg-zinc-200',
+                                        )}
                                     >
                                         <span
-                                            className={[
+                                            className={cn(
                                                 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition duration-200',
                                                 isPublic ? 'translate-x-5' : 'translate-x-0',
-                                            ].join(' ')}
+                                            )}
                                         />
                                     </button>
-                                    <span className="text-sm text-[#C1CDE8]">
+                                    <span className="text-sm text-zinc-650 font-semibold">
                                         {isPublic ? 'Public — visible to investors' : 'Draft — not visible'}
                                     </span>
                                 </div>
@@ -228,7 +229,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                 <button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#3A54A5] py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#2F4587] disabled:opacity-60"
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors disabled:opacity-60"
                                 >
                                     <Save className="size-4" />
                                     {saving ? 'Saving...' : 'Save Profile'}
@@ -237,19 +238,19 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                         </div>
 
                         {/* ── Right: Badge Manager ── */}
-                        <div className="rounded-xl border border-[#232C43] bg-[#101623] p-6">
-                            <h2 className="mb-5 text-sm font-bold tracking-widest text-[#C1CDE8] uppercase">Badge Manager</h2>
+                        <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                            <h2 className="mb-5 text-sm font-bold tracking-widest text-zinc-500 uppercase">Badge Manager</h2>
 
                             <div className="space-y-3">
                                 {badges.map((badge) => (
                                     <div
                                         key={badge.id}
-                                        className="flex items-center justify-between rounded-xl border border-[#232C43] bg-[#1B294B]/30 px-4 py-3"
+                                        className="flex items-center justify-between rounded-xl border border-zinc-200/80 bg-zinc-50/50 px-4 py-3 shadow-xs"
                                     >
                                         <div>
-                                            <p className="text-sm font-semibold text-[#D8E0F3]">{badge.label}</p>
+                                            <p className="text-sm font-bold text-zinc-900">{badge.label}</p>
                                             {badge.is_verified && badge.verified_at && (
-                                                <p className="mt-0.5 text-xs text-[#91A7D8]">
+                                                <p className="mt-0.5 text-xs text-zinc-400">
                                                     Verified {new Date(badge.verified_at).toLocaleDateString()}
                                                 </p>
                                             )}
@@ -260,16 +261,16 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                             aria-checked={badge.is_verified}
                                             disabled={togglingBadge === badge.id}
                                             onClick={() => handleBadgeToggle(badge, !badge.is_verified)}
-                                            className={[
+                                            className={cn(
                                                 'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none disabled:opacity-50',
-                                                badge.is_verified ? 'bg-emerald-500' : 'bg-[#232C43]',
-                                            ].join(' ')}
+                                                badge.is_verified ? 'bg-emerald-600' : 'bg-zinc-200',
+                                            )}
                                         >
                                             <span
-                                                className={[
+                                                className={cn(
                                                     'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition duration-200',
                                                     badge.is_verified ? 'translate-x-5' : 'translate-x-0',
-                                                ].join(' ')}
+                                                )}
                                             />
                                         </button>
                                     </div>
@@ -280,30 +281,30 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
 
                     {/* ── Access Requests ── */}
                     {access_requests.length > 0 && (
-                        <div className="mt-6 rounded-xl border border-[#232C43] bg-[#101623] p-6">
-                            <h2 className="mb-5 text-sm font-bold tracking-widest text-[#C1CDE8] uppercase">
+                        <div className="mt-6 rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                            <h2 className="mb-5 text-sm font-bold tracking-widest text-zinc-500 uppercase">
                                 Investor Access Requests ({access_requests.length})
                             </h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[600px] text-sm">
                                     <thead>
-                                        <tr className="border-b border-[#232C43]">
-                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">Investor</th>
-                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">Firm</th>
-                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">Email</th>
-                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-[#91A7D8] uppercase">Requested</th>
+                                        <tr className="border-b border-zinc-200">
+                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-zinc-500 uppercase">Investor</th>
+                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-zinc-500 uppercase">Firm</th>
+                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-zinc-500 uppercase">Email</th>
+                                            <th className="pb-3 text-left text-xs font-bold tracking-widest text-zinc-500 uppercase">Requested</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="divide-y divide-zinc-200/80">
                                         {access_requests.map((req) => (
                                             <tr
                                                 key={req.id}
-                                                className="border-b border-[#232C43] transition-colors last:border-0 hover:bg-[#1B294B]/30"
+                                                className="group transition-colors hover:bg-zinc-50/40"
                                             >
-                                                <td className="py-3 pr-4 text-[#D8E0F3]">{req.investor_name}</td>
-                                                <td className="py-3 pr-4 text-[#C1CDE8]">{req.firm_name ?? '—'}</td>
-                                                <td className="py-3 pr-4 text-[#C1CDE8]">{req.investor_email}</td>
-                                                <td className="py-3 text-[#91A7D8]">{new Date(req.created_at).toLocaleDateString()}</td>
+                                                <td className="py-3 pr-4 text-zinc-900 font-bold">{req.investor_name}</td>
+                                                <td className="py-3 pr-4 text-zinc-655 font-medium">{req.firm_name ?? '—'}</td>
+                                                <td className="py-3 pr-4 text-zinc-655 font-medium">{req.investor_email}</td>
+                                                <td className="py-3 text-zinc-450 font-semibold">{new Date(req.created_at).toLocaleDateString()}</td>
                                             </tr>
                                         ))}
                                     </tbody>

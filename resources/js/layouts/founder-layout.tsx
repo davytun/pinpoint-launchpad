@@ -5,6 +5,7 @@ import { ExternalLink, FileText, LayoutDashboard, LogOut, Menu, MessageSquare, X
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import SideRays from '@/components/SideRays';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FounderLayoutProps {
@@ -54,24 +55,24 @@ function SidebarContent({
             {/* Wordmark */}
             <div className="px-6 pt-7 pb-6">
                 <div className="flex items-center justify-between">
-                    <PinpointLogo height={22} variant="dark" />
+                    <PinpointLogo height={22} />
                     {onClose && (
                         <button
                             onClick={onClose}
                             aria-label="Close menu"
-                            className="rounded-lg p-1 text-white/30 transition-colors hover:text-white lg:hidden"
+                            className="rounded-lg p-1 text-zinc-400 transition-colors hover:text-zinc-650 lg:hidden"
                         >
                             <X className="size-5" aria-hidden="true" />
                         </button>
                     )}
                 </div>
                 <div className="mt-5 px-1">
-                    <p className="truncate text-[14px] font-semibold tracking-tight text-[#D8E0F3]">{founder.full_name ?? 'Founder'}</p>
-                    <p className="truncate text-[11px] font-medium text-[#91A7D8]">{founder.company_name ?? founder.email}</p>
+                    <p className="truncate text-[14px] font-extrabold tracking-tight text-zinc-950">{founder.full_name ?? 'Founder'}</p>
+                    <p className="truncate text-[11px] font-medium text-zinc-500">{founder.company_name ?? founder.email}</p>
                 </div>
             </div>
 
-            <div className="mx-6 h-px bg-white/[0.06]" />
+            <div className="mx-6 h-px bg-zinc-200" />
 
             {/* Nav */}
             <nav className="flex-1 space-y-0.5 px-3 py-4" aria-label="Main navigation">
@@ -86,15 +87,15 @@ function SidebarContent({
                                             role="button"
                                             aria-disabled="true"
                                             aria-label={`${label} — ${disabledReason}`}
-                                            className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 opacity-30"
+                                            className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 opacity-40"
                                         >
-                                            <Icon className="size-4 text-white/50" aria-hidden="true" />
-                                            <span className="text-[13px] font-medium text-white/50">{label}</span>
+                                            <Icon className="size-4 text-zinc-400" aria-hidden="true" />
+                                            <span className="text-[13px] font-medium text-zinc-400">{label}</span>
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent
                                         side="right"
-                                        className="rounded-xl border border-white/[0.08] bg-[#111] text-[11px] text-white/60 shadow-xl"
+                                        className="rounded-xl border border-zinc-200 bg-white text-[11px] text-zinc-500 shadow-md px-3 py-2"
                                     >
                                         {disabledReason ?? 'Coming soon'}
                                     </TooltipContent>
@@ -110,22 +111,22 @@ function SidebarContent({
                                 className={cn(
                                     'group flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-300',
                                     isActive
-                                        ? 'bg-[#1B294B]/40 text-[#D8E0F3] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] ring-1 ring-[#3A54A5]/30'
-                                        : 'text-[#91A7D8] hover:bg-white/[0.03] hover:text-[#D8E0F3]',
+                                        ? 'bg-[#3A54A5]/10 text-[#3A54A5] ring-1 ring-[#3A54A5]/25 shadow-xs'
+                                        : 'text-zinc-550 hover:bg-zinc-100 hover:text-zinc-900',
                                 )}
                             >
                                 <Icon
                                     className={cn(
                                         'size-4 shrink-0 transition-colors duration-300',
-                                        isActive ? 'text-[#3A54A5]' : 'text-[#91A7D8] group-hover:text-[#C1CDE8]',
+                                        isActive ? 'text-[#3A54A5]' : 'text-zinc-400 group-hover:text-zinc-650',
                                     )}
                                     aria-hidden="true"
                                 />
-                                <span className="text-[13.5px] font-medium tracking-tight">{label}</span>
+                                <span className="text-[13.5px] font-semibold tracking-tight">{label}</span>
                                 {isActive && (
                                     <motion.div
                                         layoutId="active-pill"
-                                        className="ml-auto h-1 w-1 rounded-full bg-[#3A54A5] shadow-[0_0_8px_#3A54A5]"
+                                        className="ml-auto h-1 w-1 rounded-full bg-[#3A54A5]"
                                     />
                                 )}
                             </Link>
@@ -136,13 +137,13 @@ function SidebarContent({
 
             {/* Logout */}
             <div className="px-3 pb-6">
-                <div className="mb-3 h-px bg-white/[0.06]" />
+                <div className="mb-3 h-px bg-zinc-200" />
                 <button
                     onClick={onLogout}
-                    className="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-[#91A7D8] transition-all duration-300 hover:bg-red-500/[0.06] hover:text-red-400"
+                    className="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-zinc-550 transition-all duration-300 hover:bg-red-50 hover:text-red-650"
                 >
-                    <LogOut className="size-4 shrink-0 transition-colors group-hover:text-red-400" aria-hidden="true" />
-                    <span className="text-[13.5px] font-medium tracking-tight">Logout</span>
+                    <LogOut className="size-4 shrink-0 text-zinc-450 transition-colors group-hover:text-red-650" aria-hidden="true" />
+                    <span className="text-[13.5px] font-semibold tracking-tight">Logout</span>
                 </button>
             </div>
         </div>
@@ -200,19 +201,34 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
     }
 
     return (
-        <div className="relative min-h-screen overflow-x-hidden bg-[#050505] text-white antialiased">
-            {/* ── Background treatment (same as DiagnosticLayout) ── */}
-            <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-wireframe pointer-events-none fixed top-[15%] -left-[15%] z-0 aspect-square w-[110vw] max-w-[600px] opacity-20 mix-blend-overlay md:top-[20%] md:-left-[5%]" />
-            <div className="waitlist-wireframe waitlist-float-delay pointer-events-none fixed top-[40%] -right-[15%] z-0 aspect-square w-[90vw] max-w-[500px] opacity-15 mix-blend-overlay md:top-[45%] md:-right-[5%]" />
+        <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900 antialiased">
+            {/* Background SideRays */}
+            <div className="pointer-events-none fixed inset-0 z-0">
+                <SideRays
+                    rayColor1="#3A54A5"
+                    rayColor2="#93C5FD"
+                    origin="top-left"
+                    speed={1.8}
+                    intensity={1.2}
+                    spread={2}
+                    tilt={0}
+                    saturation={1.5}
+                    blend={0.35}
+                    falloff={2.3}
+                    opacity={0.35}
+                />
+            </div>
+
+            {/* Ambient top glow */}
             <div
-                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[400px]"
-                style={{ background: 'radial-gradient(ellipse 70% 45% at 50% 0%, rgba(37,99,235,0.10) 0%, transparent 70%)' }}
+                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[400px] opacity-15"
+                style={{
+                    background: 'radial-gradient(circle at top, #3A54A5, transparent 70%)',
+                }}
             />
 
             {/* ── Desktop sidebar ── */}
-            <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] flex-col border-r border-[#232C43] bg-[#0B0E14] lg:flex">
+            <aside className="fixed inset-y-0 left-0 z-30 hidden w-[260px] flex-col border-r border-zinc-200 bg-white/40 backdrop-blur-md lg:flex">
                 <SidebarContent founder={founder} navItems={navItems} currentUrl={url} onLogout={handleLogout} />
             </aside>
 
@@ -235,7 +251,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
                             role="dialog"
                             aria-modal="true"
                             aria-label="Navigation menu"
-                            className="fixed inset-y-0 left-0 z-50 w-[260px] border-r border-[#232C43] bg-[#0B0E14] lg:hidden"
+                            className="fixed inset-y-0 left-0 z-50 w-[260px] border-r border-zinc-200 bg-white/60 backdrop-blur-md lg:hidden"
                             initial={{ x: -260 }}
                             animate={{ x: 0 }}
                             exit={{ x: -260 }}
@@ -255,19 +271,19 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
             </AnimatePresence>
 
             {/* ── Mobile top bar ── */}
-            <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.06] bg-[#050505]/80 px-4 backdrop-blur-md lg:hidden">
+            <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center justify-between border-b border-zinc-200 bg-white/60 px-4 backdrop-blur-md lg:hidden">
                 <button
                     onClick={() => setSidebarOpen(true)}
                     aria-label="Open navigation menu"
                     aria-expanded={sidebarOpen}
-                    className="rounded-lg p-1.5 text-white/30 transition-colors hover:text-white"
+                    className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:text-zinc-650"
                 >
                     <Menu className="size-5" aria-hidden="true" />
                 </button>
-                <PinpointLogo height={20} variant="dark" />
+                <PinpointLogo height={20} />
                 <div
                     aria-hidden="true"
-                    className="flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.12] bg-blue-600/20 text-[10px] font-bold text-blue-400"
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-[#3A54A5]/20 bg-[#3A54A5]/10 text-[10px] font-bold text-[#3A54A5]"
                 >
                     {getInitials(founder.full_name)}
                 </div>

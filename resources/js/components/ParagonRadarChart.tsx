@@ -15,11 +15,11 @@ const pillars = [
 const chartConfig = {
     verified: {
         label: 'Pinpoint-Verified',
-        color: '#5ca336',
+        color: '#3A54A5',
     },
     average: {
         label: 'Average Startup',
-        color: '#2F4587',
+        color: '#94A3B8',
     },
 } satisfies ChartConfig;
 
@@ -29,17 +29,18 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
     if (!active || !payload?.length) return null;
 
     return (
-        <div className="rounded-xl border border-white/10 bg-[#0e0e0e]/95 px-4 py-3 shadow-[0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-xl">
-            <p className="mb-2 text-[11px] font-semibold tracking-[0.15em] text-white/40 uppercase">{label}</p>
+        <div className="rounded-xl border border-zinc-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-xl">
+            <p className="mb-2 text-[11px] font-semibold tracking-[0.15em] text-zinc-400 uppercase">{label}</p>
             {payload.map((entry) => {
                 const isVerified = entry.dataKey === 'verified';
+                const color = isVerified ? '#3A54A5' : '#94A3B8';
                 return (
                     <div key={entry.dataKey} className="flex items-center gap-2.5 py-0.5">
-                        <span className="inline-block size-2 rounded-full" style={{ backgroundColor: isVerified ? '#5ca336' : '#2F4587' }} />
-                        <span className="text-[13px] text-white/55">{isVerified ? 'Pinpoint-Verified' : 'Average Startup'}</span>
-                        <span className="ml-auto text-[13px] font-bold tabular-nums" style={{ color: isVerified ? '#5ca336' : '#7b8fd4' }}>
+                        <span className="inline-block size-2 rounded-full" style={{ backgroundColor: color }} />
+                        <span className="text-[13px] text-zinc-600">{isVerified ? 'Pinpoint-Verified' : 'Average Startup'}</span>
+                        <span className="ml-auto text-[13px] font-bold tabular-nums" style={{ color: color }}>
                             {entry.value}
-                            <span className="text-[11px] font-normal text-white/30">/100</span>
+                            <span className="text-[11px] font-normal text-zinc-400">/100</span>
                         </span>
                     </div>
                 );
@@ -63,7 +64,7 @@ function AxisTick({ x, y, payload, cx, cy }: { x?: number; y?: number; cx?: numb
             y={y + dy}
             textAnchor="middle"
             dominantBaseline="middle"
-            fill="rgba(255,255,255,0.4)"
+            fill="rgba(9, 9, 11, 0.6)"
             fontSize={9}
             fontFamily="Inter, system-ui, sans-serif"
             fontWeight={600}
@@ -81,7 +82,7 @@ function Legend({ active, onToggle }: { active: { verified: boolean; average: bo
         <div className="-mt-8 mb-4 flex flex-wrap items-center justify-center gap-3 md:-mt-4 md:mb-0 md:gap-6">
             {(['verified', 'average'] as const).map((key) => {
                 const isVerified = key === 'verified';
-                const color = isVerified ? '#5ca336' : '#2F4587';
+                const color = isVerified ? '#3A54A5' : '#94A3B8';
                 const label = isVerified ? 'Pinpoint-Verified' : 'Average Startup';
                 const isActive = active[key];
 
@@ -90,11 +91,11 @@ function Legend({ active, onToggle }: { active: { verified: boolean; average: bo
                         key={key}
                         type="button"
                         onClick={() => onToggle(key)}
-                        className="flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.12em] uppercase transition-all duration-200 hover:border-white/15 hover:bg-white/[0.06]"
+                        className="flex items-center gap-2 rounded-full border border-zinc-200 bg-white/60 px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.12em] uppercase transition-all duration-200 hover:border-zinc-300 hover:bg-zinc-50"
                         style={{ opacity: isActive ? 1 : 0.35 }}
                     >
                         <span className="inline-block size-2 rounded-full" style={{ backgroundColor: color }} />
-                        <span style={{ color: isActive ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.35)' }}>{label}</span>
+                        <span style={{ color: isActive ? '#18181b' : '#a1a1aa' }}>{label}</span>
                     </button>
                 );
             })}
@@ -114,7 +115,7 @@ export function ParagonRadarChart() {
             <ChartContainer config={chartConfig} className="mx-auto h-[320px] w-full max-w-[400px] md:h-[400px] md:max-w-none">
                 <ResponsiveContainer width="100%" height="100%">
                     <RadarChart data={pillars} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
-                        <PolarGrid stroke="rgba(255,255,255,0.07)" strokeDasharray="3 3" />
+                        <PolarGrid stroke="rgba(9, 9, 11, 0.08)" strokeDasharray="3 3" />
                         <PolarAngleAxis dataKey="pillar" tick={(props) => <AxisTick {...props} />} stroke="transparent" />
                         <Tooltip content={<CustomTooltip />} cursor={false} />
 
@@ -123,13 +124,13 @@ export function ParagonRadarChart() {
                             <Radar
                                 name="average"
                                 dataKey="average"
-                                stroke="#2F4587"
+                                stroke="#94A3B8"
                                 strokeOpacity={0.6}
                                 strokeWidth={1.5}
-                                fill="#2F4587"
+                                fill="#94A3B8"
                                 fillOpacity={0.12}
-                                dot={{ fill: '#2F4587', r: 3, fillOpacity: 0.7, strokeWidth: 0 }}
-                                activeDot={{ fill: '#2F4587', r: 5, strokeWidth: 0, fillOpacity: 1 }}
+                                dot={{ fill: '#94A3B8', r: 3, fillOpacity: 0.7, strokeWidth: 0 }}
+                                activeDot={{ fill: '#94A3B8', r: 5, strokeWidth: 0, fillOpacity: 1 }}
                             />
                         )}
 
@@ -138,12 +139,12 @@ export function ParagonRadarChart() {
                             <Radar
                                 name="verified"
                                 dataKey="verified"
-                                stroke="#5ca336"
+                                stroke="#3A54A5"
                                 strokeWidth={2}
-                                fill="#5ca336"
+                                fill="#3A54A5"
                                 fillOpacity={0.22}
-                                dot={{ fill: '#5ca336', r: 3.5, fillOpacity: 0.9, strokeWidth: 0 }}
-                                activeDot={{ fill: '#5ca336', r: 5.5, strokeWidth: 0, fillOpacity: 1 }}
+                                dot={{ fill: '#3A54A5', r: 3.5, fillOpacity: 0.9, strokeWidth: 0 }}
+                                activeDot={{ fill: '#3A54A5', r: 5.5, strokeWidth: 0, fillOpacity: 1 }}
                             />
                         )}
                     </RadarChart>
@@ -154,3 +155,5 @@ export function ParagonRadarChart() {
         </div>
     );
 }
+
+export default ParagonRadarChart;

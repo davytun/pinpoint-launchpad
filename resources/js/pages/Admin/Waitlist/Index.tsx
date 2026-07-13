@@ -74,6 +74,7 @@ function fmt(dateStr: string | null): string {
     return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+// Ensure safe conversion value percentage
 function pct(value: number, total: number): string {
     if (total === 0) return '0%';
     return Math.round((value / total) * 100) + '%';
@@ -120,17 +121,17 @@ function FlashBanner() {
     return (
         <div
             className={cn(
-                'mb-4 flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm',
+                'mb-4 flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-semibold',
                 msg.type === 'success'
-                    ? 'border-emerald-500/25 bg-emerald-500/10 text-emerald-300'
-                    : 'border-rose-500/25 bg-rose-500/10 text-rose-300',
+                    ? 'border-emerald-500/25 bg-emerald-50 text-emerald-700'
+                    : 'border-rose-500/25 bg-rose-50 text-rose-700',
             )}
         >
             <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 shrink-0" />
                 {msg.text}
             </div>
-            <button onClick={() => setVisible(false)} className="text-current opacity-50 hover:opacity-100">
+            <button onClick={() => setVisible(false)} className="text-current opacity-55 hover:opacity-100">
                 <X className="h-3.5 w-3.5" />
             </button>
         </div>
@@ -141,15 +142,15 @@ function FlashBanner() {
 
 function StatCard({ label, value, sub, icon: Icon }: { label: string; value: number; sub?: string; icon: React.ElementType }) {
     return (
-        <div className="flex items-center gap-3.5 rounded-xl border border-[#232C43] bg-[#101623] px-4 py-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0C1427]">
-                <Icon className="h-4 w-4 text-[#91A7D8]" />
+        <div className="flex items-center gap-3.5 rounded-xl border border-white/80 bg-white/30 px-4 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
+                <Icon className="h-4 w-4 text-zinc-550" />
             </div>
             <div className="min-w-0">
-                <p className="truncate text-[11px] font-medium tracking-widest text-[#91A7D8] uppercase">{label}</p>
+                <p className="truncate text-[11px] font-bold tracking-widest text-zinc-500 uppercase">{label}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
-                    <span className="text-xl font-semibold text-[#D8E0F3] tabular-nums">{value.toLocaleString()}</span>
-                    {sub && <span className="text-xs text-[#C1CDE8]">{sub}</span>}
+                    <span className="text-xl font-extrabold text-zinc-950 tabular-nums">{value.toLocaleString()}</span>
+                    {sub && <span className="text-xs text-zinc-550 font-bold">{sub}</span>}
                 </div>
             </div>
         </div>
@@ -162,10 +163,10 @@ function TypeBadge({ type }: { type: 'founder' | 'investor' }) {
     return (
         <span
             className={cn(
-                'inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-semibold tracking-wider uppercase',
+                'inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold tracking-wider uppercase border',
                 type === 'founder'
-                    ? 'bg-[#5CA336]/15 text-[#8fd168] ring-1 ring-[#5CA336]/25'
-                    : 'bg-[#2F4587]/15 text-[#8da4e8] ring-1 ring-[#2F4587]/25',
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-250/85'
+                    : 'bg-[#3A54A5]/10 text-[#3A54A5] border-[#3A54A5]/25',
             )}
         >
             {type}
@@ -179,8 +180,10 @@ function StatusPill({ value, label }: { value: boolean; label: string }) {
     return (
         <span
             className={cn(
-                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium',
-                value ? 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20' : 'bg-[#0C1427] text-[#91A7D8] ring-1 ring-[#232C43]',
+                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border shadow-xs',
+                value
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-250'
+                    : 'bg-zinc-100 text-zinc-500 border-zinc-200/80',
             )}
         >
             {value ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
@@ -211,8 +214,8 @@ function SortTh({
         <th className={cn('px-4 py-3', className)}>
             <button
                 onClick={() => onClick(column)}
-                className="flex items-center gap-1 text-left text-[11px] font-semibold tracking-wider uppercase transition-colors hover:text-[#D8E0F3]"
-                style={{ color: active ? '#D8E0F3' : '#91A7D8' }}
+                className="flex items-center gap-1 text-left text-[11px] font-bold tracking-wider uppercase transition-colors hover:text-zinc-950"
+                style={{ color: active ? '#09090b' : '#71717a' }}
             >
                 {label}
                 {active ? (
@@ -239,7 +242,7 @@ function FilterTabs({ activeType, totals, currentProps }: { activeType: PageProp
     ];
 
     return (
-        <div className="flex gap-1 rounded-lg border border-[#232C43] bg-[#101623] p-1">
+        <div className="flex gap-1 rounded-xl border border-zinc-200/80 bg-zinc-100/80 p-1 shadow-xs">
             {tabs.map(({ key, label, count }) => (
                 <button
                     key={key}
@@ -249,15 +252,15 @@ function FilterTabs({ activeType, totals, currentProps }: { activeType: PageProp
                         })
                     }
                     className={cn(
-                        'flex items-center gap-2 rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors duration-150',
-                        activeType === key ? 'bg-[#1B294B] text-[#D8E0F3] shadow-sm' : 'text-[#C1CDE8] hover:text-[#D8E0F3]',
+                        'flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-colors duration-150',
+                        activeType === key ? 'bg-white text-zinc-950 font-bold shadow-sm' : 'text-zinc-550 hover:text-zinc-950',
                     )}
                 >
                     {label}
                     <span
                         className={cn(
-                            'rounded-full px-1.5 py-px text-[10px] font-bold tabular-nums',
-                            activeType === key ? 'bg-[#3A54A5]/30 text-[#D8E0F3]' : 'bg-[#0C1427] text-[#91A7D8]',
+                            'rounded-full px-1.5 py-px text-[10px] font-extrabold tabular-nums',
+                            activeType === key ? 'bg-[#3A54A5]/10 text-[#3A54A5]' : 'bg-zinc-200 text-zinc-500',
                         )}
                     >
                         {count}
@@ -273,16 +276,16 @@ function FilterTabs({ activeType, totals, currentProps }: { activeType: PageProp
 function SearchInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
     return (
         <div className="relative">
-            <Search className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-[#91A7D8]" />
+            <Search className="pointer-events-none absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
             <input
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="Search name, email, company…"
-                className="h-9 w-full rounded-lg border border-[#232C43] bg-[#101623] pr-8 pl-8 text-sm text-[#D8E0F3] placeholder:text-[#91A7D8] focus:border-[#3A54A5]/50 focus:ring-0 focus:outline-none"
+                className="h-9 w-full rounded-xl border border-zinc-200 bg-white pr-8 pl-8 text-sm text-zinc-950 placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
             />
             {value && (
-                <button onClick={() => onChange('')} className="absolute top-1/2 right-2.5 -translate-y-1/2 text-[#91A7D8] hover:text-[#C1CDE8]">
+                <button onClick={() => onChange('')} className="absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400 hover:text-zinc-650">
                     <X className="h-3.5 w-3.5" />
                 </button>
             )}
@@ -325,10 +328,10 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
                 onClick={handleConvert}
                 title={entry.converted_at ? 'Unmark converted' : 'Mark as converted'}
                 className={cn(
-                    'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
+                    'flex h-7 w-7 items-center justify-center rounded-md border border-transparent transition-colors',
                     entry.converted_at
-                        ? 'bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25'
-                        : 'text-[#91A7D8] hover:bg-[#1B294B] hover:text-[#D8E0F3]',
+                        ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200'
+                        : 'text-zinc-450 hover:bg-zinc-105 hover:text-zinc-800',
                 )}
             >
                 <CheckCircle2 className="h-3.5 w-3.5" />
@@ -339,7 +342,7 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
                 onClick={handleResend}
                 disabled={resending}
                 title="Resend waitlist email"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-[#91A7D8] transition-colors hover:bg-[#1B294B] hover:text-[#D8E0F3] disabled:opacity-40"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-450 border border-transparent transition-colors hover:bg-zinc-105 hover:text-zinc-800 disabled:opacity-40"
             >
                 <RefreshCw className={cn('h-3.5 w-3.5', resending && 'animate-spin')} />
             </button>
@@ -348,7 +351,7 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
             <button
                 onClick={handleDelete}
                 title="Delete entry"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-[#91A7D8] transition-colors hover:bg-rose-500/15 hover:text-rose-400"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-450 border border-transparent transition-colors hover:bg-rose-50 hover:text-rose-600"
             >
                 <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -366,8 +369,8 @@ function Pagination({ entries }: { entries: Paginated<WaitlistEntry> }) {
     const to = Math.min(current_page * per_page, total);
 
     return (
-        <div className="flex items-center justify-between border-t border-[#232C43] px-1 pt-4">
-            <p className="text-xs text-[#91A7D8]">
+        <div className="flex items-center justify-between border-t border-zinc-200 px-1 pt-4">
+            <p className="text-xs text-zinc-500">
                 Showing {from}–{to} of {total}
             </p>
             <div className="flex gap-1">
@@ -381,15 +384,15 @@ function Pagination({ entries }: { entries: Paginated<WaitlistEntry> }) {
                             href={link.url}
                             preserveScroll
                             className={cn(
-                                'flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-xs font-medium transition-colors',
-                                link.active ? 'bg-[#1B294B] text-[#D8E0F3]' : 'text-[#C1CDE8] hover:bg-[#0C1427] hover:text-[#D8E0F3]',
+                                'flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-xs font-semibold transition-colors',
+                                link.active ? 'bg-[#3A54A5] text-white shadow-xs font-bold' : 'text-zinc-650 hover:bg-zinc-150 hover:text-zinc-950',
                             )}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ) : (
                         <span
                             key={i}
-                            className="flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-xs font-medium text-[#91A7D8]"
+                            className="flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-xs font-semibold text-zinc-400"
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     );
@@ -431,12 +434,12 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                     {/* Header */}
                     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
                         <div>
-                            <p className="text-[11px] font-semibold tracking-widest text-[#91A7D8] uppercase">Admin</p>
-                            <h1 className="mt-1 text-2xl font-semibold text-[#D8E0F3]">Waitlist</h1>
+                            <p className="text-[11px] font-bold tracking-widest text-zinc-400 uppercase">Admin</p>
+                            <h1 className="mt-1 text-2xl font-extrabold text-zinc-950">Waitlist</h1>
                         </div>
                         <a
                             href={route('admin.waitlist.export')}
-                            className="inline-flex items-center gap-2 rounded-lg border border-[#232C43] bg-[#101623] px-4 py-2 text-sm font-medium text-[#C1CDE8] transition-colors hover:border-[#3A54A5]/30 hover:bg-[#1B294B] hover:text-[#D8E0F3]"
+                            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-650 transition-colors hover:border-zinc-350 hover:bg-zinc-50 hover:text-zinc-955 shadow-xs"
                         >
                             <Download className="h-4 w-4" />
                             Export CSV
@@ -464,46 +467,46 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                     </div>
 
                     {/* Table */}
-                    <div className="overflow-hidden rounded-xl border border-[#232C43] bg-[#101623]">
+                    <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
                         {entries.data.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-16 text-[#91A7D8]">
+                            <div className="flex flex-col items-center justify-center py-16 text-zinc-400">
                                 <Users className="mb-3 h-8 w-8 opacity-40" />
-                                <p className="text-sm">{searchValue ? 'No results for that search.' : 'No entries yet.'}</p>
+                                <p className="text-sm font-bold">{searchValue ? 'No results for that search.' : 'No entries yet.'}</p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[820px] text-sm">
                                     <thead>
-                                        <tr className="border-b border-[#232C43] bg-[#0C1427]/50">
+                                        <tr className="border-b border-zinc-200 bg-zinc-50/50">
                                             <SortTh column="name" label="Name" sort={sort} dir={dir} onClick={handleSort} className="w-[22%]" />
                                             <SortTh column="type" label="Type" sort={sort} dir={dir} onClick={handleSort} />
-                                            <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wider text-[#91A7D8] uppercase">
+                                            <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
                                                 Company / Firm
                                             </th>
-                                            <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wider text-[#91A7D8] uppercase">
+                                            <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
                                                 Stage / Role
                                             </th>
                                             <SortTh column="created_at" label="Signed Up" sort={sort} dir={dir} onClick={handleSort} />
                                             <SortTh column="email_sent_at" label="Email" sort={sort} dir={dir} onClick={handleSort} />
                                             <SortTh column="converted_at" label="Converted" sort={sort} dir={dir} onClick={handleSort} />
-                                            <th className="px-4 py-3 text-right text-[11px] font-semibold tracking-wider text-[#91A7D8] uppercase">
+                                            <th className="px-4 py-3 text-right text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
                                                 Actions
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-[#232C43]">
+                                    <tbody className="divide-y divide-zinc-200/80">
                                         {entries.data.map((entry) => (
-                                            <tr key={entry.id} className="group transition-colors hover:bg-[#1B294B]/30">
+                                            <tr key={entry.id} className="group transition-colors hover:bg-zinc-50/40">
                                                 <td className="px-4 py-3.5">
-                                                    <p className="font-medium text-[#D8E0F3]">{entry.name}</p>
-                                                    <p className="mt-0.5 text-xs text-[#C1CDE8]">{entry.email}</p>
+                                                    <p className="font-semibold text-zinc-900">{entry.name}</p>
+                                                    <p className="mt-0.5 text-xs text-zinc-500">{entry.email}</p>
                                                 </td>
                                                 <td className="px-4 py-3.5">
                                                     <TypeBadge type={entry.type} />
                                                 </td>
-                                                <td className="px-4 py-3.5 text-[#C1CDE8]">{entry.company_name ?? entry.firm_name ?? '—'}</td>
-                                                <td className="px-4 py-3.5 text-[#C1CDE8]">{humanize(entry.stage ?? entry.role)}</td>
-                                                <td className="px-4 py-3.5 text-[#91A7D8] tabular-nums">{fmt(entry.created_at)}</td>
+                                                <td className="px-4 py-3.5 text-zinc-650 font-medium">{entry.company_name ?? entry.firm_name ?? '—'}</td>
+                                                <td className="px-4 py-3.5 text-zinc-650 font-medium">{humanize(entry.stage ?? entry.role)}</td>
+                                                <td className="px-4 py-3.5 text-zinc-450 font-semibold tabular-nums">{fmt(entry.created_at)}</td>
                                                 <td className="px-4 py-3.5">
                                                     <StatusPill value={!!entry.email_sent_at} label={entry.email_sent_at ? 'Sent' : 'Pending'} />
                                                 </td>

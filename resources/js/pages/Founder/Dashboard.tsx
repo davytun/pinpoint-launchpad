@@ -435,7 +435,7 @@ export default function FounderDashboard({
                 {/* ── Section 3 — PARAGON Score & Radar ── */}
                 <div className="grid gap-6 sm:grid-cols-2">
                     <FadeUp delay={0.15}>
-                        <ProCard id="tour-score" className="relative flex h-full flex-col items-center justify-center p-8 text-center">
+                        <ProCard id="tour-score" className="relative flex h-full flex-col items-center justify-center p-8 text-center min-w-0 overflow-hidden">
                             <p className="mb-6 text-[12px] font-bold tracking-wider text-zinc-500 uppercase">PARAGON Score</p>
                             {score != null ? (
                                 <>
@@ -468,7 +468,7 @@ export default function FounderDashboard({
                     </FadeUp>
 
                     <FadeUp delay={0.2}>
-                        <ProCard id="tour-pillar" className="h-full p-6 sm:p-8">
+                        <ProCard id="tour-pillar" className="h-full p-6 sm:p-8 min-w-0 overflow-hidden">
                             <p className="mb-4 text-[12px] font-bold tracking-wider text-zinc-500 uppercase">Pillar Breakdown</p>
                             {hasPillarData ? (
                                 <div className="relative h-[220px] w-full">

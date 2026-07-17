@@ -31,7 +31,6 @@ export default function Contact() {
                         </p>
                         <div className="space-y-2 pt-4">
                             <span className="text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase">Direct Email</span>
-                            <p className="text-sm font-semibold text-zinc-800">hello@pinpoint.network</p>
                         </div>
                     </div>
 

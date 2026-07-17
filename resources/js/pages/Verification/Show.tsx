@@ -1,8 +1,8 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, Clock, FileText, Loader2, Lock, Shield } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
-import { motion } from 'framer-motion';
 
 import SideRays from '@/components/SideRays';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -27,6 +27,13 @@ interface RadarData {
     [key: string]: number | undefined;
 }
 
+interface UnlockedDocument {
+    id: number;
+    size: string;
+    category?: string | null;
+    name?: string | null;
+}
+
 interface PageProps {
     profile_id: number | null;
     founder_name: string;
@@ -47,7 +54,7 @@ interface PageProps {
     flash?: { success?: string; info?: string; error?: string };
     is_unlocked?: boolean;
     token?: string | null;
-    unlocked_documents?: any[];
+    unlocked_documents?: UnlockedDocument[];
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -119,7 +126,6 @@ function diligenceRows(tier?: string | null) {
 // ─── Access Request Form ──────────────────────────────────────────────────────
 
 function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; onClose: () => void; slug: string; isSample: boolean }) {
-    const { props } = usePage<PageProps & { flash?: { success?: string } }>();
     const [form, setForm] = useState({
         investor_name: '',
         investor_email: '',
@@ -149,19 +155,19 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                 if (!v) onClose();
             }}
         >
-            <DialogContent className="border-zinc-200/80 bg-white/95 shadow-2xl backdrop-blur-xl rounded-[2rem] p-7 text-zinc-900 sm:max-w-md">
+            <DialogContent className="rounded-[2rem] border-zinc-200/80 bg-white/95 p-7 text-zinc-900 shadow-2xl backdrop-blur-xl sm:max-w-md">
                 <DialogHeader>
                     {isSample ? (
                         <>
-                            <DialogTitle className="text-zinc-955 font-extrabold text-xl">Sample Profile</DialogTitle>
-                            <DialogDescription className="text-zinc-555 font-medium mt-1">
+                            <DialogTitle className="text-zinc-955 text-xl font-extrabold">Sample Profile</DialogTitle>
+                            <DialogDescription className="text-zinc-555 mt-1 font-medium">
                                 This is a sample profile. Request access on a real founder's page.
                             </DialogDescription>
                         </>
                     ) : (
                         <>
-                            <DialogTitle className="text-zinc-955 font-extrabold text-xl">Request Data Room Access</DialogTitle>
-                            <DialogDescription className="text-zinc-555 font-medium mt-1">
+                            <DialogTitle className="text-zinc-955 text-xl font-extrabold">Request Data Room Access</DialogTitle>
+                            <DialogDescription className="text-zinc-555 mt-1 font-medium">
                                 Tell the founder who you are. They'll review and approve your request.
                             </DialogDescription>
                         </>
@@ -171,7 +177,7 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                 {!isSample && (
                     <form onSubmit={handleSubmit} className="mt-4 space-y-4">
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Full Name</label>
+                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Full Name</label>
                             <input
                                 type="text"
                                 required
@@ -183,7 +189,7 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Work Email</label>
+                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Work Email</label>
                             <input
                                 type="email"
                                 required
@@ -195,7 +201,7 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Venture Firm</label>
+                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Venture Firm</label>
                             <input
                                 type="text"
                                 value={form.firm_name}
@@ -206,7 +212,7 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">LinkedIn Profile</label>
+                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">LinkedIn Profile</label>
                             <input
                                 type="url"
                                 value={form.linkedin_url}
@@ -217,7 +223,7 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                         </div>
 
                         <div className="space-y-1">
-                            <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Note (Optional)</label>
+                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Note (Optional)</label>
                             <textarea
                                 value={form.message}
                                 onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
@@ -229,7 +235,7 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                         <button
                             type="submit"
                             disabled={submitting}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#2D4182] disabled:opacity-60 shadow-md shadow-[#3A54A5]/20 hover:shadow-lg"
+                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-colors hover:bg-[#2D4182] hover:shadow-lg disabled:opacity-60"
                         >
                             {submitting ? (
                                 <>
@@ -321,39 +327,37 @@ export default function VerificationShow({
                 <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 lg:px-8">
                     {/* Sample banner */}
                     {is_sample && (
-                        <div className="mb-6 rounded-xl border border-amber-500/25 bg-amber-50 py-2.5 text-center text-sm text-amber-700 font-semibold shadow-xs animate-fade-in">
+                        <div className="animate-fade-in mb-6 rounded-xl border border-amber-500/25 bg-amber-50 py-2.5 text-center text-sm font-semibold text-amber-700 shadow-xs">
                             SAMPLE PROFILE — This is a demonstration of the Pinpoint verification page.
                         </div>
                     )}
 
                     {/* Expiry warning */}
                     {showExpiryWarning && (
-                        <div className="mb-6 rounded-xl border border-amber-500/25 bg-amber-50 py-2.5 text-center text-sm text-amber-700 font-semibold shadow-xs animate-fade-in">
+                        <div className="animate-fade-in mb-6 rounded-xl border border-amber-500/25 bg-amber-50 py-2.5 text-center text-sm font-semibold text-amber-700 shadow-xs">
                             This verification expires in {days_until_expiry} day{days_until_expiry !== 1 ? 's' : ''}. Renewal required.
                         </div>
                     )}
 
                     {/* Single Master Certificate Card */}
                     <motion.div
-                        className="rounded-[2.5rem] border border-zinc-200/80 bg-white p-6 sm:p-10 shadow-[0_12px_45px_rgba(0,0,0,0.02)] animate-fade-in space-y-8"
+                        className="animate-fade-in min-w-0 space-y-8 overflow-hidden rounded-[2.5rem] border border-zinc-200/80 bg-white p-6 shadow-[0_12px_45px_rgba(0,0,0,0.02)] sm:p-10"
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, ease }}
                     >
                         {/* ── Header Section ── */}
-                        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between border-b border-zinc-100 pb-8">
+                        <div className="flex flex-col gap-6 border-b border-zinc-100 pb-8 md:flex-row md:items-start md:justify-between">
                             <div className="space-y-3.5">
                                 {/* Verification Badge */}
-                                <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-250 px-3 py-1 text-[11px] font-bold text-emerald-700 tracking-wide uppercase shadow-xs">
-                                    <Shield className="size-3.5 text-emerald-650" />
+                                <div className="border-emerald-250 inline-flex items-center gap-1.5 rounded-full border bg-emerald-50 px-3 py-1 text-[11px] font-bold tracking-wide text-emerald-700 uppercase shadow-xs">
+                                    <Shield className="text-emerald-650 size-3.5" />
                                     Pinpoint Certified: {tier ? tier.toUpperCase() : 'INSTITUTIONAL'} Grade
                                 </div>
-                                
-                                <h1 className="text-4xl font-extrabold text-zinc-950 tracking-tight leading-none">
-                                    {company_name}
-                                </h1>
-                                
-                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+
+                                <h1 className="text-4xl leading-none font-extrabold tracking-tight text-zinc-950">{company_name}</h1>
+
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold tracking-wider text-zinc-500 uppercase">
                                     <span>{batch ?? 'Spring 2026'}</span>
                                     {sector && (
                                         <>
@@ -363,30 +367,28 @@ export default function VerificationShow({
                                     )}
                                 </div>
                             </div>
-                            
+
                             <div className="flex flex-col items-start gap-1 md:items-end md:text-right">
                                 <span className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">Verification Status</span>
-                                <span className="text-xs font-extrabold text-emerald-650 bg-emerald-50/50 border border-emerald-200/50 px-2 py-0.5 rounded-md mt-0.5">Active</span>
-                                {verified_at && (
-                                    <span className="text-[11px] font-semibold text-zinc-500 mt-1">
-                                        Verified On {verified_at}
-                                    </span>
-                                )}
+                                <span className="text-emerald-650 mt-0.5 rounded-md border border-emerald-200/50 bg-emerald-50/50 px-2 py-0.5 text-xs font-extrabold">
+                                    Active
+                                </span>
+                                {verified_at && <span className="mt-1 text-[11px] font-semibold text-zinc-500">Verified On {verified_at}</span>}
                             </div>
                         </div>
 
                         {/* ── Score & Executive Summary Panel ── */}
                         <div className="grid gap-8 lg:grid-cols-3">
                             {/* Left: PARAGON Score */}
-                            <div className="space-y-4">
+                            <div className="min-w-0 space-y-4 overflow-hidden">
                                 <p className="text-xs font-bold tracking-[0.28em] text-zinc-400 uppercase">PARAGON Score</p>
                                 <div className="flex items-end gap-1 leading-none">
                                     <span className="text-6xl leading-none font-black" style={{ color }}>
                                         {overall_score != null ? <CountUp target={overall_score} /> : '—'}
                                     </span>
-                                    <span className="mb-1 text-xl text-zinc-400 font-semibold">/ 100</span>
+                                    <span className="mb-1 text-xl font-semibold text-zinc-400">/ 100</span>
                                 </div>
-                                <div className="pt-2 flex items-center justify-center">
+                                <div className="flex items-center justify-center pt-2">
                                     <ResponsiveContainer width="100%" height={200}>
                                         <RadarChart data={radarItems} outerRadius="62%" margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
                                             <PolarGrid stroke="#E2E8F0" />
@@ -398,22 +400,22 @@ export default function VerificationShow({
                             </div>
 
                             {/* Right: Executive Summary */}
-                            <div className="lg:col-span-2 flex flex-col justify-between space-y-4">
+                            <div className="flex flex-col justify-between space-y-4 lg:col-span-2">
                                 <div className="space-y-3">
                                     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
                                         <p className="text-xs font-bold tracking-[0.28em] text-zinc-400 uppercase">ANALYST EXECUTIVE SUMMARY</p>
-                                        <span className="flex items-center gap-1 text-[11px] text-zinc-450 font-semibold">
+                                        <span className="text-zinc-450 flex items-center gap-1 text-[11px] font-semibold">
                                             <Clock className="size-3" />
                                             Timestamped &amp; Analyst-Signed
                                         </span>
                                     </div>
 
                                     {analyst_summary ? (
-                                        <p className="text-[14px] leading-relaxed text-zinc-700 font-semibold">{analyst_summary}</p>
+                                        <p className="text-[14px] leading-relaxed font-semibold text-zinc-700">{analyst_summary}</p>
                                     ) : (
-                                        <div className="rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-6 flex flex-col items-center justify-center text-center py-8 shadow-xs border-dashed">
-                                            <Shield className="size-6 text-zinc-300 animate-pulse mb-2" />
-                                            <p className="text-xs text-zinc-500 font-bold max-w-xs leading-relaxed">
+                                        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200/60 bg-zinc-50/50 p-6 py-8 text-center shadow-xs">
+                                            <Shield className="mb-2 size-6 animate-pulse text-zinc-300" />
+                                            <p className="max-w-xs text-xs leading-relaxed font-bold text-zinc-500">
                                                 The official analyst evaluation summary will be published here upon audit completion.
                                             </p>
                                         </div>
@@ -425,7 +427,7 @@ export default function VerificationShow({
                                         {badges.map((badge) => (
                                             <span
                                                 key={badge.badge_type}
-                                                className="rounded-lg border border-zinc-250/70 bg-white px-3 py-1 text-xs font-bold text-zinc-650 shadow-xs animate-fade-in"
+                                                className="border-zinc-250/70 text-zinc-650 animate-fade-in rounded-lg border bg-white px-3 py-1 text-xs font-bold shadow-xs"
                                             >
                                                 {badge.label}
                                             </span>
@@ -442,23 +444,25 @@ export default function VerificationShow({
                         <div className="space-y-5">
                             <div className="flex flex-col gap-4 pb-1 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <h2 className="font-extrabold text-zinc-950 text-lg tracking-tight">Verified Diligence Assets</h2>
-                                    <p className="text-[13px] text-zinc-500 font-semibold mt-0.5">Access verified financial audits and diagnostic reports.</p>
+                                    <h2 className="text-lg font-extrabold tracking-tight text-zinc-950">Verified Diligence Assets</h2>
+                                    <p className="mt-0.5 text-[13px] font-semibold text-zinc-500">
+                                        Access verified financial audits and diagnostic reports.
+                                    </p>
                                 </div>
                                 {is_unlocked ? (
-                                    <span className="flex items-center gap-1.5 text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-500/25 px-3 py-1.5 rounded-full shadow-xs">
-                                        <CheckCircle2 className="size-4 text-emerald-650" />
+                                    <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs">
+                                        <CheckCircle2 className="text-emerald-650 size-4" />
                                         Secure Access Unlocked
                                     </span>
                                 ) : reqSubmitted ? (
-                                    <span className="flex items-center gap-1.5 text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-500/25 px-3 py-1.5 rounded-full shadow-xs">
-                                        <CheckCircle2 className="size-4 text-emerald-650" />
+                                    <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs">
+                                        <CheckCircle2 className="text-emerald-650 size-4" />
                                         Request submitted
                                     </span>
                                 ) : (
                                     <button
                                         onClick={() => setModalOpen(true)}
-                                        className="rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#2D4182] shadow-sm shadow-[#3A54A5]/25"
+                                        className="rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-[#3A54A5]/25 transition-colors hover:bg-[#2D4182]"
                                     >
                                         Request Access to Full Data Room
                                     </button>
@@ -468,15 +472,31 @@ export default function VerificationShow({
                             <div className="divide-y divide-zinc-100">
                                 {rows.map((row, i) => {
                                     const matchingDoc = is_unlocked
-                                        ? unlocked_documents.find((d: any) => {
+                                        ? (unlocked_documents || []).find((d: UnlockedDocument) => {
                                               const cat = d.category?.toLowerCase() || '';
                                               const name = row.name.toLowerCase();
                                               if (name.includes('assessment') && (cat.includes('assessment') || cat.includes('other'))) return true;
-                                              if (name.includes('radar') && (cat.includes('diagnostics') || cat.includes('model') || cat.includes('economics'))) return true;
-                                              if (name.includes('stress-test') && (cat.includes('forecast') || cat.includes('bank') || cat.includes('statement'))) return true;
+                                              if (
+                                                  name.includes('radar') &&
+                                                  (cat.includes('diagnostics') || cat.includes('model') || cat.includes('economics'))
+                                              )
+                                                  return true;
+                                              if (
+                                                  name.includes('stress-test') &&
+                                                  (cat.includes('forecast') || cat.includes('bank') || cat.includes('statement'))
+                                              )
+                                                  return true;
                                               if (name.includes('cap table') && cat.includes('cap')) return true;
-                                              if (name.includes('economics') && (cat.includes('unit') || cat.includes('economics') || cat.includes('forecast'))) return true;
-                                              if (name.includes('incorporation') && (cat.includes('incorporation') || cat.includes('legal') || cat.includes('articles'))) return true;
+                                              if (
+                                                  name.includes('economics') &&
+                                                  (cat.includes('unit') || cat.includes('economics') || cat.includes('forecast'))
+                                              )
+                                                  return true;
+                                              if (
+                                                  name.includes('incorporation') &&
+                                                  (cat.includes('incorporation') || cat.includes('legal') || cat.includes('articles'))
+                                              )
+                                                  return true;
                                               return false;
                                           })
                                         : null;
@@ -484,29 +504,31 @@ export default function VerificationShow({
                                     return (
                                         <div key={i} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                                             <div className="flex items-center gap-4">
-                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-50 border border-zinc-200/80 text-zinc-400">
+                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 text-zinc-400">
                                                     <FileText className="size-5" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="text-[14px] font-bold text-zinc-900 leading-snug">{row.name}</h3>
-                                                    <p className="text-[11px] text-zinc-500 font-semibold mt-0.5">{row.level}</p>
+                                                    <h3 className="text-[14px] leading-snug font-bold text-zinc-900">{row.name}</h3>
+                                                    <p className="mt-0.5 text-[11px] font-semibold text-zinc-500">{row.level}</p>
                                                 </div>
                                             </div>
 
                                             <div>
                                                 {!is_unlocked ? (
-                                                    <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400 font-bold bg-zinc-50 border border-zinc-200/80 px-3 py-1.5 rounded-lg select-none">
+                                                    <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-zinc-50 px-3 py-1.5 text-xs font-bold text-zinc-400 select-none">
                                                         <Lock className="size-3.5" /> Locked
                                                     </span>
                                                 ) : matchingDoc ? (
                                                     <a
-                                                        href={route('verify.document.download', { slug, document: matchingDoc.id }) + '?token=' + token}
-                                                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors"
+                                                        href={
+                                                            route('verify.document.download', { slug, document: matchingDoc.id }) + '?token=' + token
+                                                        }
+                                                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-700"
                                                     >
                                                         Download ({matchingDoc.size})
                                                     </a>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400 font-bold bg-zinc-50 border border-zinc-200/60 px-3 py-1.5 rounded-lg select-none">
+                                                    <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/60 bg-zinc-50 px-3 py-1.5 text-xs font-bold text-zinc-400 select-none">
                                                         Pending Upload
                                                     </span>
                                                 )}
@@ -515,69 +537,85 @@ export default function VerificationShow({
                                     );
                                 })}
 
-                                {is_unlocked && (() => {
-                                    const unmatched = unlocked_documents.filter((d: any) => {
-                                        const cat = d.category?.toLowerCase() || '';
-                                        const wasMatched = rows.some((row) => {
-                                            const name = row.name.toLowerCase();
-                                            if (name.includes('assessment') && (cat.includes('assessment') || cat.includes('other'))) return true;
-                                            if (name.includes('radar') && (cat.includes('diagnostics') || cat.includes('model') || cat.includes('economics'))) return true;
-                                            if (name.includes('stress-test') && (cat.includes('forecast') || cat.includes('bank') || cat.includes('statement'))) return true;
-                                            if (name.includes('cap table') && cat.includes('cap')) return true;
-                                            if (name.includes('economics') && (cat.includes('unit') || cat.includes('economics') || cat.includes('forecast'))) return true;
-                                            if (name.includes('incorporation') && (cat.includes('incorporation') || cat.includes('legal') || cat.includes('articles'))) return true;
-                                            return false;
+                                {is_unlocked &&
+                                    (() => {
+                                        const unmatched = (unlocked_documents || []).filter((d: UnlockedDocument) => {
+                                            const cat = d.category?.toLowerCase() || '';
+                                            const wasMatched = rows.some((row) => {
+                                                const name = row.name.toLowerCase();
+                                                if (name.includes('assessment') && (cat.includes('assessment') || cat.includes('other'))) return true;
+                                                if (
+                                                    name.includes('radar') &&
+                                                    (cat.includes('diagnostics') || cat.includes('model') || cat.includes('economics'))
+                                                )
+                                                    return true;
+                                                if (
+                                                    name.includes('stress-test') &&
+                                                    (cat.includes('forecast') || cat.includes('bank') || cat.includes('statement'))
+                                                )
+                                                    return true;
+                                                if (name.includes('cap table') && cat.includes('cap')) return true;
+                                                if (
+                                                    name.includes('economics') &&
+                                                    (cat.includes('unit') || cat.includes('economics') || cat.includes('forecast'))
+                                                )
+                                                    return true;
+                                                if (
+                                                    name.includes('incorporation') &&
+                                                    (cat.includes('incorporation') || cat.includes('legal') || cat.includes('articles'))
+                                                )
+                                                    return true;
+                                                return false;
+                                            });
+                                            return !wasMatched;
                                         });
-                                        return !wasMatched;
-                                    });
 
-                                    if (unmatched.length === 0) return null;
+                                        if (unmatched.length === 0) return null;
 
-                                    return (
-                                        <div className="mt-6 pt-5 border-t border-zinc-100">
-                                            <h4 className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase mb-3">Additional Diligence Materials</h4>
-                                            <div className="space-y-3">
-                                                {unmatched.map((doc: any) => (
-                                                    <div key={doc.id} className="flex items-center justify-between">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-50 border border-zinc-200/80 text-zinc-400">
-                                                                <FileText className="size-4.5" />
+                                        return (
+                                            <div className="mt-6 border-t border-zinc-100 pt-5">
+                                                <h4 className="mb-3 text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                                                    Additional Diligence Materials
+                                                </h4>
+                                                <div className="space-y-3">
+                                                    {unmatched.map((doc: UnlockedDocument) => (
+                                                        <div key={doc.id} className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-zinc-400">
+                                                                    <FileText className="size-4.5" />
+                                                                </div>
+                                                                <div>
+                                                                    <h5 className="text-[13.5px] leading-snug font-bold text-zinc-800">{doc.name}</h5>
+                                                                    <p className="mt-0.5 text-[11px] font-semibold text-zinc-500">{doc.category}</p>
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <h5 className="text-[13.5px] font-bold text-zinc-800 leading-snug">{doc.name}</h5>
-                                                                <p className="text-[11px] text-zinc-500 font-semibold mt-0.5">{doc.category}</p>
-                                                            </div>
+                                                            <a
+                                                                href={
+                                                                    route('verify.document.download', { slug, document: doc.id }) + '?token=' + token
+                                                                }
+                                                                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-700"
+                                                            >
+                                                                Download ({doc.size})
+                                                            </a>
                                                         </div>
-                                                        <a
-                                                            href={route('verify.document.download', { slug, document: doc.id }) + '?token=' + token}
-                                                            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition-colors"
-                                                        >
-                                                            Download ({doc.size})
-                                                        </a>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })()}
+                                        );
+                                    })()}
                             </div>
                         </div>
                     </motion.div>
 
                     {/* ── Footer ── */}
-                    <div className="mt-10 border-t border-zinc-200 pt-8 text-center animate-fade-in">
-                        <p className="text-sm text-zinc-555 font-semibold">This verification is valid for 90 days.</p>
-                        {expires_at && <p className="text-sm text-zinc-555 font-semibold">Next scheduled audit: {expires_at}</p>}
+                    <div className="animate-fade-in mt-10 border-t border-zinc-200 pt-8 text-center">
+                        <p className="text-zinc-555 text-sm font-semibold">This verification is valid for 90 days.</p>
+                        {expires_at && <p className="text-zinc-555 text-sm font-semibold">Next scheduled audit: {expires_at}</p>}
                     </div>
                 </div>
             </div>
 
-            <AccessRequestModal
-                open={modalOpen}
-                onClose={() => setModalOpen(false)}
-                slug={slug}
-                isSample={is_sample}
-            />
+            <AccessRequestModal open={modalOpen} onClose={() => setModalOpen(false)} slug={slug} isSample={is_sample} />
         </>
     );
 }

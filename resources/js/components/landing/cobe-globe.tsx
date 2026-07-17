@@ -35,7 +35,7 @@ export function CobeGlobe({ className }: CobeGlobeProps) {
                 { location: [51.5074, -0.1278], size: 0.05 }, // London
                 { location: [1.3521, 103.8198], size: 0.05 }, // Singapore
             ],
-            onRender: (state: Record<string, any>) => {
+            onRender: (state: Record<string, unknown>) => {
                 state.phi = phi;
                 phi += 0.005; // Slightly slower, smoother rotation
             },

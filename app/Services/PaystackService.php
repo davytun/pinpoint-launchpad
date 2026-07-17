@@ -28,24 +28,27 @@ class PaystackService
 
     public function initializeTransaction(array $data): array
     {
+        $currency    = isset($data['currency']) ? strtoupper($data['currency']) : strtoupper(config('services.paystack.currency', 'NGN'));
+        $isNaira     = $currency === 'NGN';
+
         $tierMap = [
             'foundation' => [
-                'amount' => 50000,
-                'base'   => 350,
-                'total'  => 500,
-                'label'  => 'Foundation Audit — PARAGON Certification',
+                'amount' => $isNaira ? 69900000 : 50000,
+                'base'   => $isNaira ? 699000 : 500,
+                'total'  => $isNaira ? 699000 : 500,
+                'label'  => 'Concept / Pre-Seed Audit — PARAGON Certification',
             ],
             'growth' => [
-                'amount' => 90000,
-                'base'   => 750,
-                'total'  => 900,
-                'label'  => 'Growth Audit — PARAGON Certification',
+                'amount' => $isNaira ? 209000000 : 150000,
+                'base'   => $isNaira ? 2090000 : 1500,
+                'total'  => $isNaira ? 2090000 : 1500,
+                'label'  => 'Seed / Early Traction Audit — PARAGON Certification',
             ],
             'institutional' => [
-                'amount' => 165000,
-                'base'   => 1500,
-                'total'  => 1650,
-                'label'  => 'Institutional Audit — PARAGON Certification',
+                'amount' => $isNaira ? 485000000 : 350000,
+                'base'   => $isNaira ? 4850000 : 3500,
+                'total'  => $isNaira ? 4850000 : 3500,
+                'label'  => 'Seed+ / Growth Audit — PARAGON Certification',
             ],
         ];
 
@@ -68,7 +71,6 @@ class PaystackService
         $baseAmount  = $tierData['base'];
         $totalAmount = $tierData['total'];
         $tierLabel   = $tierData['label'];
-        $currency    = strtoupper(config('services.paystack.currency', 'NGN'));
 
         try {
             $response = Http::withHeaders([
@@ -110,7 +112,6 @@ class PaystackService
             'paystack_access_code'  => $response['data']['access_code'],
             'tier'                  => $tier,
             'tier_base_amount'      => $baseAmount,
-            'gate_fee'              => 150,
             'total_amount'          => $totalAmount,
             'customer_email'        => $data['email'],
             'diagnostic_session_id' => $data['diagnostic_session_id'],

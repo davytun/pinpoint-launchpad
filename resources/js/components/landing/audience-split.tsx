@@ -1,14 +1,16 @@
+import { ChevronRight } from 'lucide-react';
+
 export default function AudienceSplit() {
     return (
         <section className="relative z-10 w-full py-20 font-sans">
             <div className="mx-auto max-w-5xl px-6 md:px-8">
                 <div className="grid grid-cols-1 gap-16 md:grid-cols-2">
-                    {/* Left Column: Startups & SMEs */}
+                    {/* Left Column: Startups */}
                     <div className="space-y-6">
                         <div className="space-y-3">
-                            <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-950 sm:text-5xl">Startups & SMEs</h2>
+                            <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-950 sm:text-5xl">Startups</h2>
                             <p className="font-sans text-base leading-relaxed text-zinc-500">
-                                With Pinpoint, get your startup or SME investment-ready and get connected to investors.
+                                With Pinpoint, get your startup investment-ready and get connected to investors.
                             </p>
                         </div>
 
@@ -16,7 +18,7 @@ export default function AudienceSplit() {
                         <ul className="space-y-4 pt-4 text-sm text-zinc-600">
                             <li className="flex items-start gap-3">
                                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Reposition your startup or SME by applying our PARAGON Model.</span>
+                                <span>Reposition your startup by applying our PARAGON Model.</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
@@ -31,6 +33,16 @@ export default function AudienceSplit() {
                                 <span>Access our growing network of investors, mentors, and incubators and accelerators.</span>
                             </li>
                         </ul>
+
+                        <a
+                            href="/diagnostic"
+                            className="group inline-flex h-10 items-center justify-between rounded-full bg-[#3A54A5] pr-1 pl-5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-[#2d4182] active:scale-[0.98]"
+                        >
+                            <span>Apply as a Startup</span>
+                            <span className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition-transform duration-300 group-hover:translate-x-0.5">
+                                <ChevronRight className="h-4 w-4 stroke-[2.5]" />
+                            </span>
+                        </a>
                     </div>
 
                     {/* Right Column: Investors */}
@@ -38,7 +50,7 @@ export default function AudienceSplit() {
                         <div className="space-y-3">
                             <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-950 sm:text-5xl">Investors</h2>
                             <p className="font-sans text-base leading-relaxed text-zinc-500">
-                                With Pinpoint, discover high-potential startups and MSMEs that will not waste your time.
+                                With Pinpoint, discover high-potential startups that will not waste your time.
                             </p>
                         </div>
 
@@ -46,11 +58,11 @@ export default function AudienceSplit() {
                         <ul className="space-y-4 pt-4 text-sm text-zinc-600">
                             <li className="flex items-start gap-3">
                                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Meet startups and SMEs that promise significantly higher returns on investments.</span>
+                                <span>Meet startups that promise significantly higher returns on investments.</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Access to vetted startups and MSMEs with higher credibility for investments.</span>
+                                <span>Access to vetted startups with higher credibility for investments.</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
@@ -61,6 +73,16 @@ export default function AudienceSplit() {
                                 <span>Access to our growing network of startups, partners, and industry players.</span>
                             </li>
                         </ul>
+
+                        <a
+                            href="/investor"
+                            className="group inline-flex h-10 items-center justify-between rounded-full bg-[#6EBE44] pr-1 pl-5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-[#5da837] active:scale-[0.98]"
+                        >
+                            <span>Apply as an Investor</span>
+                            <span className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition-transform duration-300 group-hover:translate-x-0.5">
+                                <ChevronRight className="h-4 w-4 stroke-[2.5]" />
+                            </span>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -9,6 +9,14 @@ class DiagnosticSession extends Model
 {
     protected $fillable = [
         'email',
+        'name',
+        'role',
+        'company_name',
+        'country',
+        'sector',
+        'growth_stage',
+        'describe_you',
+        'looking_to_raise',
         'answers',
         'score',
         'score_band',

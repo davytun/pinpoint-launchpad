@@ -31,14 +31,14 @@ export default function AdminUsersEdit({ member, is_self }: PageProps) {
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <Link
                     href={route('admin.users.index')}
-                    className="mb-6 inline-flex items-center gap-2 text-sm text-zinc-550 transition-colors hover:text-zinc-955 font-bold"
+                    className="text-zinc-550 hover:text-zinc-955 mb-6 inline-flex items-center gap-2 text-sm font-bold transition-colors"
                 >
                     <ArrowLeft className="size-4" /> Back to Team
                 </Link>
 
                 <div className="mb-6">
-                    <h1 className="text-2xl font-extrabold text-zinc-955">Edit Team Member</h1>
-                    <p className="mt-1 text-sm text-zinc-555 font-semibold">{member.email}</p>
+                    <h1 className="text-zinc-955 text-2xl font-extrabold">Edit Team Member</h1>
+                    <p className="text-zinc-555 mt-1 text-sm font-semibold">{member.email}</p>
                 </div>
 
                 <form onSubmit={submit} className="max-w-lg space-y-5">
@@ -52,7 +52,7 @@ export default function AdminUsersEdit({ member, is_self }: PageProps) {
                             className={inputClass}
                             required
                         />
-                        {errors.name && <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.name}</p>}
+                        {errors.name && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.name}</p>}
                     </div>
 
                     <div>
@@ -67,21 +67,21 @@ export default function AdminUsersEdit({ member, is_self }: PageProps) {
                             <option value="support">Support</option>
                             <option value="superadmin">Super Admin</option>
                         </select>
-                        {is_self && <p className="mt-1 text-xs text-amber-600 font-semibold">You cannot change your own role.</p>}
-                        {errors.role && <p className="mt-1 text-xs text-rose-600 font-semibold">{errors.role}</p>}
+                        {is_self && <p className="mt-1 text-xs font-semibold text-amber-600">You cannot change your own role.</p>}
+                        {errors.role && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.role}</p>}
                     </div>
 
                     <div className="flex gap-3 pt-4">
                         <Link
                             href={route('admin.users.index')}
-                            className="flex-1 rounded-xl border border-zinc-200 bg-white py-2.5 text-center text-sm font-bold text-zinc-650 shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
+                            className="text-zinc-650 flex-1 rounded-xl border border-zinc-200 bg-white py-2.5 text-center text-sm font-bold shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                         >
                             Cancel
                         </Link>
                         <button
                             type="submit"
                             disabled={processing}
-                            className="flex-1 rounded-xl bg-[#3A54A5] py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors disabled:opacity-50"
+                            className="flex-1 rounded-xl bg-[#3A54A5] py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-colors hover:bg-[#2D4182] hover:shadow-lg disabled:opacity-50"
                         >
                             {processing ? 'Saving…' : 'Save Changes'}
                         </button>

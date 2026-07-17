@@ -24,15 +24,18 @@ class PaymentConfirmationMail extends Mailable
 
     public function content(): Content
     {
+        $currency = strtoupper($this->payment->currency ?? 'USD');
+        $currencySymbol = $currency === 'NGN' ? '₦' : '$';
+
         return new Content(
             view: 'emails.payment.confirmation',
             with: [
-                'tier_label'   => ucfirst((string) ($this->payment->tier ?? 'unknown')),
-                'total_amount' => $this->payment->total_amount,
-                'base_price'   => $this->payment->tier_base_amount,
-                'gate_fee'     => $this->payment->gate_fee,
-                'email'        => $this->payment->customer_email,
-                'paid_at'      => $this->payment->paid_at,
+                'tier_label'      => $this->payment->tier_label,
+                'total_amount'    => $this->payment->total_amount,
+                'email'           => $this->payment->customer_email,
+                'paid_at'         => $this->payment->paid_at,
+                'currency'        => $currency,
+                'currency_symbol' => $currencySymbol,
             ],
         );
     }

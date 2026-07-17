@@ -12,19 +12,18 @@ export default function ProgramsPricing() {
 
                 {/* Cards Grid */}
                 <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-3">
-                    {/* Foundation Card */}
+                    {/* Concept / Pre-Seed Card */}
                     <div className="flex flex-col justify-between rounded-4xl border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.02)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/50">
                         <div>
                             <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Stage 01</span>
-                            <h3 className="mt-1 text-2xl font-bold text-zinc-950">Foundation</h3>
-                            <p className="mt-3 text-sm leading-relaxed text-zinc-500">Early-stage roadmap. Evaluates baseline venture readiness.</p>
+                            <h3 className="mt-1 text-2xl font-bold text-zinc-950">Concept / Pre-Seed</h3>
+                            <p className="mt-3 text-sm leading-relaxed text-zinc-500">Idea to MVP, little or no revenue, seeking validation.</p>
 
                             {/* Price */}
                             <div className="mt-6">
-                                <span className="text-xs font-medium text-zinc-400">Starting at</span>
+                                <span className="text-xs font-medium text-zinc-400">Total Price</span>
                                 <div className="mt-1 flex items-baseline gap-1">
-                                    <span className="text-4xl font-extrabold tracking-tight text-zinc-900">$350</span>
-                                    <span className="text-xs text-zinc-400">/ base</span>
+                                    <span className="text-4xl font-extrabold tracking-tight text-zinc-900">$500</span>
                                 </div>
                             </div>
 
@@ -42,52 +41,50 @@ export default function ProgramsPricing() {
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>65+ score qualification gate</span>
+                                    <span>Full PARAGON scan (weighted to Potential)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>7-pillar radar chart & gap analysis</span>
+                                    <span>1 founder interview (60 min)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>$150 initial assessment gate fee</span>
+                                    <span>Analyst-delivered 12–15 page report</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>Email-based analyst guidance</span>
+                                    <span>1 debrief call (10–12 hours total)</span>
+                                </li>
+                                <li className="flex items-start gap-2.5">
+                                    <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
+                                        <Check className="h-3 w-3 stroke-[3]" />
+                                    </span>
+                                    <span>Turnaround: 7 working days</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
 
-                    {/* Growth Card (Featured / Primary Color) */}
+                    {/* Seed / Early Traction Card (Featured style without Recommended Badge) */}
                     <div className="relative flex flex-col justify-between rounded-4xl bg-[#2D4182] p-8 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-[#25366D]">
-                        {/* Featured Badge */}
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                            <span className="rounded-full bg-emerald-500 px-3 py-0.5 text-[9px] font-black tracking-widest text-white uppercase shadow-sm">
-                                Recommended
-                            </span>
-                        </div>
-
                         <div>
                             <span className="text-xs font-bold tracking-widest text-[#93C5FD] uppercase">Stage 02</span>
-                            <h3 className="mt-1 text-2xl font-bold text-white">Growth</h3>
+                            <h3 className="mt-1 text-2xl font-bold text-white">Seed / Early Traction</h3>
                             <p className="mt-3 text-sm leading-relaxed text-white/70">
-                                Seed round preparation. Detailed stress-testing for validation.
+                                Working model, ARR under $500k, ready for a first institutional cheque.
                             </p>
 
                             {/* Price */}
                             <div className="mt-6">
-                                <span className="text-xs font-medium text-white/50">Starting at</span>
+                                <span className="text-xs font-medium text-white/50">Total Price</span>
                                 <div className="mt-1 flex items-baseline gap-1">
-                                    <span className="text-4xl font-extrabold tracking-tight text-white">$750</span>
-                                    <span className="text-xs text-white/50">/ base</span>
+                                    <span className="text-4xl font-extrabold tracking-tight text-white">$1,500</span>
                                 </div>
                             </div>
 
@@ -105,43 +102,63 @@ export default function ProgramsPricing() {
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>70+ score qualification gate</span>
+                                    <span>Everything in Stage 01</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>Cap table audit & financial stress-test</span>
+                                    <span>Financial review (up to 24 months)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>5 dedicated forensic analyst hours</span>
+                                    <span>Unit-economics and LTV: CAC build</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>$150 initial assessment gate fee</span>
+                                    <span>Cap table & founding docs review</span>
+                                </li>
+                                <li className="flex items-start gap-2.5">
+                                    <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
+                                        <Check className="h-3 w-3 stroke-[3]" />
+                                    </span>
+                                    <span>3 interviews (25–30 hours total)</span>
+                                </li>
+                                <li className="flex items-start gap-2.5">
+                                    <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
+                                        <Check className="h-3 w-3 stroke-[3]" />
+                                    </span>
+                                    <span>Partner-reviewed 25–30 page report</span>
+                                </li>
+                                <li className="flex items-start gap-2.5">
+                                    <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
+                                        <Check className="h-3 w-3 stroke-[3]" />
+                                    </span>
+                                    <span>Turnaround: 12 working days</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
 
-                    {/* Institutional Card */}
+                    {/* Seed+ / Growth Card */}
                     <div className="flex flex-col justify-between rounded-4xl border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.02)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/50">
                         <div>
                             <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Stage 03</span>
-                            <h3 className="mt-1 text-2xl font-bold text-zinc-950">Institutional</h3>
-                            <p className="mt-3 text-sm leading-relaxed text-zinc-500">Series A/B & SMEs. Full credit warrant success model.</p>
+                            <h3 className="mt-1 text-2xl font-bold text-zinc-950">Seed+ / Growth</h3>
+                            <p className="mt-3 text-sm leading-relaxed text-zinc-500">
+                                ARR above $500k, established processes, larger round or growth equity.
+                            </p>
 
                             {/* Price */}
                             <div className="mt-6">
-                                <span className="text-xs font-medium text-zinc-400">Starting at</span>
+                                <span className="text-xs font-medium text-zinc-400">Total Price</span>
                                 <div className="mt-1 flex items-baseline gap-1">
-                                    <span className="text-4xl font-extrabold tracking-tight text-zinc-900">$1,500</span>
-                                    <span className="text-xs text-zinc-400">/ base</span>
+                                    <span className="text-4xl font-extrabold tracking-tight text-zinc-900">$3,500+</span>
+                                    <span className="text-xs text-zinc-400">floor</span>
                                 </div>
                             </div>
 
@@ -159,25 +176,43 @@ export default function ProgramsPricing() {
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>80+ score qualification gate</span>
+                                    <span>Everything in Stage 02</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>Secure diligence URL & credit model</span>
+                                    <span>Full data-room review</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>15 dedicated forensic analyst hours</span>
+                                    <span>Corporate and governance analysis</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
                                         <Check className="h-3 w-3 stroke-[3]" />
                                     </span>
-                                    <span>Success model: fully credited fee</span>
+                                    <span>Material contract & IP review</span>
+                                </li>
+                                <li className="flex items-start gap-2.5">
+                                    <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
+                                        <Check className="h-3 w-3 stroke-[3]" />
+                                    </span>
+                                    <span>5+ interviews (60+ hours total)</span>
+                                </li>
+                                <li className="flex items-start gap-2.5">
+                                    <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
+                                        <Check className="h-3 w-3 stroke-[3]" />
+                                    </span>
+                                    <span>Board-ready presentation (Partner-led)</span>
+                                </li>
+                                <li className="flex items-start gap-2.5">
+                                    <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
+                                        <Check className="h-3 w-3 stroke-[3]" />
+                                    </span>
+                                    <span>Turnaround: 20 working days</span>
                                 </li>
                             </ul>
                         </div>

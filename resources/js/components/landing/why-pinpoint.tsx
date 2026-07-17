@@ -1,4 +1,4 @@
-import { BadgeCheck, ChevronRight, Coins, Gem, Handshake } from 'lucide-react';
+import { BadgeCheck, Coins, Gem, Handshake } from 'lucide-react';
 import React from 'react';
 
 interface BenefitCardProps {
@@ -30,28 +30,10 @@ export default function WhyPinpoint() {
                             <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl">Why Pinpoint?</h2>
                             <p className="font-sans text-base leading-relaxed text-zinc-500">
                                 With our PARAGON Model™, Pinpoint offers you an easier, faster, smarter, and more secure platform to either raise
-                                funds for your startup or SME or de-risk your investments big time. Besides, Pinpoint is founded and managed by people
-                                who haven’t only worked with startups & SMEs and investors but also love the startup and SME ecosystem. It is all
-                                about having that partner you can TRUST to pinpoint projects or funds that will take you there.
+                                funds for your startup or de-risk your investments. Besides, Pinpoint is founded and managed by people who haven’t
+                                only worked with startups and investors but also love the startup ecosystem. It is all about having that partner you
+                                can TRUST to pinpoint projects or funds that will take you there.
                             </p>
-                        </div>
-                        {/* Pathway CTA buttons in a horizontal flex layout */}
-                        <div className="flex flex-wrap items-center gap-2.5 pt-2">
-                            <a
-                                href="/diagnostic"
-                                className="group flex h-10 items-center justify-between rounded-full bg-[#3A54A5] pr-1 pl-5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-[#2d4182] active:scale-[0.98]"
-                            >
-                                <span>Apply as a Startup</span>
-                                <span className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition-transform duration-300 group-hover:translate-x-0.5">
-                                    <ChevronRight className="h-4 w-4 stroke-[2.5]" />
-                                </span>
-                            </a>
-                            <a
-                                href="/diagnostic"
-                                className="flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white/60 px-5 text-xs font-bold text-zinc-700 shadow-xs transition-all duration-300 hover:border-[#3A54A5]/30 hover:bg-[#3A54A5]/5 hover:text-[#3A54A5] active:scale-[0.98]"
-                            >
-                                Apply as an Investor
-                            </a>
                         </div>
                     </div>
 
@@ -59,19 +41,15 @@ export default function WhyPinpoint() {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-3">
                         <BenefitCard
                             title="Expert Curation"
-                            description="A showcase of first-string startups & SMEs with high growth potential"
+                            description="A showcase of first-string startups with high growth potential"
                             icon={Gem}
                         />
                         <BenefitCard
                             title="Cost Savings"
-                            description="Startups & SMEs become investor-ready while investors de-risk their investments"
+                            description="Startups become investor-ready while investors de-risk their investments"
                             icon={Coins}
                         />
-                        <BenefitCard
-                            title="Credibility"
-                            description="Credible and vetted startups & SMEs with PARAGON Model scorecards"
-                            icon={BadgeCheck}
-                        />
+                        <BenefitCard title="Credibility" description="Credible and vetted startups with PARAGON Model scorecards" icon={BadgeCheck} />
                         <BenefitCard
                             title="Exclusive Network"
                             description="A trusted and growing network of founders & entrepreneurs and investors"

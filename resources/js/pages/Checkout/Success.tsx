@@ -125,7 +125,7 @@ function Step({ n, label, sub, isLast = false }: { n: number; label: string; sub
                 {n}
             </div>
             <div className="-mt-0.5">
-                <p className="text-[13.5px] font-bold text-zinc-950 leading-tight">{label}</p>
+                <p className="text-[13.5px] leading-tight font-bold text-zinc-950">{label}</p>
                 <p className="mt-1 max-w-[280px] text-[12px] leading-relaxed text-zinc-500">{sub}</p>
             </div>
         </div>
@@ -149,7 +149,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
 
                 <div className="w-full max-w-[440px]">
                     {/* Main card */}
-                    <div className="relative overflow-hidden dx-card p-8 sm:p-10 rounded-[2rem] hover:shadow-md transition-all duration-300">
+                    <div className="dx-card relative overflow-hidden rounded-[2rem] p-8 transition-all duration-300 hover:shadow-md sm:p-10">
                         {/* Status Icon */}
                         <FadeUp delay={0.1}>
                             <div className="mb-6 flex justify-center">
@@ -191,10 +191,10 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         {/* Email notice */}
                         <FadeUp delay={0.4}>
                             <div className="mb-8 flex items-center gap-3.5 rounded-xl border border-zinc-200 bg-zinc-50/50 p-4">
-                                <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-zinc-150/80">
+                                <div className="bg-zinc-150/80 flex size-7 shrink-0 items-center justify-center rounded-lg">
                                     <MailCheck className="size-3.5 text-zinc-500" />
                                 </div>
-                                <p className="text-[13px] leading-tight text-zinc-650">
+                                <p className="text-zinc-650 text-[13px] leading-tight">
                                     Receipt delivered to <span className="font-semibold text-zinc-950">{email}</span>.
                                 </p>
                             </div>
@@ -225,7 +225,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                         <FadeUp delay={0.6}>
                             <Link
                                 href={route('onboarding.sign')}
-                                className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase shadow-none transition-all duration-300 outline-none hover:bg-[#2D4182] hover:shadow-[0_8px_25px_rgba(58,84,165,0.25)] hover:scale-[1.005] active:scale-[0.99]"
+                                className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase shadow-none transition-all duration-300 outline-none hover:scale-[1.005] hover:bg-[#2D4182] hover:shadow-[0_8px_25px_rgba(58,84,165,0.25)] active:scale-[0.99]"
                             >
                                 Proceed to Agreement
                                 <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -237,7 +237,7 @@ export default function CheckoutSuccess({ tier_label, total_amount, email, curre
                     <FadeUp delay={0.75}>
                         <div className="mt-6 flex items-start gap-3 rounded-2xl border border-zinc-200 bg-zinc-50/50 px-5 py-4">
                             <Info className="mt-0.5 size-4 shrink-0 text-zinc-400" />
-                            <p className="text-[12px] leading-relaxed text-zinc-550">
+                            <p className="text-zinc-550 text-[12px] leading-relaxed">
                                 Protected transaction. If the program fails to commence within 10 business days, you are fully entitled to our
                                 risk-free, zero-questions refund policy.
                             </p>

@@ -122,9 +122,7 @@ function FlashBanner() {
         <div
             className={cn(
                 'mb-4 flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-semibold',
-                msg.type === 'success'
-                    ? 'border-emerald-500/25 bg-emerald-50 text-emerald-700'
-                    : 'border-rose-500/25 bg-rose-50 text-rose-700',
+                msg.type === 'success' ? 'border-emerald-500/25 bg-emerald-50 text-emerald-700' : 'border-rose-500/25 bg-rose-50 text-rose-700',
             )}
         >
             <div className="flex items-center gap-2">
@@ -144,13 +142,13 @@ function StatCard({ label, value, sub, icon: Icon }: { label: string; value: num
     return (
         <div className="flex items-center gap-3.5 rounded-xl border border-white/80 bg-white/30 px-4 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-                <Icon className="h-4 w-4 text-zinc-550" />
+                <Icon className="text-zinc-550 h-4 w-4" />
             </div>
             <div className="min-w-0">
                 <p className="truncate text-[11px] font-bold tracking-widest text-zinc-500 uppercase">{label}</p>
                 <div className="mt-0.5 flex items-baseline gap-1.5">
                     <span className="text-xl font-extrabold text-zinc-950 tabular-nums">{value.toLocaleString()}</span>
-                    {sub && <span className="text-xs text-zinc-550 font-bold">{sub}</span>}
+                    {sub && <span className="text-zinc-550 text-xs font-bold">{sub}</span>}
                 </div>
             </div>
         </div>
@@ -163,10 +161,8 @@ function TypeBadge({ type }: { type: 'founder' | 'investor' }) {
     return (
         <span
             className={cn(
-                'inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold tracking-wider uppercase border',
-                type === 'founder'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-250/85'
-                    : 'bg-[#3A54A5]/10 text-[#3A54A5] border-[#3A54A5]/25',
+                'inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-bold tracking-wider uppercase',
+                type === 'founder' ? 'border-emerald-250/85 bg-emerald-50 text-emerald-700' : 'border-[#3A54A5]/25 bg-[#3A54A5]/10 text-[#3A54A5]',
             )}
         >
             {type}
@@ -180,10 +176,8 @@ function StatusPill({ value, label }: { value: boolean; label: string }) {
     return (
         <span
             className={cn(
-                'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border shadow-xs',
-                value
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-250'
-                    : 'bg-zinc-100 text-zinc-500 border-zinc-200/80',
+                'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold shadow-xs',
+                value ? 'border-emerald-250 bg-emerald-50 text-emerald-700' : 'border-zinc-200/80 bg-zinc-100 text-zinc-500',
             )}
         >
             {value ? <CheckCircle2 className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
@@ -253,7 +247,7 @@ function FilterTabs({ activeType, totals, currentProps }: { activeType: PageProp
                     }
                     className={cn(
                         'flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-sm font-semibold transition-colors duration-150',
-                        activeType === key ? 'bg-white text-zinc-950 font-bold shadow-sm' : 'text-zinc-550 hover:text-zinc-950',
+                        activeType === key ? 'bg-white font-bold text-zinc-950 shadow-sm' : 'text-zinc-550 hover:text-zinc-950',
                     )}
                 >
                     {label}
@@ -282,10 +276,10 @@ function SearchInput({ value, onChange }: { value: string; onChange: (v: string)
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder="Search name, email, company…"
-                className="h-9 w-full rounded-xl border border-zinc-200 bg-white pr-8 pl-8 text-sm text-zinc-950 placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
+                className="h-9 w-full rounded-xl border border-zinc-200 bg-white pr-8 pl-8 text-sm text-zinc-950 shadow-xs placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
             />
             {value && (
-                <button onClick={() => onChange('')} className="absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400 hover:text-zinc-650">
+                <button onClick={() => onChange('')} className="hover:text-zinc-650 absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400">
                     <X className="h-3.5 w-3.5" />
                 </button>
             )}
@@ -330,7 +324,7 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
                 className={cn(
                     'flex h-7 w-7 items-center justify-center rounded-md border border-transparent transition-colors',
                     entry.converted_at
-                        ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200'
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
                         : 'text-zinc-450 hover:bg-zinc-105 hover:text-zinc-800',
                 )}
             >
@@ -342,7 +336,7 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
                 onClick={handleResend}
                 disabled={resending}
                 title="Resend waitlist email"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-450 border border-transparent transition-colors hover:bg-zinc-105 hover:text-zinc-800 disabled:opacity-40"
+                className="text-zinc-450 hover:bg-zinc-105 flex h-7 w-7 items-center justify-center rounded-md border border-transparent transition-colors hover:text-zinc-800 disabled:opacity-40"
             >
                 <RefreshCw className={cn('h-3.5 w-3.5', resending && 'animate-spin')} />
             </button>
@@ -351,7 +345,7 @@ function RowActions({ entry }: { entry: WaitlistEntry }) {
             <button
                 onClick={handleDelete}
                 title="Delete entry"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-zinc-450 border border-transparent transition-colors hover:bg-rose-50 hover:text-rose-600"
+                className="text-zinc-450 flex h-7 w-7 items-center justify-center rounded-md border border-transparent transition-colors hover:bg-rose-50 hover:text-rose-600"
             >
                 <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -385,7 +379,7 @@ function Pagination({ entries }: { entries: Paginated<WaitlistEntry> }) {
                             preserveScroll
                             className={cn(
                                 'flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-xs font-semibold transition-colors',
-                                link.active ? 'bg-[#3A54A5] text-white shadow-xs font-bold' : 'text-zinc-650 hover:bg-zinc-150 hover:text-zinc-950',
+                                link.active ? 'bg-[#3A54A5] font-bold text-white shadow-xs' : 'text-zinc-650 hover:bg-zinc-150 hover:text-zinc-950',
                             )}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
@@ -439,7 +433,7 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                         </div>
                         <a
                             href={route('admin.waitlist.export')}
-                            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-650 transition-colors hover:border-zinc-350 hover:bg-zinc-50 hover:text-zinc-955 shadow-xs"
+                            className="text-zinc-650 hover:border-zinc-350 hover:text-zinc-955 inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold shadow-xs transition-colors hover:bg-zinc-50"
                         >
                             <Download className="h-4 w-4" />
                             Export CSV
@@ -467,7 +461,7 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                     </div>
 
                     {/* Table */}
-                    <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                    <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                         {entries.data.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-zinc-400">
                                 <Users className="mb-3 h-8 w-8 opacity-40" />
@@ -504,9 +498,11 @@ export default function WaitlistIndex({ entries, activeType, search, sort, dir, 
                                                 <td className="px-4 py-3.5">
                                                     <TypeBadge type={entry.type} />
                                                 </td>
-                                                <td className="px-4 py-3.5 text-zinc-650 font-medium">{entry.company_name ?? entry.firm_name ?? '—'}</td>
-                                                <td className="px-4 py-3.5 text-zinc-650 font-medium">{humanize(entry.stage ?? entry.role)}</td>
-                                                <td className="px-4 py-3.5 text-zinc-450 font-semibold tabular-nums">{fmt(entry.created_at)}</td>
+                                                <td className="text-zinc-650 px-4 py-3.5 font-medium">
+                                                    {entry.company_name ?? entry.firm_name ?? '—'}
+                                                </td>
+                                                <td className="text-zinc-650 px-4 py-3.5 font-medium">{humanize(entry.stage ?? entry.role)}</td>
+                                                <td className="text-zinc-450 px-4 py-3.5 font-semibold tabular-nums">{fmt(entry.created_at)}</td>
                                                 <td className="px-4 py-3.5">
                                                     <StatusPill value={!!entry.email_sent_at} label={entry.email_sent_at ? 'Sent' : 'Pending'} />
                                                 </td>

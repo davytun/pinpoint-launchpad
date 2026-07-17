@@ -37,18 +37,11 @@ function ProgressDots({ current }: { current: number }) {
                                     : 'bg-zinc-200',
                             )}
                         />
-                        <span
-                            className={cn(
-                                'text-[9px] font-bold tracking-[0.16em] uppercase',
-                                step.done ? 'text-[#3A54A5]' : 'text-zinc-400',
-                            )}
-                        >
+                        <span className={cn('text-[9px] font-bold tracking-[0.16em] uppercase', step.done ? 'text-[#3A54A5]' : 'text-zinc-400')}>
                             {step.label}
                         </span>
                     </div>
-                    {i < steps.length - 1 && (
-                        <div className={cn('mb-4 h-px w-8', step.done ? 'bg-[#3A54A5]/30' : 'bg-zinc-200')} />
-                    )}
+                    {i < steps.length - 1 && <div className={cn('mb-4 h-px w-8', step.done ? 'bg-[#3A54A5]/30' : 'bg-zinc-200')} />}
                 </div>
             ))}
         </div>
@@ -106,7 +99,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                         <h1 className="font-display mb-1.5 text-center text-[22px] leading-tight font-extrabold tracking-tight text-zinc-950">
                             Set Up Your Account
                         </h1>
-                        <p className="mb-8 text-center text-[13px] leading-relaxed text-zinc-550">
+                        <p className="text-zinc-550 mb-8 text-center text-[13px] leading-relaxed">
                             Create your password to access your founder dashboard.
                         </p>
 
@@ -204,7 +197,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                         type="button"
                                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                                         onClick={() => setShowPassword((v) => !v)}
-                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-650"
+                                        className="hover:text-zinc-650 absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors"
                                     >
                                         {showPassword ? (
                                             <EyeOff className="size-4" aria-hidden="true" />
@@ -249,7 +242,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                         type="button"
                                         aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
                                         onClick={() => setShowConfirm((v) => !v)}
-                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-650"
+                                        className="hover:text-zinc-650 absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors"
                                     >
                                         {showConfirm ? (
                                             <EyeOff className="size-4" aria-hidden="true" />

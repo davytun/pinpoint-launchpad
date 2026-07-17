@@ -12,7 +12,7 @@ export interface IconPlaceholderProps extends React.SVGProps<SVGSVGElement> {
 
 export function IconPlaceholder({ lucide, className, ...props }: IconPlaceholderProps) {
     if (lucide) {
-        const Icon = (LucideIcons as any)[lucide];
+        const Icon = (LucideIcons as Record<string, React.ComponentType<{ className?: string }>>)[lucide];
         if (Icon) {
             return <Icon className={className} {...props} />;
         }

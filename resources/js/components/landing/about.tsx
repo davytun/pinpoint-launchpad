@@ -44,8 +44,7 @@ function WhatWeDoCard() {
                 <div className="space-y-3">
                     <FeatureTitle>What We Do</FeatureTitle>
                     <FeatureDescription>
-                        We get startups and SMEs investment-ready, significantly de-risking them for investors that we then connect with these
-                        startups and SMEs.
+                        We get startups investment-ready, significantly de-risking them for investors that we then connect with these startups.
                     </FeatureDescription>
                 </div>
                 <div className="pt-2">
@@ -113,8 +112,7 @@ function HowWeDoItCard() {
                 <div className="space-y-2">
                     <FeatureTitle>How We Do It</FeatureTitle>
                     <FeatureDescription>
-                        We evaluate eligible startups and SMEs with our proprietary PARAGON Model™ and onboard the vetted startups and SMEs on our
-                        global platform.
+                        We evaluate eligible startups with our proprietary PARAGON Model™ and onboard the vetted startups on our global platform.
                     </FeatureDescription>
                 </div>
             </div>
@@ -163,8 +161,8 @@ function WhoWeWorkWithCard() {
                 <div className="space-y-2">
                     <FeatureTitle>Who we Work With</FeatureTitle>
                     <FeatureDescription>
-                        We work with both early-stage startup founders and SME entrepreneurs as well as individual and corporate investors who are
-                        looking to investing in a safer future.
+                        We work with early-stage startup founders as well as individual and corporate investors who are looking to invest in a safer
+                        future.
                     </FeatureDescription>
                 </div>
             </div>
@@ -195,7 +193,7 @@ function WhyYouNeedUsCard() {
                 <FeatureTitle>Why You Need Us</FeatureTitle>
                 <div className="space-y-4">
                     <div className="space-y-1.5">
-                        <h4 className="font-display text-[10px] font-black tracking-widest text-[#3A54A5]">STARTUPS & SMES</h4>
+                        <h4 className="font-display text-[10px] font-black tracking-widest text-[#3A54A5]">STARTUPS</h4>
                         <p className="max-w-[42ch] text-sm leading-relaxed text-zinc-500">
                             Significantly save yourself the time and resources it costs you trying to raise funds without first making your enterprise
                             investment-ready and more visible to investors.
@@ -204,8 +202,8 @@ function WhyYouNeedUsCard() {
                     <div className="space-y-1.5">
                         <h4 className="font-display text-[10px] font-black tracking-widest text-[#3A54A5]">INVESTORS</h4>
                         <p className="max-w-[42ch] text-sm leading-relaxed text-zinc-500">
-                            Significantly save yourself the time and resources it costs you seeking investable startups and SMEs on your own when we
-                            can easily pinpoint you there.
+                            Significantly save yourself the time and resources it costs you seeking investable startups on your own when we can easily
+                            pinpoint you there.
                         </p>
                     </div>
                 </div>

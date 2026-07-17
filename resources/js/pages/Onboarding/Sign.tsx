@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, ArrowRight, Check, Loader2, Lock, Percent, RefreshCw, ShieldCheck, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { cn } from '@/lib/utils';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
+import { cn } from '@/lib/utils';
 
 interface PageProps {
     embed_url: string;
@@ -141,7 +141,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                             className="flex h-16 w-16 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50"
                             style={{ boxShadow: '0 0 48px rgba(16,185,129,0.18)' }}
                         >
-                            <Check className="size-8 text-emerald-650" strokeWidth={3} />
+                            <Check className="text-emerald-650 size-8" strokeWidth={3} />
                         </motion.div>
                         <div className="text-center">
                             <p className="font-display text-lg font-bold text-zinc-950">Agreement Signed</p>
@@ -154,7 +154,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                     MOBILE header (shown below md)
                     A compact bar: logo + step pill + email
                 ════════════════════════════════════════ */}
-                <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white/60 backdrop-blur-md px-4 py-3 lg:hidden">
+                <header className="relative z-10 flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white/60 px-4 py-3 backdrop-blur-md lg:hidden">
                     <img src="/pinpoint-logo.png" alt="Pinpoint" className="block h-5 w-auto select-none" style={{ maxWidth: 120 }} />
                     <div className="flex items-center gap-2">
                         <span className="inline-flex items-center rounded-full border border-[#3A54A5]/30 bg-[#3A54A5]/10 px-2 py-0.5 text-[9px] font-bold tracking-[0.16em] text-[#3A54A5] uppercase">
@@ -169,7 +169,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                 ════════════════════════════════════════ */}
                 <div className="relative z-10 flex min-h-0 flex-1 flex-col lg:flex-row">
                     {/* ── Sidebar — hidden on mobile, fixed width on lg+ ── */}
-                    <div className="hidden w-full shrink-0 flex-col overflow-y-auto border-b border-zinc-200 bg-white/40 backdrop-blur-md px-6 py-8 lg:flex lg:w-[280px] xl:w-[300px] lg:border-r lg:border-b-0 lg:min-h-screen">
+                    <div className="hidden w-full shrink-0 flex-col overflow-y-auto border-b border-zinc-200 bg-white/40 px-6 py-8 backdrop-blur-md lg:flex lg:min-h-screen lg:w-[280px] lg:border-r lg:border-b-0 xl:w-[300px]">
                         <FadeUp delay={0}>
                             {/* Logo */}
                             <img src="/pinpoint-logo.png" alt="Pinpoint" className="mb-9 block h-6 w-auto select-none" style={{ maxWidth: 140 }} />
@@ -182,9 +182,9 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                                             className={cn(
                                                 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold tabular-nums transition-colors',
                                                 step.state === 'done'
-                                                    ? 'border-emerald-500/30 bg-emerald-50 text-emerald-650'
+                                                    ? 'text-emerald-650 border-emerald-500/30 bg-emerald-50'
                                                     : step.state === 'active'
-                                                      ? 'border-[#3A54A5]/30 bg-white shadow-xs text-[#3A54A5]'
+                                                      ? 'border-[#3A54A5]/30 bg-white text-[#3A54A5] shadow-xs'
                                                       : 'border-zinc-200 bg-zinc-50 text-zinc-400',
                                             )}
                                         >
@@ -196,7 +196,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                                                 step.state === 'done'
                                                     ? 'text-zinc-400 line-through'
                                                     : step.state === 'active'
-                                                      ? 'text-zinc-900 font-bold'
+                                                      ? 'font-bold text-zinc-900'
                                                       : 'text-zinc-400',
                                             )}
                                         >
@@ -239,7 +239,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                         </div>
 
                         {/* Push pill to bottom */}
-                        <div className="flex-1 min-h-[40px]" />
+                        <div className="min-h-[40px] flex-1" />
 
                         {/* Tier / email pill */}
                         <FadeUp delay={0.4}>
@@ -264,7 +264,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                     >
                         {/* Desktop sub-header above iframe */}
                         <div className="hidden shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-5 py-2.5 lg:flex">
-                            <span className="text-[10px] font-semibold tracking-[0.22em] text-zinc-550 uppercase">Pinpoint Investment Warrant</span>
+                            <span className="text-zinc-550 text-[10px] font-semibold tracking-[0.22em] uppercase">Pinpoint Investment Warrant</span>
                             <div className="flex items-center gap-1.5 text-[9px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
                                 <Lock className="size-2.5 text-zinc-400" />
                                 <span>BoldSign · SOC 2</span>
@@ -272,7 +272,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                         </div>
 
                         {/* iframe — absolutely fills its container */}
-                        <div className="relative min-h-[500px] lg:min-h-0 flex-1">
+                        <div className="relative min-h-[500px] flex-1 lg:min-h-0">
                             {/* Loading overlay */}
                             {!loaded && !error && (
                                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white">
@@ -300,9 +300,9 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                                     </div>
                                     <button
                                         onClick={() => router.reload({ preserveUrl: true })}
-                                        className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[12px] font-semibold text-zinc-650 transition-all hover:bg-zinc-50"
+                                        className="text-zinc-650 flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-[12px] font-semibold transition-all hover:bg-zinc-50"
                                     >
-                                        <RefreshCw className="size-3.5 text-zinc-550" />
+                                        <RefreshCw className="text-zinc-550 size-3.5" />
                                         Refresh Agreement
                                     </button>
                                 </div>
@@ -310,7 +310,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                                 <iframe
                                     src={embed_url}
                                     title="Pinpoint Investment Warrant"
-                                    className="absolute inset-0 bg-white border-0"
+                                    className="absolute inset-0 border-0 bg-white"
                                     width="100%"
                                     height="100%"
                                     allow="encrypted-media"

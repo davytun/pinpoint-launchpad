@@ -21,7 +21,7 @@
         'low'      => 'You are in the Build phase. Your focus now is product-market validation and structural clean-up before any investor conversation.',
         'mid_low'  => 'You have a foundation, but key gaps could trigger red flags in due diligence. Address them before approaching institutional capital.',
         'mid_high' => 'You are an Investment Ready Candidate. Your fundamentals are solid. A PARAGON Certification closes the final verification gap.',
-        'high'     => 'You are a High Velocity Candidate. Your profile is exceptional. A PARAGON Certification makes that verifiable to any investor.',
+        'high'     => 'You are a High Velocity Candidate. The profile from your Self-Scan is exceptional.<br><br>However, a company can be excellent and still score badly under closer assessment by investors. If the excellence cannot be evidenced, no investor can act on it. The distance between what is true and what is provable is usually the whole distance between you and the money.<br><br>This is why we invite you to proceed to take the PARAGON Investment Assessment (PIA).<br><br>Click link below to learn more about the PIA and apply:<br><a href="https://pinpointlaunchpad.com/assessment" style="color:#3A54A5;font-weight:700;">https://pinpointlaunchpad.com/assessment</a>',
     ];
     $color   = $bandColors[$session->score_band] ?? '#2F4587';
     $label   = $bandLabels[$session->score_band]  ?? 'Unknown';
@@ -50,9 +50,15 @@
     </tr>
   </table>
 
+  @if($session->score_band === 'high')
+  <p style="margin-bottom: 32px; font-size: 16px; color: #4B5563; line-height: 1.6;">
+    {!! $message !!}
+  </p>
+  @else
   <p style="margin-bottom: 32px; font-size: 16px; color: #4B5563; line-height: 1.6;">
     {{ $message }}
   </p>
+  @endif
 
   {{-- Pillar breakdown --}}
   <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #111827;">Pillar Breakdown</p>
@@ -85,7 +91,7 @@
   </div>
   @else
   <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
-    <a href="{{ url('/diagnostic/result') }}" class="cta-button" style="background-color: #6B7280;">
+    <a href="{{ route('diagnostic.view', $session->id) }}" class="cta-button" style="background-color: #6B7280;">
       View Your Results
     </a>
   </div>

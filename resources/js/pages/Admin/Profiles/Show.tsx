@@ -99,11 +99,11 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                     {/* Header */}
                     <div className="mb-8 flex items-center justify-between">
                         <div>
-                            <Link href="/admin/profiles" className="mb-2 block text-sm text-zinc-550 hover:text-zinc-955 font-bold">
+                            <Link href="/admin/profiles" className="text-zinc-550 hover:text-zinc-955 mb-2 block text-sm font-bold">
                                 &larr; All Profiles
                             </Link>
                             <h1 className="text-2xl font-extrabold text-zinc-950">{founder.company_name ?? founder.email}</h1>
-                            <p className="mt-1 text-sm text-zinc-555 font-medium">
+                            <p className="text-zinc-555 mt-1 text-sm font-medium">
                                 {founder.full_name} · {founder.email}
                             </p>
                         </div>
@@ -111,14 +111,14 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                             href={`/verify/${profile.slug}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-650 hover:border-zinc-350 hover:text-zinc-955 shadow-xs font-semibold"
+                            className="text-zinc-650 hover:border-zinc-350 hover:text-zinc-955 flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold shadow-xs"
                         >
                             View Public Page <ExternalLink className="size-4" />
                         </a>
                     </div>
 
                     {flash?.success && (
-                        <div className="mb-6 flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 font-semibold">
+                        <div className="mb-6 flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
                             <CheckCircle2 className="size-4" />
                             {flash.success}
                         </div>
@@ -126,14 +126,12 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
 
                     <div className="grid gap-6 lg:grid-cols-2">
                         {/* ── Left: Profile Editor ── */}
-                        <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                        <div className="rounded-2xl border border-white/80 bg-white/30 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                             <h2 className="mb-5 text-sm font-bold tracking-widest text-zinc-500 uppercase">Profile Editor</h2>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-bold tracking-widest text-zinc-500 uppercase">
-                                        Analyst Summary
-                                    </label>
+                                    <label className="mb-1.5 block text-xs font-bold tracking-widest text-zinc-500 uppercase">Analyst Summary</label>
                                     <textarea
                                         rows={6}
                                         maxLength={2000}
@@ -188,7 +186,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                     <div className="space-y-3">
                                         {PILLAR_KEYS.map((key) => (
                                             <div key={key} className="flex items-center gap-3">
-                                                <span className="w-24 text-xs text-zinc-650 font-semibold capitalize">{key}</span>
+                                                <span className="text-zinc-650 w-24 text-xs font-semibold capitalize">{key}</span>
                                                 <input
                                                     type="range"
                                                     min={0}
@@ -197,7 +195,9 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                                     onChange={(e) => setRadarData((d) => ({ ...d, [key]: Number(e.target.value) }))}
                                                     className="flex-1 accent-[#3A54A5]"
                                                 />
-                                                <span className="w-8 text-right font-mono text-xs text-zinc-700 font-bold">{radarData[key] ?? 0}</span>
+                                                <span className="w-8 text-right font-mono text-xs font-bold text-zinc-700">
+                                                    {radarData[key] ?? 0}
+                                                </span>
                                             </div>
                                         ))}
                                     </div>
@@ -221,7 +221,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                             )}
                                         />
                                     </button>
-                                    <span className="text-sm text-zinc-650 font-semibold">
+                                    <span className="text-zinc-650 text-sm font-semibold">
                                         {isPublic ? 'Public — visible to investors' : 'Draft — not visible'}
                                     </span>
                                 </div>
@@ -229,7 +229,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                 <button
                                     onClick={handleSave}
                                     disabled={saving}
-                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors disabled:opacity-60"
+                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-colors hover:bg-[#2D4182] hover:shadow-lg disabled:opacity-60"
                                 >
                                     <Save className="size-4" />
                                     {saving ? 'Saving...' : 'Save Profile'}
@@ -238,7 +238,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                         </div>
 
                         {/* ── Right: Badge Manager ── */}
-                        <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                        <div className="rounded-2xl border border-white/80 bg-white/30 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                             <h2 className="mb-5 text-sm font-bold tracking-widest text-zinc-500 uppercase">Badge Manager</h2>
 
                             <div className="space-y-3">
@@ -281,7 +281,7 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
 
                     {/* ── Access Requests ── */}
                     {access_requests.length > 0 && (
-                        <div className="mt-6 rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                        <div className="mt-6 rounded-2xl border border-white/80 bg-white/30 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                             <h2 className="mb-5 text-sm font-bold tracking-widest text-zinc-500 uppercase">
                                 Investor Access Requests ({access_requests.length})
                             </h2>
@@ -297,14 +297,11 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                                     </thead>
                                     <tbody className="divide-y divide-zinc-200/80">
                                         {access_requests.map((req) => (
-                                            <tr
-                                                key={req.id}
-                                                className="group transition-colors hover:bg-zinc-50/40"
-                                            >
-                                                <td className="py-3 pr-4 text-zinc-900 font-bold">{req.investor_name}</td>
-                                                <td className="py-3 pr-4 text-zinc-655 font-medium">{req.firm_name ?? '—'}</td>
-                                                <td className="py-3 pr-4 text-zinc-655 font-medium">{req.investor_email}</td>
-                                                <td className="py-3 text-zinc-450 font-semibold">{new Date(req.created_at).toLocaleDateString()}</td>
+                                            <tr key={req.id} className="group transition-colors hover:bg-zinc-50/40">
+                                                <td className="py-3 pr-4 font-bold text-zinc-900">{req.investor_name}</td>
+                                                <td className="text-zinc-655 py-3 pr-4 font-medium">{req.firm_name ?? '—'}</td>
+                                                <td className="text-zinc-655 py-3 pr-4 font-medium">{req.investor_email}</td>
+                                                <td className="text-zinc-450 py-3 font-semibold">{new Date(req.created_at).toLocaleDateString()}</td>
                                             </tr>
                                         ))}
                                     </tbody>

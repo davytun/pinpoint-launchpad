@@ -2,6 +2,7 @@ import SideRays from '@/components/SideRays';
 import About from '@/components/landing/about';
 import { ScrollReveal } from '@/components/landing/animations';
 import AudienceSplit from '@/components/landing/audience-split';
+import BlogTeaser from '@/components/landing/blog-teaser';
 import Blueprint from '@/components/landing/blueprint';
 import Contact from '@/components/landing/contact';
 import CtaQuote from '@/components/landing/cta-quote';
@@ -11,11 +12,23 @@ import Footer from '@/components/landing/footer';
 import Header from '@/components/landing/header';
 import Hero from '@/components/landing/hero';
 import ParagonModel from '@/components/landing/paragon-model';
+import PiaTeaser from '@/components/landing/pia-teaser';
 import ProgramsPricing from '@/components/landing/programs-pricing';
 import WhyPinpoint from '@/components/landing/why-pinpoint';
 import { Head } from '@inertiajs/react';
 
-export default function Welcome() {
+interface BlogPostItem {
+    title: string;
+    slug: string;
+    excerpt: string;
+    cover_image: string | null;
+    author_name: string;
+    category: string | null;
+    reading_time_mins: number;
+    published_at: string;
+}
+
+export default function Welcome({ latest_posts = [] }: { latest_posts?: BlogPostItem[] }) {
     return (
         <>
             <Head title="Welcome" />
@@ -65,11 +78,19 @@ export default function Welcome() {
                         </ScrollReveal>
 
                         <ScrollReveal>
+                            <PiaTeaser />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
                             <ProgramsPricing />
                         </ScrollReveal>
 
                         <ScrollReveal>
                             <Faq />
+                        </ScrollReveal>
+
+                        <ScrollReveal>
+                            <BlogTeaser posts={latest_posts} />
                         </ScrollReveal>
 
                         <ScrollReveal>

@@ -100,29 +100,29 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
                             <p className="max-w-[200px] truncate text-[13px] font-bold text-zinc-900" title={doc.original_filename}>
                                 {doc.original_filename}
                             </p>
-                            <p className="text-[11px] text-zinc-500 font-medium">{doc.file_size}</p>
+                            <p className="text-[11px] font-medium text-zinc-500">{doc.file_size}</p>
                         </div>
                     </div>
                 </td>
-                <td className="px-4 py-3 text-[12px] text-zinc-650 font-medium">{doc.created_at}</td>
+                <td className="text-zinc-650 px-4 py-3 text-[12px] font-medium">{doc.created_at}</td>
                 <td className="px-4 py-3">
                     {doc.is_reviewed ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-255 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 shadow-xs">
+                        <span className="border-emerald-255 inline-flex items-center gap-1 rounded-full border bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700 shadow-xs">
                             <CheckCircle2 className="size-3" aria-hidden="true" /> Reviewed
                         </span>
                     ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-250 bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 shadow-xs">
+                        <span className="border-amber-250 inline-flex items-center gap-1 rounded-full border bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 shadow-xs">
                             <Clock className="size-3" aria-hidden="true" /> Pending
                         </span>
                     )}
-                    {doc.reviewed_by && <p className="mt-0.5 text-[10px] text-zinc-400 font-semibold">by {doc.reviewed_by}</p>}
+                    {doc.reviewed_by && <p className="mt-0.5 text-[10px] font-semibold text-zinc-400">by {doc.reviewed_by}</p>}
                 </td>
                 <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5">
                         <button
                             onClick={handleDownload}
                             title="Download"
-                            className="rounded-lg border border-zinc-200 bg-white p-1.5 text-zinc-650 shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
+                            className="text-zinc-650 rounded-lg border border-zinc-200 bg-white p-1.5 shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                         >
                             <Download className="size-3.5" aria-hidden="true" />
                         </button>
@@ -133,8 +133,8 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
                             className={cn(
                                 'rounded-lg border p-1.5 transition-colors',
                                 doc.is_reviewed
-                                    ? 'border-zinc-200 bg-white text-zinc-400 hover:bg-zinc-50 hover:text-zinc-955 shadow-xs'
-                                    : 'border-emerald-250 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 shadow-xs font-bold',
+                                    ? 'hover:text-zinc-955 border-zinc-200 bg-white text-zinc-400 shadow-xs hover:bg-zinc-50'
+                                    : 'border-emerald-250 bg-emerald-50 font-bold text-emerald-700 shadow-xs hover:bg-emerald-100',
                             )}
                         >
                             {togglingReview ? (
@@ -149,8 +149,8 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
                             className={cn(
                                 'rounded-lg border p-1.5 transition-colors',
                                 noteOpen || doc.analyst_note
-                                    ? 'border-[#3A54A5]/25 bg-[#3A54A5]/10 text-[#3A54A5] font-bold shadow-xs'
-                                    : 'border-zinc-200 bg-white text-zinc-500 hover:bg-zinc-50 hover:text-zinc-950 shadow-xs',
+                                    ? 'border-[#3A54A5]/25 bg-[#3A54A5]/10 font-bold text-[#3A54A5] shadow-xs'
+                                    : 'border-zinc-200 bg-white text-zinc-500 shadow-xs hover:bg-zinc-50 hover:text-zinc-950',
                             )}
                         >
                             <MessageSquare className="size-3.5" aria-hidden="true" />
@@ -172,14 +172,14 @@ function DocumentRow({ doc, founderId }: { doc: DocumentItem; founderId: number 
                                     maxLength={500}
                                     rows={3}
                                     placeholder="Add a note about this document..."
-                                    className="w-full resize-none rounded-xl border border-zinc-200 bg-white px-3 py-2 text-[13px] text-zinc-955 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
+                                    className="text-zinc-955 w-full resize-none rounded-xl border border-zinc-200 bg-white px-3 py-2 text-[13px] shadow-xs focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
                                 />
-                                <p className="mt-0.5 text-[10px] text-zinc-400 font-semibold">{note.length}/500</p>
+                                <p className="mt-0.5 text-[10px] font-semibold text-zinc-400">{note.length}/500</p>
                             </div>
                             <button
                                 onClick={saveNote}
                                 disabled={savingNote || !note.trim()}
-                                className="mt-5 rounded-xl bg-[#3A54A5] px-4 py-2 text-[12px] font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors disabled:opacity-50"
+                                className="mt-5 rounded-xl bg-[#3A54A5] px-4 py-2 text-[12px] font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-colors hover:bg-[#2D4182] hover:shadow-lg disabled:opacity-50"
                             >
                                 {savingNote ? <Loader2 className="size-4 animate-spin" /> : 'Save'}
                             </button>
@@ -211,7 +211,7 @@ export default function AdminDocumentsIndex({ founder, documents, audit_status }
                             <div>
                                 <p className="text-[12px] font-bold tracking-wide text-zinc-500 uppercase">Founder Documents</p>
                                 <h1 className="mt-0.5 text-2xl font-extrabold text-zinc-950">{founder.company_name ?? founder.full_name}</h1>
-                                <p className="text-[13px] text-zinc-555 font-medium">{founder.email}</p>
+                                <p className="text-zinc-555 text-[13px] font-medium">{founder.email}</p>
                             </div>
                             <div className="flex items-center gap-3">
                                 <span
@@ -223,12 +223,12 @@ export default function AdminDocumentsIndex({ founder, documents, audit_status }
                                               ? 'border-[#3A54A5]/25 bg-[#3A54A5]/10 text-[#3A54A5]'
                                               : audit_status === 'needs_info'
                                                 ? 'border-amber-250 bg-amber-50 text-amber-700'
-                                                : 'border-zinc-200 bg-zinc-100 text-zinc-650',
+                                                : 'text-zinc-650 border-zinc-200 bg-zinc-100',
                                     )}
                                 >
                                     {audit_status.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
                                 </span>
-                                <span className="text-[12px] text-zinc-550 font-semibold">
+                                <span className="text-zinc-550 text-[12px] font-semibold">
                                     {reviewedCount}/{documents.length} reviewed
                                 </span>
                             </div>
@@ -237,7 +237,7 @@ export default function AdminDocumentsIndex({ founder, documents, audit_status }
 
                     {/* Flash */}
                     {flash?.success && (
-                        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-[13px] text-emerald-700 font-semibold">
+                        <div className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-[13px] font-semibold text-emerald-700">
                             <CheckCircle2 className="size-4 shrink-0" aria-hidden="true" />
                             {flash.success}
                         </div>
@@ -245,13 +245,13 @@ export default function AdminDocumentsIndex({ founder, documents, audit_status }
 
                     {/* Table */}
                     {documents.length === 0 ? (
-                        <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md p-16 text-center shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                        <div className="rounded-2xl border border-white/80 bg-white/30 p-16 text-center shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                             <FileText className="mx-auto mb-3 size-10 text-zinc-400" aria-hidden="true" />
                             <p className="text-[14px] font-bold text-zinc-900">No documents uploaded yet</p>
-                            <p className="mt-1 text-[12px] text-zinc-500 font-medium">The founder has not uploaded any documents.</p>
+                            <p className="mt-1 text-[12px] font-medium text-zinc-500">The founder has not uploaded any documents.</p>
                         </div>
                     ) : (
-                        <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                        <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[700px] text-left">
                                     <thead>

@@ -13,7 +13,7 @@ export function CobeGlobe({ className }: { className?: string }) {
         }
 
         const globe = createGlobe(canvasRef.current, {
-            ...({} as any),
+            ...({} as Record<string, unknown>),
             devicePixelRatio: 2,
             width: 600 * 2,
             height: 600 * 2,
@@ -31,7 +31,7 @@ export function CobeGlobe({ className }: { className?: string }) {
                 { location: [37.7595, -122.4367], size: 0.03 },
                 { location: [40.7128, -74.006], size: 0.1 },
             ],
-            onRender: (state: Record<string, any>) => {
+            onRender: (state: Record<string, unknown>) => {
                 // Called on every animation frame.
                 // `state` will be an empty object, return updated params.
                 state.phi = phi;

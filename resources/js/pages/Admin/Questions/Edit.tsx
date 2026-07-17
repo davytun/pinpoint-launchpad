@@ -46,22 +46,20 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                     {/* Back link */}
                     <Link
                         href={route('admin.questions.index')}
-                        className="mb-8 inline-flex items-center gap-1.5 text-xs font-bold text-zinc-555 transition-colors hover:text-zinc-955"
+                        className="text-zinc-555 hover:text-zinc-955 mb-8 inline-flex items-center gap-1.5 text-xs font-bold transition-colors"
                     >
                         ← Back to Questions
                     </Link>
 
                     {/* Header */}
-                    <div className="mb-8 animate-fade-in">
-                        <p className="mb-0.5 text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">
-                            Admin · Question {question.order}
-                        </p>
+                    <div className="animate-fade-in mb-8">
+                        <p className="mb-0.5 text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Admin · Question {question.order}</p>
                         <h1 className="text-2xl font-extrabold text-zinc-950">Edit Question</h1>
-                        <p className="mt-1 text-sm text-zinc-555 font-semibold capitalize">Pillar: {question.pillar}</p>
+                        <p className="text-zinc-555 mt-1 text-sm font-semibold capitalize">Pillar: {question.pillar}</p>
                     </div>
 
                     {/* Form card */}
-                    <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)] p-7 animate-fade-in">
+                    <div className="animate-fade-in rounded-2xl border border-white/80 bg-white/30 p-7 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                         <form onSubmit={submit} noValidate className="space-y-6">
                             {/* question_text */}
                             <div className="space-y-1.5">
@@ -75,7 +73,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     onChange={(e) => form.setData('question_text', e.target.value)}
                                     className={`${inputClass} resize-y leading-relaxed`}
                                 />
-                                {form.errors.question_text && <p className="text-xs text-rose-600 font-semibold">{form.errors.question_text}</p>}
+                                {form.errors.question_text && <p className="text-xs font-semibold text-rose-600">{form.errors.question_text}</p>}
                             </div>
 
                             {/* sub_text */}
@@ -91,7 +89,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     placeholder="Clarifying context shown below the question"
                                     className={inputClass}
                                 />
-                                {form.errors.sub_text && <p className="text-xs text-rose-600 font-semibold">{form.errors.sub_text}</p>}
+                                {form.errors.sub_text && <p className="text-xs font-semibold text-rose-600">{form.errors.sub_text}</p>}
                             </div>
 
                             {/* points */}
@@ -108,14 +106,14 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     onChange={(e) => form.setData('points', parseInt(e.target.value, 10) || 1)}
                                     className={`${inputClass} w-28 tabular-nums`}
                                 />
-                                {form.errors.points && <p className="text-xs text-rose-600 font-semibold">{form.errors.points}</p>}
+                                {form.errors.points && <p className="text-xs font-semibold text-rose-600">{form.errors.points}</p>}
                             </div>
 
                             {/* is_active toggle */}
                             <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3.5 shadow-xs">
                                 <div>
                                     <p className="text-sm font-bold text-zinc-900">Active</p>
-                                    <p className="text-xs text-zinc-500 font-medium">Inactive questions are hidden from the diagnostic</p>
+                                    <p className="text-xs font-medium text-zinc-500">Inactive questions are hidden from the diagnostic</p>
                                 </div>
                                 <button
                                     type="button"
@@ -141,14 +139,17 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
 
                             {/* Save */}
                             <div className="flex items-center justify-between">
-                                <Link href={route('admin.questions.index')} className="text-sm text-zinc-550 transition-colors hover:text-zinc-950 font-bold">
+                                <Link
+                                    href={route('admin.questions.index')}
+                                    className="text-zinc-550 text-sm font-bold transition-colors hover:text-zinc-950"
+                                >
                                     Cancel
                                 </Link>
 
                                 <button
                                     type="submit"
                                     disabled={form.processing}
-                                    className="flex items-center gap-2 rounded-xl bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex items-center gap-2 rounded-xl bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-all duration-150 hover:bg-[#2D4182] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {form.processing ? (
                                         <>

@@ -80,7 +80,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
 
             <div className="flex min-h-screen flex-col lg:flex-row">
                 {/* ── Sidebar — hidden on mobile, fixed width on md+ ── */}
-                <div className="flex w-full flex-col justify-between border-b border-zinc-200 bg-white/40 backdrop-blur-md px-6 py-10 lg:min-h-screen lg:w-[42%] lg:border-r lg:border-b-0 lg:px-14 lg:py-16">
+                <div className="flex w-full flex-col justify-between border-b border-zinc-200 bg-white/40 px-6 py-10 backdrop-blur-md lg:min-h-screen lg:w-[42%] lg:border-r lg:border-b-0 lg:px-14 lg:py-16">
                     <FadeUp delay={0} className="flex flex-1 flex-col">
                         <div>
                             <PinpointLogo height={26} />
@@ -98,7 +98,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                                 className={cn(
                                                     'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold tabular-nums transition-colors',
                                                     step.state === 'active'
-                                                        ? 'border-[#3A54A5]/30 bg-white shadow-xs text-[#3A54A5]'
+                                                        ? 'border-[#3A54A5]/30 bg-white text-[#3A54A5] shadow-xs'
                                                         : 'border-zinc-200 bg-zinc-50 text-zinc-400',
                                                 )}
                                             >
@@ -107,7 +107,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                             <span
                                                 className={cn(
                                                     'text-[13px] font-medium transition-colors',
-                                                    step.state === 'active' ? 'text-zinc-900 font-bold' : 'text-zinc-400',
+                                                    step.state === 'active' ? 'font-bold text-zinc-900' : 'text-zinc-400',
                                                 )}
                                             >
                                                 {step.label}
@@ -120,7 +120,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     <h1 className="font-display text-3xl leading-tight font-extrabold tracking-tight text-zinc-950">
                                         One step before your audit begins.
                                     </h1>
-                                    <p className="text-[14px] leading-relaxed text-zinc-550">
+                                    <p className="text-zinc-550 text-[14px] leading-relaxed">
                                         Your name and entity will appear on the legally binding Pinpoint Investment Warrant. This takes under a
                                         minute.
                                     </p>
@@ -155,7 +155,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                         <div className="mb-8 hidden lg:block">
                             <p className="mb-1.5 text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Step 1 of 2</p>
                             <h2 className="font-display text-2xl font-extrabold text-zinc-950">Confirm Your Details</h2>
-                            <p className="mt-2 text-[13px] leading-relaxed text-zinc-550">
+                            <p className="text-zinc-550 mt-2 text-[13px] leading-relaxed">
                                 These details appear on your signed warrant — enter them exactly as they should read legally.
                             </p>
                         </div>
@@ -225,7 +225,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                     <button
                                         type="submit"
                                         disabled={processing}
-                                        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-3.5 text-[13px] font-bold tracking-[0.15em] text-white uppercase shadow-none transition-all duration-300 outline-none hover:bg-[#2D4182] hover:shadow-[0_8px_25px_rgba(58,84,165,0.25)] hover:scale-[1.005] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+                                        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-3.5 text-[13px] font-bold tracking-[0.15em] text-white uppercase shadow-none transition-all duration-300 outline-none hover:scale-[1.005] hover:bg-[#2D4182] hover:shadow-[0_8px_25px_rgba(58,84,165,0.25)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         {processing ? (
                                             <>
@@ -246,9 +246,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                         <FadeUp delay={0.35}>
                             <div className="mt-5 flex items-center justify-center gap-2">
                                 <Lock className="size-3 shrink-0 text-zinc-400" />
-                                <p className="text-[11px] text-zinc-400">
-                                    Your details are used only for the legal agreement and are never shared.
-                                </p>
+                                <p className="text-[11px] text-zinc-400">Your details are used only for the legal agreement and are never shared.</p>
                             </div>
                         </FadeUp>
                     </motion.div>

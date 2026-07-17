@@ -100,7 +100,12 @@ function formatBytes(bytes: number): string {
 
 function ProCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
     return (
-        <div className={cn('overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md transition-all duration-300', className)}>
+        <div
+            className={cn(
+                'overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md transition-all duration-300',
+                className,
+            )}
+        >
             {children}
         </div>
     );
@@ -206,7 +211,7 @@ function UploadZone({ categories, onSuccess }: { categories: Category[]; onSucce
     return (
         <form onSubmit={handleSubmit}>
             <ProCard className="mb-6 p-6">
-                <p className="mb-5 text-[11px] font-bold tracking-wider text-zinc-550 uppercase">Upload Supporting Documents</p>
+                <p className="text-zinc-550 mb-5 text-[11px] font-bold tracking-wider uppercase">Upload Supporting Documents</p>
 
                 {/* Drop zone */}
                 <div
@@ -230,7 +235,7 @@ function UploadZone({ categories, onSuccess }: { categories: Category[]; onSucce
                         <Upload className="size-6 text-[#3A54A5]" aria-hidden="true" />
                     </div>
                     <p className="text-[14px] font-extrabold text-zinc-950">Drop your files here</p>
-                    <p className="text-[13px] text-zinc-550 mt-0.5">or click to browse</p>
+                    <p className="text-zinc-550 mt-0.5 text-[13px]">or click to browse</p>
                     <p className="mt-3 text-[11px] text-zinc-400">PDF, DOCX, XLSX, Images — max 100MB</p>
                     <input
                         ref={fileInputRef}
@@ -260,7 +265,7 @@ function UploadZone({ categories, onSuccess }: { categories: Category[]; onSucce
                                     <FileText className="size-4 shrink-0 text-[#3A54A5]" aria-hidden="true" />
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate text-[13px] font-bold text-zinc-900">{file.name}</p>
-                                        <p className="text-[11px] text-zinc-500 mt-0.5">{formatBytes(file.size)}</p>
+                                        <p className="mt-0.5 text-[11px] text-zinc-500">{formatBytes(file.size)}</p>
                                     </div>
                                     {!processing && (
                                         <button
@@ -269,7 +274,7 @@ function UploadZone({ categories, onSuccess }: { categories: Category[]; onSucce
                                                 e.stopPropagation();
                                                 removeFile(i);
                                             }}
-                                            className="rounded-md p-1 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-650"
+                                            className="hover:text-red-650 rounded-md p-1 text-zinc-400 transition-colors hover:bg-red-50"
                                             aria-label={`Remove ${file.name}`}
                                         >
                                             <X className="size-4" aria-hidden="true" />
@@ -291,11 +296,11 @@ function UploadZone({ categories, onSuccess }: { categories: Category[]; onSucce
                             transition={{ duration: 0.2 }}
                             className="mb-6"
                         >
-                            <div className="mb-2 flex justify-between text-[11px] text-zinc-550">
+                            <div className="text-zinc-550 mb-2 flex justify-between text-[11px]">
                                 <span>Uploading{selectedFiles.length > 1 ? ` ${selectedFiles.length} files` : ''}…</span>
                                 <span className="font-bold">{progress}%</span>
                             </div>
-                            <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-150">
+                            <div className="bg-zinc-150 h-1 w-full overflow-hidden rounded-full">
                                 <motion.div
                                     className="h-full rounded-full bg-[#3A54A5]"
                                     animate={{ width: `${progress}%` }}
@@ -331,7 +336,7 @@ function UploadZone({ categories, onSuccess }: { categories: Category[]; onSucce
                             'group relative flex h-10 items-center justify-center rounded-lg px-6 text-[13px] font-semibold tracking-wider uppercase transition-all duration-200',
                             canSubmit
                                 ? 'bg-[#3A54A5] text-white shadow-lg shadow-[#3A54A5]/10 hover:bg-[#2D4182]'
-                                : 'cursor-not-allowed bg-zinc-100 text-zinc-400 border border-zinc-200/50',
+                                : 'cursor-not-allowed border border-zinc-200/50 bg-zinc-100 text-zinc-400',
                         )}
                     >
                         <span className="relative z-10 flex items-center gap-2">
@@ -402,7 +407,7 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
             </div>
 
             {/* Desktop columns */}
-            <div className="hidden flex-1 items-center gap-4 text-[12.5px] text-zinc-650 sm:flex">
+            <div className="text-zinc-650 hidden flex-1 items-center gap-4 text-[12.5px] sm:flex">
                 <span className="w-20 shrink-0 text-right">{doc.file_size}</span>
                 <span className="flex-1 text-right font-mono text-[11px] opacity-60">{doc.created_at}</span>
             </div>
@@ -410,7 +415,7 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
             {/* Status badge */}
             <div className="flex w-32 shrink-0 justify-end">
                 {doc.is_reviewed ? (
-                    <span className="text-[10px] font-bold tracking-wider text-emerald-650 uppercase">Reviewed</span>
+                    <span className="text-emerald-650 text-[10px] font-bold tracking-wider uppercase">Reviewed</span>
                 ) : (
                     <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Pending</span>
                 )}
@@ -429,7 +434,7 @@ function DocumentRow({ doc, onDelete }: { doc: DocumentItem; onDelete: (doc: Doc
                     <button
                         onClick={() => onDelete(doc)}
                         title="Delete"
-                        className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-655"
+                        className="hover:text-red-655 rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50"
                     >
                         <Trash2 className="size-4" aria-hidden="true" />
                     </button>
@@ -459,11 +464,6 @@ export default function DocumentsIndex({ founder, documents, can_upload, audit_s
         });
     }
 
-    const gridCategories = categories.reduce<Record<string, Category>>((acc, cat) => {
-        acc[cat.value] = cat;
-        return acc;
-    }, {});
-
     const grouped = documents.reduce<Record<string, DocumentItem[]>>((acc, doc) => {
         if (!acc[doc.category_label]) acc[doc.category_label] = [];
         acc[doc.category_label].push(doc);
@@ -483,10 +483,10 @@ export default function DocumentsIndex({ founder, documents, can_upload, audit_s
                     <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <h1 className="font-display text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">Your Documents</h1>
-                            <p className="mt-2 text-[15px] text-zinc-550">Upload supporting evidence for your analyst to review.</p>
+                            <p className="text-zinc-550 mt-2 text-[15px]">Upload supporting evidence for your analyst to review.</p>
                         </div>
                         <div className="shrink-0">
-                            <div className="inline-flex items-center rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px] font-semibold text-zinc-650 shadow-xs">
+                            <div className="text-zinc-650 inline-flex items-center rounded-lg border border-zinc-200 bg-white px-4 py-2 text-[13px] font-semibold shadow-xs">
                                 <span className="mr-2 font-bold text-[#3A54A5]">{total_count}</span>
                                 <span className="opacity-30">/</span>
                                 <span className="ml-2 opacity-50">{max_files} Documents</span>
@@ -515,8 +515,8 @@ export default function DocumentsIndex({ founder, documents, can_upload, audit_s
                 {/* ── Audit complete notice ── */}
                 {auditComplete && (
                     <FadeUp delay={0.05}>
-                        <div className="mb-8 flex items-start gap-3 rounded-lg border border-amber-250 bg-amber-50/50 px-4 py-4">
-                            <AlertTriangle className="mt-0.5 size-4.5 shrink-0 text-amber-650" aria-hidden="true" />
+                        <div className="border-amber-250 mb-8 flex items-start gap-3 rounded-lg border bg-amber-50/50 px-4 py-4">
+                            <AlertTriangle className="text-amber-650 mt-0.5 size-4.5 shrink-0" aria-hidden="true" />
                             <div>
                                 <p className="text-[14px] font-bold text-amber-700">Audit Complete</p>
                                 <p className="mt-1 text-[13px] text-amber-600">
@@ -564,9 +564,9 @@ export default function DocumentsIndex({ founder, documents, can_upload, audit_s
                                     <div key={categoryLabel}>
                                         <div className="flex items-center justify-between border-b border-zinc-200/60 bg-zinc-50/80 px-4 py-2">
                                             <p className="text-[10px] font-bold tracking-[0.1em] text-[#3A54A5] uppercase">{categoryLabel}</p>
-                                            <span className="text-[10px] font-medium text-zinc-450">{docs.length} Items</span>
+                                            <span className="text-zinc-450 text-[10px] font-medium">{docs.length} Items</span>
                                         </div>
-                                        <div className="divide-y divide-zinc-150">
+                                        <div className="divide-zinc-150 divide-y">
                                             <AnimatePresence mode="popLayout">
                                                 {docs.map((doc) => (
                                                     <DocumentRow key={doc.id} doc={doc} onDelete={setDeleteTarget} />
@@ -588,24 +588,16 @@ export default function DocumentsIndex({ founder, documents, can_upload, audit_s
                         <DialogTitle className="text-[18px] font-bold text-zinc-950">Delete document?</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
-                        <p className="text-[14px] leading-relaxed text-zinc-650">
-                            Are you sure you want to delete <span className="font-semibold text-zinc-950">{deleteTarget?.original_filename}</span>? This
-                            action cannot be undone and will remove it from the analyst's queue.
+                        <p className="text-zinc-650 text-[14px] leading-relaxed">
+                            Are you sure you want to delete <span className="font-semibold text-zinc-950">{deleteTarget?.original_filename}</span>?
+                            This action cannot be undone and will remove it from the analyst's queue.
                         </p>
                     </div>
                     <DialogFooter className="gap-3 sm:gap-0">
-                        <Button
-                            variant="ghost"
-                            onClick={() => setDeleteTarget(null)}
-                            className="text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
-                        >
+                        <Button variant="ghost" onClick={() => setDeleteTarget(null)} className="text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800">
                             Cancel
                         </Button>
-                        <Button
-                            onClick={confirmDelete}
-                            disabled={deleting}
-                            className="bg-red-650 text-white hover:bg-red-700 shadow-sm"
-                        >
+                        <Button onClick={confirmDelete} disabled={deleting} className="bg-red-650 text-white shadow-sm hover:bg-red-700">
                             {deleting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Trash2 className="mr-2 size-4" />}
                             Delete Document
                         </Button>

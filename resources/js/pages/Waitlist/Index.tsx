@@ -167,8 +167,6 @@ function AnimatedHeadline() {
 // ─── PARAGON section (radar chart + explanation) ──────────────────────────────
 
 function ParagonPillarsSection() {
-    const ref = useRef<HTMLDivElement>(null);
-    const inView = useInView(ref, { once: true, margin: '-80px' });
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
     const pillars = [
@@ -210,12 +208,12 @@ function ParagonPillarsSection() {
     ];
 
     return (
-        <section ref={ref} className="mt-28 w-full border-t border-[#0D1325]/6 pt-20">
+        <section className="mt-28 w-full border-t border-[#0D1325]/6 pt-20">
             <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16">
                 {/* Left Column: Editorial Information & Radar Chart */}
                 <div className="space-y-8 text-left">
                     <div>
-                        <span className="inline-flex items-center gap-2 rounded-sm border border-[#0D1325]/8 bg-[#0D1325]/[0.02] px-3 py-1 text-[10px] font-black tracking-[0.2em] text-[#0D1325]/50 uppercase">
+                        <span className="inline-flex items-center gap-2 rounded-sm border border-[#0D1325]/8 bg-[#0D1325]/2 px-3 py-1 text-[10px] font-black tracking-[0.2em] text-[#0D1325]/50 uppercase">
                             The PARAGON Model
                         </span>
                         <h2 className="font-display mt-6 text-3xl leading-tight font-bold tracking-tight text-[#0D1325] md:text-4xl">
@@ -961,43 +959,37 @@ function ProcessSection() {
 }
 
 function PricingComparisonMatrix() {
-    const ref = useRef<HTMLDivElement>(null);
-    const inView = useInView(ref, { once: true, margin: '-80px' });
-
     const tiers = [
         {
             key: 'foundation',
-            label: 'Foundation',
-            desc: 'Early-stage roadmap',
-            base_price: 350,
-            gate_fee: 150,
-            qualify: '65+ score',
-            hours: 'Email support',
-            focus: '7-pillar radar chart & gap analysis',
+            label: 'Concept / Pre-Seed',
+            desc: 'Idea to MVP, little/no revenue',
+            base_price: 500,
+            qualify: 'Rigorous 25-question gate',
+            hours: '10–12 analyst hours',
+            focus: '1 interview, 12–15 page report, debrief call',
             redeem: 'No',
             featured: false,
         },
         {
             key: 'growth',
-            label: 'Growth',
-            desc: 'Seed round prep',
-            base_price: 750,
-            gate_fee: 150,
-            qualify: '70+ score',
-            hours: '5 analyst hours',
-            focus: 'Cap table audit & financial stress-test',
+            label: 'Seed / Early Traction',
+            desc: 'Working model, ARR under $500k',
+            base_price: 1500,
+            qualify: 'Rigorous 25-question gate',
+            hours: '25–30 analyst hours',
+            focus: 'Everything in Stage 1 + Fin Review + LTV:CAC + Cap Table + 3 interviews + 25-30 page report',
             redeem: 'No',
-            featured: true,
+            featured: false,
         },
         {
             key: 'institutional',
-            label: 'Institutional',
-            desc: 'Series A/B SME',
-            base_price: 1500,
-            gate_fee: 150,
-            qualify: '80+ score',
-            hours: '15 analyst hours',
-            focus: 'Secure diligence URL & warrant credit model',
+            label: 'Seed+ / Growth',
+            desc: 'ARR above $500k, processes, round',
+            base_price: 3500,
+            qualify: 'Rigorous 25-question gate',
+            hours: '60+ analyst hours',
+            focus: 'Everything in Stage 2 + Full Data-Room + Corp Structure + IP Review + 5+ interviews + 40+ page report',
             redeem: 'Yes (Fully credited)',
             featured: false,
         },
@@ -1006,15 +998,14 @@ function PricingComparisonMatrix() {
     const rows = [
         { name: 'Program Goal', key: 'desc' },
         { name: 'Qualification Gate', key: 'qualify' },
-        { name: 'Base Pricing', key: 'base_price', format: (val: number) => `$${val}` },
-        { name: 'Gate Fee', key: 'gate_fee', format: (val: number) => `$${val}` },
+        { name: 'Pricing', key: 'base_price', format: (val: number) => `$${val.toLocaleString()}` },
         { name: 'Forensic Analyst Hours', key: 'hours' },
         { name: 'Diligence Scope', key: 'focus' },
         { name: 'Success Credit Model', key: 'redeem' },
     ];
 
     return (
-        <section ref={ref} className="mt-28 w-full border-t border-[#0D1325]/6 pt-20">
+        <section className="mt-28 w-full border-t border-[#0D1325]/6 pt-20">
             <div className="mx-auto mb-16 max-w-2xl text-center">
                 <span className="text-[10px] font-black tracking-[0.22em] text-[#0D1325]/40 uppercase">Programs & Pricing</span>
                 <h2 className="font-display mt-4 text-3xl leading-tight font-bold text-white">Verification Comparison Matrix</h2>
@@ -1024,7 +1015,7 @@ function PricingComparisonMatrix() {
             </div>
 
             {/* Desktop Table View */}
-            <div className="bg-card hidden overflow-hidden rounded-xl border border-[#0D1325]/5 border-[#0D1325]/8 md:block">
+            <div className="bg-card hidden overflow-hidden rounded-xl border border-[#0D1325]/5 md:block">
                 <table className="w-full border-collapse text-left text-sm">
                     <thead>
                         <tr className="bg-background/40 border-b border-[#0D1325]/5">
@@ -1045,7 +1036,7 @@ function PricingComparisonMatrix() {
                     </thead>
                     <tbody>
                         {rows.map((row, ri) => (
-                            <tr key={ri} className="border-b border-[#0D1325]/5 transition-colors last:border-0 hover:bg-white/[0.01]">
+                            <tr key={ri} className="border-b border-[#0D1325]/5 transition-colors last:border-0 hover:bg-white/1">
                                 <td className="p-6 text-xs font-bold tracking-wider text-[#0D1325]/40 uppercase">{row.name}</td>
                                 {tiers.map((t) => {
                                     const rawVal = t[row.key as keyof typeof t];
@@ -1164,10 +1155,6 @@ function FaqSection() {
             a: 'The diagnostic is a 7-pillar self-assessment. Scoring is calculated dynamically based on baseline risk levels and operational depth. A qualifying score of 65+ (Investment Ready or Top Percentile) qualifies you to enter the formal audit queue and secure verification badges.',
         },
         {
-            q: 'Why is there a $150 Gate Fee?',
-            a: 'To maintain high data room integrity for our institutional investor network, we charge a $150 entry fee. This fee ensures serious applications and directly funds the manual analyst hours required to review and verify your initial diagnostic uploads.',
-        },
-        {
             q: 'How long does the verification audit take?',
             a: 'Typically, verification is completed within 5 to 7 business days. Once your diagnostic is complete and you choose your audit tier, our investment team begins forensic reviews of your cap table, corporate registers, and financial accounts.',
         },
@@ -1176,8 +1163,8 @@ function FaqSection() {
             a: 'Your verification profile is live on a custom secure URL. Key metrics and badges are visible to verified network investors, but detailed diligence assets (e.g., contracts, models) remain locked. Investors must submit an access request, which you approve or reject from your dashboard.',
         },
         {
-            q: 'What is the success guarantee on Tier 3?',
-            a: 'For our Institutional audit, the $1,500 fee is credited back to you upon the successful close of a funding round via the PIN Network. This aligns our interests with your success, and our compensation is tied to a standard 2% equity warrant.',
+            q: 'What is the success guarantee on Seed+ / Growth?',
+            a: 'For our Seed+ / Growth audit, the $3,500 fee is credited back to you upon the successful close of a funding round via the PIN Network. This aligns our interests with your success, and our compensation is tied to a standard 2% equity warrant.',
         },
     ];
 
@@ -1214,7 +1201,7 @@ function FaqSection() {
                                         {faq.q}
                                     </span>
                                 </div>
-                                <span className="ml-6 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#0D1325]/10 bg-[#0D1325]/[0.01] text-[#0D1325]/40 transition-transform duration-300">
+                                <span className="ml-6 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#0D1325]/10 bg-[#0D1325]/1 text-[#0D1325]/40 transition-transform duration-300">
                                     <ChevronDown className={cn('h-3.5 w-3.5 transition-transform duration-300', isOpen && 'rotate-180 text-white')} />
                                 </span>
                             </button>
@@ -1242,8 +1229,18 @@ function FaqSection() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+interface ExtendedPageProps {
+    auth?: {
+        user?: {
+            name: string;
+            email: string;
+        } | null;
+    };
+    [key: string]: unknown;
+}
+
 export default function Waitlist({ selectedAudience, founderStages, investorRoles, founderStatus, investorStatus, diagnosticSession }: PageProps) {
-    const { auth } = usePage<any>().props;
+    const { auth } = usePage<ExtendedPageProps>().props;
     const config = selectedAudience ? AUDIENCES[selectedAudience] : null;
     const status = selectedAudience === 'founder' ? founderStatus : investorStatus;
     const [legalModal, setLegalModal] = useState<{ title: string; content: string } | null>(null);
@@ -1283,7 +1280,7 @@ export default function Waitlist({ selectedAudience, founderStages, investorRole
                                 <motion.section variants={fadeUp} className="relative mx-auto max-w-3xl text-center">
                                     <div className="pointer-events-none absolute top-1/2 left-1/2 -z-10 aspect-square w-[60vw] max-w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3A54A5]/5 blur-[120px]" />
                                     <motion.div variants={fadeUp} className="flex justify-center">
-                                        <div className="mx-auto inline-flex max-w-[85vw] items-center justify-center rounded-[2rem] border border-[#0D1325]/8 bg-white/[0.03] px-5 py-2.5 backdrop-blur-sm sm:max-w-none sm:rounded-full">
+                                        <div className="mx-auto inline-flex max-w-[85vw] items-center justify-center rounded-4xl border border-[#0D1325]/8 bg-white/3 px-5 py-2.5 backdrop-blur-sm sm:max-w-none sm:rounded-full">
                                             <span className="text-center text-[9px] leading-tight font-semibold tracking-[0.15em] text-[#0D1325]/70 uppercase sm:text-[11px] sm:tracking-[0.3em]">
                                                 Spring 2026 Now accepting early access
                                             </span>
@@ -1363,7 +1360,7 @@ export default function Waitlist({ selectedAudience, founderStages, investorRole
                                                     href={route('diagnostic.index')}
                                                     className="group relative flex items-center justify-center gap-2 rounded-md border border-[#0D1325]/5 bg-[#6EBE44] px-6 py-3.5 text-xs font-bold tracking-[0.2em] text-white uppercase shadow-none transition-all duration-200 hover:bg-[#6EBE44]/90"
                                                 >
-                                                    Take PARAGON Diagnostic
+                                                    Complete Self-Scan Free
                                                     <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                                                 </Link>
                                                 <a
@@ -1422,7 +1419,7 @@ export default function Waitlist({ selectedAudience, founderStages, investorRole
                                 {/* Single back link — no redundant "track selection" language */}
                                 <Link
                                     href={route('waitlist.index')}
-                                    className="group mb-8 inline-flex items-center gap-2 rounded-2xl border border-[#0D1325]/8 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-[#0D1325]/55 backdrop-blur-sm transition-all duration-200 hover:border-white/15 hover:bg-white/[0.06] hover:text-[#0D1325]/80"
+                                    className="group mb-8 inline-flex items-center gap-2 rounded-2xl border border-[#0D1325]/8 bg-white/3 px-4 py-2.5 text-sm font-medium text-[#0D1325]/55 backdrop-blur-sm transition-all duration-200 hover:border-white/15 hover:bg-white/[0.06] hover:text-[#0D1325]/80"
                                 >
                                     <ChevronLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
                                     Back

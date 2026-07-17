@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { Award, DollarSign, LayoutDashboard, LogOut, Menu, MessageSquare, Settings, UserCog, Users, X } from 'lucide-react';
+import { Award, BookOpen, DollarSign, LayoutDashboard, LogOut, Menu, MessageSquare, Settings, UserCog, Users, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
 interface AdminUser {
@@ -42,10 +42,10 @@ function NavItem({
                 'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-150',
                 active
                     ? 'border border-[#3A54A5]/25 bg-[#3A54A5]/10 text-[#3A54A5] shadow-xs'
-                    : 'border border-transparent text-zinc-550 hover:bg-zinc-100 hover:text-zinc-950',
+                    : 'text-zinc-550 border border-transparent hover:bg-zinc-100 hover:text-zinc-950',
             ].join(' ')}
         >
-            <Icon className={`size-[18px] shrink-0 transition-colors ${active ? 'text-[#3A54A5]' : 'text-zinc-400 group-hover:text-zinc-650'}`} />
+            <Icon className={`size-[18px] shrink-0 transition-colors ${active ? 'text-[#3A54A5]' : 'group-hover:text-zinc-650 text-zinc-400'}`} />
             <span className="flex-1 truncate">{label}</span>
             {badge != null && badge > 0 && (
                 <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#3A54A5] px-1.5 text-[10px] font-bold text-white">
@@ -92,7 +92,7 @@ function SidebarContent({
                 </div>
                 <div className="min-w-0">
                     <p className="truncate text-sm font-extrabold tracking-tight text-zinc-950">Pinpoint Command</p>
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase mt-0.5 ${badge.className}`}>
+                    <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase ${badge.className}`}>
                         {badge.label}
                     </span>
                 </div>
@@ -115,6 +115,7 @@ function SidebarContent({
                     <>
                         <NavSection label="Operations" />
                         <NavItem href="/admin/waitlist" icon={Users} label="Waitlist" active={isActive('/admin/waitlist')} onClick={onNav} />
+                        <NavItem href="/admin/investors" icon={Users} label="Investors" active={isActive('/admin/investors')} onClick={onNav} />
                     </>
                 )}
 
@@ -130,6 +131,7 @@ function SidebarContent({
                     <>
                         <NavSection label="Admin" />
                         <NavItem href="/admin/revenue" icon={DollarSign} label="Revenue" active={isActive('/admin/revenue')} onClick={onNav} />
+                        <NavItem href="/admin/blog" icon={BookOpen} label="Blog" active={isActive('/admin/blog')} onClick={onNav} />
                         <NavItem href="/admin/users" icon={UserCog} label="Team" active={isActive('/admin/users')} onClick={onNav} />
                         <NavItem href="/admin/settings" icon={Settings} label="Settings" active={isActive('/admin/settings')} onClick={onNav} />
                     </>
@@ -139,17 +141,17 @@ function SidebarContent({
             {/* User footer */}
             <div className="border-t border-zinc-200 bg-zinc-50/50 px-4 py-3">
                 <div className="mb-2 flex items-center gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-xs font-bold text-zinc-650 uppercase shadow-xs">
+                    <div className="text-zinc-650 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-xs font-bold uppercase shadow-xs">
                         {user?.name?.[0] ?? '?'}
                     </div>
                     <div className="min-w-0 flex-1">
                         <p className="truncate text-sm leading-tight font-bold text-zinc-950">{user?.name ?? '—'}</p>
-                        <p className="truncate text-[11px] leading-tight text-zinc-500 mt-0.5">{user?.email ?? ''}</p>
+                        <p className="mt-0.5 truncate text-[11px] leading-tight text-zinc-500">{user?.email ?? ''}</p>
                     </div>
                 </div>
                 <button
                     onClick={logout}
-                    className="flex w-full items-center gap-2 rounded-lg border border-zinc-200/60 bg-white px-2.5 py-1.5 text-xs font-semibold text-zinc-650 shadow-xs transition-colors hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-950"
+                    className="text-zinc-650 flex w-full items-center gap-2 rounded-lg border border-zinc-200/60 bg-white px-2.5 py-1.5 text-xs font-semibold shadow-xs transition-colors hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-950"
                 >
                     <LogOut className="size-3.5" />
                     Secure Sign Out
@@ -237,7 +239,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-zinc-200 bg-white/90 px-4 backdrop-blur-md lg:hidden">
                     <button
                         onClick={() => setSidebarOpen(true)}
-                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 text-zinc-650 bg-white hover:text-zinc-850 hover:bg-zinc-50 shadow-xs"
+                        className="text-zinc-650 hover:text-zinc-850 flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-white shadow-xs hover:bg-zinc-50"
                         aria-label="Open menu"
                     >
                         <Menu className="size-5" />

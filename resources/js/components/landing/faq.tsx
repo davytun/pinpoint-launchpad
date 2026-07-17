@@ -10,10 +10,6 @@ const FAQS_DATA = [
         a: 'The diagnostic is a 7-pillar self-assessment. Scoring is calculated dynamically based on baseline risk levels and operational depth. A qualifying score of 65+ (Investment Ready or Top Percentile) qualifies you to enter the formal audit queue and secure verification badges.',
     },
     {
-        q: 'Why is there a $150 Gate Fee?',
-        a: 'To maintain high data room integrity for our institutional investor network, we charge a $150 entry fee. This fee ensures serious applications and directly funds the manual analyst hours required to review and verify your initial diagnostic uploads.',
-    },
-    {
         q: 'How long does the verification audit take?',
         a: 'Typically, verification is completed within 5 to 7 business days. Once your diagnostic is complete and you choose your audit tier, our investment team begins forensic reviews of your cap table, corporate registers, and financial accounts.',
     },
@@ -22,8 +18,8 @@ const FAQS_DATA = [
         a: 'Your verification profile is live on a custom secure URL. Key metrics and badges are visible to verified network investors, but detailed diligence assets (e.g., contracts, models) remain locked. Investors must submit an access request, which you approve or reject from your dashboard.',
     },
     {
-        q: 'What is the success guarantee on Tier 3?',
-        a: 'For our Institutional audit, the $1,500 fee is credited back to you upon the successful close of a funding round via the PIN Network. This aligns our interests with your success, and our compensation is tied to a standard 2% equity warrant.',
+        q: 'What is the success guarantee on Seed+ / Growth?',
+        a: 'For our Seed+ / Growth audit, the $3,500 fee is credited back to you upon the successful close of a funding round via the PIN Network. This aligns our interests with your success, and our compensation is tied to a standard 2% equity warrant.',
     },
 ];
 

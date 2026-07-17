@@ -1,7 +1,11 @@
 <?php
 
-it('homepage redirects to the waitlist', function () {
-    $this->get('/')->assertRedirect('/waitlist');
+it('homepage loads successfully', function () {
+    $this->get('/')->assertStatus(200);
+});
+
+it('waitlist redirects to homepage', function () {
+    $this->get('/waitlist')->assertRedirect('/');
 });
 
 it('diagnostic page loads successfully', function () {

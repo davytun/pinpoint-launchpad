@@ -31,6 +31,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhooks/paystack',
             'webhooks/pandadoc',
             'webhooks/boldsign',
+            'diagnostic/submit',
+            'diagnostic/capture-email',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

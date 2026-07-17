@@ -51,7 +51,7 @@ class OnboardingController extends Controller
                 ->with('info', 'You declined the previous agreement. Please review your details and sign to proceed with your audit.');
         }
 
-        $tierLabel = ucfirst($payment->tier);
+        $tierLabel = $payment->tier_label;
 
         // Existing document with confirmed details — show iframe
         if ($payment->signature && $payment->signature->details_confirmed && $payment->signature->boldsign_document_id) {
@@ -201,8 +201,8 @@ class OnboardingController extends Controller
         return Inertia::render('Onboarding/Verifying', [
             'signature_verified' => $signature->isSigned(),
             'signer_email'       => $signature->signer_email,
-            'tier_label'         => ucfirst($payment?->tier ?? 'Foundation') . ' Audit',
-            'amount_paid'        => '$' . number_format($payment?->total_amount ?? 0) . ' USD',
+            'tier_label'         => ($payment ? $payment->tier_label : 'Concept / Pre-Seed') . ' Audit',
+            'amount_paid'        => ($payment && strtoupper($payment->currency) === 'NGN' ? '₦' : '$') . number_format($payment?->total_amount ?? 0) . ($payment && strtoupper($payment->currency) === 'NGN' ? ' NGN' : ' USD'),
             'signed_at'          => $signature->signed_at?->format('M j, Y, g:i A') ?? now()->format('M j, Y, g:i A'),
             'setup_url'          => $setupUrl,
         ]);

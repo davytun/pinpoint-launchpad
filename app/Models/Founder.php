@@ -74,6 +74,11 @@ class Founder extends Authenticatable
         return $this->payment?->tier;
     }
 
+    public function getTierLabelAttribute(): ?string
+    {
+        return $this->payment ? $this->payment->tier_label : 'Concept / Pre-Seed';
+    }
+
     public function documents(): HasMany
     {
         return $this->hasMany(FounderDocument::class)->orderBy('created_at', 'desc');

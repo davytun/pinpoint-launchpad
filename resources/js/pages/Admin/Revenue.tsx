@@ -85,18 +85,18 @@ export default function AdminRevenue({ metrics }: PageProps) {
                 {/* Header */}
                 <div className="mb-6 lg:mb-8">
                     <h1 className="text-2xl font-extrabold text-zinc-950">Revenue</h1>
-                    <p className="mt-1 text-sm text-zinc-555">Platform financial overview</p>
+                    <p className="text-zinc-555 mt-1 text-sm">Platform financial overview</p>
                 </div>
 
                 {/* Top KPIs */}
                 <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                     <div className="rounded-xl border border-white/80 bg-white/30 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                         <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Total Revenue</p>
-                        <p className="text-3xl font-extrabold text-zinc-955">{fmt(metrics.total_revenue)}</p>
+                        <p className="text-zinc-955 text-3xl font-extrabold">{fmt(metrics.total_revenue)}</p>
                     </div>
                     <div className="rounded-xl border border-white/80 bg-white/30 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                         <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">This Month</p>
-                        <p className="text-3xl font-extrabold text-zinc-955">{fmt(metrics.revenue_this_month)}</p>
+                        <p className="text-zinc-955 text-3xl font-extrabold">{fmt(metrics.revenue_this_month)}</p>
                         <div className={cn('mt-2 flex items-center gap-1.5 text-xs font-semibold', isUp ? 'text-emerald-650' : 'text-rose-650')}>
                             <TrendIcon className="size-3.5" />
                             {diffLabel}
@@ -104,7 +104,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                     </div>
                     <div className="rounded-xl border border-white/80 bg-white/30 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                         <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Last Month</p>
-                        <p className="text-3xl font-extrabold text-zinc-955">{fmt(metrics.revenue_last_month)}</p>
+                        <p className="text-zinc-955 text-3xl font-extrabold">{fmt(metrics.revenue_last_month)}</p>
                     </div>
                 </div>
 
@@ -114,7 +114,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                     {monthly.length > 0 && (
                         <div className="min-w-0 rounded-2xl border border-white/80 bg-white/30 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                             <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">6-Month Trend</p>
-                            <p className="mb-4 text-sm text-zinc-555">Revenue over the last 6 months</p>
+                            <p className="text-zinc-555 mb-4 text-sm">Revenue over the last 6 months</p>
                             <ChartContainer config={trendChartConfig} className="h-[160px] w-full">
                                 <BarChart data={monthly} barCategoryGap="32%">
                                     <CartesianGrid vertical={false} stroke="#E2E8F0" />
@@ -137,7 +137,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                     {/* Revenue by tier */}
                     <div className="min-w-0 rounded-2xl border border-white/80 bg-white/30 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                         <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Revenue by Tier</p>
-                        <p className="mb-4 text-sm text-zinc-555">Breakdown across all pricing tiers</p>
+                        <p className="text-zinc-555 mb-4 text-sm">Breakdown across all pricing tiers</p>
                         <ChartContainer config={tierChartConfig} className="h-[160px] w-full">
                             <BarChart data={tierData} barCategoryGap="40%">
                                 <CartesianGrid vertical={false} stroke="#E2E8F0" />
@@ -166,7 +166,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                 {/* Paystack reminder */}
                 <div className="mb-6 flex items-center gap-3 rounded-xl border border-[#3A54A5]/25 bg-[#3A54A5]/10 px-5 py-4 shadow-xs">
                     <ExternalLink className="size-4 shrink-0 text-[#3A54A5]" />
-                    <p className="text-sm text-zinc-700 font-semibold">
+                    <p className="text-sm font-semibold text-zinc-700">
                         View full transaction history, refunds, and customer details on your{' '}
                         <span className="font-bold text-[#3A54A5]">Paystack dashboard</span>.
                     </p>
@@ -175,9 +175,9 @@ export default function AdminRevenue({ metrics }: PageProps) {
                 {/* Recent payments table */}
                 <div>
                     <h2 className="mb-3 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Recent Payments</h2>
-                    <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                    <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                         {metrics.recent_payments.length === 0 ? (
-                            <div className="py-12 text-center text-sm text-zinc-500 font-semibold">No payments yet.</div>
+                            <div className="py-12 text-center text-sm font-semibold text-zinc-500">No payments yet.</div>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full min-w-[700px] text-sm">
@@ -195,17 +195,14 @@ export default function AdminRevenue({ metrics }: PageProps) {
                                     </thead>
                                     <tbody className="divide-y divide-zinc-200/80">
                                         {metrics.recent_payments.map((p) => (
-                                            <tr
-                                                key={p.id}
-                                                className="group transition-colors hover:bg-zinc-50/40"
-                                            >
-                                                <td className="max-w-[180px] truncate px-5 py-3.5 text-zinc-900 font-semibold">{p.customer_email}</td>
-                                                <td className="px-5 py-3.5 text-zinc-655 font-medium capitalize">{p.tier}</td>
-                                                <td className="px-5 py-3.5 font-mono font-extrabold text-emerald-650">
+                                            <tr key={p.id} className="group transition-colors hover:bg-zinc-50/40">
+                                                <td className="max-w-[180px] truncate px-5 py-3.5 font-semibold text-zinc-900">{p.customer_email}</td>
+                                                <td className="text-zinc-655 px-5 py-3.5 font-medium capitalize">{p.tier}</td>
+                                                <td className="text-emerald-650 px-5 py-3.5 font-mono font-extrabold">
                                                     {fmt(p.total_amount, p.currency)}
                                                 </td>
-                                                <td className="px-5 py-3.5 font-mono text-xs text-zinc-500 font-medium">{p.paystack_reference}</td>
-                                                <td className="px-5 py-3.5 text-zinc-655 font-medium">{p.paid_at ?? '—'}</td>
+                                                <td className="px-5 py-3.5 font-mono text-xs font-medium text-zinc-500">{p.paystack_reference}</td>
+                                                <td className="text-zinc-655 px-5 py-3.5 font-medium">{p.paid_at ?? '—'}</td>
                                             </tr>
                                         ))}
                                     </tbody>

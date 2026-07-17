@@ -17,24 +17,31 @@ class PaymentAdminNotificationMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $tierLabel = ucfirst($this->payment->tier);
-        $total = $this->payment->total_amount;
+        $currency = strtoupper($this->payment->currency ?? 'USD');
+        $symbol = $currency === 'NGN' ? '₦' : '$';
+        $tierLabel = $this->payment->tier_label;
+        $total = number_format($this->payment->total_amount);
 
         return new Envelope(
-            subject: "New Payment Received — {$tierLabel} | \${$total}",
+            subject: "New Payment Received — {$tierLabel} | {$symbol}{$total} {$currency}",
         );
     }
 
     public function content(): Content
     {
+        $currency = strtoupper($this->payment->currency ?? 'USD');
+        $currencySymbol = $currency === 'NGN' ? '₦' : '$';
+
         return new Content(
             view: 'emails.payment.admin-notification',
             with: [
-                'tier_label' => ucfirst($this->payment->tier),
-                'total_amount' => $this->payment->total_amount,
-                'email' => $this->payment->customer_email,
-                'paid_at' => $this->payment->paid_at,
-                'tier' => $this->payment->tier,
+                'tier_label'      => $this->payment->tier_label,
+                'total_amount'    => $this->payment->total_amount,
+                'email'           => $this->payment->customer_email,
+                'paid_at'         => $this->payment->paid_at,
+                'tier'            => $this->payment->tier,
+                'currency'        => $currency,
+                'currency_symbol' => $currencySymbol,
             ],
         );
     }

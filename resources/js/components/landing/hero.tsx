@@ -16,7 +16,7 @@ interface HeroProps {
 
 export default function Hero({
     title = "Fundraising is broken. We're fixing the proof problem.",
-    ctaPrimaryText = 'Take the PARAGON Diagnostic',
+    ctaPrimaryText = 'Complete Self-Scan Free',
     ctaPrimaryRoute = 'diagnostic.index',
 }: HeroProps) {
     return (

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Mail\PaymentAdminNotificationMail;
 use App\Mail\PaymentConfirmationMail;
+use App\Mail\PiaApplicationAdminMail;
 use App\Models\DiagnosticSession;
 use App\Models\Payment;
+use App\Models\PiaApplication;
 use App\Services\PaystackService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,58 +18,75 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CheckoutController extends Controller
 {
-    private const TIERS = [
-        [
-            'key'        => 'foundation',
-            'label'      => 'Foundation',
-            'tagline'    => 'Early-stage founders needing a roadmap.',
-            'base_price' => 350,
-            'gate_fee'   => 150,
-            'total'      => 500,
-            'features'   => [
-                'Full Radar Chart: Detailed visual of all 7 PARAGON pillars.',
-                'The Actionable Blueprint: 5-page gap analysis report.',
-                'Digital Readiness Badge: For your pitch deck & LinkedIn.',
-                'Standard Support: Email-based guidance on report findings.',
+    private function getTiers(bool $isNaira): array
+    {
+        return [
+            [
+                'key'              => 'foundation',
+                'label'            => 'Concept / Pre-Seed',
+                'tagline'          => 'Idea to MVP, little or no revenue, seeking validation.',
+                'base_price'       => $isNaira ? 699000 : 500,
+                'total'            => $isNaira ? 699000 : 500,
+                'naira_equivalent' => 699000,
+                'features'         => [
+                    'Full PARAGON scan (weighted to Potential)',
+                    '1 founder interview (60 min)',
+                    'Analyst-delivered 12–15 page structured report',
+                    '1 debrief call',
+                    '10–12 hours',
+                    'Turnaround 7 working days.',
+                ],
+                'is_featured'      => false,
+                'redeemable'       => false,
             ],
-            'is_featured' => false,
-            'redeemable'  => false,
-        ],
-        [
-            'key'        => 'growth',
-            'label'      => 'Growth',
-            'tagline'    => 'Seed-stage startups preparing for a round.',
-            'base_price' => 750,
-            'gate_fee'   => 150,
-            'total'      => 900,
-            'features'   => [
-                'Everything in Tier 1.',
-                '1-on-1 Analyst Review: 45-min deep dive into your "Deal-Killers."',
-                'Financial Stress-Test: Verification of your CAC/LTV & Runway.',
-                'Tier 2 PIN Access: Introduction to 3 targeted "Angel/Micro-VC" leads.',
+            [
+                'key'              => 'growth',
+                'label'            => 'Seed / Early Traction',
+                'tagline'          => 'Working model, ARR under $500k, ready for a first institutional cheque.',
+                'base_price'       => $isNaira ? 2090000 : 1500,
+                'total'            => $isNaira ? 2090000 : 1500,
+                'naira_equivalent' => 2090000,
+                'features'         => [
+                    'Everything in Stage 01',
+                    'Financial review (up to 24 months)',
+                    'Unit-economics and LTV: CAC build',
+                    'Cap table and founding-document review',
+                    '3 interviews',
+                    'Analyst + associate, partner-reviewed 25–30 page report',
+                    'Investor-readiness gap list',
+                    '25–30 hours',
+                    'Turnaround 12 working days.',
+                ],
+                'is_featured'      => true,
+                'redeemable'       => false,
             ],
-            'is_featured' => true,
-            'redeemable'  => false,
-        ],
-        [
-            'key'        => 'institutional',
-            'label'      => 'Institutional',
-            'tagline'    => 'Series A/B and High-Growth SMEs.',
-            'base_price' => 1500,
-            'gate_fee'   => 150,
-            'total'      => 1650,
-            'features'   => [
-                'Everything in Tier 2.',
-                '2-Hour Strategy Intensive: Direct consultation with a Lead Analyst.',
-                'The "Verified" Portal: Custom secure URL for investor due diligence.',
-                'The PIN Network Max: Unlimited access to our Tier-1 VC Network.',
-                'Success Fee Credit: Your $1,500 is credited against your 2% equity warrant.',
+            [
+                'key'              => 'institutional',
+                'label'            => 'Seed+ / Growth',
+                'tagline'          => 'ARR above $500k, established processes, larger round or growth equity.',
+                'base_price'       => $isNaira ? 4850000 : 3500,
+                'total'            => $isNaira ? 4850000 : 3500,
+                'naira_equivalent' => 4850000,
+                'features'         => [
+                    'Everything in Stage 02',
+                    'Full data-room review',
+                    'Corporate and governance structure analysis',
+                    'Material contract and IP review',
+                    'Management-team assessment',
+                    '5+ interviews',
+                    '40+ page report',
+                    'Board-ready presentation',
+                    'Partner-led',
+                    '60+ hours',
+                    'Turnaround 20 working days.',
+                    'Scope confirmed and quoted before invoice.',
+                ],
+                'is_featured'        => false,
+                'redeemable'         => true,
+                'redeemable_tooltip' => 'Our Success Guarantee: Upon the close of a funding round via the PIN Network, your assessment fee is fully credited toward your 2% success fee, effectively making this professional audit free.',
             ],
-            'is_featured'        => false,
-            'redeemable'         => true,
-            'redeemable_tooltip' => 'Our Success Guarantee: Upon the close of a funding round via the PIN Network, your $1,500 assessment fee is fully credited toward your 2% success fee, effectively making this professional audit free.',
-        ],
-    ];
+        ];
+    }
 
     public function index(Request $request): Response|\Illuminate\Http\RedirectResponse
     {
@@ -102,18 +121,75 @@ class CheckoutController extends Controller
             return redirect()->route('onboarding.sign');
         }
 
-        $currency = strtoupper(config('services.paystack.currency', 'USD'));
-        $currencySymbol = $currency === 'NGN' ? '₦' : '$';
+        $gatewayCurrency = strtoupper(config('services.paystack.currency', 'NGN'));
+        $isNairaUser = $diagnosticSession->country === 'Nigeria';
+
+        $displayAsUsd = !$isNairaUser;
+        $currencySymbol = $displayAsUsd ? '$' : '₦';
+
+        if ($gatewayCurrency === 'NGN') {
+            $paymentCurrency = 'NGN';
+            $billingCurrencySymbol = '₦';
+            $billingNgnFallback = !$isNairaUser;
+        } else {
+            $paymentCurrency = $isNairaUser ? 'NGN' : 'USD';
+            $billingCurrencySymbol = $isNairaUser ? '₦' : '$';
+            $billingNgnFallback = false;
+        }
 
         return Inertia::render('Checkout/Index', [
-            'score'                 => $diagnosticSession->score,
-            'score_band'            => $diagnosticSession->score_band,
-            'tiers'                 => self::TIERS,
-            'diagnostic_session_id' => $sessionId,
-            'customer_email'        => $diagnosticSession->email,
-            'currency'              => $currency,
-            'currency_symbol'       => $currencySymbol,
+            'score'                   => $diagnosticSession->score,
+            'score_band'              => $diagnosticSession->score_band,
+            'tiers'                   => $this->getTiers(!$displayAsUsd),
+            'diagnostic_session_id'   => $sessionId,
+            'customer_email'          => $diagnosticSession->email,
+            'currency'                => $paymentCurrency,
+            'currency_symbol'         => $currencySymbol,
+            'billing_currency_symbol' => $billingCurrencySymbol,
+            'billing_ngn_fallback'    => $billingNgnFallback,
         ]);
+    }
+
+    public function assessment(Request $request): Response
+    {
+        $gatewayCurrency = strtoupper(config('services.paystack.currency', 'NGN'));
+        $isNaira = $gatewayCurrency === 'NGN';
+        $currencySymbol = $isNaira ? '₦' : '$';
+
+        return Inertia::render('Checkout/Assessment', [
+            'tiers'                => $this->getTiers($isNaira),
+            'currency'             => $gatewayCurrency,
+            'currency_symbol'      => $currencySymbol,
+            'billing_ngn_fallback' => false,
+        ]);
+    }
+
+    public function applyAssessment(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'name'         => ['required', 'string', 'max:150'],
+            'email'        => ['required', 'email', 'max:200'],
+            'company'      => ['required', 'string', 'max:200'],
+            'country'      => ['required', 'string', 'max:100'],
+            'stage'        => ['required', 'in:concept,seed,growth'],
+            'raise_target' => ['required', 'string', 'max:100'],
+            'message'      => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $application = PiaApplication::create($validated);
+
+        try {
+            $adminEmail = config('mail.admin_address', config('mail.from.address'));
+            Mail::to($adminEmail)->send(new PiaApplicationAdminMail($application));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send PIA application admin notification', [
+                'application_id' => $application->id,
+                'error'          => $e->getMessage(),
+            ]);
+        }
+
+        return redirect()->route('assessment')
+            ->with('success', 'Application received. A member of our team will be in touch within 48 hours.');
     }
 
     public function initiate(Request $request, PaystackService $paystack): SymfonyResponse
@@ -152,12 +228,22 @@ class CheckoutController extends Controller
             return redirect()->route('onboarding.sign');
         }
 
+        $gatewayCurrency = strtoupper(config('services.paystack.currency', 'NGN'));
+        $isNairaUser = $diagnosticSession->country === 'Nigeria';
+
+        if ($gatewayCurrency === 'NGN') {
+            $currency = 'NGN';
+        } else {
+            $currency = $isNairaUser ? 'NGN' : 'USD';
+        }
+
         try {
             $result = $paystack->initializeTransaction([
                 'email'                 => $diagnosticSession->email,
                 'tier'                  => $validated['tier'],
                 'diagnostic_session_id' => $validated['diagnostic_session_id'],
                 'callback_url'          => route('checkout.success'),
+                'currency'              => $currency,
             ]);
         } catch (\Throwable $e) {
             Log::error('Payment initialization failed', [

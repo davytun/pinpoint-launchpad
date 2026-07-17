@@ -117,7 +117,7 @@ function RevenueSparkline({ data, thisMonth }: { data: MonthlyRevenue[]; thisMon
         <div className="min-w-0 rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
             <div className="mb-1 flex items-center justify-between">
                 <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Monthly Revenue</p>
-                <DollarSign className="size-4 text-emerald-650 opacity-50" />
+                <DollarSign className="text-emerald-650 size-4 opacity-50" />
             </div>
             <p className="mb-4 text-2xl font-extrabold text-zinc-950">{fmtCurrency(thisMonth)}</p>
             <ChartContainer config={revenueChartConfig} className="h-[90px] w-full">
@@ -178,13 +178,13 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
                         <div key={item.label} className="flex items-center justify-between gap-2">
                             <div className="flex min-w-0 items-center gap-1.5">
                                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: item.color }} />
-                                <span className="truncate text-xs text-zinc-650 font-semibold">{item.label}</span>
+                                <span className="text-zinc-650 truncate text-xs font-semibold">{item.label}</span>
                             </div>
                             <span className="shrink-0 text-xs font-bold text-zinc-800 tabular-nums">{item.value}</span>
                         </div>
                     ))}
                     <div className="flex items-center justify-between gap-2 border-t border-zinc-200 pt-1.5">
-                        <span className="text-xs text-zinc-400 font-semibold">Total</span>
+                        <span className="text-xs font-semibold text-zinc-400">Total</span>
                         <span className="text-xs font-extrabold text-zinc-950 tabular-nums">{total}</span>
                     </div>
                 </div>
@@ -229,13 +229,13 @@ function WaitlistSplit({ founders, investors }: { founders: number; investors: n
             <div className="mt-3 flex gap-4">
                 <div className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-blue-500" />
-                    <span className="text-xs text-zinc-650 font-semibold">
+                    <span className="text-zinc-650 text-xs font-semibold">
                         Founders <span className="font-bold text-zinc-950">{founderPct}%</span>
                     </span>
                 </div>
                 <div className="flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-violet-500" />
-                    <span className="text-xs text-zinc-650 font-semibold">
+                    <span className="text-zinc-650 text-xs font-semibold">
                         Investors <span className="font-bold text-zinc-950">{investorPct}%</span>
                     </span>
                 </div>
@@ -269,8 +269,8 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
 
             <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
                 <div className="mb-6 lg:mb-8">
-                    <h1 className="text-xl font-extrabold text-zinc-955 sm:text-2xl">Operational Command</h1>
-                    <p className="mt-1 text-sm text-zinc-550">
+                    <h1 className="text-zinc-955 text-xl font-extrabold sm:text-2xl">Operational Command</h1>
+                    <p className="text-zinc-550 mt-1 text-sm">
                         {isSuperAdmin ? 'Full platform overview' : isAnalyst ? 'Your assigned engagements' : 'Support overview'}
                     </p>
                 </div>
@@ -310,13 +310,7 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                             />
                         </div>
                         <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mb-6 lg:grid-cols-4">
-                            <MetricCard
-                                icon={Clock}
-                                label="Pending"
-                                value={metrics.pending_audits ?? 0}
-                                color="text-zinc-500"
-                                iconBg="bg-zinc-100"
-                            />
+                            <MetricCard icon={Clock} label="Pending" value={metrics.pending_audits ?? 0} color="text-zinc-500" iconBg="bg-zinc-100" />
                             <MetricCard
                                 icon={AlertTriangle}
                                 label="Needs Info"
@@ -360,7 +354,10 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                                 <h2 className="mb-3 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Revenue by Tier</h2>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                                     {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
-                                        <div key={tier} className="rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
+                                        <div
+                                            key={tier}
+                                            className="rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5"
+                                        >
                                             <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 capitalize">{tier}</p>
                                             <p className="text-xl font-extrabold text-zinc-950">{fmtCurrency(metrics.revenue_by_tier![tier])}</p>
                                         </div>
@@ -436,14 +433,14 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                                     <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${activityDotColor[item.type] ?? 'bg-zinc-400'}`} />
                                     <div className="min-w-0 flex-1">
                                         <div className="flex flex-wrap items-center gap-x-2">
-                                            <span className="text-[10px] font-bold tracking-wider text-zinc-450 uppercase">
+                                            <span className="text-zinc-450 text-[10px] font-bold tracking-wider uppercase">
                                                 {activityTypeLabel[item.type]}
                                             </span>
                                             <p className="truncate text-sm font-semibold text-zinc-900">{item.description}</p>
                                         </div>
                                         {item.email && <p className="mt-0.5 truncate text-xs text-zinc-500">{item.email}</p>}
                                     </div>
-                                    <span className="shrink-0 text-xs whitespace-nowrap text-zinc-450">{item.time}</span>
+                                    <span className="text-zinc-450 shrink-0 text-xs whitespace-nowrap">{item.time}</span>
                                 </div>
                             ))}
                         </div>

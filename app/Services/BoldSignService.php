@@ -231,7 +231,7 @@ class BoldSignService
             $signature->log('pdf_downloaded', ['path' => $pdfPath]);
         }
 
-        $tierLabel = ucfirst($signature->metadata['tier'] ?? 'Foundation');
+        $tierLabel = \App\Models\Payment::getTierLabel($signature->metadata['tier'] ?? 'foundation');
 
         // Generate a one-time setup token so the founder can create their dashboard account.
         // The token is validated in FounderAuthController::showSetup() and setup().

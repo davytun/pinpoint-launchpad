@@ -175,11 +175,7 @@ function CountUp({ target, duration = 1500 }: { target: number; duration?: numbe
 
 function FadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay, ease: [0.25, 1, 0.5, 1] }}
-        >
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay, ease: [0.25, 1, 0.5, 1] }}>
             {children}
         </motion.div>
     );
@@ -204,26 +200,26 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
     return (
         <div>
             {/* Desktop Stepper: Horizontal (hidden on mobile, shown on md+) */}
-            <div className="relative hidden md:block w-full py-4">
+            <div className="relative hidden w-full py-4 md:block">
                 {/* Background line */}
-                <div className="absolute left-[10%] right-[10%] top-8 h-0.5 bg-zinc-200" />
-                
+                <div className="absolute top-8 right-[10%] left-[10%] h-0.5 bg-zinc-200" />
+
                 {/* Progress line */}
                 <div
-                    className="absolute left-[10%] top-8 h-0.5 bg-emerald-500 transition-all duration-500"
+                    className="absolute top-8 left-[10%] h-0.5 bg-emerald-500 transition-all duration-500"
                     style={{ width: auditStatus === 'complete' ? '80%' : '60%' }}
                 />
 
-                <div className="flex items-start justify-between w-full">
+                <div className="flex w-full items-start justify-between">
                     {steps.map((step, idx) => (
                         <div key={idx} className="flex flex-1 flex-col items-center">
                             {/* Circle */}
                             {step.done ? (
-                                <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-500/20 ring-4 ring-white">
+                                <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md ring-4 shadow-emerald-500/20 ring-white">
                                     <CheckCircle2 className="size-4.5" />
                                 </div>
                             ) : step.active ? (
-                                <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-[#3A54A5] bg-white text-[#3A54A5] shadow-md shadow-[#3A54A5]/15 ring-4 ring-white animate-pulse">
+                                <div className="relative z-10 flex h-8 w-8 shrink-0 animate-pulse items-center justify-center rounded-full border-2 border-[#3A54A5] bg-white text-[#3A54A5] shadow-md ring-4 shadow-[#3A54A5]/15 ring-white">
                                     <span className="h-2.5 w-2.5 rounded-full bg-[#3A54A5]" />
                                 </div>
                             ) : (
@@ -235,12 +231,8 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
                             {/* Label */}
                             <span
                                 className={cn(
-                                    'mt-2.5 text-center text-[11.5px] font-extrabold tracking-tight max-w-[110px] transition-colors leading-tight',
-                                    step.done
-                                        ? 'text-emerald-700'
-                                        : step.active
-                                          ? 'text-[#3A54A5]'
-                                          : 'text-zinc-400',
+                                    'mt-2.5 max-w-[110px] text-center text-[11.5px] leading-tight font-extrabold tracking-tight transition-colors',
+                                    step.done ? 'text-emerald-700' : step.active ? 'text-[#3A54A5]' : 'text-zinc-400',
                                 )}
                             >
                                 {step.label}
@@ -251,10 +243,10 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
             </div>
 
             {/* Mobile Stepper: Vertical (shown on mobile, hidden on md+) */}
-            <div className="relative block md:hidden space-y-5 pl-2">
+            <div className="relative block space-y-5 pl-2 md:hidden">
                 {/* Vertical connecting line */}
-                <div className="absolute left-[21px] top-3 bottom-3 w-0.5 bg-zinc-200" />
-                
+                <div className="absolute top-3 bottom-3 left-[21px] w-0.5 bg-zinc-200" />
+
                 {steps.map((step, idx) => {
                     return (
                         <div key={idx} className="relative flex items-start gap-4">
@@ -262,10 +254,10 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
                             <div className="relative z-10 shrink-0">
                                 {step.done ? (
                                     <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm ring-4 ring-white">
-                                        <CheckCircle2 className="size-4 animate-fade-in" />
+                                        <CheckCircle2 className="animate-fade-in size-4" />
                                     </div>
                                 ) : step.active ? (
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#3A54A5] bg-white text-[#3A54A5] ring-4 ring-white animate-pulse">
+                                    <div className="flex h-7 w-7 animate-pulse items-center justify-center rounded-full border-2 border-[#3A54A5] bg-white text-[#3A54A5] ring-4 ring-white">
                                         <span className="h-2 w-2 rounded-full bg-[#3A54A5]" />
                                     </div>
                                 ) : (
@@ -280,19 +272,13 @@ function ProgressStepper({ auditStatus }: { auditStatus: string }) {
                                 <h4
                                     className={cn(
                                         'text-xs font-bold tracking-tight',
-                                        step.done
-                                            ? 'text-emerald-700'
-                                            : step.active
-                                              ? 'text-[#3A54A5]'
-                                              : 'text-zinc-400',
+                                        step.done ? 'text-emerald-700' : step.active ? 'text-[#3A54A5]' : 'text-zinc-400',
                                     )}
                                 >
                                     {step.label}
                                 </h4>
                                 {step.active && (
-                                    <p className="mt-0.5 text-[11px] text-zinc-500 font-semibold leading-relaxed animate-fade-in">
-                                        {step.desc}
-                                    </p>
+                                    <p className="animate-fade-in mt-0.5 text-[11px] leading-relaxed font-semibold text-zinc-500">{step.desc}</p>
                                 )}
                             </div>
                         </div>
@@ -310,7 +296,7 @@ function ProCard({ children, className, id }: { children: React.ReactNode; class
         <div
             id={id}
             className={cn(
-                'overflow-hidden rounded-[2rem] border border-white/80 bg-white/30 backdrop-blur-md transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.025)]',
+                'overflow-hidden rounded-[2rem] border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md transition-all duration-300',
                 className,
             )}
         >
@@ -356,10 +342,14 @@ export default function FounderDashboard({
 
     function handleRequestStatus(id: number, status: 'approved' | 'rejected') {
         setUpdatingStatusId(id);
-        router.patch(route('founder.access-requests.status', id), { status }, {
-            preserveScroll: true,
-            onFinish: () => setUpdatingStatusId(null),
-        });
+        router.patch(
+            route('founder.access-requests.status', id),
+            { status },
+            {
+                preserveScroll: true,
+                onFinish: () => setUpdatingStatusId(null),
+            },
+        );
     }
 
     return (
@@ -375,10 +365,10 @@ export default function FounderDashboard({
                                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: meta.color }} />
                                 {meta.badgeLabel}
                             </div>
-                            <h1 id="tour-welcome" className="font-display text-3xl font-extrabold tracking-tight text-zinc-955 sm:text-4xl">
+                            <h1 id="tour-welcome" className="font-display text-zinc-955 text-3xl font-extrabold tracking-tight sm:text-4xl">
                                 {greeting(founder.full_name)}
                             </h1>
-                            <p className="mt-1.5 text-[14px] text-zinc-555 font-semibold">
+                            <p className="text-zinc-555 mt-1.5 text-[14px] font-semibold">
                                 {founder.company_name ?? '—'} <span className="mx-2 opacity-50">•</span> {tierLabel} Audit
                             </p>
                         </div>
@@ -396,7 +386,7 @@ export default function FounderDashboard({
                                             <p className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">Audit Pipeline</p>
                                             <span
                                                 className={cn(
-                                                    'rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-xs',
+                                                    'rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase shadow-xs',
                                                     audit_status === 'complete'
                                                         ? 'border-emerald-250 bg-emerald-50 text-emerald-600'
                                                         : audit_status === 'needs_info'
@@ -407,22 +397,23 @@ export default function FounderDashboard({
                                                 {statusCfg.label}
                                             </span>
                                         </div>
-                                        <h2 className="text-xl font-extrabold text-zinc-900 tracking-tight">Status Overview</h2>
-                                        <p className="text-[14px] leading-relaxed text-zinc-555 font-semibold">{statusCfg.description}</p>
+                                        <h2 className="text-xl font-extrabold tracking-tight text-zinc-900">Status Overview</h2>
+                                        <p className="text-zinc-555 text-[14px] leading-relaxed font-semibold">{statusCfg.description}</p>
                                     </div>
                                 </div>
 
                                 {audit_status === 'needs_info' && (
-                                    <div className="-mt-2 animate-fade-in">
+                                    <div className="animate-fade-in -mt-2">
                                         <div className="rounded-xl border border-amber-500/25 bg-amber-50 p-4 shadow-xs">
-                                            <p className="text-[13px] font-semibold text-amber-800 leading-relaxed">
-                                                Please review the messages thread inside your portal dashboard. There are details and additional documents requested by your assigned auditor.
+                                            <p className="text-[13px] leading-relaxed font-semibold text-amber-800">
+                                                Please review the messages thread inside your portal dashboard. There are details and additional
+                                                documents requested by your assigned auditor.
                                             </p>
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="h-px bg-zinc-200/80 my-1" />
+                                <div className="my-1 h-px bg-zinc-200/80" />
 
                                 <div id="tour-stepper" className="w-full">
                                     <ProgressStepper auditStatus={audit_status} />
@@ -435,7 +426,10 @@ export default function FounderDashboard({
                 {/* ── Section 3 — PARAGON Score & Radar ── */}
                 <div className="grid gap-6 sm:grid-cols-2">
                     <FadeUp delay={0.15}>
-                        <ProCard id="tour-score" className="relative flex h-full flex-col items-center justify-center p-8 text-center min-w-0 overflow-hidden">
+                        <ProCard
+                            id="tour-score"
+                            className="relative flex h-full min-w-0 flex-col items-center justify-center overflow-hidden p-8 text-center"
+                        >
                             <p className="mb-6 text-[12px] font-bold tracking-wider text-zinc-500 uppercase">PARAGON Score</p>
                             {score != null ? (
                                 <>
@@ -454,21 +448,21 @@ export default function FounderDashboard({
                                         <meta.Icon className="mr-2 inline size-3.5" aria-hidden="true" />
                                         {meta.badgeLabel}
                                     </Badge>
-                                    {score_band_message && <p className="mt-4 text-[13px] leading-relaxed text-zinc-650">{score_band_message}</p>}
+                                    {score_band_message && <p className="text-zinc-650 mt-4 text-[13px] leading-relaxed">{score_band_message}</p>}
                                 </>
                             ) : (
                                 <div className="flex flex-col items-center space-y-4 py-6">
-                                    <div className="flex h-16 w-24 items-center justify-center rounded-2xl bg-[#3A54A5]/5 text-[#3A54A5] ring-1 ring-[#3A54A5]/10 shadow-xs">
+                                    <div className="flex h-16 w-24 items-center justify-center rounded-2xl bg-[#3A54A5]/5 text-[#3A54A5] shadow-xs ring-1 ring-[#3A54A5]/10">
                                         <Clock className="size-8 animate-pulse text-[#3A54A5]/70" />
                                     </div>
-                                    <p className="text-[13px] text-zinc-500 font-bold">Score pending audit completion</p>
+                                    <p className="text-[13px] font-bold text-zinc-500">Score pending audit completion</p>
                                 </div>
                             )}
                         </ProCard>
                     </FadeUp>
 
                     <FadeUp delay={0.2}>
-                        <ProCard id="tour-pillar" className="h-full p-6 sm:p-8 min-w-0 overflow-hidden">
+                        <ProCard id="tour-pillar" className="h-full min-w-0 overflow-hidden p-6 sm:p-8">
                             <p className="mb-4 text-[12px] font-bold tracking-wider text-zinc-500 uppercase">Pillar Breakdown</p>
                             {hasPillarData ? (
                                 <div className="relative h-[220px] w-full">
@@ -489,10 +483,10 @@ export default function FounderDashboard({
                                 </div>
                             ) : (
                                 <div className="flex h-[220px] flex-col items-center justify-center gap-4">
-                                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-zinc-50 text-zinc-400 ring-1 ring-zinc-200/80 shadow-xs">
-                                        <Lock className="size-8 text-zinc-400/80 animate-pulse" />
+                                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-zinc-50 text-zinc-400 shadow-xs ring-1 ring-zinc-200/80">
+                                        <Lock className="size-8 animate-pulse text-zinc-400/80" />
                                     </div>
-                                    <p className="text-[13px] text-zinc-500 font-bold">Pillar data unlocked post-audit</p>
+                                    <p className="text-[13px] font-bold text-zinc-500">Pillar data unlocked post-audit</p>
                                 </div>
                             )}
                         </ProCard>
@@ -510,7 +504,9 @@ export default function FounderDashboard({
                                 <h2 className="text-[16px] font-bold text-zinc-800">{tierLabel} Package Inclusions</h2>
                             </div>
                             {payment && (
-                                <span className="text-[14px] font-semibold text-zinc-555">Paid: ${Number(payment.total_amount).toLocaleString()}</span>
+                                <span className="text-zinc-555 text-[14px] font-semibold">
+                                    Paid: ${Number(payment.total_amount).toLocaleString()}
+                                </span>
                             )}
                         </div>
                         <ul className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -536,8 +532,8 @@ export default function FounderDashboard({
                                 <FileText className="size-4.5 text-zinc-500 transition-colors group-hover:text-[#3A54A5]" />
                             </div>
                             <div>
-                                <h3 className="text-[15px] font-bold text-zinc-955">Documents</h3>
-                                <p className="mt-1 text-[13px] text-zinc-555">Manage and upload requested files.</p>
+                                <h3 className="text-zinc-955 text-[15px] font-bold">Documents</h3>
+                                <p className="text-zinc-555 mt-1 text-[13px]">Manage and upload requested files.</p>
                             </div>
                             <div className="mt-5 flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-[#3A54A5] uppercase transition-colors group-hover:text-[#2D4182]">
                                 View <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -553,8 +549,8 @@ export default function FounderDashboard({
                                 <MessageSquare className="size-4.5 text-zinc-500 transition-colors group-hover:text-[#3A54A5]" />
                             </div>
                             <div>
-                                <h3 className="text-[15px] font-bold text-zinc-955">Messages</h3>
-                                <p className="mt-1 text-[13px] text-zinc-555">Communicate directly with your analyst.</p>
+                                <h3 className="text-zinc-955 text-[15px] font-bold">Messages</h3>
+                                <p className="text-zinc-555 mt-1 text-[13px]">Communicate directly with your analyst.</p>
                             </div>
                             <div className="mt-5 flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-[#3A54A5] uppercase transition-colors group-hover:text-[#2D4182]">
                                 Open <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -564,9 +560,7 @@ export default function FounderDashboard({
                         <div
                             className={cn(
                                 'flex flex-col justify-between overflow-hidden rounded-2xl border border-white/80 bg-white/30 p-6 shadow-md backdrop-blur-md transition-all duration-300 ease-out',
-                                profile_is_live
-                                    ? 'hover:-translate-y-1 hover:border-[#3A54A5]/40 hover:bg-white/50 hover:shadow-lg'
-                                    : '',
+                                profile_is_live ? 'hover:-translate-y-1 hover:border-[#3A54A5]/40 hover:bg-white/50 hover:shadow-lg' : '',
                             )}
                         >
                             <div className="mb-4 flex items-center justify-between">
@@ -574,14 +568,14 @@ export default function FounderDashboard({
                                     <ExternalLink className="size-4.5 text-zinc-500" />
                                 </div>
                                 {profile_is_live && (
-                                    <span className="rounded-sm border border-emerald-250 bg-emerald-50 px-2 py-0.5 text-[10px] font-bold tracking-wider text-emerald-600 uppercase">
+                                    <span className="border-emerald-250 rounded-sm border bg-emerald-50 px-2 py-0.5 text-[10px] font-bold tracking-wider text-emerald-600 uppercase">
                                         Live
                                     </span>
                                 )}
                             </div>
                             <div>
-                                <h3 className="text-[15px] font-bold text-zinc-955">Investor Page</h3>
-                                <p className="mt-1 text-[13px] text-zinc-555">
+                                <h3 className="text-zinc-955 text-[15px] font-bold">Investor Page</h3>
+                                <p className="text-zinc-555 mt-1 text-[13px]">
                                     {profile_is_live ? 'Your page is publicly visible.' : 'Goes live post-audit.'}
                                 </p>
                             </div>
@@ -613,16 +607,17 @@ export default function FounderDashboard({
                                 </div>
                                 <h2 className="text-[16px] font-bold text-zinc-800">Investor Access Requests</h2>
                             </div>
-                            <span className="text-[13px] font-semibold text-zinc-555">
+                            <span className="text-zinc-555 text-[13px] font-semibold">
                                 {access_requests.length} total request{access_requests.length !== 1 ? 's' : ''}
                             </span>
                         </div>
 
                         {access_requests.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-8 text-center">
-                                <p className="text-sm text-zinc-450 font-medium">No data room access requests yet.</p>
+                                <p className="text-zinc-450 text-sm font-medium">No data room access requests yet.</p>
                                 <p className="mt-1 text-xs text-zinc-400">
-                                    When venture investors view your profile page and request full access to your diligence assets, their requests will appear here.
+                                    When venture investors view your profile page and request full access to your diligence assets, their requests
+                                    will appear here.
                                 </p>
                             </div>
                         ) : (
@@ -632,9 +627,9 @@ export default function FounderDashboard({
                                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                             <div className="space-y-1">
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="font-semibold text-zinc-900 text-sm">{req.investor_name}</span>
+                                                    <span className="text-sm font-semibold text-zinc-900">{req.investor_name}</span>
                                                     {req.firm_name && (
-                                                        <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10.5px] font-bold text-zinc-650">
+                                                        <span className="text-zinc-650 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10.5px] font-bold">
                                                             {req.firm_name}
                                                         </span>
                                                     )}
@@ -649,9 +644,9 @@ export default function FounderDashboard({
                                                         </a>
                                                     )}
                                                 </div>
-                                                <div className="text-xs text-zinc-555 font-semibold">
+                                                <div className="text-zinc-555 text-xs font-semibold">
                                                     Email:{' '}
-                                                    <a href={`mailto:${req.investor_email}`} className="text-[#3A54A5] hover:underline font-bold">
+                                                    <a href={`mailto:${req.investor_email}`} className="font-bold text-[#3A54A5] hover:underline">
                                                         {req.investor_email}
                                                     </a>
                                                     <span className="mx-2 opacity-50">•</span>
@@ -659,13 +654,13 @@ export default function FounderDashboard({
                                                 </div>
 
                                                 {req.message && (
-                                                    <div className="mt-2.5 border-l-2 border-zinc-200 pl-3.5 italic text-zinc-500 text-xs leading-relaxed max-w-2xl font-semibold">
+                                                    <div className="mt-2.5 max-w-2xl border-l-2 border-zinc-200 pl-3.5 text-xs leading-relaxed font-semibold text-zinc-500 italic">
                                                         {req.message}
                                                     </div>
                                                 )}
                                             </div>
 
-                                            <div className="flex items-center gap-2 shrink-0 sm:mt-1">
+                                            <div className="flex shrink-0 items-center gap-2 sm:mt-1">
                                                 {req.status === 'pending' ? (
                                                     <>
                                                         <button
@@ -684,7 +679,7 @@ export default function FounderDashboard({
                                                         </button>
                                                     </>
                                                 ) : req.status === 'approved' ? (
-                                                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-250 bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs animate-fade-in">
+                                                    <span className="border-emerald-250 animate-fade-in inline-flex items-center gap-1 rounded-full border bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs">
                                                         <CheckCircle2 className="size-3.5 text-emerald-600" />
                                                         Approved &amp; Emailed
                                                     </span>
@@ -714,9 +709,9 @@ export default function FounderDashboard({
                                 <div className="flex h-8 w-8 items-center justify-center rounded-md border border-zinc-200 bg-zinc-50/50">
                                     <User className="size-4.5 text-[#3A54A5]" />
                                 </div>
-                                <span className="text-[15px] font-semibold text-zinc-955">Account Details</span>
+                                <span className="text-zinc-955 text-[15px] font-semibold">Account Details</span>
                             </div>
-                            {accountOpen ? <ChevronUp className="size-4.5 text-zinc-450" /> : <ChevronDown className="size-4.5 text-zinc-450" />}
+                            {accountOpen ? <ChevronUp className="text-zinc-450 size-4.5" /> : <ChevronDown className="text-zinc-450 size-4.5" />}
                         </button>
 
                         <AnimatePresence>
@@ -741,7 +736,7 @@ export default function FounderDashboard({
                                                     key={label}
                                                     className="rounded-xl border border-zinc-200 bg-white p-4 shadow-xs transition-all hover:border-zinc-300"
                                                 >
-                                                    <dt className="text-[10px] font-bold tracking-wider text-zinc-450 uppercase">{label}</dt>
+                                                    <dt className="text-zinc-450 text-[10px] font-bold tracking-wider uppercase">{label}</dt>
                                                     <dd className="mt-1 font-sans text-[13.5px] font-medium text-zinc-800">{value ?? '—'}</dd>
                                                 </div>
                                             ))}

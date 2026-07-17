@@ -81,13 +81,13 @@ export default function FounderLogin({ flash }: PageProps) {
                         <h1 className="font-display mb-1.5 text-center text-[22px] leading-tight font-extrabold tracking-tight text-zinc-950">
                             Welcome Back
                         </h1>
-                        <p className="mb-8 text-center text-[13px] leading-relaxed text-zinc-555 font-medium">Sign in to your founder dashboard.</p>
+                        <p className="text-zinc-555 mb-8 text-center text-[13px] leading-relaxed font-medium">Sign in to your founder dashboard.</p>
 
                         {/* Flash messages */}
                         {flash?.info && (
                             <div
                                 role="status"
-                                className="mb-5 rounded-xl border border-blue-500/20 bg-blue-50 px-4 py-3 text-center text-[13px] font-bold text-blue-700 shadow-xs animate-fade-in"
+                                className="animate-fade-in mb-5 rounded-xl border border-blue-500/20 bg-blue-50 px-4 py-3 text-center text-[13px] font-bold text-blue-700 shadow-xs"
                             >
                                 {flash.info}
                             </div>
@@ -95,7 +95,7 @@ export default function FounderLogin({ flash }: PageProps) {
                         {flash?.error && (
                             <div
                                 role="alert"
-                                className="mb-5 rounded-xl border border-red-500/20 bg-red-50 px-4 py-3 text-center text-[13px] font-bold text-red-700 shadow-xs animate-fade-in"
+                                className="animate-fade-in mb-5 rounded-xl border border-red-500/20 bg-red-50 px-4 py-3 text-center text-[13px] font-bold text-red-700 shadow-xs"
                             >
                                 {flash.error}
                             </div>
@@ -114,7 +114,7 @@ export default function FounderLogin({ flash }: PageProps) {
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                     className={cn(
-                                        'w-full rounded-xl border bg-white px-4 py-3 text-[14px] text-zinc-950 transition-all duration-200 outline-none placeholder:text-zinc-400 shadow-xs focus:ring-2 focus:ring-[#3A54A5]/10',
+                                        'w-full rounded-xl border bg-white px-4 py-3 text-[14px] text-zinc-950 shadow-xs transition-all duration-200 outline-none placeholder:text-zinc-400 focus:ring-2 focus:ring-[#3A54A5]/10',
                                         errors.email
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
                                             : 'border-zinc-200 focus:border-[#3A54A5]/60',
@@ -123,7 +123,7 @@ export default function FounderLogin({ flash }: PageProps) {
                                     required
                                 />
                                 {errors.email && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-600 font-semibold">
+                                    <p role="alert" className="mt-1.5 text-[11px] font-semibold text-red-600">
                                         {errors.email}
                                     </p>
                                 )}
@@ -142,7 +142,7 @@ export default function FounderLogin({ flash }: PageProps) {
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
                                         className={cn(
-                                            'w-full rounded-xl border bg-white px-4 py-3 pr-11 text-[14px] text-zinc-950 transition-all duration-200 outline-none placeholder:text-zinc-400 shadow-xs focus:ring-2 focus:ring-[#3A54A5]/10',
+                                            'w-full rounded-xl border bg-white px-4 py-3 pr-11 text-[14px] text-zinc-950 shadow-xs transition-all duration-200 outline-none placeholder:text-zinc-400 focus:ring-2 focus:ring-[#3A54A5]/10',
                                             errors.password
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
                                                 : 'border-zinc-200 focus:border-[#3A54A5]/60',
@@ -154,7 +154,7 @@ export default function FounderLogin({ flash }: PageProps) {
                                         type="button"
                                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                                         onClick={() => setShowPassword((v) => !v)}
-                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-650"
+                                        className="hover:text-zinc-650 absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors"
                                     >
                                         {showPassword ? (
                                             <EyeOff className="size-4" aria-hidden="true" />
@@ -164,7 +164,7 @@ export default function FounderLogin({ flash }: PageProps) {
                                     </button>
                                 </div>
                                 {errors.password && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-600 font-semibold">
+                                    <p role="alert" className="mt-1.5 text-[11px] font-semibold text-red-600">
                                         {errors.password}
                                     </p>
                                 )}
@@ -193,11 +193,11 @@ export default function FounderLogin({ flash }: PageProps) {
                                             </svg>
                                         )}
                                     </div>
-                                    <span className="text-[12px] text-zinc-550 font-bold">Remember me</span>
+                                    <span className="text-zinc-550 text-[12px] font-bold">Remember me</span>
                                 </label>
                                 <Link
                                     href={route('founder.password.request')}
-                                    className="text-[12px] text-zinc-555 transition-colors duration-200 hover:text-zinc-950 font-bold"
+                                    className="text-zinc-555 text-[12px] font-bold transition-colors duration-200 hover:text-zinc-950"
                                 >
                                     Forgot password?
                                 </Link>
@@ -209,7 +209,7 @@ export default function FounderLogin({ flash }: PageProps) {
                                 disabled={processing}
                                 aria-busy={processing}
                                 aria-label={processing ? 'Signing in, please wait' : 'Sign In'}
-                                className="group relative mt-1 w-full overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#2D4182] disabled:cursor-not-allowed disabled:opacity-50 shadow-md shadow-[#3A54A5]/25 hover:shadow-lg"
+                                className="group relative mt-1 w-full overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase shadow-md shadow-[#3A54A5]/25 transition-all duration-200 outline-none hover:bg-[#2D4182] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     {processing ? (
@@ -229,15 +229,15 @@ export default function FounderLogin({ flash }: PageProps) {
 
                         <div className="mt-8 flex items-center gap-3">
                             <div className="h-px flex-1 bg-zinc-200" />
-                            <span className="text-[11px] text-zinc-400 font-bold">OR</span>
+                            <span className="text-[11px] font-bold text-zinc-400">OR</span>
                             <div className="h-px flex-1 bg-zinc-200" />
                         </div>
 
-                        <p className="mt-5 text-center text-[12px] text-zinc-550 font-semibold">
+                        <p className="text-zinc-550 mt-5 text-center text-[12px] font-semibold">
                             New to Pinpoint? Complete the diagnostic to get started.{' '}
                             <Link
                                 href={route('diagnostic.index')}
-                                className="group inline-flex items-center gap-1 text-[#3A54A5] underline underline-offset-2 transition-colors duration-200 hover:text-[#2D4182] font-bold"
+                                className="group inline-flex items-center gap-1 font-bold text-[#3A54A5] underline underline-offset-2 transition-colors duration-200 hover:text-[#2D4182]"
                             >
                                 Take the Diagnostic
                                 <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />

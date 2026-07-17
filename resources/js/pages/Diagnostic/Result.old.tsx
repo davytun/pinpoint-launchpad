@@ -119,7 +119,9 @@ export default function DiagnosticResult({ score, score_band, pillar_scores, sco
                 <div className="mx-auto max-w-4xl px-4 pt-8 pb-24 sm:px-8">
                     {/* Heading */}
                     <FadeUp delay={0.05}>
-                        <h1 className="font-display mb-10 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">Your PARAGON Diagnostic Results</h1>
+                        <h1 className="font-display mb-10 text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">
+                            Your PARAGON Diagnostic Results
+                        </h1>
                     </FadeUp>
 
                     {/* ── Section 1: Score Hero ── */}
@@ -152,9 +154,7 @@ export default function DiagnosticResult({ score, score_band, pillar_scores, sco
                                     <span className="font-display mb-3 text-2xl font-light text-zinc-400 sm:mb-5">/100</span>
                                 </div>
 
-                                <p className="mt-3 text-[10px] font-extrabold tracking-[0.2em] text-zinc-400 uppercase">
-                                    Overall Diligence Score
-                                </p>
+                                <p className="mt-3 text-[10px] font-extrabold tracking-[0.2em] text-zinc-400 uppercase">Overall Diligence Score</p>
                             </div>
                         </div>
                     </FadeUp>
@@ -167,7 +167,7 @@ export default function DiagnosticResult({ score, score_band, pillar_scores, sco
                                 <div className="flex flex-col space-y-1.5 p-6">
                                     <h3 className="text-sm font-semibold tracking-widest text-zinc-500 uppercase">Pillar Radar</h3>
                                 </div>
-                                <div className="p-6 pt-0 relative">
+                                <div className="relative p-6 pt-0">
                                     <ResponsiveContainer width="100%" height={280}>
                                         <RadarChart data={radarData} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
                                             <PolarGrid stroke="rgba(0, 0, 0, 0.08)" />
@@ -211,7 +211,7 @@ export default function DiagnosticResult({ score, score_band, pillar_scores, sco
                                     <div>
                                         <a
                                             href="/checkout"
-                                            className="group relative flex w-full items-center justify-center gap-2 rounded-md border border-white/5 bg-[#3A54A5] px-5 py-4 text-xs font-bold tracking-[0.2em] text-white uppercase shadow-none transition-all duration-300 outline-none hover:bg-[#2D4182] hover:shadow-[0_8px_25px_rgba(58,84,165,0.25)] hover:scale-[1.005] active:scale-[0.99]"
+                                            className="group relative flex w-full items-center justify-center gap-2 rounded-md border border-white/5 bg-[#3A54A5] px-5 py-4 text-xs font-bold tracking-[0.2em] text-white uppercase shadow-none transition-all duration-300 outline-none hover:scale-[1.005] hover:bg-[#2D4182] hover:shadow-[0_8px_25px_rgba(58,84,165,0.25)] active:scale-[0.99]"
                                         >
                                             <span className="relative z-10 flex items-center gap-2">
                                                 Proceed to Application
@@ -250,11 +250,9 @@ export default function DiagnosticResult({ score, score_band, pillar_scores, sco
                             <FadeUp delay={0.38}>
                                 <div className="dx-card overflow-hidden rounded-xl md:rounded-2xl">
                                     <div className="flex flex-col space-y-1.5 p-6 pb-3">
-                                        <h3 className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase">
-                                            Pillar Breakdown
-                                        </h3>
+                                        <h3 className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Pillar Breakdown</h3>
                                     </div>
-                                    <div className="p-6 pt-0 flex flex-col gap-4">
+                                    <div className="flex flex-col gap-4 p-6 pt-0">
                                         {PILLAR_KEYS.map((key, i) => (
                                             <div key={key} className="space-y-1.5">
                                                 <div className="flex items-center justify-between">

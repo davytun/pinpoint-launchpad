@@ -73,10 +73,12 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                             <PinpointLogo height={24} />
                         </div>
 
-                        <h1 className="font-display mb-1.5 text-center text-[22px] leading-tight font-extrabold tracking-tight text-zinc-955">
+                        <h1 className="font-display text-zinc-955 mb-1.5 text-center text-[22px] leading-tight font-extrabold tracking-tight">
                             Set New Password
                         </h1>
-                        <p className="mb-8 text-center text-[13px] leading-relaxed text-zinc-555 font-medium">Choose a strong password for your account.</p>
+                        <p className="text-zinc-555 mb-8 text-center text-[13px] leading-relaxed font-medium">
+                            Choose a strong password for your account.
+                        </p>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {/* Hidden fields */}
@@ -96,7 +98,7 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                                     className="w-full cursor-not-allowed rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-[14px] text-zinc-500 shadow-xs outline-none"
                                 />
                                 {errors.email && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-605 font-semibold">
+                                    <p role="alert" className="text-red-605 mt-1.5 text-[11px] font-semibold">
                                         {errors.email}
                                     </p>
                                 )}
@@ -115,7 +117,7 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                                         onChange={(e) => setData('password', e.target.value)}
                                         autoComplete="new-password"
                                         className={cn(
-                                            'w-full rounded-xl border bg-white px-4 py-3 pr-11 text-[14px] text-zinc-950 transition-all duration-200 outline-none placeholder:text-zinc-400 shadow-xs focus:ring-2 focus:ring-[#3A54A5]/10',
+                                            'w-full rounded-xl border bg-white px-4 py-3 pr-11 text-[14px] text-zinc-950 shadow-xs transition-all duration-200 outline-none placeholder:text-zinc-400 focus:ring-2 focus:ring-[#3A54A5]/10',
                                             errors.password
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
                                                 : 'border-zinc-200 focus:border-[#3A54A5]/60',
@@ -127,7 +129,7 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                                         type="button"
                                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                                         onClick={() => setShowPassword((v) => !v)}
-                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-650"
+                                        className="hover:text-zinc-650 absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors"
                                     >
                                         {showPassword ? (
                                             <EyeOff className="size-4" aria-hidden="true" />
@@ -137,11 +139,11 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                                     </button>
                                 </div>
                                 {errors.password ? (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-600 font-semibold">
+                                    <p role="alert" className="mt-1.5 text-[11px] font-semibold text-red-600">
                                         {errors.password}
                                     </p>
                                 ) : (
-                                    <p className="mt-1.5 text-[11px] text-zinc-400 font-semibold">Minimum 8 characters</p>
+                                    <p className="mt-1.5 text-[11px] font-semibold text-zinc-400">Minimum 8 characters</p>
                                 )}
                             </div>
 
@@ -161,7 +163,7 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                                         onChange={(e) => setData('password_confirmation', e.target.value)}
                                         autoComplete="new-password"
                                         className={cn(
-                                            'w-full rounded-xl border bg-white px-4 py-3 pr-11 text-[14px] text-zinc-950 transition-all duration-200 outline-none placeholder:text-zinc-400 shadow-xs focus:ring-2 focus:ring-[#3A54A5]/10',
+                                            'w-full rounded-xl border bg-white px-4 py-3 pr-11 text-[14px] text-zinc-950 shadow-xs transition-all duration-200 outline-none placeholder:text-zinc-400 focus:ring-2 focus:ring-[#3A54A5]/10',
                                             errors.password_confirmation
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
                                                 : 'border-zinc-200 focus:border-[#3A54A5]/60',
@@ -173,7 +175,7 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                                         type="button"
                                         aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
                                         onClick={() => setShowConfirm((v) => !v)}
-                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-650"
+                                        className="hover:text-zinc-650 absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 transition-colors"
                                     >
                                         {showConfirm ? (
                                             <EyeOff className="size-4" aria-hidden="true" />
@@ -183,7 +185,7 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                                     </button>
                                 </div>
                                 {errors.password_confirmation && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-600 font-semibold">
+                                    <p role="alert" className="mt-1.5 text-[11px] font-semibold text-red-600">
                                         {errors.password_confirmation}
                                     </p>
                                 )}
@@ -195,7 +197,7 @@ export default function FounderResetPassword({ token, email }: PageProps) {
                                 disabled={processing}
                                 aria-busy={processing}
                                 aria-label={processing ? 'Resetting password, please wait' : 'Reset Password'}
-                                className="group relative w-full overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#2D4182] disabled:cursor-not-allowed disabled:opacity-50 shadow-md shadow-[#3A54A5]/25 hover:shadow-lg"
+                                className="group relative w-full overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase shadow-md shadow-[#3A54A5]/25 transition-all duration-200 outline-none hover:bg-[#2D4182] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     {processing ? (

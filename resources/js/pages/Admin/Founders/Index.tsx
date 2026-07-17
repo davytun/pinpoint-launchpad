@@ -100,7 +100,7 @@ function AssignModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
             <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
                 <h2 className="mb-1 text-lg font-extrabold text-zinc-950">Assign Analyst</h2>
-                <p className="mb-5 text-sm text-zinc-550">{founderName}</p>
+                <p className="text-zinc-550 mb-5 text-sm">{founderName}</p>
 
                 <form onSubmit={submit} className="space-y-4">
                     <div>
@@ -108,7 +108,7 @@ function AssignModal({
                         <select
                             value={data.analyst_id}
                             onChange={(e) => setData('analyst_id', e.target.value)}
-                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-955 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
+                            className="text-zinc-955 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-xs focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
                             required
                         >
                             <option value="">Select analyst…</option>
@@ -118,7 +118,7 @@ function AssignModal({
                                 </option>
                             ))}
                         </select>
-                        {errors.analyst_id && <p className="mt-1 text-xs text-red-650">{errors.analyst_id}</p>}
+                        {errors.analyst_id && <p className="text-red-650 mt-1 text-xs">{errors.analyst_id}</p>}
                     </div>
                     <div>
                         <label className="mb-1.5 block text-xs font-bold text-zinc-500">Notes (optional)</label>
@@ -128,21 +128,21 @@ function AssignModal({
                             rows={3}
                             maxLength={500}
                             placeholder="Internal notes for the analyst…"
-                            className="w-full resize-none rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-955 placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
+                            className="text-zinc-955 w-full resize-none rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-xs placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
                         />
                     </div>
                     <div className="flex justify-end gap-3 pt-2">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-650 font-semibold shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
+                            className="text-zinc-650 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={processing}
-                            className="rounded-xl bg-[#3A54A5] text-white px-4 py-2 text-sm font-bold shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-colors disabled:opacity-50"
+                            className="rounded-xl bg-[#3A54A5] px-4 py-2 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-colors hover:bg-[#2D4182] hover:shadow-lg disabled:opacity-50"
                         >
                             {processing ? 'Assigning…' : 'Assign'}
                         </button>
@@ -187,12 +187,12 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                 <div className="mb-6 flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-extrabold text-zinc-950">Founders</h1>
-                        <p className="mt-1 text-sm text-zinc-555 font-medium">{founders.total} total</p>
+                        <p className="text-zinc-555 mt-1 text-sm font-medium">{founders.total} total</p>
                     </div>
                 </div>
 
                 {flash?.success && (
-                    <div className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 font-semibold">
+                    <div className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
                         {flash.success}
                     </div>
                 )}
@@ -206,7 +206,7 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search name or company…"
-                            className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-4 pl-9 text-sm text-zinc-955 placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
+                            className="text-zinc-955 w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-4 pl-9 text-sm shadow-xs placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
                         />
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -215,10 +215,10 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                                 key={s}
                                 onClick={() => setStatus(s)}
                                 className={cn(
-                                    'rounded-full border px-3.5 py-1.5 text-xs font-bold capitalize transition-colors shadow-xs',
+                                    'rounded-full border px-3.5 py-1.5 text-xs font-bold capitalize shadow-xs transition-colors',
                                     statusFilter === s
                                         ? 'border-[#3A54A5]/25 bg-[#3A54A5]/10 text-[#3A54A5]'
-                                        : 'border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-100 hover:text-zinc-950',
+                                        : 'text-zinc-650 border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-950',
                                 )}
                             >
                                 {s === 'all' ? 'All' : (auditStatusLabel[s] ?? s)}
@@ -228,9 +228,9 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                 </div>
 
                 {/* Table */}
-                <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)]">
+                <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                     {filtered.length === 0 ? (
-                        <div className="py-16 text-center text-sm text-zinc-550 font-medium">No founders match your filter.</div>
+                        <div className="text-zinc-550 py-16 text-center text-sm font-medium">No founders match your filter.</div>
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[900px] text-sm">
@@ -253,7 +253,7 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                                                 <p className="font-semibold text-zinc-900">{f.full_name ?? '—'}</p>
                                                 <p className="max-w-[140px] truncate text-xs text-zinc-500">{f.email}</p>
                                             </td>
-                                            <td className="px-5 py-4 text-zinc-650 font-medium">{f.company_name ?? '—'}</td>
+                                            <td className="text-zinc-650 px-5 py-4 font-medium">{f.company_name ?? '—'}</td>
                                             <td className="px-5 py-4">
                                                 <div className="flex items-center gap-1.5">
                                                     <span className={`font-mono font-bold ${scoreBandColor[f.score_band ?? ''] ?? 'text-zinc-800'}`}>
@@ -266,7 +266,7 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="px-5 py-4 text-zinc-650 font-medium capitalize">{f.tier ?? '—'}</td>
+                                            <td className="text-zinc-650 px-5 py-4 font-medium capitalize">{f.tier ?? '—'}</td>
                                             <td className="px-5 py-4">
                                                 {f.audit_status ? (
                                                     <span
@@ -275,14 +275,14 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                                                         {auditStatusLabel[f.audit_status] ?? f.audit_status}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-zinc-400 font-semibold">—</span>
+                                                    <span className="font-semibold text-zinc-400">—</span>
                                                 )}
                                             </td>
                                             <td className="px-5 py-4">
                                                 {f.assigned_analyst ? (
-                                                    <span className="text-sm text-zinc-650 font-semibold">{f.assigned_analyst.name}</span>
+                                                    <span className="text-zinc-650 text-sm font-semibold">{f.assigned_analyst.name}</span>
                                                 ) : (
-                                                    <span className="rounded-full border border-amber-250 bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-700">
+                                                    <span className="border-amber-250 rounded-full border bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-700">
                                                         Unassigned
                                                     </span>
                                                 )}
@@ -298,7 +298,7 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                                                     {isSuperAdmin && (
                                                         <button
                                                             onClick={() => setAssignModal({ id: f.id, name: f.full_name ?? f.email })}
-                                                            className="flex items-center gap-1 text-xs font-extrabold tracking-wider text-zinc-550 uppercase transition-colors hover:text-zinc-950"
+                                                            className="text-zinc-550 flex items-center gap-1 text-xs font-extrabold tracking-wider uppercase transition-colors hover:text-zinc-950"
                                                         >
                                                             <UserPlus className="size-3" />
                                                             Assign
@@ -316,7 +316,7 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
 
                 {/* Pagination */}
                 {founders.last_page > 1 && (
-                    <div className="mt-4 flex items-center justify-between text-sm text-zinc-500 font-semibold">
+                    <div className="mt-4 flex items-center justify-between text-sm font-semibold text-zinc-500">
                         <span>
                             Page {founders.current_page} of {founders.last_page}
                         </span>
@@ -327,10 +327,10 @@ export default function AdminFoundersIndex({ founders, analysts, user_role }: Pa
                                         key={i}
                                         href={link.url}
                                         className={cn(
-                                            'rounded-lg border px-3 py-1.5 text-xs transition-colors shadow-xs',
+                                            'rounded-lg border px-3 py-1.5 text-xs shadow-xs transition-colors',
                                             link.active
-                                                ? 'bg-[#3A54A5] text-white border-transparent'
-                                                : 'border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-150 hover:text-zinc-950',
+                                                ? 'border-transparent bg-[#3A54A5] text-white'
+                                                : 'text-zinc-650 hover:bg-zinc-150 border-zinc-200 bg-white hover:text-zinc-950',
                                         )}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />

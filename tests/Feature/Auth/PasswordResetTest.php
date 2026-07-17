@@ -7,6 +7,7 @@ test('founder forgot-password screen can be rendered', function () {
 });
 
 test('founder reset-password link can be requested', function () {
+    \Illuminate\Support\Facades\Mail::fake();
     Founder::factory()->create(['email' => 'test@example.com']);
 
     $response = $this->post('/founder/forgot-password', [

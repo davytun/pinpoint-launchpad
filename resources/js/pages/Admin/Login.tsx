@@ -97,10 +97,10 @@ export default function AdminLogin({ status }: { status?: string }) {
                                         value={data.email}
                                         onChange={(e) => setData('email', e.target.value)}
                                         placeholder="admin@pinpointlaunchpad.com"
-                                        className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-4 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 transition outline-none focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 shadow-xs"
+                                        className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-4 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 shadow-xs transition outline-none focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10"
                                     />
                                 </div>
-                                {errors.email && <p className="mt-1.5 text-[11px] text-red-650">{errors.email}</p>}
+                                {errors.email && <p className="text-red-650 mt-1.5 text-[11px]">{errors.email}</p>}
                             </div>
 
                             {/* Password */}
@@ -118,18 +118,18 @@ export default function AdminLogin({ status }: { status?: string }) {
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-10 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 transition outline-none focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 shadow-xs"
+                                        className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-10 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 shadow-xs transition outline-none focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10"
                                     />
                                     <button
                                         type="button"
                                         tabIndex={-1}
                                         onClick={() => setShowPassword((v) => !v)}
-                                        className="absolute top-1/2 right-3.5 -translate-y-1/2 text-zinc-400 transition hover:text-zinc-650"
+                                        className="hover:text-zinc-650 absolute top-1/2 right-3.5 -translate-y-1/2 text-zinc-400 transition"
                                     >
                                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                                     </button>
                                 </div>
-                                {errors.password && <p className="mt-1.5 text-[11px] text-red-650">{errors.password}</p>}
+                                {errors.password && <p className="text-red-650 mt-1.5 text-[11px]">{errors.password}</p>}
                             </div>
 
                             {/* Remember */}
@@ -149,7 +149,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition hover:bg-[#2D4182] shadow-md shadow-[#3A54A5]/20 hover:shadow-lg active:scale-[0.98] disabled:opacity-60"
+                                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase shadow-md shadow-[#3A54A5]/20 transition hover:bg-[#2D4182] hover:shadow-lg active:scale-[0.98] disabled:opacity-60"
                             >
                                 {processing ? <LoaderCircle className="size-4 animate-spin" /> : null}
                                 {processing ? 'Signing in…' : 'Sign In'}

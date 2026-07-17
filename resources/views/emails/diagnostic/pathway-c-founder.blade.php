@@ -9,20 +9,20 @@
   <p style="margin-bottom: 24px;">Hi there,</p>
   
   <p style="margin-bottom: 24px;">
-    I just reviewed your PARAGON diagnostic. A score of <strong>{{ $session->score }}/100</strong> is rare at this stage — specifically your performance across <strong>{{ $session->topTwoPillars() }}</strong>. I have flagged your venture for our High-Priority Fast-Track.
+    We have reviewed your PARAGON Self-Scan. A score of <strong>{{ $session->score }}/100</strong> is rare at this stage—specifically your performance across <strong>{{ $session->topTwoPillars() }}</strong>. I have flagged your venture for our High-Priority Fast-Track.
   </p>
 
   {{-- What this means box --}}
   <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F9FAFB; border-radius: 12px; border: 1px solid #F3F4F6; margin-bottom: 32px;">
     <tr>
       <td style="padding: 24px;">
-        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #059669;">What this means for you</p>
+        <p style="margin: 0 0 16px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #3A54A5;">What this means for you</p>
         
         @php
         $items = [
-            'You bypass the standard intake queue entirely',
-            'You speak directly with our Lead Analyst this week',
-            'Your venture gets first-look placement in the Spring 2026 PIN Network cohort',
+            'If you proceed to apply for our Pinpoint Investment Assessment (PA), you bypass any intake queue entirely.',
+            'You speak directly with a Pinpoint Analyst on a mutually convenient date within a week from today to personally introduce your startup.',
+            'If you subsequently apply for our Pinpoint Investment Window (PIW), your startup gets first-look placement in the PIN network cohort.',
         ];
         @endphp
 
@@ -30,9 +30,9 @@
           @foreach($items as $item)
           <tr>
             <td width="24" valign="top" style="padding-bottom: 12px;">
-              <span style="color: #059669; font-weight: 700;">✓</span>
+              <span style="color: #3A54A5; font-weight: 700;">✓</span>
             </td>
-            <td style="font-size: 14px; color: #4B5563; padding-bottom: 12px;">{{ $item }}</td>
+            <td style="font-size: 14px; color: #4B5563; padding-bottom: 12px; line-height: 1.5;">{{ $item }}</td>
           </tr>
           @endforeach
         </table>
@@ -45,14 +45,14 @@
   </p>
 
   <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
-    <a href="{{ config('mail.booking_link') }}" class="cta-button" style="background-color: #059669;">
+    <a href="{{ config('mail.booking_link') }}" class="cta-button" style="background-color: #3A54A5;">
       Book Your Fast-Track Sync
     </a>
   </div>
 
   <p style="margin-bottom: 0;">
-    Looking forward to it,<br>
-    <strong>{{ config('mail.analyst_name') }}</strong><br>
+    Looking forward to it,<br><br>
+    <strong>The Pinpoint Team</strong><br>
     <span style="color: #9CA3AF; font-size: 13px;">Lead Analyst, Pinpoint Launchpad</span>
   </p>
 

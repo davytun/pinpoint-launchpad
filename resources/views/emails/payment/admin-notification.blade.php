@@ -21,7 +21,7 @@
           </tr>
           <tr>
             <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Amount Paid</td>
-            <td style="padding: 8px 0; font-size: 14px; color: #059669; font-weight: 700; text-align: right;">${{ number_format($total_amount, 2) }} USD</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #059669; font-weight: 700; text-align: right;">{{ $currency_symbol }}{{ number_format($total_amount) }} {{ $currency }}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Paid At</td>

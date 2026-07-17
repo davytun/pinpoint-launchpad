@@ -26,10 +26,10 @@ use Inertia\Response;
 class DiagnosticController extends Controller
 {
     private const BAND_MESSAGES = [
-        'low'      => 'You are in the Build phase. Focus on your MVP. Come back to Pinpoint when you have 10 active users.',
-        'mid_low'  => 'You have a foundation, but you are hitting Red Flag territory. You aren\'t ready for the PIN Network yet, but our PIA Assessment can fix this.',
-        'mid_high' => 'Investment Ready Candidate. You have the fundamentals. To bridge the gap to a Top-Tier Seed round, you need the PARAGON Certification. Proceed to Application.',
-        'high'     => 'High Velocity Candidate. Your profile is exceptional. We want to fast-track your PIA. An analyst will contact you within 72 hours.',
+        'low'      => 'Raising now would waste your time and your reputation. That is not a judgement on the idea. It is a judgement on the state of the company around it — and every item is fixable.',
+        'mid_low'  => 'There is something here, but it is not yet an investable proposition. Do not start a raise from this position. You will burn your best introductions on a package that is not ready.',
+        'mid_high' => 'The business is fundable. The package is not — yet. This is the most common band, and the most fixable. The two dimensions below are what is costing you.',
+        'high'     => 'You are in the top band. The gap now is polish, not repair. Companies scoring here are usually one focused sprint away from a credible process.',
     ];
 
     public function index(Request $request): Response|RedirectResponse
@@ -67,15 +67,37 @@ class DiagnosticController extends Controller
     public function submit(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'answers'   => ['required', 'array', 'min:1'],
-            'answers.*' => ['required'],
+            'answers'          => ['required', 'array', 'min:1'],
+            'answers.*'        => ['required'], // ScoringService normalises the value; boolean legacy format is handled there
+            'company_name'     => ['required', 'string', 'max:255'],
+            'country'          => ['required', 'string', 'max:255'],
+            'sector'           => ['required', 'string', 'max:255'],
+            'growth_stage'     => ['required', 'string', 'max:255'],
+            'describe_you'     => ['required', 'string', 'max:255'],
+            'looking_to_raise' => ['required', 'string', 'max:255'],
         ]);
+
+        $stageText = $validated['growth_stage'] ?? '';
+        $stage = 'seed';
+        if (str_starts_with(strtolower($stageText), 'concept')) {
+            $stage = 'concept';
+        } elseif (str_starts_with(strtolower($stageText), 'growth')) {
+            $stage = 'growth';
+        }
 
         /** @var ScoringService $scorer */
         $scorer = app(ScoringService::class);
-        $result = $scorer->calculate($validated['answers']);
+        $result = $scorer->calculate($validated['answers'], $stage);
 
         $request->session()->put('diagnostic_result', $result);
+        $request->session()->put('diagnostic_basics', [
+            'company_name'     => $validated['company_name'],
+            'country'          => $validated['country'],
+            'sector'           => $validated['sector'],
+            'growth_stage'     => $validated['growth_stage'],
+            'describe_you'     => $validated['describe_you'],
+            'looking_to_raise' => $validated['looking_to_raise'],
+        ]);
 
         return redirect()->route('diagnostic.email-gate');
     }
@@ -106,6 +128,8 @@ class DiagnosticController extends Controller
 
         $validated = $request->validate([
             'email' => ['required', 'email'],
+            'name'  => ['required', 'string', 'max:255'],
+            'role'  => ['required', 'string', 'max:255'],
         ]);
 
         $email = $validated['email'];
@@ -163,20 +187,31 @@ class DiagnosticController extends Controller
             ? now()->addDays($cooldownDays)
             : null;
 
+        $basics = $request->session()->get('diagnostic_basics', []);
+
         $session = DiagnosticSession::create([
-            'email'          => $email,
-            'answers'        => $result['answers'],
-            'score'          => $result['total_score'],
-            'score_band'     => $scoreBand,
-            'pillar_scores'  => $result['pillar_scores'],
-            'cooldown_until' => $cooldownUntil,
-            'completed_at'   => now(),
-            'ip_address'     => $request->ip(),
+            'email'            => $email,
+            'name'             => $validated['name'],
+            'role'             => $validated['role'],
+            'company_name'     => $basics['company_name'] ?? null,
+            'country'          => $basics['country'] ?? null,
+            'sector'           => $basics['sector'] ?? null,
+            'growth_stage'     => $basics['growth_stage'] ?? null,
+            'describe_you'     => $basics['describe_you'] ?? null,
+            'looking_to_raise' => $basics['looking_to_raise'] ?? null,
+            'answers'          => $result['answers'],
+            'score'            => $result['total_score'],
+            'score_band'       => $scoreBand,
+            'pillar_scores'    => $result['pillar_scores'],
+            'cooldown_until'   => $cooldownUntil,
+            'completed_at'     => now(),
+            'ip_address'       => $request->ip(),
         ]);
 
         $request->session()->put('diagnostic_email', $email);
         $request->session()->put('diagnostic_session_id', $session->id);
         $request->session()->forget('diagnostic_result');
+        $request->session()->forget('diagnostic_basics');
 
         // 1. Always send the general result email first (queued — non-blocking)
         Mail::to($session->email)->queue(new DiagnosticResultMail($session));
@@ -212,6 +247,28 @@ class DiagnosticController extends Controller
 
         $request->session()->put('result_viewed', true);
 
+        // Convert answers to flat structure for calculation
+        $flatAnswers = [];
+        if (is_array($session->answers)) {
+            foreach ($session->answers as $ans) {
+                if (isset($ans['question_id'])) {
+                    $flatAnswers[$ans['question_id']] = $ans['answer'] ?? 'A';
+                }
+            }
+        }
+
+        $stageText = $session->growth_stage ?? '';
+        $stage = 'seed';
+        if (str_starts_with(strtolower($stageText), 'concept')) {
+            $stage = 'concept';
+        } elseif (str_starts_with(strtolower($stageText), 'growth')) {
+            $stage = 'growth';
+        }
+
+        /** @var ScoringService $scorer */
+        $scorer = app(ScoringService::class);
+        $result = $scorer->calculate($flatAnswers, $stage);
+
         return Inertia::render('Diagnostic/Result', [
             'score'              => $session->score,
             'score_band'         => $session->score_band,
@@ -220,7 +277,47 @@ class DiagnosticController extends Controller
             'score_band_message' => self::BAND_MESSAGES[$session->score_band],
             'next_action'        => $this->nextAction($session->score_band),
             'completed_at'       => $session->completed_at->toIso8601String(),
+            'describe_you'       => $session->describe_you,
+            'hard_flags'         => $result['hard_flags'] ?? [],
+            'weakest_dimensions' => $result['weakest_dimensions'] ?? [],
+            'network_strands'    => $result['network_strands'] ?? ['commercial' => 0, 'capital' => 0],
         ]);
+    }
+
+    public function sendChecklist(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $sessionId = $request->session()->get('diagnostic_session_id');
+
+        if (! $sessionId) {
+            return response()->json(['error' => 'Session not found.'], 403);
+        }
+
+        $session = DiagnosticSession::find($sessionId);
+
+        if (! $session) {
+            return response()->json(['error' => 'Session not found.'], 403);
+        }
+
+        // Only low / mid-low bands get the checklist
+        if (! in_array($session->score_band, ['low', 'mid_low'])) {
+            return response()->json(['error' => 'Not applicable for this score band.'], 422);
+        }
+
+        Mail::to($session->email)->queue(new PathwayAMail($session));
+
+        return response()->json(['success' => true]);
+    }
+
+    public function viewById(Request $request, int $id): RedirectResponse
+    {
+        $session = DiagnosticSession::findOrFail($id);
+
+        // Restore the session so the standard result() method can render it
+        $request->session()->put('diagnostic_session_id', $session->id);
+        $request->session()->put('diagnostic_email', $session->email);
+        $request->session()->put('result_viewed', true);
+
+        return redirect()->route('diagnostic.result');
     }
 
     public function blocked(Request $request): Response|RedirectResponse

@@ -17,7 +17,7 @@ class DashboardController extends Controller
         }
 
         return \Inertia\Inertia::render('Dashboard/Index', [
-            'tier'        => ucfirst($payment?->tier ?? 'Foundation'),
+            'tier'        => $payment ? $payment->tier_label : 'Concept / Pre-Seed',
             'amount_paid' => $payment?->total_amount ?? 0,
             'signed_at'   => $signature?->signed_at?->toDateTimeString(),
             'email'       => $payment?->customer_email ?? $request->user()?->email,

@@ -19,7 +19,6 @@ class Payment extends Model
         'paystack_access_code',
         'tier',
         'tier_base_amount',
-        'gate_fee',
         'total_amount',
         'currency',
         'customer_email',
@@ -29,7 +28,6 @@ class Payment extends Model
     protected $casts = [
         'paid_at'           => 'datetime',
         'tier_base_amount'  => 'integer',
-        'gate_fee'          => 'integer',
         'total_amount'      => 'integer',
     ];
 
@@ -46,6 +44,21 @@ class Payment extends Model
     public function isRefundable(): bool
     {
         return $this->audit_status === 'pending' && $this->status === 'paid';
+    }
+
+    public static function getTierLabel(?string $tier): string
+    {
+        return match ($tier) {
+            'foundation'    => 'Concept / Pre-Seed',
+            'growth'        => 'Seed / Early Traction',
+            'institutional' => 'Seed+ / Growth',
+            default         => ucfirst((string) $tier),
+        };
+    }
+
+    public function getTierLabelAttribute(): string
+    {
+        return self::getTierLabel($this->tier);
     }
 
     public function signature(): HasOne

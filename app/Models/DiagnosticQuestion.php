@@ -11,12 +11,14 @@ class DiagnosticQuestion extends Model
         'pillar',
         'question_text',
         'sub_text',
-        'points',
+        'options',
+        'strand',
         'order',
         'is_active',
     ];
 
     protected $casts = [
+        'options'   => 'array',
         'is_active' => 'boolean',
     ];
 

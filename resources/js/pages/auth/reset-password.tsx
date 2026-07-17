@@ -82,7 +82,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         <h1 className="font-display mb-1.5 text-center text-[22px] leading-tight font-extrabold tracking-tight text-zinc-950">
                             Reset Password
                         </h1>
-                        <p className="mb-8 text-center text-[13px] leading-relaxed text-zinc-555 font-medium">Please enter your new password below</p>
+                        <p className="text-zinc-555 mb-8 text-center text-[13px] leading-relaxed font-medium">Please enter your new password below</p>
 
                         <form onSubmit={submit} className="space-y-4">
                             {/* Hidden token field */}
@@ -103,7 +103,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                     className="w-full cursor-not-allowed rounded-xl border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-[14px] text-zinc-500 shadow-xs outline-none"
                                 />
                                 {errors.email && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-600 font-semibold">
+                                    <p role="alert" className="mt-1.5 text-[11px] font-semibold text-red-600">
                                         {errors.email}
                                     </p>
                                 )}
@@ -121,7 +121,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                     autoComplete="new-password"
                                     value={data.password}
                                     className={cn(
-                                        'w-full rounded-xl border bg-white px-4 py-3 text-[14px] text-zinc-950 transition-all duration-200 outline-none placeholder:text-zinc-400 shadow-xs focus:ring-2 focus:ring-[#3A54A5]/10',
+                                        'w-full rounded-xl border bg-white px-4 py-3 text-[14px] text-zinc-950 shadow-xs transition-all duration-200 outline-none placeholder:text-zinc-400 focus:ring-2 focus:ring-[#3A54A5]/10',
                                         errors.password
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
                                             : 'border-zinc-200 focus:border-[#3A54A5]/60',
@@ -132,7 +132,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                     onChange={(e) => setData('password', e.target.value)}
                                 />
                                 {errors.password && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-600 font-semibold">
+                                    <p role="alert" className="mt-1.5 text-[11px] font-semibold text-red-600">
                                         {errors.password}
                                     </p>
                                 )}
@@ -140,7 +140,10 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
 
                             {/* Confirm Password */}
                             <div>
-                                <label htmlFor="password_confirmation" className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-zinc-500 uppercase">
+                                <label
+                                    htmlFor="password_confirmation"
+                                    className="mb-1.5 block text-[11px] font-bold tracking-[0.16em] text-zinc-500 uppercase"
+                                >
                                     Confirm password
                                 </label>
                                 <input
@@ -150,7 +153,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                     autoComplete="new-password"
                                     value={data.password_confirmation}
                                     className={cn(
-                                        'w-full rounded-xl border bg-white px-4 py-3 text-[14px] text-zinc-955 transition-all duration-200 outline-none placeholder:text-zinc-400 shadow-xs focus:ring-2 focus:ring-[#3A54A5]/10',
+                                        'text-zinc-955 w-full rounded-xl border bg-white px-4 py-3 text-[14px] shadow-xs transition-all duration-200 outline-none placeholder:text-zinc-400 focus:ring-2 focus:ring-[#3A54A5]/10',
                                         errors.password_confirmation
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
                                             : 'border-zinc-200 focus:border-[#3A54A5]/60',
@@ -160,7 +163,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                                     onChange={(e) => setData('password_confirmation', e.target.value)}
                                 />
                                 {errors.password_confirmation && (
-                                    <p role="alert" className="mt-1.5 text-[11px] text-red-600 font-semibold">
+                                    <p role="alert" className="mt-1.5 text-[11px] font-semibold text-red-600">
                                         {errors.password_confirmation}
                                     </p>
                                 )}
@@ -170,7 +173,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="group relative mt-1 w-full overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#2D4182] disabled:cursor-not-allowed disabled:opacity-50 shadow-md shadow-[#3A54A5]/25 hover:shadow-lg"
+                                className="group relative mt-1 w-full overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-[13px] font-bold tracking-[0.18em] text-white uppercase shadow-md shadow-[#3A54A5]/25 transition-all duration-200 outline-none hover:bg-[#2D4182] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     {processing ? (

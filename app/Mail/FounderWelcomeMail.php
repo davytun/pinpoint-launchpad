@@ -28,7 +28,7 @@ class FounderWelcomeMail extends Mailable
             view: 'emails.founder.welcome',
             with: [
                 'founder'    => $this->founder,
-                'tierLabel'  => ucfirst($this->founder->tier ?? 'Foundation'),
+                'tierLabel'  => $this->founder->tier_label,
                 'dashboardUrl' => url('/dashboard'),
             ],
         );

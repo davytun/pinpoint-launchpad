@@ -236,7 +236,9 @@ void main() {
                         if (loseCtx) loseCtx.loseContext();
                         const canvas = renderer.gl.canvas;
                         if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
-                    } catch {}
+                    } catch {
+                        // ignore WebGL context loss errors on cleanup
+                    }
                 }
                 rendererRef.current = null;
                 uniformsRef.current = null;

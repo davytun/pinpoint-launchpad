@@ -1,8 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Clock, ExternalLink, Lock, Mail, Shield } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, ExternalLink, Lock, Mail } from 'lucide-react';
 
 import AdminLayout from '@/layouts/admin-layout';
-import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,20 +32,20 @@ interface PageProps {
 function StatusBadge({ status }: { status: 'pending' | 'approved' | 'rejected' }) {
     if (status === 'approved') {
         return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-250 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs">
+            <span className="border-emerald-250 inline-flex items-center gap-1 rounded-full border bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs">
                 <CheckCircle2 className="size-3.5" /> Approved
             </span>
         );
     }
     if (status === 'rejected') {
         return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-bold text-zinc-500">
+            <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-bold text-zinc-500">
                 Rejected
             </span>
         );
     }
     return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-250 px-2.5 py-0.5 text-xs font-bold text-amber-700 shadow-xs">
+        <span className="border-amber-250 inline-flex items-center gap-1 rounded-full border bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-700 shadow-xs">
             <Clock className="size-3.5" /> Pending Review
         </span>
     );
@@ -69,7 +68,7 @@ export default function AdminAccessRequests({ profile, access_requests }: PagePr
                     <div className="mb-6">
                         <Link
                             href="/admin/profiles"
-                            className="inline-flex items-center gap-1.5 text-sm font-bold text-zinc-550 hover:text-zinc-950 transition-colors"
+                            className="text-zinc-550 inline-flex items-center gap-1.5 text-sm font-bold transition-colors hover:text-zinc-950"
                         >
                             <ArrowLeft className="size-4" /> Back to Profiles
                         </Link>
@@ -78,18 +77,19 @@ export default function AdminAccessRequests({ profile, access_requests }: PagePr
                     {/* Header */}
                     <div className="mb-8">
                         <span className="text-[10px] font-bold tracking-widest text-[#3A54A5] uppercase">Security Portal</span>
-                        <h1 className="text-2xl font-extrabold text-zinc-950 tracking-tight mt-1">Data Room Access Requests</h1>
-                        <p className="mt-1 text-sm text-zinc-555 font-medium">
-                            Reviewing requests for <span className="font-bold text-zinc-900">{profile.company_name}</span> · {access_requests.length} total request{access_requests.length !== 1 ? 's' : ''}
+                        <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-zinc-950">Data Room Access Requests</h1>
+                        <p className="text-zinc-555 mt-1 text-sm font-medium">
+                            Reviewing requests for <span className="font-bold text-zinc-900">{profile.company_name}</span> · {access_requests.length}{' '}
+                            total request{access_requests.length !== 1 ? 's' : ''}
                         </p>
                     </div>
 
                     {/* Content */}
                     {access_requests.length === 0 ? (
                         <div className="rounded-2xl border border-zinc-200 bg-white p-12 text-center shadow-xs">
-                            <Lock className="size-8 mx-auto text-zinc-300 mb-3" />
-                            <p className="text-zinc-500 font-bold text-sm">No data room access requests have been submitted for this company.</p>
-                            <p className="text-xs text-zinc-400 mt-1">When investors request access, they will show up here.</p>
+                            <Lock className="mx-auto mb-3 size-8 text-zinc-300" />
+                            <p className="text-sm font-bold text-zinc-500">No data room access requests have been submitted for this company.</p>
+                            <p className="mt-1 text-xs text-zinc-400">When investors request access, they will show up here.</p>
                         </div>
                     ) : (
                         <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xs">
@@ -114,11 +114,11 @@ export default function AdminAccessRequests({ profile, access_requests }: PagePr
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-zinc-150">
+                                    <tbody className="divide-zinc-150 divide-y">
                                         {access_requests.map((req) => (
                                             <tr key={req.id} className="transition-colors hover:bg-zinc-50/40">
                                                 <td className="px-5 py-4">
-                                                    <div className="font-bold text-zinc-900 flex items-center gap-1.5">
+                                                    <div className="flex items-center gap-1.5 font-bold text-zinc-900">
                                                         {req.investor_name}
                                                         {req.linkedin_url && (
                                                             <a
@@ -131,29 +131,25 @@ export default function AdminAccessRequests({ profile, access_requests }: PagePr
                                                             </a>
                                                         )}
                                                     </div>
-                                                    <div className="text-xs text-zinc-500 mt-0.5 flex items-center gap-1">
+                                                    <div className="mt-0.5 flex items-center gap-1 text-xs text-zinc-500">
                                                         <Mail className="size-3 text-zinc-400" />
                                                         <a href={`mailto:${req.investor_email}`} className="hover:underline">
                                                             {req.investor_email}
                                                         </a>
                                                     </div>
                                                 </td>
-                                                <td className="px-5 py-4 font-semibold text-zinc-650">
-                                                    {req.firm_name ?? '—'}
-                                                </td>
+                                                <td className="text-zinc-650 px-5 py-4 font-semibold">{req.firm_name ?? '—'}</td>
                                                 <td className="px-5 py-4">
                                                     <StatusBadge status={req.status} />
                                                 </td>
-                                                <td className="px-5 py-4 text-zinc-550 font-medium">
-                                                    {fmtDateTime(req.created_at)}
-                                                </td>
-                                                <td className="px-5 py-4 text-zinc-600 max-w-xs truncate font-medium">
+                                                <td className="text-zinc-550 px-5 py-4 font-medium">{fmtDateTime(req.created_at)}</td>
+                                                <td className="max-w-xs truncate px-5 py-4 font-medium text-zinc-600">
                                                     {req.message ? (
-                                                        <span title={req.message} className="italic text-zinc-500">
+                                                        <span title={req.message} className="text-zinc-500 italic">
                                                             "{req.message}"
                                                         </span>
                                                     ) : (
-                                                        <span className="text-zinc-400 font-normal italic">No message provided</span>
+                                                        <span className="font-normal text-zinc-400 italic">No message provided</span>
                                                     )}
                                                 </td>
                                             </tr>

@@ -76,23 +76,20 @@ export default function AdminQuestionsIndex() {
                             <p className="mb-0.5 text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Admin</p>
                             <h1 className="text-2xl font-extrabold text-zinc-950">Diagnostic Questions</h1>
                         </div>
-                        <Link
-                            href={route('admin.waitlist.index')}
-                            className="text-xs font-bold text-zinc-550 transition-colors hover:text-zinc-955"
-                        >
+                        <Link href={route('admin.waitlist.index')} className="text-zinc-550 hover:text-zinc-955 text-xs font-bold transition-colors">
                             ← Waitlist
                         </Link>
                     </div>
 
                     {/* Flash */}
                     {flash?.success && (
-                        <div className="mb-6 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 font-semibold animate-fade-in">
+                        <div className="animate-fade-in mb-6 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
                             {flash.success}
                         </div>
                     )}
 
                     {/* Table */}
-                    <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)] animate-fade-in">
+                    <div className="animate-fade-in overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                         <div className="overflow-x-auto">
                             <div className="min-w-[720px]">
                                 {/* Table header */}
@@ -119,7 +116,7 @@ export default function AdminQuestionsIndex() {
                                             <PillarBadge pillar={q.pillar} />
 
                                             {/* Question text truncated */}
-                                            <p className="truncate text-sm text-zinc-900 font-semibold" title={q.question_text}>
+                                            <p className="truncate text-sm font-semibold text-zinc-900" title={q.question_text}>
                                                 {q.question_text}
                                             </p>
 
@@ -147,7 +144,7 @@ export default function AdminQuestionsIndex() {
                                             <div className="flex justify-end">
                                                 <Link
                                                     href={route('admin.questions.edit', q.id)}
-                                                    className="rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-[11px] font-extrabold tracking-[0.12em] text-zinc-650 uppercase shadow-xs transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-950"
+                                                    className="text-zinc-650 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-[11px] font-extrabold tracking-[0.12em] uppercase shadow-xs transition-all duration-150 hover:bg-zinc-50 hover:text-zinc-950"
                                                 >
                                                     Edit
                                                 </Link>
@@ -161,8 +158,8 @@ export default function AdminQuestionsIndex() {
 
                     {/* Pagination */}
                     {questions.last_page > 1 && (
-                        <div className="mt-5 flex items-center justify-between animate-fade-in">
-                            <p className="text-xs text-zinc-550 font-semibold">{questions.total} questions</p>
+                        <div className="animate-fade-in mt-5 flex items-center justify-between">
+                            <p className="text-zinc-550 text-xs font-semibold">{questions.total} questions</p>
                             <div className="flex gap-1">
                                 {questions.links.map((link, i) =>
                                     link.url ? (
@@ -173,15 +170,15 @@ export default function AdminQuestionsIndex() {
                                             className={cn(
                                                 'rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-150',
                                                 link.active
-                                                    ? 'border-[#3A54A5]/25 bg-[#3A54A5]/10 text-[#3A54A5] font-extrabold shadow-xs'
-                                                    : 'border-zinc-200 bg-white text-zinc-650 hover:bg-zinc-50 hover:text-zinc-950 shadow-xs',
+                                                    ? 'border-[#3A54A5]/25 bg-[#3A54A5]/10 font-extrabold text-[#3A54A5] shadow-xs'
+                                                    : 'text-zinc-650 border-zinc-200 bg-white shadow-xs hover:bg-zinc-50 hover:text-zinc-950',
                                             )}
                                         />
                                     ) : (
                                         <span
                                             key={i}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
-                                            className="rounded-lg px-3 py-1.5 text-xs text-zinc-400 font-semibold"
+                                            className="rounded-lg px-3 py-1.5 text-xs font-semibold text-zinc-400"
                                         />
                                     ),
                                 )}

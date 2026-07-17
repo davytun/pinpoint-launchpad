@@ -16,7 +16,7 @@ class FounderFactory extends Factory
     {
         return [
             'email'             => fake()->unique()->safeEmail(),
-            'password'          => Hash::make('password'),
+            'password'          => 'password',
             'full_name'         => fake()->name(),
             'company_name'      => fake()->company(),
             'email_verified_at' => now(),

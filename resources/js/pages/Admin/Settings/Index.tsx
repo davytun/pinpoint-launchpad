@@ -1,7 +1,6 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 
 import AdminLayout from '@/layouts/admin-layout';
-import { cn } from '@/lib/utils';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -33,18 +32,18 @@ export default function AdminSettingsIndex() {
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-2xl font-extrabold text-zinc-950">Settings</h1>
-                    <p className="mt-1 text-sm text-zinc-555 font-medium">Platform configuration</p>
+                    <p className="text-zinc-555 mt-1 text-sm font-medium">Platform configuration</p>
                 </div>
 
                 {/* Flash */}
                 {flash?.success && (
-                    <div className="mb-6 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 font-semibold">
+                    <div className="mb-6 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
                         {flash.success}
                     </div>
                 )}
 
                 {/* Settings card */}
-                <div className="rounded-2xl border border-white/80 bg-white/30 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.025)] p-7">
+                <div className="rounded-2xl border border-white/80 bg-white/30 p-7 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
                     <h2 className="mb-6 text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Diagnostic Settings</h2>
 
                     <form onSubmit={submit} noValidate>
@@ -53,7 +52,7 @@ export default function AdminSettingsIndex() {
                             <div className="mb-4 flex items-start justify-between gap-6">
                                 <div className="flex-1">
                                     <p className="text-sm font-bold text-zinc-900">Diagnostic Cooldown Days</p>
-                                    <p className="mt-1 text-xs leading-relaxed text-zinc-555 font-medium">
+                                    <p className="text-zinc-555 mt-1 text-xs leading-relaxed font-medium">
                                         Number of days a founder must wait before retaking after scoring below 65%
                                     </p>
                                 </div>
@@ -72,13 +71,13 @@ export default function AdminSettingsIndex() {
                                     max={365}
                                     value={form.data.diagnostic_cooldown_days}
                                     onChange={(e) => form.setData('diagnostic_cooldown_days', parseInt(e.target.value, 10) || 1)}
-                                    className="w-24 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-955 placeholder:text-zinc-400 tabular-nums focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs"
+                                    className="text-zinc-955 w-24 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm tabular-nums shadow-xs placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
                                 />
-                                <span className="text-sm text-zinc-500 font-semibold">days</span>
+                                <span className="text-sm font-semibold text-zinc-500">days</span>
                             </div>
 
                             {form.errors.diagnostic_cooldown_days && (
-                                <p className="mt-2 text-xs text-rose-600 font-semibold">{form.errors.diagnostic_cooldown_days}</p>
+                                <p className="mt-2 text-xs font-semibold text-rose-600">{form.errors.diagnostic_cooldown_days}</p>
                             )}
                         </div>
 
@@ -90,7 +89,7 @@ export default function AdminSettingsIndex() {
                             <button
                                 type="submit"
                                 disabled={form.processing}
-                                className="flex items-center gap-2 rounded-xl bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 hover:bg-[#2D4182] hover:shadow-lg transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="flex items-center gap-2 rounded-xl bg-[#3A54A5] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-all duration-150 hover:bg-[#2D4182] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {form.processing ? (
                                     <>

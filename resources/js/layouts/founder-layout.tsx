@@ -60,7 +60,7 @@ function SidebarContent({
                         <button
                             onClick={onClose}
                             aria-label="Close menu"
-                            className="rounded-lg p-1 text-zinc-400 transition-colors hover:text-zinc-650 lg:hidden"
+                            className="hover:text-zinc-650 rounded-lg p-1 text-zinc-400 transition-colors lg:hidden"
                         >
                             <X className="size-5" aria-hidden="true" />
                         </button>
@@ -95,7 +95,7 @@ function SidebarContent({
                                     </TooltipTrigger>
                                     <TooltipContent
                                         side="right"
-                                        className="rounded-xl border border-zinc-200 bg-white text-[11px] text-zinc-500 shadow-md px-3 py-2"
+                                        className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-[11px] text-zinc-500 shadow-md"
                                     >
                                         {disabledReason ?? 'Coming soon'}
                                     </TooltipContent>
@@ -111,24 +111,19 @@ function SidebarContent({
                                 className={cn(
                                     'group flex items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-300',
                                     isActive
-                                        ? 'bg-[#3A54A5]/10 text-[#3A54A5] ring-1 ring-[#3A54A5]/25 shadow-xs'
+                                        ? 'bg-[#3A54A5]/10 text-[#3A54A5] shadow-xs ring-1 ring-[#3A54A5]/25'
                                         : 'text-zinc-550 hover:bg-zinc-100 hover:text-zinc-900',
                                 )}
                             >
                                 <Icon
                                     className={cn(
                                         'size-4 shrink-0 transition-colors duration-300',
-                                        isActive ? 'text-[#3A54A5]' : 'text-zinc-400 group-hover:text-zinc-650',
+                                        isActive ? 'text-[#3A54A5]' : 'group-hover:text-zinc-650 text-zinc-400',
                                     )}
                                     aria-hidden="true"
                                 />
                                 <span className="text-[13.5px] font-semibold tracking-tight">{label}</span>
-                                {isActive && (
-                                    <motion.div
-                                        layoutId="active-pill"
-                                        className="ml-auto h-1 w-1 rounded-full bg-[#3A54A5]"
-                                    />
-                                )}
+                                {isActive && <motion.div layoutId="active-pill" className="ml-auto h-1 w-1 rounded-full bg-[#3A54A5]" />}
                             </Link>
                         );
                     })}
@@ -140,9 +135,9 @@ function SidebarContent({
                 <div className="mb-3 h-px bg-zinc-200" />
                 <button
                     onClick={onLogout}
-                    className="group flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-zinc-550 transition-all duration-300 hover:bg-red-50 hover:text-red-650"
+                    className="group text-zinc-550 hover:text-red-650 flex w-full items-center gap-3 rounded-xl px-4 py-2.5 transition-all duration-300 hover:bg-red-50"
                 >
-                    <LogOut className="size-4 shrink-0 text-zinc-450 transition-colors group-hover:text-red-650" aria-hidden="true" />
+                    <LogOut className="text-zinc-450 group-hover:text-red-650 size-4 shrink-0 transition-colors" aria-hidden="true" />
                     <span className="text-[13.5px] font-semibold tracking-tight">Logout</span>
                 </button>
             </div>
@@ -276,7 +271,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
                     onClick={() => setSidebarOpen(true)}
                     aria-label="Open navigation menu"
                     aria-expanded={sidebarOpen}
-                    className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:text-zinc-650"
+                    className="hover:text-zinc-650 rounded-lg p-1.5 text-zinc-400 transition-colors"
                 >
                     <Menu className="size-5" aria-hidden="true" />
                 </button>

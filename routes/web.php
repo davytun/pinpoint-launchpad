@@ -20,7 +20,12 @@ use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WaitlistController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\Admin\AdminBlogController;
+use App\Http\Controllers\Admin\BlogImageController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\InvestorController;
+use App\Http\Controllers\Admin\AdminInvestorApplicationController;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -69,6 +74,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/waitlist/{entry}/convert', [AdminWaitlistController::class, 'toggleConverted'])->name('waitlist.convert');
         Route::post('/waitlist/{entry}/resend',   [AdminWaitlistController::class, 'resend'])->name('waitlist.resend');
         Route::delete('/waitlist/{entry}',        [AdminWaitlistController::class, 'destroy'])->name('waitlist.destroy');
+        
+        // Investors
+        Route::get('/investors',                          [AdminInvestorApplicationController::class, 'index'])->name('investors.index');
+        Route::get('/investors/{application}',            [AdminInvestorApplicationController::class, 'show'])->name('investors.show');
+        Route::patch('/investors/{application}/status',   [AdminInvestorApplicationController::class, 'updateStatus'])->name('investors.status');
     });
 
     // Founders — superadmin + analyst
@@ -105,8 +115,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('require.role:superadmin')->group(function () {
         Route::get('/settings',   [AdminSettingsController::class, 'index'])->name('settings.index');
         Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
-
         Route::get('/revenue', [AdminDashboardController::class, 'revenue'])->name('revenue');
+
+        // Admin Blog
+        Route::prefix('blog')->name('blog.')->group(function () {
+            Route::get('/',                    [AdminBlogController::class, 'index'])->name('index');
+            Route::get('/create',              [AdminBlogController::class, 'create'])->name('create');
+            Route::post('/',                   [AdminBlogController::class, 'store'])->name('store');
+            Route::get('/{post}/edit',         [AdminBlogController::class, 'edit'])->name('edit');
+            Route::patch('/{post}',            [AdminBlogController::class, 'update'])->name('update');
+            Route::delete('/{post}',           [AdminBlogController::class, 'destroy'])->name('destroy');
+            Route::patch('/{post}/toggle',     [AdminBlogController::class, 'toggle'])->name('toggle');
+            Route::post('/images',             [BlogImageController::class, 'store'])->name('images.store');
+        });
     });
 
     // User management — superadmin only
@@ -121,7 +142,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    $latestPosts = \App\Models\BlogPost::published()
+        ->orderByDesc('published_at')
+        ->limit(3)
+        ->get()
+        ->map(fn ($p) => [
+            'title'            => $p->title,
+            'slug'             => $p->slug,
+            'excerpt'          => $p->excerpt,
+            'cover_image'      => $p->cover_image,
+            'author_name'      => $p->author_name,
+            'category'         => $p->category,
+            'reading_time_mins'=> $p->reading_time_mins,
+            'published_at'     => $p->published_at?->format('M j, Y'),
+        ]);
+
+    return Inertia::render('Welcome', [
+        'latest_posts' => $latestPosts,
+    ]);
 })->name('waitlist.index');
 Route::get('/orbit-demo', function () {
     return Inertia::render('OrbitDemo');
@@ -131,14 +169,43 @@ Route::post('/waitlist/investors', [WaitlistController::class, 'storeInvestor'])
 Route::post('/contact',            [ContactController::class, 'storeContact'])->name('contact.store');
 Route::post('/newsletter',         [ContactController::class, 'storeNewsletter'])->name('newsletter.store');
 
+// Public Blog
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{post}', [BlogController::class, 'show'])->name('blog.show');
+
 Route::prefix('diagnostic')->name('diagnostic.')->group(function () {
     Route::get('/',              [DiagnosticController::class, 'index'])->name('index');
     Route::post('/submit',       [DiagnosticController::class, 'submit'])->name('submit')->middleware('throttle:10,1');
     Route::get('/email-gate',    [DiagnosticController::class, 'emailGate'])->name('email-gate');
     Route::post('/capture-email', [DiagnosticController::class, 'captureEmail'])->name('capture-email')->middleware('throttle:5,1');
     Route::get('/result',        [DiagnosticController::class, 'result'])->name('result');
+    Route::get('/result/{id}',   [DiagnosticController::class, 'viewById'])->name('view');
+    Route::post('/send-checklist', [DiagnosticController::class, 'sendChecklist'])->name('send-checklist')->middleware('throttle:3,5');
     Route::get('/blocked',       [DiagnosticController::class, 'blocked'])->name('blocked');
 });
+
+Route::get('/assessment', [CheckoutController::class, 'assessment'])->name('assessment');
+Route::post('/assessment/apply', [CheckoutController::class, 'applyAssessment'])->name('assessment.apply')->middleware('throttle:5,1');
+
+// PIN Investor Page
+Route::get('/investor', [InvestorController::class, 'index'])->name('investor.index');
+Route::post('/investor/apply', [InvestorController::class, 'store'])->name('investor.apply')->middleware('throttle:5,1');
+
+Route::get('/terms', function () {
+    return Inertia::render('Terms');
+})->name('terms');
+
+Route::get('/privacy', function () {
+    return Inertia::render('Privacy');
+})->name('privacy');
+
+Route::get('/investor-terms', function () {
+    return Inertia::render('InvestorTerms');
+})->name('investor-terms');
+
+Route::get('/cookies', function () {
+    return Inertia::render('CookiesPolicy');
+})->name('cookies');
 
 Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/',         [CheckoutController::class, 'index'])->name('index');

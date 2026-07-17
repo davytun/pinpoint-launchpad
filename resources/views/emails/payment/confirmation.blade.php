@@ -5,7 +5,7 @@
   <p style="margin-bottom: 24px;">Hi there,</p>
   
   <p style="margin-bottom: 32px;">
-    Your payment of <strong>${{ number_format($total_amount, 2) }}</strong> has been received. Your place in the PARAGON Certification programme is now secured and your audit is being queued.
+    Your payment of <strong>{{ $currency_symbol }}{{ number_format($total_amount) }}</strong> has been received. Your place in the PARAGON Certification programme is now secured and your audit is being queued.
   </p>
 
   {{-- Receipt table --}}
@@ -21,7 +21,7 @@
           </tr>
           <tr>
             <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Total Charged</td>
-            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">${{ number_format($total_amount, 2) }} USD</td>
+            <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 700; text-align: right;">{{ $currency_symbol }}{{ number_format($total_amount) }} {{ $currency }}</td>
           </tr>
           <tr>
             <td style="padding: 8px 0; font-size: 14px; color: #6B7280;">Date</td>

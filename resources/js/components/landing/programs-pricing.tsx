@@ -17,14 +17,17 @@ export default function ProgramsPricing() {
                         <div>
                             <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Stage 01</span>
                             <h3 className="mt-1 text-2xl font-bold text-zinc-950">Concept / Pre-Seed</h3>
-                            <p className="mt-3 text-sm leading-relaxed text-zinc-500">Idea to MVP, little or no revenue, seeking validation.</p>
+                            <p className="mt-3 text-sm leading-relaxed text-zinc-500">Pricing depends on founder location and the selected tier.</p>
 
                             {/* Price */}
                             <div className="mt-6">
-                                <span className="text-xs font-medium text-zinc-400">Total Price</span>
+                                <span className="text-xs font-medium text-zinc-400">Starting From</span>
                                 <div className="mt-1 flex items-baseline gap-1">
-                                    <span className="text-4xl font-extrabold tracking-tight text-zinc-900">$500</span>
+                                    <span className="text-4xl font-extrabold tracking-tight text-zinc-900">₦350,000</span>
                                 </div>
+                                <p className="mt-2 text-xs font-medium text-zinc-500">
+                                    Starting From N350,000 for Domestic & Local Founders or $500 for Diaspora & International Founders
+                                </p>
                             </div>
 
                             {/* Button */}
@@ -39,31 +42,31 @@ export default function ProgramsPricing() {
                             <ul className="mt-8 space-y-4 border-t border-zinc-200/50 pt-6 text-xs text-zinc-600">
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Full PARAGON scan (weighted to Potential)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>1 founder interview (60 min)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Analyst-delivered 12–15 page report</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>1 debrief call (10–12 hours total)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Turnaround: 7 working days</span>
                                 </li>
@@ -100,43 +103,43 @@ export default function ProgramsPricing() {
                             <ul className="mt-8 space-y-4 border-t border-white/10 pt-6 text-xs text-white/80">
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Everything in Stage 01</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Financial review (up to 24 months)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Unit-economics and LTV: CAC build</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Cap table & founding docs review</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>3 interviews (25–30 hours total)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Partner-reviewed 25–30 page report</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Turnaround: 12 working days</span>
                                 </li>
@@ -174,43 +177,43 @@ export default function ProgramsPricing() {
                             <ul className="mt-8 space-y-4 border-t border-zinc-200/50 pt-6 text-xs text-zinc-600">
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Everything in Stage 02</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Full data-room review</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Corporate and governance analysis</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Material contract & IP review</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>5+ interviews (60+ hours total)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Board-ready presentation (Partner-led)</span>
                                 </li>
                                 <li className="flex items-start gap-2.5">
                                     <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                        <Check className="h-3 w-3 stroke-[3]" />
+                                        <Check className="h-3 w-3 stroke-3" />
                                     </span>
                                     <span>Turnaround: 20 working days</span>
                                 </li>

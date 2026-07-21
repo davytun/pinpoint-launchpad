@@ -33,10 +33,12 @@ class PaystackService
 
         $tierMap = [
             'foundation' => [
-                'amount' => $isNaira ? 69900000 : 50000,
-                'base'   => $isNaira ? 699000 : 500,
-                'total'  => $isNaira ? 699000 : 500,
-                'label'  => 'Concept / Pre-Seed Audit — PARAGON Certification',
+                'amount' => $isNaira ? 35000000 : 50000,
+                'base'   => $isNaira ? 350000 : 500,
+                'total'  => $isNaira ? 350000 : 500,
+                'label'  => $isNaira
+                    ? 'Tier 1 (Domestic & Local Founders) Audit — PARAGON Certification'
+                    : 'Tier 1 (Diaspora & International) Audit — PARAGON Certification',
             ],
             'growth' => [
                 'amount' => $isNaira ? 209000000 : 150000,

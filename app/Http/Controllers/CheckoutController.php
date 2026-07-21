@@ -23,11 +23,13 @@ class CheckoutController extends Controller
         return [
             [
                 'key'              => 'foundation',
-                'label'            => 'Concept / Pre-Seed',
-                'tagline'          => 'Idea to MVP, little or no revenue, seeking validation.',
-                'base_price'       => $isNaira ? 699000 : 500,
-                'total'            => $isNaira ? 699000 : 500,
-                'naira_equivalent' => 699000,
+                'label'            => $isNaira ? 'Domestic & Local Founders' : 'Diaspora & International',
+                'tagline'          => $isNaira
+                    ? 'Domestic founders in Nigeria pay ₦350,000 ($250) for the full PARAGON assessment.'
+                    : 'Diaspora and international founders pay $500 for the full PARAGON assessment.',
+                'base_price'       => $isNaira ? 350000 : 500,
+                'total'            => $isNaira ? 350000 : 500,
+                'naira_equivalent' => 350000,
                 'features'         => [
                     'Full PARAGON scan (weighted to Potential)',
                     '1 founder interview (60 min)',

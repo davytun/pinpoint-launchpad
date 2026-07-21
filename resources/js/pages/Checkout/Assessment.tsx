@@ -945,9 +945,7 @@ export default function Assessment() {
                 {/* ── Footer ── */}
                 <footer className="border-t border-zinc-200/50 bg-zinc-50 py-12">
                     <div className="mx-auto max-w-5xl px-6 text-center">
-                        <p className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
-                            Pinpoint Launchpad
-                        </p>
+                        <p className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Pinpoint Launchpad</p>
                         <p className="mx-auto mt-3 max-w-xl text-[11px] leading-relaxed font-medium text-zinc-400/80">
                             The PIA is an investment-readiness assessment. It is not an audit, not a legal opinion, and not investment advice.
                             Findings rest on the evidence made available within the assessment window.

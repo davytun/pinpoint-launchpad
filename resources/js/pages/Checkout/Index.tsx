@@ -210,8 +210,9 @@ export default function CheckoutIndex({
                                                     </span>
                                                     <div className="mt-1 flex items-baseline gap-1">
                                                         <span className="text-4xl font-extrabold tracking-tight">
-                                                            {currency_symbol}
-                                                            {tier.base_price.toLocaleString()}
+                                                            {tier.key === 'foundation' && currency_symbol === '₦'
+                                                                ? `₦${tier.base_price.toLocaleString()} ($250)`
+                                                                : `${currency_symbol}${tier.base_price.toLocaleString()}`}
                                                         </span>
                                                     </div>
                                                     {billing_ngn_fallback && (

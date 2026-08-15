@@ -25,15 +25,15 @@ export default function BlogTeaser({ posts = [] }: BlogTeaserProps) {
                 {/* Header */}
                 <div className="mb-12 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                     <div className="space-y-3">
-                        <span className="text-[11px] font-bold tracking-widest text-[#3A54A5] uppercase">Resource Library</span>
-                        <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">Latest from the Blog</h2>
-                        <p className="max-w-xl font-sans text-sm text-zinc-500">
+                        <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase md:text-sm">Resource Library</span>
+                        <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl">Latest from the Blog</h2>
+                        <p className="max-w-xl font-sans text-base text-zinc-500 md:text-lg">
                             Actionable fundraising insights, founder playbooks, and structural checklists to accelerate your readiness journey.
                         </p>
                     </div>
                     <Link
                         href="/blog"
-                        className="group inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#3A54A5] uppercase transition-colors hover:text-[#2d4182]"
+                        className="group inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#3A54A5] uppercase transition-colors hover:text-[#2d4182] md:text-sm"
                     >
                         View All Articles
                         <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -59,23 +59,23 @@ export default function BlogTeaser({ posts = [] }: BlogTeaserProps) {
 
                                 <div className="space-y-2">
                                     {post.category && (
-                                        <span className="text-[10px] font-bold tracking-wider text-[#3A54A5] uppercase">{post.category}</span>
+                                        <span className="text-xs font-bold tracking-wider text-[#3A54A5] uppercase md:text-sm">{post.category}</span>
                                     )}
-                                    <h3 className="font-display line-clamp-2 text-base font-extrabold text-zinc-950 transition-colors group-hover:text-[#3A54A5]">
+                                    <h3 className="font-display line-clamp-2 text-lg font-extrabold text-zinc-950 transition-colors group-hover:text-[#3A54A5] md:text-xl">
                                         <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                                     </h3>
-                                    <p className="line-clamp-3 text-xs leading-relaxed font-medium text-zinc-500">{post.excerpt}</p>
+                                    <p className="line-clamp-3 text-sm leading-relaxed font-medium text-zinc-500 md:text-base">{post.excerpt}</p>
                                 </div>
                             </div>
 
-                            <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 text-[11px] font-semibold text-zinc-500">
+                            <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 text-xs font-semibold text-zinc-500 md:text-sm">
                                 <div className="flex gap-3">
                                     <span className="flex items-center gap-1">
-                                        <Calendar className="size-3" />
+                                        <Calendar className="size-3.5" />
                                         {post.published_at}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                        <Clock className="size-3" />
+                                        <Clock className="size-3.5" />
                                         {post.reading_time_mins}m read
                                     </span>
                                 </div>

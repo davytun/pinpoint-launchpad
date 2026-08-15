@@ -21,9 +21,9 @@ export default function Terms() {
 
                         <Link
                             href="/"
-                            className="flex items-center gap-1 text-xs font-bold text-zinc-500 hover:text-zinc-950 transition-colors"
+                            className="flex items-center gap-1 text-sm font-bold text-zinc-600 hover:text-zinc-950 transition-colors"
                         >
-                            <ArrowLeft className="size-3.5" />
+                            <ArrowLeft className="size-4" />
                             Back
                         </Link>
                     </div>
@@ -33,28 +33,28 @@ export default function Terms() {
                 <main className="mx-auto max-w-4xl px-6 py-12 md:py-16 bg-white my-6 rounded-2xl border border-zinc-200 shadow-sm">
                     {/* Title */}
                     <div className="border-b border-zinc-250 pb-8 mb-8">
-                        <h1 className="font-display text-2xl md:text-3xl font-black tracking-tight text-zinc-900 mb-2">
+                        <h1 className="font-display text-3xl md:text-4xl font-black tracking-tight text-zinc-900 mb-2">
                             Terms of Service
                         </h1>
-                        <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">
+                        <p className="text-xs md:text-sm text-zinc-500 font-semibold uppercase tracking-wider">
                             Governing the use of pinpointlaunchpad.com and the Pinpoint services
                         </p>
                     </div>
 
                     {/* Meta info box */}
-                    <div className="rounded-xl border border-zinc-200 text-zinc-800 bg-zinc-50 p-5 mb-8 space-y-2 text-xs font-semibold text-zinc-655 leading-relaxed">
-                        <p><strong className="text-zinc-800">Platform:</strong> pinpointlaunchpad.com</p>
-                        <p><strong className="text-zinc-800">Operator:</strong> Pinpoint Launchpad Ltd (RC 8806541), a company incorporated in Nigeria</p>
-                        <p><strong className="text-zinc-800">Registered office:</strong> Vibranium Valley, 42 Local Airport Road, Ikeja, Lagos, Nigeria</p>
-                        <p><strong className="text-zinc-805">Effective date:</strong> 1 August 2026</p>
-                        <p><strong className="text-zinc-805">Version:</strong> 1.0</p>
+                    <div className="rounded-xl border border-zinc-200 text-zinc-800 bg-zinc-50 p-6 mb-8 space-y-2 text-sm md:text-base font-semibold leading-relaxed">
+                        <p><strong className="text-zinc-900">Platform:</strong> pinpointlaunchpad.com</p>
+                        <p><strong className="text-zinc-900">Operator:</strong> Pinpoint Launchpad Ltd (RC 8806541), a company incorporated in Nigeria</p>
+                        <p><strong className="text-zinc-900">Registered office:</strong> Vibranium Valley, 42 Local Airport Road, Ikeja, Lagos, Nigeria</p>
+                        <p><strong className="text-zinc-900">Effective date:</strong> 1 August 2026</p>
+                        <p><strong className="text-zinc-900">Version:</strong> 1.0</p>
                     </div>
 
                     {/* Clauses */}
-                    <div className="space-y-8 text-sm md:text-[14.5px] leading-relaxed text-zinc-700">
+                    <div className="space-y-8 text-base md:text-lg leading-relaxed text-zinc-700">
                         {/* Section 1 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">1. Introduction and acceptance</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">1. Introduction and acceptance</h2>
                             <p>
                                 1.1 These Terms of Service (“Terms”) are a legally binding agreement between Pinpoint Launchpad Ltd (“Pinpoint”, “we”, “us” or “our”) and you, the person or entity accessing or using the platform at pinpointlaunchpad.com and the related services described in these Terms (together, the “Platform”).
                             </p>
@@ -71,7 +71,7 @@ export default function Terms() {
 
                         {/* Section 2 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">2. Definitions and interpretation</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">2. Definitions and interpretation</h2>
                             <p>2.1 In these Terms, unless the context otherwise requires:</p>
                             <ul className="list-disc pl-6 space-y-2 text-zinc-650">
                                 <li><strong>“Applicant”</strong> means a Startup that submits an application for a PIA.</li>
@@ -95,7 +95,7 @@ export default function Terms() {
 
                         {/* Section 3 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">3. Nature of the Services — what Pinpoint is, and what it is not</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">3. Nature of the Services — what Pinpoint is, and what it is not</h2>
                             <div className="rounded-xl border border-amber-500/20 bg-amber-50/50 p-4 text-xs md:text-sm font-semibold text-amber-800">
                                 <strong className="text-amber-900">This clause governs the entire agreement:</strong> Every other provision of these Terms is to be read subject to, and consistently with, this clause 3. In the event of any inconsistency between this clause and any other part of the Platform or these Terms, this clause prevails.
                             </div>
@@ -127,7 +127,7 @@ export default function Terms() {
 
                         {/* Section 4 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">4. Eligibility, accounts, and acceptable use</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">4. Eligibility, accounts, and acceptable use</h2>
                             <p>
                                 4.1 To use the paid Services you must be at least 18 years old and capable of forming a binding contract. The Platform is intended for businesses and their authorised representatives, not for consumers acting in a personal capacity.
                             </p>
@@ -151,7 +151,7 @@ export default function Terms() {
 
                         {/* Section 5 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">5. The Self-Scan</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">5. The Self-Scan</h2>
                             <p>
                                 5.1 The Self-Scan is a free, automated, indicative diagnostic. It generates a provisional PARAGON score and a summary based solely and entirely on the answers you provide. It involves no human review, no verification of any answer, and no examination of any document.
                             </p>
@@ -168,7 +168,7 @@ export default function Terms() {
 
                         {/* Section 6 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">6. The Pinpoint Investment Assessment (PIA)</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">6. The Pinpoint Investment Assessment (PIA)</h2>
                             <p>
                                 6.1 The PIA is a paid investment-readiness assessment. On acceptance of an application and payment of the applicable fee, Pinpoint assesses the Startup against the PARAGON framework and delivers an Assessment Report. Application is free; the fee is scoped and disclosed before it is invoiced.
                             </p>
@@ -194,7 +194,7 @@ export default function Terms() {
 
                         {/* Section 7 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">7. The Pinpoint Investment Window (PIW)</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">7. The Pinpoint Investment Window (PIW)</h2>
                             <p>
                                 7.1 The PIW is a paid implementation and advisory service in which Pinpoint works with a Startup, over a defined period, to address matters identified in the PIA and to improve the Startup’s investment-readiness.
                             </p>
@@ -214,7 +214,7 @@ export default function Terms() {
 
                         {/* Section 8 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">8. The Pinpoint Investment Network (PIN)</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">8. The Pinpoint Investment Network (PIN)</h2>
                             <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-xs md:text-sm font-semibold text-blue-900">
                                 <strong>The PIN is a visibility channel, not a brokerage:</strong> The PIN allows Startups that meet Pinpoint’s criteria to be visible to Investors who have been admitted to the network. Pinpoint curates who may see and be seen. Pinpoint does not introduce, match, recommend, solicit, negotiate, or arrange any investment, and receives no compensation contingent on any financing that may result. Admission to the PIN is a visibility opportunity only.
                             </div>
@@ -240,7 +240,7 @@ export default function Terms() {
 
                         {/* Section 9 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">9. Fees, payment, and taxes</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">9. Fees, payment, and taxes</h2>
                             <p>
                                 9.1 Fees for the paid Services are as stated on the Platform or in the applicable engagement letter. Pinpoint may price in naira or US dollars and may revise its fees prospectively.
                             </p>
@@ -260,7 +260,7 @@ export default function Terms() {
 
                         {/* Section 10 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">10. Intellectual property</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">10. Intellectual property</h2>
                             <p>
                                 10.1 The Platform, the PARAGON framework, all question banks, scoring rubrics, benchmarks, methodologies, templates, software, text, graphics, and all other Content (other than User Content) are owned by Pinpoint or its licensors and are protected by copyright, trade mark, and other intellectual-property laws. All rights are reserved.
                             </p>
@@ -280,7 +280,7 @@ export default function Terms() {
 
                         {/* Section 11 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">11. Confidentiality</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">11. Confidentiality</h2>
                             <p>
                                 11.1 Each party may receive confidential information of the other. Each party must keep the other’s confidential information confidential, use it only for the purposes of these Terms and the Services, and protect it with reasonable care.
                             </p>
@@ -294,7 +294,7 @@ export default function Terms() {
 
                         {/* Section 12 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">12. Data protection</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">12. Data protection</h2>
                             <p>
                                 12.1 Pinpoint processes personal data in accordance with the Nigeria Data Protection Act 2023, any regulation or guidance issued under it, and the Privacy Policy. By using the Platform you acknowledge that Pinpoint may collect, use, and process personal data as described in the Privacy Policy.
                             </p>
@@ -308,7 +308,7 @@ export default function Terms() {
 
                         {/* Section 13 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">13. Third-party services and links</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">13. Third-party services and links</h2>
                             <p>
                                 13.1 The Platform may contain links to, or integrate with, third-party websites or services. Pinpoint does not control and is not responsible for third-party services, and their inclusion does not imply endorsement. Your use of any third-party service is governed by that third party’s terms.
                             </p>
@@ -316,7 +316,7 @@ export default function Terms() {
 
                         {/* Section 14 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">14. Disclaimers and no guarantee of outcome</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">14. Disclaimers and no guarantee of outcome</h2>
                             <p>
                                 14.1 To the fullest extent permitted by law, the Platform, the Content, and the Services are provided “as is” and “as available”, and Pinpoint disclaims all warranties, whether express, implied, or statutory, including any implied warranty of merchantability, fitness for a particular purpose, accuracy, and non-infringement.
                             </p>
@@ -333,7 +333,7 @@ export default function Terms() {
 
                         {/* Section 15 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">15. Limitation of liability</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">15. Limitation of liability</h2>
                             <p>
                                 15.1 Nothing in these Terms excludes or limits liability that cannot lawfully be excluded or limited, including liability for fraud, fraudulent misrepresentation, death, or personal injury caused by negligence.
                             </p>
@@ -353,7 +353,7 @@ export default function Terms() {
 
                         {/* Section 16 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">16. Indemnity</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">16. Indemnity</h2>
                             <p>
                                 16.1 You agree to indemnify and hold harmless Pinpoint, its directors, officers, employees, and agents against all claims, liabilities, losses, and reasonable costs (including legal fees) arising out of or in connection with: (a) your breach of these Terms; (b) your violation of any law or the rights of any third party; (c) any information or document you submit to the Platform; or (d) any dealing between you and any Investor or other User.
                             </p>
@@ -361,7 +361,7 @@ export default function Terms() {
 
                         {/* Section 17 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">17. Suspension, termination, and effect</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">17. Suspension, termination, and effect</h2>
                             <p>
                                 17.1 You may stop using the Platform at any time. Certain provisions survive, as set out in clause 17.4.
                             </p>
@@ -378,7 +378,7 @@ export default function Terms() {
 
                         {/* Section 18 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">18. Dispute resolution</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">18. Dispute resolution</h2>
                             <p>
                                 18.1 Scope. This clause applies to any dispute, controversy, or claim arising out of or in connection with these Terms or the Services, including any question as to their existence, validity, interpretation, breach, or termination (a “Dispute”).
                             </p>
@@ -414,7 +414,7 @@ export default function Terms() {
 
                         {/* Section 19 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">19. Governing law</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">19. Governing law</h2>
                             <p>
                                 19.1 These Terms, and any Dispute, are governed by and construed in accordance with the laws of the Federal Republic of Nigeria.
                             </p>
@@ -425,7 +425,7 @@ export default function Terms() {
 
                         {/* Section 20 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">20. General</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">20. General</h2>
                             <p>
                                 20.1 Entire agreement. These Terms, the Privacy Policy, and any applicable engagement letter or value agreement constitute the entire agreement between the parties and supersede all prior understandings. Where an engagement letter for a PIA or PIW conflicts with these Terms, the engagement letter prevails for that engagement.
                             </p>

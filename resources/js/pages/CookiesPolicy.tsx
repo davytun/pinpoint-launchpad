@@ -24,9 +24,9 @@ export default function CookiesPolicy() {
                         </Link>
                         <Link
                             href="/"
-                            className="flex items-center gap-1 text-xs font-bold text-zinc-500 transition-colors hover:text-zinc-950"
+                            className="flex items-center gap-1 text-sm font-bold text-zinc-600 transition-colors hover:text-zinc-950"
                         >
-                            <ArrowLeft className="size-3.5" />
+                            <ArrowLeft className="size-4" />
                             Back
                         </Link>
                     </div>
@@ -36,16 +36,16 @@ export default function CookiesPolicy() {
                 <main className="mx-auto my-6 max-w-4xl rounded-2xl border border-zinc-200 bg-white px-6 py-12 shadow-sm md:py-16">
                     {/* Title */}
                     <div className="mb-8 border-b border-zinc-200 pb-8">
-                        <h1 className="font-display mb-2 text-2xl font-black tracking-tight text-zinc-900 md:text-3xl">
+                        <h1 className="font-display mb-2 text-3xl font-black tracking-tight text-zinc-900 md:text-4xl">
                             Cookies Policy
                         </h1>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                        <p className="text-xs md:text-sm font-semibold uppercase tracking-wider text-zinc-500">
                             How pinpointlaunchpad.com uses cookies and similar technologies
                         </p>
                     </div>
 
                     {/* Meta */}
-                    <div className="mb-8 space-y-2 rounded-xl border border-zinc-200 bg-zinc-50 p-5 text-xs font-semibold leading-relaxed text-zinc-800">
+                    <div className="mb-8 space-y-2 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-sm md:text-base font-semibold leading-relaxed text-zinc-800">
                         <p>
                             <strong className="text-zinc-900">Platform:</strong> pinpointlaunchpad.com
                         </p>
@@ -106,7 +106,7 @@ export default function CookiesPolicy() {
                     <div className="space-y-8 text-sm leading-relaxed text-zinc-700 md:text-[14.5px]">
                         {/* 1 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">1. About this policy</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">1. About this policy</h2>
                             <p>
                                 1.1 This Cookies Policy is issued by Pinpoint Launchpad Ltd ("Pinpoint", "we", "us",
                                 "our") and applies to the website and platform at pinpointlaunchpad.com (the
@@ -132,7 +132,7 @@ export default function CookiesPolicy() {
 
                         {/* 2 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 2. What cookies and similar technologies are
                             </h2>
                             <p>
@@ -162,7 +162,7 @@ export default function CookiesPolicy() {
 
                         {/* 3 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 3. The categories of cookies we use
                             </h2>
                             <p>
@@ -227,7 +227,7 @@ export default function CookiesPolicy() {
 
                         {/* 4 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">4. The specific cookies we use</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">4. The specific cookies we use</h2>
                             <p>
                                 4.1 The table below lists the cookies currently in use. It is illustrative and must be
                                 completed and kept current by our development team; the live cookie banner reflects the
@@ -325,7 +325,7 @@ export default function CookiesPolicy() {
 
                         {/* 5 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">5. Third-party cookies</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">5. Third-party cookies</h2>
                             <p>
                                 5.1 Some cookies are set by third parties who provide services to us, such as
                                 analytics, payment, and content-delivery providers. We do not control these third
@@ -341,7 +341,7 @@ export default function CookiesPolicy() {
 
                         {/* 6 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 6. How we obtain and record your consent
                             </h2>
                             <p>
@@ -364,7 +364,7 @@ export default function CookiesPolicy() {
 
                         {/* 7 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 7. How to manage or withdraw consent
                             </h2>
                             <p>7.1 You can control cookies in the following ways:</p>
@@ -392,7 +392,7 @@ export default function CookiesPolicy() {
 
                         {/* 8 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">8. Do-not-track and personal data</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">8. Do-not-track and personal data</h2>
                             <p>
                                 8.1 Some browsers send a "do not track" signal. There is no common standard for how
                                 such signals should be treated, and the Platform does not currently respond to them. You
@@ -410,7 +410,7 @@ export default function CookiesPolicy() {
 
                         {/* 9 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">9. Changes to this policy</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">9. Changes to this policy</h2>
                             <p>
                                 9.1 We may update this policy as our use of cookies changes or as the law requires.
                                 The current version is always available on the Platform, and the effective date appears
@@ -421,7 +421,7 @@ export default function CookiesPolicy() {
 
                         {/* 10 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">10. Contact us</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">10. Contact us</h2>
                             <p>
                                 10.1 If you have any question about our use of cookies, please contact:
                             </p>

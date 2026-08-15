@@ -22,21 +22,21 @@ export default function Footer() {
                 <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
                     {/* Brand Column */}
                     <div className="space-y-4">
-                        <PinpointLogo height={20} variant="white" />
-                        <p className="max-w-xs text-xs leading-relaxed text-zinc-400">
+                        <PinpointLogo height={26} variant="white" />
+                        <p className="max-w-xs text-sm leading-relaxed text-zinc-400 md:text-base">
                             Venture diligence & investment-readiness verification using the PARAGON Model.
                         </p>
-                        <p className="text-[11px] text-zinc-500">© {new Date().getFullYear()} Pinpoint Launchpad.</p>
+                        <p className="text-xs text-zinc-500 md:text-sm">© {new Date().getFullYear()} Pinpoint Launchpad.</p>
                     </div>
 
                     {/* Newsletter Column */}
                     <div className="space-y-3">
-                        <h4 className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Subscribe to Updates</h4>
-                        <p className="text-xs leading-relaxed text-zinc-400">
+                        <h4 className="text-xs font-bold tracking-widest text-zinc-400 uppercase md:text-sm">Subscribe to Updates</h4>
+                        <p className="text-sm leading-relaxed text-zinc-400 md:text-base">
                             Stay up-to-date with our verification cycle cohort releases, checklists, and platform news.
                         </p>
                         {wasSuccessful ? (
-                            <div className="text-xs font-bold text-[#93C5FD] transition-all duration-300">✓ Thank you for subscribing!</div>
+                            <div className="text-sm font-bold text-[#93C5FD] transition-all duration-300">✓ Thank you for subscribing!</div>
                         ) : (
                             <form onSubmit={handleSubscribe} className="relative mt-2 flex max-w-sm items-center">
                                 <input
@@ -45,24 +45,24 @@ export default function Footer() {
                                     required
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
-                                    className="h-9 w-full rounded-full border border-white/10 bg-white/5 pr-24 pl-4 text-xs text-white placeholder-zinc-500 transition-colors focus:border-zinc-700 focus:outline-none"
+                                    className="h-10 w-full rounded-full border border-white/10 bg-white/5 pr-28 pl-4 text-xs text-white placeholder-zinc-500 transition-colors focus:border-zinc-700 focus:outline-none md:text-sm"
                                 />
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="absolute top-1 right-1 flex h-7 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-[10px] font-bold text-[#0D1325] transition-colors hover:bg-zinc-200 disabled:opacity-50"
+                                    className="absolute top-1 right-1 flex h-8 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-xs font-bold text-[#0D1325] transition-colors hover:bg-zinc-200 disabled:opacity-50 md:text-sm"
                                 >
                                     Subscribe
                                 </button>
                             </form>
                         )}
-                        {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+                        {errors.email && <p className="mt-1 text-xs text-red-400 md:text-sm">{errors.email}</p>}
                     </div>
 
                     {/* Legal & Socials (Right Aligned on desktop) */}
                     <div className="flex flex-col space-y-4 md:items-end">
-                        <h4 className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Legal & Social</h4>
-                        <div className="text-zinc-350 flex flex-col space-y-2 text-xs font-semibold md:items-end">
+                        <h4 className="text-xs font-bold tracking-widest text-zinc-400 uppercase md:text-sm">Legal & Social</h4>
+                        <div className="text-zinc-350 flex flex-col space-y-2.5 text-sm font-semibold md:items-end md:text-base">
                             <Link href="/terms" className="text-left transition-colors outline-none hover:text-white md:text-right">
                                 Terms & Conditions
                             </Link>

@@ -116,6 +116,15 @@
     --sidebar: hsl(0 0% 98%);
 }
 
+/* Subtle responsive typography adjustments for mobile devices */
+@media (max-width: 640px) {
+    :root {
+        --text-xs: 0.8125rem; /* ~13px */
+        --text-sm: 0.9375rem;  /* ~15px */
+    }
+}
+
+
 @layer base {
     * {
         @apply border-border;
@@ -145,7 +154,7 @@
     }
 
     .dx-answer-btn {
-        @apply relative flex w-full items-center gap-4 rounded-2xl border border-white/8 bg-white/3 px-5 py-4 text-left text-sm font-medium text-white/60 transition-all duration-200 outline-none hover:border-white/20 hover:bg-white/7 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-500/40;
+        @apply relative flex w-full items-center gap-4 rounded-2xl border border-white/8 bg-white/3 px-5 py-4 text-left text-base font-semibold md:text-[17px] text-white/70 transition-all duration-200 outline-none hover:border-white/20 hover:bg-white/7 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-500/40;
     }
 
     .dx-answer-btn[data-selected='yes'] {
@@ -738,29 +747,43 @@ select::placeholder,
 }
 
 /* Blog public content rendering (Show.tsx) */
+.blog-content {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+}
+@media (min-width: 768px) {
+    .blog-content {
+        font-size: 1.125rem;
+    }
+}
+@media (min-width: 1280px) {
+    .blog-content {
+        font-size: 1.1875rem;
+    }
+}
 .blog-content h1 {
-    font-size: 1.75rem;
+    font-size: 2.25rem;
     font-weight: 800;
-    margin: 1.5rem 0 0.75rem;
+    margin: 2rem 0 1rem;
     color: #111827;
     letter-spacing: -0.025em;
 }
 .blog-content h2 {
-    font-size: 1.375rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    margin: 1.25rem 0 0.6rem;
+    margin: 1.75rem 0 0.8rem;
     color: #111827;
 }
 .blog-content h3 {
-    font-size: 1.125rem;
+    font-size: 1.375rem;
     font-weight: 700;
-    margin: 1rem 0 0.5rem;
+    margin: 1.5rem 0 0.75rem;
     color: #111827;
 }
 .blog-content p {
-    margin: 0 0 1rem;
+    margin: 0 0 1.25rem;
     color: #374151;
-    line-height: 1.75;
+    line-height: 1.8;
 }
 .blog-content strong {
     font-weight: 700;

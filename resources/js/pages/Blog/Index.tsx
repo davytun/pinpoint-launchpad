@@ -89,9 +89,9 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-12 md:px-8">
                         {/* Section Header */}
                         <div className="mx-auto mb-12 max-w-3xl pt-8 text-center">
-                            <span className="text-[11px] font-bold tracking-widest text-[#3A54A5] uppercase">Insights & Analysis</span>
-                            <h1 className="font-display mt-3 text-4xl font-extrabold tracking-tight text-zinc-950 sm:text-5xl">The Pinpoint Blog</h1>
-                            <p className="mt-4 text-base leading-relaxed text-zinc-500">
+                            <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase md:text-sm">Insights & Analysis</span>
+                            <h1 className="font-display mt-3 text-4xl font-extrabold tracking-tight text-zinc-950 sm:text-5xl md:text-6xl">The Pinpoint Blog</h1>
+                            <p className="mt-4 text-base leading-relaxed text-zinc-500 md:text-lg lg:text-xl">
                                 Investment readiness advice, institutional vetting guides, and fundraising playbooks for early-stage founders.
                             </p>
                         </div>
@@ -103,7 +103,7 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                                 <button
                                     onClick={() => handleCategoryClick('')}
                                     className={cn(
-                                        'rounded-full border px-4 py-1.5 text-xs font-bold transition-all',
+                                        'rounded-full border px-4 py-1.5 text-xs font-bold transition-all md:text-sm',
                                         selectedCategory === ''
                                             ? 'border-transparent bg-[#3A54A5] text-white'
                                             : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300',
@@ -116,7 +116,7 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                                         key={cat}
                                         onClick={() => handleCategoryClick(cat)}
                                         className={cn(
-                                            'rounded-full border px-4 py-1.5 text-xs font-bold transition-all',
+                                            'rounded-full border px-4 py-1.5 text-xs font-bold transition-all md:text-sm',
                                             selectedCategory === cat
                                                 ? 'border-transparent bg-[#3A54A5] text-white'
                                                 : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300',
@@ -135,7 +135,7 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="Search articles..."
-                                    className="w-full rounded-full border border-zinc-200 bg-white/70 py-2 pr-4 pl-9 text-xs placeholder:text-zinc-400 focus:border-[#3A54A5]/65 focus:outline-none"
+                                    className="w-full rounded-full border border-zinc-200 bg-white/70 py-2 pr-4 pl-9 text-xs placeholder:text-zinc-400 focus:border-[#3A54A5]/65 focus:outline-none md:text-sm"
                                 />
                             </form>
                         </div>
@@ -143,8 +143,8 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                         {posts.data.length === 0 ? (
                             <div className="py-20 text-center">
                                 <BookOpen className="mx-auto mb-4 size-12 text-zinc-300" />
-                                <h3 className="text-lg font-bold text-zinc-800">No articles found</h3>
-                                <p className="mt-1 text-sm text-zinc-500">Try tweaking your search or filtering keywords.</p>
+                                <h3 className="text-xl font-bold text-zinc-800">No articles found</h3>
+                                <p className="mt-1 text-base text-zinc-500">Try tweaking your search or filtering keywords.</p>
                             </div>
                         ) : (
                             <div className="space-y-16">
@@ -163,20 +163,20 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                                         <div className="flex flex-col justify-between space-y-6 p-8">
                                             <div className="space-y-4">
                                                 {featuredPost.category && (
-                                                    <span className="inline-block rounded-full bg-[#3A54A5]/10 px-3 py-1 text-[10px] font-bold tracking-wider text-[#3A54A5] uppercase">
+                                                    <span className="inline-block rounded-full bg-[#3A54A5]/10 px-3.5 py-1 text-xs font-bold tracking-wider text-[#3A54A5] uppercase md:text-sm">
                                                         {featuredPost.category}
                                                     </span>
                                                 )}
-                                                <h2 className="font-display line-clamp-2 text-2xl leading-tight font-extrabold text-zinc-950 sm:text-3xl">
+                                                <h2 className="font-display line-clamp-2 text-2xl leading-tight font-extrabold text-zinc-950 sm:text-3xl md:text-4xl">
                                                     {featuredPost.title}
                                                 </h2>
-                                                <p className="line-clamp-3 text-sm leading-relaxed font-medium text-zinc-500">
+                                                <p className="line-clamp-3 text-sm leading-relaxed font-medium text-zinc-500 md:text-base lg:text-lg">
                                                     {featuredPost.excerpt}
                                                 </p>
                                             </div>
 
                                             <div className="flex items-center justify-between border-t border-zinc-100 pt-6">
-                                                <div className="text-zinc-550 flex items-center gap-4 text-xs font-semibold">
+                                                <div className="text-zinc-550 flex items-center gap-4 text-xs font-semibold md:text-sm">
                                                     <span className="flex items-center gap-1">
                                                         <Calendar className="size-3.5" />
                                                         {featuredPost.published_at}
@@ -188,7 +188,7 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                                                 </div>
                                                 <Link
                                                     href={`/blog/${featuredPost.slug}`}
-                                                    className="inline-flex items-center gap-1 text-sm font-bold text-[#3A54A5] transition-colors hover:text-[#2d4182]"
+                                                    className="inline-flex items-center gap-1 text-sm font-bold text-[#3A54A5] transition-colors hover:text-[#2d4182] md:text-base"
                                                 >
                                                     Read Article
                                                     <ChevronRight className="size-4" />
@@ -221,27 +221,27 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
 
                                                     <div className="space-y-2">
                                                         {post.category && (
-                                                            <span className="text-[10px] font-bold tracking-wider text-[#3A54A5] uppercase">
+                                                            <span className="text-xs font-bold tracking-wider text-[#3A54A5] uppercase md:text-sm">
                                                                 {post.category}
                                                             </span>
                                                         )}
-                                                        <h3 className="font-display line-clamp-2 text-lg font-extrabold text-zinc-950 transition-colors group-hover:text-[#3A54A5]">
+                                                        <h3 className="font-display line-clamp-2 text-lg font-extrabold text-zinc-950 transition-colors group-hover:text-[#3A54A5] md:text-xl">
                                                             <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                                                         </h3>
-                                                        <p className="line-clamp-3 text-xs leading-relaxed font-medium text-zinc-500">
+                                                        <p className="line-clamp-3 text-sm leading-relaxed font-medium text-zinc-500 md:text-base">
                                                             {post.excerpt}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 text-[11px] font-semibold text-zinc-500">
+                                                <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4 text-xs font-semibold text-zinc-500 md:text-sm">
                                                     <div className="flex gap-3">
                                                         <span className="flex items-center gap-1">
-                                                            <Calendar className="size-3" />
+                                                            <Calendar className="size-3.5" />
                                                             {post.published_at}
                                                         </span>
                                                         <span className="flex items-center gap-1">
-                                                            <Clock className="size-3" />
+                                                            <Clock className="size-3.5" />
                                                             {post.reading_time_mins}m read
                                                         </span>
                                                     </div>

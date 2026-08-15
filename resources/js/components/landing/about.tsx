@@ -26,7 +26,7 @@ function FeatureTitle({ className, ...props }: React.ComponentProps<'h3'>) {
 }
 
 function FeatureDescription({ className, ...props }: React.ComponentProps<'p'>) {
-    return <p className={cn('max-w-[42ch] font-sans text-base leading-relaxed text-zinc-500', className)} {...props} />;
+    return <p className={cn('max-w-[42ch] font-sans text-[17px] leading-relaxed text-zinc-600 md:text-lg', className)} {...props} />;
 }
 
 // ----------------------------------------------------
@@ -117,9 +117,9 @@ function HowWeDoItCard() {
                 </div>
             </div>
             {/* PARAGON Model Grade Visual with Bottom/Right Mask */}
-            <div className="relative h-[110px] w-full overflow-hidden">
+            <div className="relative h-27.5 w-full overflow-hidden">
                 <div
-                    className="absolute inset-x-6 bottom-[-10px] h-[110px] overflow-hidden rounded-t-2xl border border-[#3A54A5]/10 bg-white p-3 shadow-lg"
+                    className="absolute inset-x-6 -bottom-2.5 h-27.5 overflow-hidden rounded-t-2xl border border-[#3A54A5]/10 bg-white p-3 shadow-lg"
                     style={{
                         maskImage: 'linear-gradient(to bottom, black 75%, transparent 100%), linear-gradient(to right, black 80%, transparent 100%)',
                         WebkitMaskImage:
@@ -193,15 +193,15 @@ function WhyYouNeedUsCard() {
                 <FeatureTitle>Why You Need Us</FeatureTitle>
                 <div className="space-y-4">
                     <div className="space-y-1.5">
-                        <h4 className="font-display text-[10px] font-black tracking-widest text-[#3A54A5]">STARTUPS</h4>
-                        <p className="max-w-[42ch] text-sm leading-relaxed text-zinc-500">
+                        <h4 className="font-display text-[11px] font-black tracking-widest text-[#3A54A5]">STARTUPS</h4>
+                        <p className="max-w-[42ch] text-sm leading-relaxed text-zinc-600 md:text-base">
                             Significantly save yourself the time and resources it costs you trying to raise funds without first making your enterprise
                             investment-ready and more visible to investors.
                         </p>
                     </div>
                     <div className="space-y-1.5">
-                        <h4 className="font-display text-[10px] font-black tracking-widest text-[#3A54A5]">INVESTORS</h4>
-                        <p className="max-w-[42ch] text-sm leading-relaxed text-zinc-500">
+                        <h4 className="font-display text-[11px] font-black tracking-widest text-[#3A54A5]">INVESTORS</h4>
+                        <p className="max-w-[42ch] text-sm leading-relaxed text-zinc-600 md:text-base">
                             Significantly save yourself the time and resources it costs you seeking investable startups on your own when we can easily
                             pinpoint you there.
                         </p>

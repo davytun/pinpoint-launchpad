@@ -25,9 +25,9 @@ export default function Privacy() {
 
                         <Link
                             href="/"
-                            className="flex items-center gap-1 text-xs font-bold text-zinc-500 transition-colors hover:text-zinc-950"
+                            className="flex items-center gap-1 text-sm font-bold text-zinc-600 transition-colors hover:text-zinc-950"
                         >
-                            <ArrowLeft className="size-3.5" />
+                            <ArrowLeft className="size-4" />
                             Back
                         </Link>
                     </div>
@@ -37,16 +37,16 @@ export default function Privacy() {
                 <main className="mx-auto my-6 max-w-4xl rounded-2xl border border-zinc-200 bg-white px-6 py-12 shadow-sm md:py-16">
                     {/* Title */}
                     <div className="mb-8 border-b border-zinc-200 pb-8">
-                        <h1 className="font-display mb-2 text-2xl font-black tracking-tight text-zinc-900 md:text-3xl">
+                        <h1 className="font-display mb-2 text-3xl font-black tracking-tight text-zinc-900 md:text-4xl">
                             Privacy Notice
                         </h1>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                        <p className="text-xs md:text-sm font-semibold uppercase tracking-wider text-zinc-500">
                             How Pinpoint collects, uses, and protects your personal data
                         </p>
                     </div>
 
                     {/* Meta info box */}
-                    <div className="mb-8 space-y-2 rounded-xl border border-zinc-200 bg-zinc-50 p-5 text-xs font-semibold leading-relaxed text-zinc-800">
+                    <div className="mb-8 space-y-2 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-sm md:text-base font-semibold leading-relaxed text-zinc-800">
                         <p>
                             <strong className="text-zinc-900">Platform:</strong> pinpointlaunchpad.com
                         </p>
@@ -77,7 +77,7 @@ export default function Privacy() {
                     <div className="space-y-8 text-sm leading-relaxed text-zinc-700 md:text-[14.5px]">
                         {/* Section 1 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 1. Who we are and the scope of this policy
                             </h2>
                             <p>
@@ -106,7 +106,7 @@ export default function Privacy() {
 
                         {/* Section 2 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">2. The personal data we collect</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">2. The personal data we collect</h2>
                             <p>
                                 2.1 We collect the following categories of personal data, depending on how you interact
                                 with the Services:
@@ -190,7 +190,7 @@ export default function Privacy() {
 
                         {/* Section 3 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">3. How we collect your personal data</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">3. How we collect your personal data</h2>
                             <p>3.1 We collect personal data:</p>
                             <ul className="list-disc space-y-2 pl-6 text-zinc-650">
                                 <li>
@@ -216,7 +216,7 @@ export default function Privacy() {
 
                         {/* Section 4 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 4. Why we use your personal data, and our lawful basis
                             </h2>
                             <p>
@@ -309,7 +309,7 @@ export default function Privacy() {
 
                         {/* Section 5 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">5. The Self-Scan — a specific note</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">5. The Self-Scan — a specific note</h2>
                             <p>
                                 5.1 Because the Self-Scan is free and open, we want to be clear about it. When you
                                 complete the Self-Scan we collect your answers and the contact details you provide, and
@@ -331,7 +331,7 @@ export default function Privacy() {
 
                         {/* Section 6 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 6. Who we share your personal data with
                             </h2>
                             <p>6.1 We do not sell your personal data. We share it only as described below:</p>
@@ -369,7 +369,7 @@ export default function Privacy() {
 
                         {/* Section 7 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">7. International transfers</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">7. International transfers</h2>
                             <p>
                                 7.1 Some of our service providers may process personal data outside Nigeria. Where we
                                 transfer personal data outside Nigeria, we do so only in accordance with sections 41 to
@@ -386,7 +386,7 @@ export default function Privacy() {
 
                         {/* Section 8 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">8. How long we keep your personal data</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">8. How long we keep your personal data</h2>
                             <p>
                                 8.1 We keep personal data only for as long as necessary for the purposes for which it
                                 was collected, including to satisfy legal, accounting, tax, or reporting requirements.
@@ -459,7 +459,7 @@ export default function Privacy() {
 
                         {/* Section 9 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">9. Your rights under the NDPA</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">9. Your rights under the NDPA</h2>
                             <p>
                                 9.1 Subject to the conditions and exceptions in the NDPA, you have the following rights
                                 in relation to your personal data:
@@ -515,7 +515,7 @@ export default function Privacy() {
 
                         {/* Section 10 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">10. How we protect your personal data</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">10. How we protect your personal data</h2>
                             <p>
                                 10.1 We implement appropriate technical and organisational measures to protect personal
                                 data against unauthorised or unlawful processing and against accidental loss,
@@ -537,7 +537,7 @@ export default function Privacy() {
 
                         {/* Section 11 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">11. Cookies and similar technologies</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">11. Cookies and similar technologies</h2>
                             <p>
                                 11.1 We use cookies and similar technologies to operate the Platform, remember your
                                 preferences, measure usage, and improve the Services. Some cookies are necessary for the
@@ -553,7 +553,7 @@ export default function Privacy() {
 
                         {/* Section 12 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">12. Changes to this policy</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">12. Changes to this policy</h2>
                             <p>
                                 12.1 We may update this policy from time to time. The current version is always
                                 available on the Platform, and the effective date appears at the top. Where a change is
@@ -563,7 +563,7 @@ export default function Privacy() {
 
                         {/* Section 13 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">13. Contact us</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">13. Contact us</h2>
                             <p>
                                 13.1 If you have any question about this policy or about how we handle your personal
                                 data, please contact:

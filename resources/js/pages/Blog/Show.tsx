@@ -87,16 +87,16 @@ export default function BlogShow({ post, related }: PageProps) {
                         <article className="space-y-8">
                             <header className="space-y-4">
                                 {post.category && (
-                                    <span className="inline-block rounded-full bg-[#3A54A5]/10 px-3 py-1 text-[10px] font-bold tracking-wider text-[#3A54A5] uppercase">
+                                    <span className="inline-block rounded-full bg-[#3A54A5]/10 px-3.5 py-1 text-xs font-bold tracking-wider text-[#3A54A5] uppercase md:text-sm">
                                         {post.category}
                                     </span>
                                 )}
-                                <h1 className="font-display text-3xl leading-tight font-extrabold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl">
+                                <h1 className="font-display text-3xl leading-tight font-extrabold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl lg:text-6xl">
                                     {post.title}
                                 </h1>
-                                <p className="text-zinc-550 text-base leading-relaxed font-medium">{post.excerpt}</p>
+                                <p className="text-zinc-600 text-lg leading-relaxed font-medium md:text-xl">{post.excerpt}</p>
 
-                                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-zinc-200/80 py-4 text-xs font-bold text-zinc-500">
+                                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-zinc-200/80 py-4 text-sm font-bold text-zinc-500 md:text-base">
                                     <div className="flex flex-wrap items-center gap-6">
                                         <span className="flex items-center gap-1.5">
                                             <User className="size-4 text-zinc-400" />
@@ -113,7 +113,7 @@ export default function BlogShow({ post, related }: PageProps) {
                                     </div>
                                     <button
                                         onClick={share}
-                                        className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 transition-colors hover:border-[#3A54A5]/30 hover:text-[#3A54A5]"
+                                        className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 transition-colors hover:border-[#3A54A5]/30 hover:text-[#3A54A5]"
                                     >
                                         <Share2 className="size-3.5" />
                                         Share
@@ -124,12 +124,12 @@ export default function BlogShow({ post, related }: PageProps) {
                             {/* Cover Image */}
                             {post.cover_image && (
                                 <div className="overflow-hidden rounded-2xl border border-zinc-200">
-                                    <img src={post.cover_image} alt={post.title} className="max-h-[400px] w-full object-cover" />
+                                    <img src={post.cover_image} alt={post.title} className="max-h-[440px] w-full object-cover" />
                                 </div>
                             )}
 
                             {/* Article Body Content */}
-                            <div className="prose prose-zinc text-zinc-850 max-w-none space-y-6 pt-4 font-sans text-sm leading-relaxed md:text-base">
+                            <div className="prose prose-zinc text-zinc-850 max-w-none space-y-6 pt-4 font-sans text-base leading-relaxed md:text-lg lg:text-xl">
                                 <div dangerouslySetInnerHTML={{ __html: post.body }} className="blog-content space-y-5" />
                             </div>
                         </article>

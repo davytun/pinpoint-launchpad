@@ -24,9 +24,9 @@ export default function InvestorTerms() {
                         </Link>
                         <Link
                             href="/"
-                            className="flex items-center gap-1 text-xs font-bold text-zinc-500 transition-colors hover:text-zinc-950"
+                            className="flex items-center gap-1 text-sm font-bold text-zinc-600 transition-colors hover:text-zinc-950"
                         >
-                            <ArrowLeft className="size-3.5" />
+                            <ArrowLeft className="size-4" />
                             Back
                         </Link>
                     </div>
@@ -36,16 +36,16 @@ export default function InvestorTerms() {
                 <main className="mx-auto my-6 max-w-4xl rounded-2xl border border-zinc-200 bg-white px-6 py-12 shadow-sm md:py-16">
                     {/* Title */}
                     <div className="mb-8 border-b border-zinc-200 pb-8">
-                        <h1 className="font-display mb-2 text-2xl font-black tracking-tight text-zinc-900 md:text-3xl">
+                        <h1 className="font-display mb-2 text-3xl font-black tracking-tight text-zinc-900 md:text-4xl">
                             Investor Terms
                         </h1>
-                        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                        <p className="text-xs md:text-sm font-semibold uppercase tracking-wider text-zinc-500">
                             Governing admission to and use of the Pinpoint Investment Network (PIN)
                         </p>
                     </div>
 
                     {/* Meta */}
-                    <div className="mb-8 space-y-2 rounded-xl border border-zinc-200 bg-zinc-50 p-5 text-xs font-semibold leading-relaxed text-zinc-800">
+                    <div className="mb-8 space-y-2 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-sm md:text-base font-semibold leading-relaxed text-zinc-800">
                         <p>
                             <strong className="text-zinc-900">Platform:</strong> pinpointlaunchpad.com
                         </p>
@@ -127,7 +127,7 @@ export default function InvestorTerms() {
                     <div className="space-y-8 text-sm leading-relaxed text-zinc-700 md:text-[14.5px]">
                         {/* 1 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">1. Introduction and acceptance</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">1. Introduction and acceptance</h2>
                             <p>
                                 1.1 These Investor Terms ("Investor Terms") are a legally binding agreement between
                                 Pinpoint Launchpad Ltd ("Pinpoint", "we", "us", "our") and you, the person or entity
@@ -154,7 +154,7 @@ export default function InvestorTerms() {
 
                         {/* 2 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">2. Definitions</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">2. Definitions</h2>
                             <p>
                                 2.1 In these Investor Terms, capitalized terms not defined here have the meaning given
                                 in the Terms of Service. In addition:
@@ -195,7 +195,7 @@ export default function InvestorTerms() {
                                     any Investment you make.
                                 </p>
                             </div>
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 3. Nature of the PIN — what you are receiving, and what you are not
                             </h2>
                             <p>
@@ -242,7 +242,7 @@ export default function InvestorTerms() {
 
                         {/* 4 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">4. Eligibility and investor status</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">4. Eligibility and investor status</h2>
                             <p>
                                 4.1 Admission to the PIN is at Pinpoint's sole discretion. Pinpoint may refuse,
                                 condition, suspend, or withdraw admission at any time, with or without cause, and is
@@ -289,7 +289,7 @@ export default function InvestorTerms() {
 
                         {/* 5 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 5. No advice, no reliance, and your own due diligence
                             </h2>
                             <p>
@@ -317,7 +317,7 @@ export default function InvestorTerms() {
 
                         {/* 6 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 6. Anti-money laundering, sanctions, and lawful conduct
                             </h2>
                             <p>
@@ -346,7 +346,7 @@ export default function InvestorTerms() {
 
                         {/* 7 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">7. Conduct within the PIN</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">7. Conduct within the PIN</h2>
                             <p>
                                 7.1 You must use the PIN and PIN Materials only to evaluate potential Investments for
                                 yourself or the entity you represent, and for no other purpose.
@@ -389,7 +389,7 @@ export default function InvestorTerms() {
 
                         {/* 8 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 8. Dealings between you and Startups take place directly
                             </h2>
                             <p>
@@ -427,7 +427,7 @@ export default function InvestorTerms() {
                                     in advance and payable irrespective of whether you make any Investment.
                                 </p>
                             </div>
-                            <h2 className="text-base font-bold text-zinc-900">
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">
                                 9. No compensation contingent on investment; fees
                             </h2>
                             <p>
@@ -444,7 +444,7 @@ export default function InvestorTerms() {
 
                         {/* 10 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">10. Confidentiality</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">10. Confidentiality</h2>
                             <p>
                                 10.1 You must keep all Confidential Information confidential, use it only to evaluate a
                                 potential Investment, and protect it with at least reasonable care. You may share it
@@ -476,7 +476,7 @@ export default function InvestorTerms() {
 
                         {/* 11 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">11. Conflicts of interest</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">11. Conflicts of interest</h2>
                             <p>
                                 11.1 You must notify Pinpoint of any actual or potential conflict of interest that
                                 could affect your dealings within the PIN, including any interest you hold in a
@@ -492,7 +492,7 @@ export default function InvestorTerms() {
 
                         {/* 12 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">12. Data protection</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">12. Data protection</h2>
                             <p>
                                 12.1 Pinpoint processes personal data in accordance with the Nigeria Data Protection
                                 Act 2023 and the{' '}
@@ -512,7 +512,7 @@ export default function InvestorTerms() {
 
                         {/* 13 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">13. Intellectual property</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">13. Intellectual property</h2>
                             <p>
                                 13.1 The PIN, the PIN Materials, the PARAGON framework, and all associated
                                 methodologies and benchmarks are owned by Pinpoint or its licensors. You receive a
@@ -528,7 +528,7 @@ export default function InvestorTerms() {
 
                         {/* 14 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">14. Disclaimers</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">14. Disclaimers</h2>
                             <p>
                                 14.1 To the fullest extent permitted by law, the PIN and PIN Materials are provided
                                 "as is" and "as available", and Pinpoint disclaims all warranties, express, implied,
@@ -549,7 +549,7 @@ export default function InvestorTerms() {
 
                         {/* 15 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">15. Limitation of liability</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">15. Limitation of liability</h2>
                             <p>
                                 15.1 Nothing in these Investor Terms excludes or limits any liability that cannot
                                 lawfully be excluded, including for fraud, fraudulent misrepresentation, death, or
@@ -578,7 +578,7 @@ export default function InvestorTerms() {
 
                         {/* 16 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">16. Indemnity</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">16. Indemnity</h2>
                             <p>
                                 16.1 You agree to indemnify and hold harmless Pinpoint, its directors, officers,
                                 employees, and agents against all claims, liabilities, losses, and reasonable costs
@@ -592,7 +592,7 @@ export default function InvestorTerms() {
 
                         {/* 17 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">17. Suspension, withdrawal, and survival</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">17. Suspension, withdrawal, and survival</h2>
                             <p>
                                 17.1 You may withdraw from the PIN at any time on written notice. Pinpoint may suspend
                                 or withdraw your admission at any time, with or without cause, and without liability.
@@ -623,7 +623,7 @@ export default function InvestorTerms() {
                                     they genuinely must.
                                 </p>
                             </div>
-                            <h2 className="text-base font-bold text-zinc-900">18. Dispute resolution</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">18. Dispute resolution</h2>
                             <p>
                                 18.1 <strong>Scope.</strong> This clause applies to any dispute, controversy, or claim
                                 arising out of or in connection with these Investor Terms or the PIN, including any
@@ -682,7 +682,7 @@ export default function InvestorTerms() {
 
                         {/* 19 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">19. Governing law</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">19. Governing law</h2>
                             <p>
                                 19.1 These Investor Terms, and any Dispute, are governed by and construed in accordance
                                 with the laws of the Federal Republic of Nigeria.
@@ -695,7 +695,7 @@ export default function InvestorTerms() {
 
                         {/* 20 */}
                         <section className="space-y-3">
-                            <h2 className="text-base font-bold text-zinc-900">20. General</h2>
+                            <h2 className="text-lg md:text-xl font-bold text-zinc-900">20. General</h2>
                             <p>
                                 20.1 <strong>Entire agreement.</strong> These Investor Terms, the Terms of Service, and
                                 the Privacy Notice constitute the entire agreement between the parties as to the PIN

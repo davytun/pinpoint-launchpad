@@ -193,7 +193,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 <h1 className="font-display text-2xl leading-tight font-black tracking-tight text-zinc-950 sm:text-3xl">
                                     Find out why investors would pass before they do.
                                 </h1>
-                                <p className="mt-4 text-sm leading-relaxed font-medium text-zinc-600">
+                                <p className="mt-4 text-base leading-relaxed font-medium text-zinc-600 sm:text-lg">
                                     Twenty-five questions. An indicative score across the seven dimensions investors actually diligence. And a
                                     straight answer on the two things standing between you and a cheque.
                                 </p>
@@ -203,9 +203,9 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                     <div className="rounded-xl border border-zinc-200/50 bg-white/50 p-4 shadow-2xs transition-all duration-300 hover:border-[#3A54A5]/20 hover:bg-white">
                                         <div className="flex items-center gap-2 text-[#3A54A5]">
                                             <Clock className="size-4 shrink-0" />
-                                            <span className="text-xs font-bold tracking-wider uppercase">Time</span>
+                                            <span className="text-xs font-bold tracking-wider uppercase sm:text-sm">Time</span>
                                         </div>
-                                        <p className="mt-2 text-xs leading-relaxed font-semibold text-zinc-500">
+                                        <p className="mt-2 text-xs leading-relaxed font-semibold text-zinc-500 sm:text-sm">
                                             About six minutes. Answer from what you know today, don't go looking things up.
                                         </p>
                                     </div>
@@ -214,9 +214,9 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                     <div className="rounded-xl border border-zinc-200/50 bg-white/50 p-4 shadow-2xs transition-all duration-300 hover:border-[#3A54A5]/20 hover:bg-white">
                                         <div className="flex items-center gap-2 text-[#3A54A5]">
                                             <Coins className="size-4 shrink-0" />
-                                            <span className="text-xs font-bold tracking-wider uppercase">Cost</span>
+                                            <span className="text-xs font-bold tracking-wider uppercase sm:text-sm">Cost</span>
                                         </div>
-                                        <p className="mt-2 text-xs leading-relaxed font-semibold text-zinc-500">
+                                        <p className="mt-2 text-xs leading-relaxed font-semibold text-zinc-500 sm:text-sm">
                                             Free. No card, no call, no obligation.
                                         </p>
                                     </div>
@@ -225,9 +225,9 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                     <div className="rounded-xl border border-zinc-200/50 bg-white/50 p-4 shadow-2xs transition-all duration-300 hover:border-[#3A54A5]/20 hover:bg-white">
                                         <div className="flex items-center gap-2 text-[#3A54A5]">
                                             <ShieldAlert className="size-4 shrink-0" />
-                                            <span className="text-xs font-bold tracking-wider uppercase">Privacy</span>
+                                            <span className="text-xs font-bold tracking-wider uppercase sm:text-sm">Privacy</span>
                                         </div>
-                                        <p className="mt-2 text-xs leading-relaxed font-semibold text-zinc-500">
+                                        <p className="mt-2 text-xs leading-relaxed font-semibold text-zinc-500 sm:text-sm">
                                             Nothing is shown to any investor. This is a mirror, not a listing.
                                         </p>
                                     </div>
@@ -236,9 +236,9 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                     <div className="rounded-xl border border-zinc-200/50 bg-white/50 p-4 shadow-2xs transition-all duration-300 hover:border-[#3A54A5]/20 hover:bg-white">
                                         <div className="flex items-center gap-2 text-[#3A54A5]">
                                             <Sparkles className="size-4 shrink-0" />
-                                            <span className="text-xs font-bold tracking-wider uppercase">Honesty</span>
+                                            <span className="text-xs font-bold tracking-wider uppercase sm:text-sm">Honesty</span>
                                         </div>
-                                        <p className="mt-2 text-xs leading-relaxed font-semibold text-zinc-500">
+                                        <p className="mt-2 text-xs leading-relaxed font-semibold text-zinc-500 sm:text-sm">
                                             The score is only worth what your answers are worth. Nobody is marking you.
                                         </p>
                                     </div>
@@ -247,7 +247,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 <button
                                     type="button"
                                     onClick={() => setStarted(true)}
-                                    className="group mt-8 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3A54A5] text-sm font-bold text-white shadow-[0_8px_20px_rgba(58,84,165,0.2)] transition-all duration-200 hover:bg-[#2D4182] active:scale-[0.99]"
+                                    className="group mt-8 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3A54A5] text-base font-bold text-white shadow-[0_8px_20px_rgba(58,84,165,0.2)] transition-all duration-200 hover:bg-[#2D4182] active:scale-[0.99]"
                                 >
                                     Begin Self-Scan
                                     <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />

@@ -1,6 +1,13 @@
 <?php
 
+use App\Http\Middleware\EnsureFounderAuthenticated;
+use App\Http\Middleware\EnsureInvestorAuthenticated;
+use App\Http\Middleware\EnsurePaymentComplete;
+use App\Http\Middleware\EnsureSignatureComplete;
+use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\FounderSessionTimeout;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RequireRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,12 +26,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'role'               => \App\Http\Middleware\EnsureUserHasRole::class,
-            'require.role'       => \App\Http\Middleware\RequireRole::class,
-            'payment.complete'   => \App\Http\Middleware\EnsurePaymentComplete::class,
-            'signature.complete' => \App\Http\Middleware\EnsureSignatureComplete::class,
-            'auth.founder'       => \App\Http\Middleware\EnsureFounderAuthenticated::class,
-            'founder.session'    => \App\Http\Middleware\FounderSessionTimeout::class,
+            'role' => EnsureUserHasRole::class,
+            'require.role' => RequireRole::class,
+            'payment.complete' => EnsurePaymentComplete::class,
+            'signature.complete' => EnsureSignatureComplete::class,
+            'auth.founder' => EnsureFounderAuthenticated::class,
+            'auth.investor' => EnsureInvestorAuthenticated::class,
+            'founder.session' => FounderSessionTimeout::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

@@ -18,7 +18,10 @@ class AuditLogFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'event' => 'investor.account_created',
+            'metadata' => [],
+            'ip_address' => fake()->ipv4(),
+            'user_agent' => fake()->userAgent(),
         ];
     }
 }

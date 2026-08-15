@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Investor;
 use App\Models\InvestorProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,7 +19,12 @@ class InvestorProfileFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'investor_id' => Investor::factory(),
+            'investor_type' => 'individual',
+            'full_name' => fake()->name(),
+            'company_name' => null,
+            'phone' => fake()->phoneNumber(),
+            'address' => fake()->address(),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\InvestorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -10,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Investor extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\InvestorFactory> */
+    /** @use HasFactory<InvestorFactory> */
     use HasFactory, Notifiable;
 
     protected $fillable = [

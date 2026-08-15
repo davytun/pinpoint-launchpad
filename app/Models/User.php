@@ -3,13 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     protected $fillable = [
@@ -48,10 +49,20 @@ class User extends Authenticatable
         return $this->role === 'support';
     }
 
+    public function isCompliance(): bool
+    {
+        return $this->role === 'compliance';
+    }
+
+    public function isInvestorRelations(): bool
+    {
+        return $this->role === 'investor_relations';
+    }
+
     // Legacy helpers — keep for backward compat with any existing checks
     public function isAdmin(): bool
     {
-        return in_array($this->role, ['superadmin', 'analyst', 'support']);
+        return in_array($this->role, ['superadmin', 'analyst', 'support', 'compliance', 'investor_relations']);
     }
 
     public function isFounder(): bool
@@ -71,8 +82,12 @@ class User extends Authenticatable
 
     public function canAccessFounder(int $founderId): bool
     {
-        if ($this->isSuperAdmin()) return true;
-        if ($this->isSupport()) return true;
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+        if ($this->isSupport()) {
+            return true;
+        }
 
         return AuditAssignment::where('analyst_id', $this->id)
             ->where('founder_id', $founderId)

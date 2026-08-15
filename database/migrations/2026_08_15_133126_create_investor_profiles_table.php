@@ -11,8 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('investor_profiles', function (Blueprint $table) {
+        Schema::create('investor_profiles', function (Blueprint $table): void {
             $table->id();
+            $table->foreignId('investor_id')->unique()->constrained()->cascadeOnDelete();
+            $table->enum('investor_type', ['individual', 'corporate']);
+            $table->string('full_name');
+            $table->string('company_name')->nullable();
+            $table->string('phone', 40);
+            $table->text('address');
             $table->timestamps();
         });
     }

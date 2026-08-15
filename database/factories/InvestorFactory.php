@@ -18,7 +18,14 @@ class InvestorFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'email' => fake()->unique()->safeEmail(),
+            'password' => 'password',
+            'account_status' => 'pending_review',
         ];
+    }
+
+    public function active(): static
+    {
+        return $this->state(fn (): array => ['account_status' => 'active']);
     }
 }

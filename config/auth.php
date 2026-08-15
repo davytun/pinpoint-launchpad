@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Founder;
+use App\Models\Investor;
+use App\Models\User;
+
 return [
 
     /*
@@ -44,6 +48,10 @@ return [
             'driver' => 'session',
             'provider' => 'founders',
         ],
+        'investor' => [
+            'driver' => 'session',
+            'provider' => 'investors',
+        ],
     ],
 
     /*
@@ -66,11 +74,15 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', User::class),
         ],
         'founders' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Founder::class,
+            'model' => Founder::class,
+        ],
+        'investors' => [
+            'driver' => 'eloquent',
+            'model' => Investor::class,
         ],
     ],
 
@@ -103,6 +115,12 @@ return [
         'founders' => [
             'provider' => 'founders',
             'table' => 'founder_password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'investors' => [
+            'provider' => 'investors',
+            'table' => 'investor_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

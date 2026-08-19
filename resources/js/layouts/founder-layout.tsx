@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ExternalLink, FileText, LayoutDashboard, LogOut, Menu, MessageSquare, X } from 'lucide-react';
+import { FileText, LayoutDashboard, LogOut, Menu, MessageSquare, Sparkles, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -155,7 +155,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
             { icon: LayoutDashboard, label: 'Dashboard', href: route('founder.dashboard'), disabled: false },
             { icon: FileText, label: 'Documents', href: route('founder.documents.index'), disabled: false },
             { icon: MessageSquare, label: 'Messages', href: route('founder.messages.index'), disabled: false },
-            { icon: ExternalLink, label: 'My Investor Page', href: '#', disabled: true, disabledReason: 'Available after PARAGON certification' },
+            { icon: Sparkles, label: 'Spotlight', href: route('founder.spotlight.edit'), disabled: false },
         ],
         [],
     );

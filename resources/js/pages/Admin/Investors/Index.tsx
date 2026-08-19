@@ -11,10 +11,9 @@ import {
     User,
     Users,
     X,
-    Filter,
     ArrowRight
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface InvestorApplication {
     id: number;
@@ -185,10 +184,10 @@ export default function Index({ applications, activeStatus, activeType, search: 
     const [search, setSearch] = useState(initialSearch);
     const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-    const applyFilters = (overrides: Record<string, string | undefined>) => {
+    const applyFilters = useCallback((overrides: Record<string, string | undefined>) => {
         const query = buildParams(overrides, { activeStatus, activeType, search, sort, dir });
         router.get('/admin/investors', query, { replace: true, preserveState: true });
-    };
+    }, [activeStatus, activeType, search, sort, dir]);
 
     useEffect(() => {
         if (search === initialSearch) return;
@@ -197,7 +196,7 @@ export default function Index({ applications, activeStatus, activeType, search: 
             applyFilters({ search });
         }, 350);
         return () => clearTimeout(searchTimeout.current);
-    }, [search]);
+    }, [search, applyFilters, initialSearch]);
 
     const handleSort = (col: string) => {
         const nextDir = sort === col && dir === 'desc' ? 'asc' : 'desc';

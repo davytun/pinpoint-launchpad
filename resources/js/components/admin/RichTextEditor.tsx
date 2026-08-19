@@ -131,7 +131,7 @@ export default function RichTextEditor({ value, onChange, imageUploadUrl, csrfTo
             if (!res.ok) throw new Error('Upload failed');
             const { url } = await res.json();
             editor.chain().focus().setImage({ src: url, alt: file.name }).run();
-        } catch (err) {
+        } catch {
             alert('Image upload failed. Please try again.');
         } finally {
             setUploadingImage(false);

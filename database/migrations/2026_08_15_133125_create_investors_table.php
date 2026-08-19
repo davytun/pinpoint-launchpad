@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('account_status', ['pending_review', 'active', 'rejected'])->default('pending_review')->index();
+            $table->enum('account_status', ['pending_review', 'active', 'rejected'])->default('active')->index();
             $table->timestamp('terms_accepted_at')->nullable();
             $table->timestamp('aml_confirmed_at')->nullable();
             $table->timestamp('last_login_at')->nullable();

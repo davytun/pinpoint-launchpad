@@ -12,6 +12,7 @@ class FounderDocument extends Model
         'founder_id',
         'payment_id',
         'category',
+        'visibility',
         'original_filename',
         'stored_filename',
         'file_path',
@@ -27,7 +28,7 @@ class FounderDocument extends Model
     protected $casts = [
         'is_reviewed' => 'boolean',
         'reviewed_at' => 'datetime',
-        'file_size'   => 'integer',
+        'file_size' => 'integer',
     ];
 
     public function founder(): BelongsTo
@@ -48,27 +49,28 @@ class FounderDocument extends Model
     public function fileSizeForHumans(): string
     {
         if ($this->file_size < 1024) {
-            return $this->file_size . ' B';
+            return $this->file_size.' B';
         }
         if ($this->file_size < 1048576) {
-            return round($this->file_size / 1024, 1) . ' KB';
+            return round($this->file_size / 1024, 1).' KB';
         }
-        return round($this->file_size / 1048576, 1) . ' MB';
+
+        return round($this->file_size / 1048576, 1).' MB';
     }
 
     public function categoryLabel(): string
     {
         return match ($this->category) {
-            'cap_table'                => 'Cap Table',
-            'financial_forecast'       => 'Financial Forecast',
-            'bank_statement'           => 'Bank Statement',
-            'pitch_deck'               => 'Pitch Deck',
-            'articles_of_incorporation'=> 'Articles of Incorporation',
-            'ip_assignment'            => 'IP Assignment',
-            'customer_contracts'       => 'Customer Contracts / LOIs',
-            'unit_economics'           => 'Unit Economics Model',
-            'other'                    => 'Other',
-            default                    => ucfirst(str_replace('_', ' ', $this->category)),
+            'cap_table' => 'Cap Table',
+            'financial_forecast' => 'Financial Forecast',
+            'bank_statement' => 'Bank Statement',
+            'pitch_deck' => 'Pitch Deck',
+            'articles_of_incorporation' => 'Articles of Incorporation',
+            'ip_assignment' => 'IP Assignment',
+            'customer_contracts' => 'Customer Contracts / LOIs',
+            'unit_economics' => 'Unit Economics Model',
+            'other' => 'Other',
+            default => ucfirst(str_replace('_', ' ', $this->category)),
         };
     }
 
@@ -83,12 +85,12 @@ class FounderDocument extends Model
     public function fileIcon(): string
     {
         return match ($this->extension) {
-            'pdf'             => 'file-text',
-            'doc', 'docx'    => 'file-text',
+            'pdf' => 'file-text',
+            'doc', 'docx' => 'file-text',
             'xls', 'xlsx', 'csv' => 'file-spreadsheet',
-            'ppt', 'pptx'    => 'presentation',
+            'ppt', 'pptx' => 'presentation',
             'jpg', 'jpeg', 'png' => 'image',
-            default           => 'file',
+            default => 'file',
         };
     }
 

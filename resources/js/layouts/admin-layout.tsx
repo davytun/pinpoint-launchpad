@@ -6,7 +6,7 @@ interface AdminUser {
     id: number;
     name: string;
     email: string;
-    role: 'superadmin' | 'analyst' | 'support';
+    role: 'superadmin' | 'analyst' | 'support' | 'compliance' | 'investor_relations';
 }
 
 interface AdminLayoutProps {
@@ -17,6 +17,8 @@ const roleBadge: Record<string, { label: string; className: string }> = {
     superadmin: { label: 'Super Admin', className: 'bg-emerald-50 text-emerald-700 border border-emerald-250' },
     analyst: { label: 'Analyst', className: 'bg-[#3A54A5]/10 text-[#3A54A5] border border-[#3A54A5]/25' },
     support: { label: 'Support', className: 'bg-zinc-105 text-zinc-650 border border-zinc-200' },
+    compliance: { label: 'Compliance', className: 'bg-amber-50 text-amber-700 border border-amber-200' },
+    investor_relations: { label: 'Investor Relations', className: 'bg-[#3A54A5]/10 text-[#3A54A5] border border-[#3A54A5]/25' },
 };
 
 function NavItem({
@@ -66,6 +68,8 @@ function SidebarContent({
     isSuperAdmin,
     isAnalyst,
     isSupport,
+    isCompliance,
+    isInvestorRelations,
     unreadMessages,
     isActive,
     logout,
@@ -76,6 +80,8 @@ function SidebarContent({
     isSuperAdmin: boolean;
     isAnalyst: boolean;
     isSupport: boolean;
+    isCompliance: boolean;
+    isInvestorRelations: boolean;
     unreadMessages: number;
     isActive: (path: string) => boolean;
     logout: () => void;
@@ -116,6 +122,23 @@ function SidebarContent({
                         <NavSection label="Operations" />
                         <NavItem href="/admin/waitlist" icon={Users} label="Waitlist" active={isActive('/admin/waitlist')} onClick={onNav} />
                         <NavItem href="/admin/investors" icon={Users} label="Investors" active={isActive('/admin/investors')} onClick={onNav} />
+                    </>
+                )}
+
+                {(isSuperAdmin || isInvestorRelations || isCompliance) && (
+                    <>
+                        <NavSection label="Investors" />
+                        {(isSuperAdmin || isInvestorRelations) && <NavItem href="/admin/investor-accounts" icon={Users} label="Investor Accounts" active={isActive('/admin/investor-accounts')} onClick={onNav} />}
+                        {(isSuperAdmin || isCompliance) && <NavItem href="/admin/investor-kyc" icon={Award} label="KYC Queue" active={isActive('/admin/investor-kyc')} onClick={onNav} />}
+                    </>
+                )}
+
+                {(isSuperAdmin || isInvestorRelations) && (
+                    <>
+                        <NavSection label="Dealflow" />
+                        <NavItem href="/admin/spotlight" icon={Award} label="Spotlight" active={isActive('/admin/spotlight')} onClick={onNav} />
+                        <NavItem href="/admin/dealflow/interests" icon={MessageSquare} label="Interests" active={isActive('/admin/dealflow/interests')} onClick={onNav} />
+                        <NavItem href="/admin/dealflow/data-rooms" icon={Users} label="Data Rooms" active={isActive('/admin/dealflow/data-rooms')} onClick={onNav} />
                     </>
                 )}
 
@@ -175,6 +198,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const isSuperAdmin = role === 'superadmin';
     const isAnalyst = role === 'analyst';
     const isSupport = role === 'support';
+    const isCompliance = role === 'compliance';
+    const isInvestorRelations = role === 'investor_relations';
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -206,7 +231,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         return currentUrl === path || currentUrl.startsWith(path + '/') || currentUrl.startsWith(path + '?');
     }
 
-    const sidebarProps = { user, role, isSuperAdmin, isAnalyst, isSupport, unreadMessages, isActive, logout };
+    const sidebarProps = { user, role, isSuperAdmin, isAnalyst, isSupport, isCompliance, isInvestorRelations, unreadMessages, isActive, logout };
 
     return (
         <div className="flex min-h-screen bg-slate-50 text-zinc-900 antialiased selection:bg-[#3A54A5]/20 selection:text-zinc-800">

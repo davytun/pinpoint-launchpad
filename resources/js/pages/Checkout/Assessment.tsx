@@ -91,56 +91,6 @@ function ScaleIcon(props: React.SVGProps<SVGSVGElement>) {
     );
 }
 
-const WHY_ITEMS = [
-    {
-        num: '01',
-        title: 'We read the documents',
-        body: 'Your cap table is reconciled to your CAC filings. Your deck is reconciled to your management accounts. Your model is reconciled to your bank. Most founders have never had this done. A meaningful number do not survive it.',
-    },
-    {
-        num: '02',
-        title: 'We interview your co-founders separately',
-        body: 'The same questions, asked apart. What would make you personally happy in five years. What is the least you would sell for. Founder disagreement is the most common cause of early failure and the least often diagnosed, because it is invisible in a joint meeting.',
-    },
-    {
-        num: '03',
-        title: 'We call the customers who left',
-        body: 'You cannot ring your own churned customers and get an honest answer. We can. Where their account of you differs from yours, that difference is the finding.',
-    },
-    {
-        num: '04',
-        title: 'We run the panel before they do',
-        body: 'A closed-door session run exactly as an investment committee runs one, briefed in advance on your weakest findings and instructed to press there. The first time you are properly interrogated should not be in front of the person you need money from.',
-    },
-    {
-        num: '05',
-        title: 'We benchmark you',
-        body: 'A score of 62 means nothing on its own. A score of 62 against a median of 48 for companies at your stage, in your sector, in your market, that is a position you can act on.',
-    },
-    {
-        num: '06',
-        title: 'We write down the part nobody says',
-        body: "One section of your report is written in the investor's voice: how a mandate-matched fund would read this company, and why they would pass. It is the least comfortable thing we produce and the reason most founders say the assessment paid for itself.",
-    },
-];
-
-const DELIVERABLES = [
-    { title: 'Deal-Stopper Register', desc: 'Everything that would end a diligence process, with cost, cure and timeline. Before anything else.' },
-    {
-        title: 'The verdict',
-        desc: 'Your score, your band, your benchmark position, and a straight answer to whether you should raise now (including, where it is warranted, no).',
-    },
-    { title: 'The PARAGON profile', desc: 'Seven dimensions, with substance and evidence graded separately, set against your cohort.' },
-    { title: 'Dimension findings', desc: 'All thirty-seven criteria: what we found, what we verified, and what we could not.' },
-    { title: "The investor's view", desc: 'How a mandate-matched fund would read this company, written in their voice. The section nobody enjoys.' },
-    { title: 'Panel debrief', desc: 'Question-level feedback from the simulation, including the ones you could not answer.' },
-    { title: 'The 90-day roadmap', desc: 'Prioritised, sequenced and costed. What to fix, in what order, and what it buys you.' },
-    {
-        title: 'Fundability forecast',
-        desc: 'A realistic valuation range on comparable African transactions, the investor profiles that fit you, and expected time to a term sheet (now and after remediation).',
-    },
-    { title: 'Evidence appendix', desc: 'Everything we reviewed, everything we asked for and did not receive, and what that absence means.' },
-];
 
 const EVIDENCE_GRADES = [
     {
@@ -369,7 +319,7 @@ function PillarInteractiveSection() {
             </div>
 
             {/* Right details card */}
-            <div className="flex min-h-[280px] flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] sm:p-8">
+            <div className="flex min-h-70 flex-col justify-between rounded-3xl border border-zinc-200 bg-white p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] sm:p-8">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activePillar}
@@ -613,7 +563,7 @@ export default function Assessment() {
             <div className="relative min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-950 selection:text-white">
                 {/* Ambient background rays matching standard site rays */}
                 <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-                    <div className="bg-radial-to-b absolute top-0 left-1/2 h-[800px] w-full max-w-7xl -translate-x-1/2 from-[#3A54A5]/4 to-transparent opacity-80 blur-3xl" />
+                    <div className="bg-radial-to-b absolute top-0 left-1/2 h-200 w-full max-w-7xl -translate-x-1/2 from-[#3A54A5]/4 to-transparent opacity-80 blur-3xl" />
                 </div>
 
                 {/* ── Sticky Nav (Light Mode) ── */}
@@ -664,7 +614,7 @@ export default function Assessment() {
                                         <button
                                             type="button"
                                             onClick={scrollToApply}
-                                            className="inline-flex h-12 w-full min-w-[220px] cursor-pointer items-center justify-center gap-2 rounded-full bg-zinc-950 px-8 text-sm font-bold text-white transition hover:bg-zinc-800 active:scale-[0.98] sm:w-auto"
+                                            className="inline-flex h-12 w-full min-w-55 cursor-pointer items-center justify-center gap-2 rounded-full bg-zinc-950 px-8 text-sm font-bold text-white transition hover:bg-zinc-800 active:scale-[0.98] sm:w-auto"
                                         >
                                             Apply for an assessment <ArrowRight className="h-4 w-4" />
                                         </button>
@@ -684,12 +634,12 @@ export default function Assessment() {
                             {/* Right Side: Hero Image */}
                             <FadeUp delay={0.18} className="relative lg:mt-6">
                                 {/* Asymmetric offset background card to create depth and visual structure */}
-                                <div className="absolute -inset-3 -z-10 translate-x-3 translate-y-3 rounded-[32px] border border-zinc-200 bg-zinc-50" />
+                                <div className="absolute -inset-3 -z-10 translate-x-3 translate-y-3 rounded-4xl border border-zinc-200 bg-zinc-50" />
                                 <div className="relative overflow-hidden rounded-3xl bg-zinc-100 shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
                                     <img
                                         src="/images/pia-hero.jpg"
                                         alt="Founder reviewing investment documents"
-                                        className="h-[360px] w-full object-cover object-top transition-transform duration-500 hover:scale-[1.02]"
+                                        className="h-90 w-full object-cover object-top transition-transform duration-500 hover:scale-[1.02]"
                                         fetchPriority="high"
                                     />
                                 </div>

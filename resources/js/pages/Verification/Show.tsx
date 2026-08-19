@@ -155,7 +155,7 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                 if (!v) onClose();
             }}
         >
-            <DialogContent className="rounded-[2rem] border-zinc-200/80 bg-white/95 p-7 text-zinc-900 shadow-2xl backdrop-blur-xl sm:max-w-md">
+            <DialogContent className="rounded-4xl border-zinc-200/80 bg-white/95 p-7 text-zinc-900 shadow-2xl backdrop-blur-xl sm:max-w-md">
                 <DialogHeader>
                     {isSample ? (
                         <>
@@ -227,7 +227,7 @@ function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; 
                             <textarea
                                 value={form.message}
                                 onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-                                className={cn(inputClass, 'min-h-[80px] resize-y')}
+                                className={cn(inputClass, 'min-h-20 resize-y')}
                                 placeholder="Briefly state your investment thesis or interest..."
                             />
                         </div>
@@ -318,13 +318,30 @@ export default function VerificationShow({
 
                 {/* Ambient top glow */}
                 <div
-                    className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[400px] opacity-10"
+                    className="pointer-events-none fixed inset-x-0 top-0 z-0 h-100 opacity-10"
                     style={{
                         background: 'radial-gradient(circle at top, #3A54A5, transparent 70%)',
                     }}
                 />
 
                 <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 lg:px-8">
+                    {/* 30-day transition banner */}
+                    <div className="animate-fade-in mb-6 rounded-xl border border-[#3A54A5]/25 bg-[#eef2ff] p-5 text-sm text-[#3A54A5] shadow-xs">
+                        <div className="flex items-start gap-4">
+                            <Shield className="mt-0.5 size-6 shrink-0 text-[#3A54A5]" />
+                            <div>
+                                <h3 className="text-base font-extrabold text-zinc-950">Important Notice: Moving to Secure Access</h3>
+                                <p className="mt-1 text-zinc-700">
+                                    Pinpoint is transitioning to a secure Investor Portal. In 30 days, public verification pages will be deprecated.
+                                    To continue reviewing detailed PARAGON reports and data rooms, please create your verified investor account.
+                                </p>
+                                <a href="/investor" className="mt-4 inline-block rounded-xl bg-[#3A54A5] px-5 py-2.5 font-bold text-white shadow-sm transition hover:bg-[#2D4182]">
+                                    Join Pinpoint Investor Network
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Sample banner */}
                     {is_sample && (
                         <div className="animate-fade-in mb-6 rounded-xl border border-amber-500/25 bg-amber-50 py-2.5 text-center text-sm font-semibold text-amber-700 shadow-xs">

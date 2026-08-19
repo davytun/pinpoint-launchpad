@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class FounderProfile extends Model
 {
@@ -19,15 +20,19 @@ class FounderProfile extends Model
         'analyst_summary',
         'batch',
         'sector',
+        'spotlight_one_liner',
+        'spotlight_summary',
+        'is_featured_in_spotlight',
         'verified_at',
         'expires_at',
     ];
 
     protected $casts = [
-        'is_public'   => 'boolean',
-        'radar_data'  => 'array',
+        'is_public' => 'boolean',
+        'is_featured_in_spotlight' => 'boolean',
+        'radar_data' => 'array',
         'verified_at' => 'datetime',
-        'expires_at'  => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
     public function founder(): BelongsTo
@@ -48,6 +53,21 @@ class FounderProfile extends Model
     public function investorAccessRequests(): HasMany
     {
         return $this->hasMany(InvestorAccessRequest::class, 'profile_id');
+    }
+
+    public function spotlightEntry(): HasOne
+    {
+        return $this->hasOne(SpotlightEntry::class, 'profile_id');
+    }
+
+    public function investorInterests(): HasMany
+    {
+        return $this->hasMany(InvestorInterest::class, 'profile_id');
+    }
+
+    public function dataRoomGrants(): HasMany
+    {
+        return $this->hasMany(InvestorDataRoomGrant::class, 'profile_id');
     }
 
     public function isLive(): bool

@@ -6,6 +6,7 @@ import AdminLayout from '@/layouts/admin-layout';
 
 interface PageProps {
     cooldown_days: number;
+    investor_cta: { label: string; url: string; enabled: boolean };
     flash?: { success?: string };
     [key: string]: unknown;
 }
@@ -13,10 +14,13 @@ interface PageProps {
 // ─── Page ───────────────────────────────────────────────────────────────────────
 
 export default function AdminSettingsIndex() {
-    const { cooldown_days, flash } = usePage<PageProps>().props;
+    const { cooldown_days, investor_cta, flash } = usePage<PageProps>().props;
 
     const form = useForm({
         diagnostic_cooldown_days: cooldown_days,
+        investor_cta_label: investor_cta.label,
+        investor_cta_url: investor_cta.url,
+        investor_cta_enabled: investor_cta.enabled,
     });
 
     function submit(e: React.FormEvent) {
@@ -82,6 +86,20 @@ export default function AdminSettingsIndex() {
                         </div>
 
                         {/* Divider */}
+                        <div className="my-6 h-px bg-zinc-200" />
+
+                        <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-5">
+                            <div className="mb-5">
+                                <p className="text-sm font-bold text-zinc-900">Investor landing CTA</p>
+                                <p className="text-zinc-555 mt-1 text-xs leading-relaxed font-medium">Controls the single primary action shown on the public investor landing page.</p>
+                            </div>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <label className="flex flex-col gap-2 text-xs font-bold text-zinc-700"><span>Button label</span><input value={form.data.investor_cta_label} onChange={(e) => form.setData('investor_cta_label', e.target.value)} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 outline-none focus:border-[#3A54A5]" /></label>
+                                <label className="flex flex-col gap-2 text-xs font-bold text-zinc-700"><span>Destination URL</span><input value={form.data.investor_cta_url} onChange={(e) => form.setData('investor_cta_url', e.target.value)} className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 outline-none focus:border-[#3A54A5]" /></label>
+                            </div>
+                            <label className="mt-5 flex items-center gap-3 text-sm font-semibold text-zinc-700"><input type="checkbox" checked={form.data.investor_cta_enabled} onChange={(e) => form.setData('investor_cta_enabled', e.target.checked)} className="size-4 rounded border-zinc-300 text-[#3A54A5] focus:ring-[#3A54A5]" /> Show the CTA on the investor landing page</label>
+                        </div>
+
                         <div className="my-6 h-px bg-zinc-200" />
 
                         {/* Save */}

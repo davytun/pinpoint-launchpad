@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureFounderAuthenticated;
 use App\Http\Middleware\EnsureInvestorAuthenticated;
+use App\Http\Middleware\EnsureInvestorKycApproved;
 use App\Http\Middleware\EnsurePaymentComplete;
 use App\Http\Middleware\EnsureSignatureComplete;
 use App\Http\Middleware\EnsureUserHasRole;
@@ -32,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'signature.complete' => EnsureSignatureComplete::class,
             'auth.founder' => EnsureFounderAuthenticated::class,
             'auth.investor' => EnsureInvestorAuthenticated::class,
+            'kyc.approved' => EnsureInvestorKycApproved::class,
             'founder.session' => FounderSessionTimeout::class,
         ]);
 

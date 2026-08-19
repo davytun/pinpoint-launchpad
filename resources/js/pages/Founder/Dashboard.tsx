@@ -8,7 +8,6 @@ import {
     ChevronDown,
     ChevronUp,
     Clock,
-    ExternalLink,
     FileText,
     Lock,
     MessageSquare,
@@ -70,8 +69,7 @@ interface PageProps {
     audit_status_config: Record<string, { label: string; color: string; description: string }>;
     payment?: { tier: string; total_amount: number; paid_at?: string | null } | null;
     signature?: { status: string; signed_at?: string | null } | null;
-    verification_url?: string | null;
-    profile_is_live?: boolean;
+    spotlight_featured?: boolean;
     access_requests: InvestorAccessRequest[];
 }
 
@@ -318,8 +316,7 @@ export default function FounderDashboard({
     audit_status,
     audit_status_config,
     payment,
-    verification_url,
-    profile_is_live,
+    spotlight_featured,
     access_requests = [],
 }: PageProps) {
     const meta = BAND_META[score_band ?? 'mid_high'] ?? BAND_META.mid_high;
@@ -557,43 +554,23 @@ export default function FounderDashboard({
                             </div>
                         </Link>
 
-                        <div
-                            className={cn(
-                                'flex flex-col justify-between overflow-hidden rounded-2xl border border-white/80 bg-white/30 p-6 shadow-md backdrop-blur-md transition-all duration-300 ease-out',
-                                profile_is_live ? 'hover:-translate-y-1 hover:border-[#3A54A5]/40 hover:bg-white/50 hover:shadow-lg' : '',
-                            )}
-                        >
+                        <Link href={route('founder.spotlight.edit')} className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-white/80 bg-white/30 p-6 shadow-md backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#3A54A5]/40 hover:bg-white/50 hover:shadow-lg">
                             <div className="mb-4 flex items-center justify-between">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-md border border-zinc-200 bg-zinc-50/50">
-                                    <ExternalLink className="size-4.5 text-zinc-500" />
+                                    <Zap className="size-4.5 text-zinc-500 transition-colors group-hover:text-[#3A54A5]" />
                                 </div>
-                                {profile_is_live && (
+                                {spotlight_featured && (
                                     <span className="border-emerald-250 rounded-sm border bg-emerald-50 px-2 py-0.5 text-[10px] font-bold tracking-wider text-emerald-600 uppercase">
-                                        Live
+                                        Featured
                                     </span>
                                 )}
                             </div>
                             <div>
-                                <h3 className="text-zinc-955 text-[15px] font-bold">Investor Page</h3>
-                                <p className="text-zinc-555 mt-1 text-[13px]">
-                                    {profile_is_live ? 'Your page is publicly visible.' : 'Goes live post-audit.'}
-                                </p>
+                                <h3 className="text-zinc-955 text-[15px] font-bold">Spotlight Status</h3>
+                                <p className="text-zinc-555 mt-1 text-[13px]">{spotlight_featured ? 'Your startup is featured for qualified investors.' : 'Prepare your profile for Pinpoint review.'}</p>
                             </div>
-                            {profile_is_live && verification_url ? (
-                                <a
-                                    href={verification_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="group mt-5 flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-emerald-600 uppercase transition-colors hover:text-emerald-500"
-                                >
-                                    View Link <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-                                </a>
-                            ) : (
-                                <div className="mt-5 flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-zinc-400 uppercase">
-                                    Pending Audit
-                                </div>
-                            )}
-                        </div>
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-[#3A54A5] uppercase">Open Spotlight <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" /></div>
+                        </Link>
                     </div>
                 </FadeUp>
 

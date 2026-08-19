@@ -33,14 +33,14 @@ class DocumentService
 
     public function validateFile(UploadedFile $file): void
     {
-        if (!\in_array($file->getMimeType(), self::ALLOWED_MIMES)) {
+        if (! \in_array($file->getMimeType(), self::ALLOWED_MIMES)) {
             throw ValidationException::withMessages([
                 'file' => 'This file type is not allowed.',
             ]);
         }
 
         $extension = strtolower($file->getClientOriginalExtension());
-        if (!\in_array($extension, self::ALLOWED_EXTENSIONS)) {
+        if (! \in_array($extension, self::ALLOWED_EXTENSIONS)) {
             throw ValidationException::withMessages([
                 'file' => 'This file extension is not permitted.',
             ]);
@@ -55,11 +55,11 @@ class DocumentService
 
     public function store(UploadedFile $file, Founder $founder, string $category): FounderDocument
     {
-        $storedFilename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $path = 'founder-documents/' . $founder->id . '/' . $storedFilename;
+        $storedFilename = Str::uuid().'.'.$file->getClientOriginalExtension();
+        $path = 'founder-documents/'.$founder->id.'/'.$storedFilename;
 
         Storage::disk('local')->putFileAs(
-            'founder-documents/' . $founder->id,
+            'founder-documents/'.$founder->id,
             $file,
             $storedFilename
         );
@@ -69,24 +69,25 @@ class DocumentService
             preg_replace('/[^a-zA-Z0-9._\- ]/', '', $originalName),
             100
         );
-        $originalFilename = $originalName . '.' . strtolower($file->getClientOriginalExtension());
+        $originalFilename = $originalName.'.'.strtolower($file->getClientOriginalExtension());
 
         return FounderDocument::create([
-            'founder_id'        => $founder->id,
-            'payment_id'        => $founder->payment_id,
-            'category'          => $category,
+            'founder_id' => $founder->id,
+            'payment_id' => $founder->payment_id,
+            'category' => $category,
+            'visibility' => $category === 'pitch_deck' ? 'spotlight' : 'data_room',
             'original_filename' => $originalFilename,
-            'stored_filename'   => $storedFilename,
-            'file_path'         => $path,
-            'file_size'         => $file->getSize(),
-            'mime_type'         => $file->getMimeType(),
-            'extension'         => strtolower($file->getClientOriginalExtension()),
+            'stored_filename' => $storedFilename,
+            'file_path' => $path,
+            'file_size' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+            'extension' => strtolower($file->getClientOriginalExtension()),
         ]);
     }
 
     public function delete(FounderDocument $document): bool
     {
-        if (!$document->isDeletable()) {
+        if (! $document->isDeletable()) {
             throw new \RuntimeException('This document cannot be deleted once the audit has begun.');
         }
 

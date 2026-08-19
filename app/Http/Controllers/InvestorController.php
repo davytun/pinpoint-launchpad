@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\InvestorApplicationAdminMail;
 use App\Mail\InvestorApplicationConfirmationMail;
 use App\Models\InvestorApplication;
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -15,7 +16,13 @@ class InvestorController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('Investor/Index');
+        return Inertia::render('Investor/Landing', [
+            'cta' => [
+                'label' => Setting::get('investor_cta_label', 'Join PIN'),
+                'url' => Setting::get('investor_cta_url', '/investor/onboarding'),
+                'enabled' => Setting::get('investor_cta_enabled', '1') === '1',
+            ],
+        ]);
     }
 
     public function store(Request $request): RedirectResponse

@@ -285,7 +285,7 @@ export default function AdminBlogForm({ post }: PageProps) {
                                                 if (!res.ok) throw new Error('Upload failed');
                                                 const { url } = await res.json();
                                                 setData('cover_image', url);
-                                            } catch (err) {
+                                            } catch {
                                                 alert('Cover image upload failed. Please try again.');
                                             } finally {
                                                 if (originalText) originalText.innerText = '';

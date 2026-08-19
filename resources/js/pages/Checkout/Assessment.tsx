@@ -809,7 +809,7 @@ export default function Assessment() {
                                                 <span className="text-xs text-zinc-400">/ one-off fee</span>
                                             </div>
 
-                                            <p className="mt-3 min-h-[44px] text-xs leading-relaxed font-semibold text-zinc-500">{tier.headline}</p>
+                                            <p className="mt-3 min-h-11 text-xs leading-relaxed font-semibold text-zinc-500">{tier.headline}</p>
 
                                             <div className="border-zinc-150 my-6 border-t" />
 

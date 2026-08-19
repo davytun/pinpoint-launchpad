@@ -294,7 +294,7 @@ export default function RichTextEditor({ value, onChange, imageUploadUrl, csrfTo
             </div>
 
             {/* Editor Body */}
-            <EditorContent editor={editor} className="tiptap-editor text-zinc-850 min-h-[380px] px-5 py-4 text-sm focus:outline-none" />
+            <EditorContent editor={editor} className="tiptap-editor text-zinc-850 min-h-95 px-5 py-4 text-sm focus:outline-none" />
         </div>
     );
 }

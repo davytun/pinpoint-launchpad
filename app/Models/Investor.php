@@ -74,11 +74,6 @@ class Investor extends Authenticatable
         return $this->isActive() && $this->hasApprovedKyc();
     }
 
-    public function canAccessProtectedInvestorContent(): bool
-    {
-        return $this->isActive() && $this->hasApprovedKyc();
-    }
-
     public function hasPendingKyc(): bool
     {
         return $this->kyc_status === self::KYC_STATUS_PENDING;

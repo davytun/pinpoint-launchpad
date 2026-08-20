@@ -24,7 +24,7 @@ class ReviewInvestorKycRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::in(['approved', 'rejected'])],
-            'review_notes' => ['nullable', 'string', 'max:2000'],
+            'review_notes' => ['nullable', 'string', 'max:2000', 'required_if:status,rejected'],
         ];
     }
 }

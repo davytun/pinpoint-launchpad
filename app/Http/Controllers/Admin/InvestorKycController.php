@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\ReviewInvestorKycRequest;
 use App\Models\AuditLog;
 use App\Models\Investor;
 use App\Models\InvestorKycSubmission;
+use App\Notifications\InvestorKycReviewedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
@@ -33,11 +34,11 @@ class InvestorKycController extends Controller
     {
         $data = $request->validated();
 
-        $reviewed = DB::transaction(function () use ($data, $request, $submission): bool {
+        $reviewedInvestor = DB::transaction(function () use ($data, $request, $submission): ?Investor {
             $lockedSubmission = InvestorKycSubmission::query()->lockForUpdate()->findOrFail($submission->id);
 
             if (! $lockedSubmission->isPending()) {
-                return false;
+                return null;
             }
 
             $investor = $lockedSubmission->investor()->lockForUpdate()->firstOrFail();
@@ -68,12 +69,15 @@ class InvestorKycController extends Controller
                 'user_agent' => $request->userAgent(),
             ]);
 
-            return true;
+            return $investor;
         });
 
-        if (! $reviewed) {
+        if (! $reviewedInvestor) {
             return back()->withErrors(['status' => 'This KYC submission has already been reviewed.']);
         }
+
+        $reviewedInvestor->loadMissing('profile');
+        $reviewedInvestor->notify(new InvestorKycReviewedNotification($data['status'], $data['review_notes'] ?? null));
 
         return back()->with('success', 'KYC submission reviewed.');
     }

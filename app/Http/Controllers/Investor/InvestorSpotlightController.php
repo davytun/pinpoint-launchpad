@@ -44,7 +44,7 @@ class InvestorSpotlightController extends Controller
     public function downloadPitchDeck(string $slug, DocumentService $documents): StreamedResponse
     {
         $investor = Auth::guard('investor')->user();
-        abort_unless($investor->hasApprovedKyc(), 403, 'KYC approval is required to download a pitch deck.');
+        abort_unless($investor->canAccessProtectedInvestorContent(), 403, 'KYC approval is required to download a pitch deck.');
 
         $entry = $this->entryForSlug($slug);
         $document = $entry->profile->founder->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->latest()->firstOrFail();

@@ -18,6 +18,8 @@ class InvestorDataRoomController extends Controller
     public function index(): Response
     {
         $investor = Auth::guard('investor')->user();
+        abort_unless($investor->canAccessProtectedInvestorContent(), 403, 'KYC approval is required to access data rooms.');
+
         $grants = $investor->dataRoomGrants()
             ->with('profile.founder:id,company_name')
             ->whereNull('revoked_at')
@@ -37,6 +39,8 @@ class InvestorDataRoomController extends Controller
     public function show(string $slug): Response
     {
         $investor = Auth::guard('investor')->user();
+        abort_unless($investor->canAccessProtectedInvestorContent(), 403, 'KYC approval is required to access data rooms.');
+
         $grant = $investor->dataRoomGrants()
             ->whereNull('revoked_at')
             ->whereHas('profile', fn ($q) => $q->where('slug', $slug))
@@ -59,6 +63,8 @@ class InvestorDataRoomController extends Controller
     public function download(string $slug, FounderDocument $document, DocumentService $documents): StreamedResponse
     {
         $investor = Auth::guard('investor')->user();
+        abort_unless($investor->canAccessProtectedInvestorContent(), 403, 'KYC approval is required to download data room documents.');
+
         $grant = $investor->dataRoomGrants()
             ->whereNull('revoked_at')
             ->whereHas('profile', fn ($q) => $q->where('slug', $slug))

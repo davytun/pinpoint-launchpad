@@ -23,6 +23,8 @@ class InvestorInterestController extends Controller
     public function store(StoreInvestorInterestRequest $request, string $slug): RedirectResponse
     {
         $investor = Auth::guard('investor')->user();
+        abort_unless($investor->canAccessProtectedInvestorContent(), 403, 'KYC approval is required to submit interest.');
+
         $entry = SpotlightEntry::published()->with('profile')->whereHas('profile', fn ($query) => $query->where('slug', $slug))->firstOrFail();
         $interest = InvestorInterest::updateOrCreate(['investor_id' => $investor->id, 'profile_id' => $entry->profile_id], array_merge($request->validated(), ['status' => 'pending', 'reviewed_at' => null, 'reviewed_by_founder' => null]));
         AuditLog::create(['event' => 'investor.interest_submitted', 'actor_type' => $investor::class, 'actor_id' => $investor->id, 'auditable_type' => $interest::class, 'auditable_id' => $interest->id, 'metadata' => ['profile_id' => $entry->profile_id, 'type' => $interest->type], 'ip_address' => $request->ip(), 'user_agent' => $request->userAgent()]);

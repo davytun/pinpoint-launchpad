@@ -18,7 +18,7 @@ class EnsureInvestorKycApproved
     {
         $investor = Auth::guard('investor')->user();
 
-        if (! $investor || ! $investor->hasApprovedKyc()) {
+        if (! $investor || ! $investor->canAccessProtectedInvestorContent()) {
             return redirect()->route('investor.kyc.create')
                 ->with('error', 'KYC approval is required before you can access protected investor materials.');
         }

@@ -5,16 +5,31 @@ use App\Models\Investor;
 use App\Models\InvestorProfile;
 use App\Models\User;
 
-test('an investor has one profile and an independent account status', function () {
-    $investor = Investor::factory()->active()->create();
+test('an investor has one profile, immediate account access, and a KYC state', function () {
+    $investor = Investor::factory()->create();
     $profile = InvestorProfile::factory()->for($investor)->create([
         'investor_type' => 'corporate',
         'company_name' => 'Pinpoint Capital Ltd',
     ]);
 
     expect($investor->fresh()->isActive())->toBeTrue()
+        ->and($investor->fresh()->needsKycSubmission())->toBeTrue()
+        ->and($investor->fresh()->hasPendingKyc())->toBeFalse()
+        ->and($investor->fresh()->hasApprovedKyc())->toBeFalse()
         ->and($investor->profile->is($profile))->toBeTrue()
         ->and($profile->investor_type)->toBe('corporate');
+});
+
+test('KYC state helpers describe pending, approved, and rejected investors', function () {
+    $pendingInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_PENDING]);
+    $approvedInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
+    $rejectedInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_REJECTED]);
+
+    expect($pendingInvestor->hasPendingKyc())->toBeTrue()
+        ->and($pendingInvestor->needsKycSubmission())->toBeFalse()
+        ->and($approvedInvestor->hasApprovedKyc())->toBeTrue()
+        ->and($approvedInvestor->needsKycSubmission())->toBeFalse()
+        ->and($rejectedInvestor->needsKycSubmission())->toBeTrue();
 });
 
 test('audit logs can record an investor actor and auditable target', function () {

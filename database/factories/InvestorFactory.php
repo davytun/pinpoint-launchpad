@@ -20,12 +20,13 @@ class InvestorFactory extends Factory
         return [
             'email' => fake()->unique()->safeEmail(),
             'password' => 'password',
-            'account_status' => 'pending_review',
+            'account_status' => Investor::ACCOUNT_STATUS_ACTIVE,
+            'kyc_status' => Investor::KYC_STATUS_NOT_SUBMITTED,
         ];
     }
 
     public function active(): static
     {
-        return $this->state(fn (): array => ['account_status' => 'active']);
+        return $this->state(fn (): array => ['account_status' => Investor::ACCOUNT_STATUS_ACTIVE]);
     }
 }

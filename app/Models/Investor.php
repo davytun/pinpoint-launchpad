@@ -14,6 +14,16 @@ class Investor extends Authenticatable
     /** @use HasFactory<InvestorFactory> */
     use HasFactory, Notifiable;
 
+    public const ACCOUNT_STATUS_ACTIVE = 'active';
+
+    public const KYC_STATUS_NOT_SUBMITTED = 'not_submitted';
+
+    public const KYC_STATUS_PENDING = 'pending';
+
+    public const KYC_STATUS_APPROVED = 'approved';
+
+    public const KYC_STATUS_REJECTED = 'rejected';
+
     protected $fillable = [
         'email', 'password', 'account_status', 'email_verified_at', 'last_login_at',
         'terms_accepted_at', 'aml_confirmed_at', 'kyc_status', 'kyc_approved_at',
@@ -56,11 +66,21 @@ class Investor extends Authenticatable
 
     public function hasApprovedKyc(): bool
     {
-        return $this->kyc_status === 'approved';
+        return $this->kyc_status === self::KYC_STATUS_APPROVED;
+    }
+
+    public function hasPendingKyc(): bool
+    {
+        return $this->kyc_status === self::KYC_STATUS_PENDING;
+    }
+
+    public function needsKycSubmission(): bool
+    {
+        return in_array($this->kyc_status, [self::KYC_STATUS_NOT_SUBMITTED, self::KYC_STATUS_REJECTED], true);
     }
 
     public function isActive(): bool
     {
-        return $this->account_status === 'active';
+        return $this->account_status === self::ACCOUNT_STATUS_ACTIVE;
     }
 }

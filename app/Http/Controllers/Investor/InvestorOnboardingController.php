@@ -7,9 +7,8 @@ use App\Http\Requests\Investor\StoreInvestorOnboardingRequest;
 use App\Models\AuditLog;
 use App\Models\Investor;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,7 +27,7 @@ class InvestorOnboardingController extends Controller
             $investor = Investor::create([
                 'email' => $validated['email'],
                 'password' => $validated['password'],
-                'account_status' => 'active',
+                'account_status' => Investor::ACCOUNT_STATUS_ACTIVE,
                 'terms_accepted_at' => now(),
                 'aml_confirmed_at' => now(),
             ]);

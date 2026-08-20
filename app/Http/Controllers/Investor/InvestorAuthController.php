@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Investor;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Investor\InvestorLoginRequest;
+use App\Models\Investor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,7 @@ class InvestorAuthController extends Controller
         if (! Auth::guard('investor')->attempt([
             'email' => $validated['email'],
             'password' => $validated['password'],
-            'account_status' => 'active',
+            'account_status' => Investor::ACCOUNT_STATUS_ACTIVE,
         ], $request->boolean('remember'))) {
             return back()->withErrors([
                 'email' => 'We could not sign you in. Your account may still be under review.',

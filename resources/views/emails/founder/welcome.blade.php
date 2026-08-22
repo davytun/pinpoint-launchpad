@@ -21,7 +21,7 @@
       </li>
       <li style="margin-bottom: 0; padding-left: 20px; position: relative;">
         <span style="position: absolute; left: 0; color: #2F4587;">&bull;</span>
-        Your investor verification page goes live immediately upon completion.
+        Your Pinpoint profile will be available after your audit is complete.
       </li>
     </ul>
   </div>

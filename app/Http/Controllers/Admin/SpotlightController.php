@@ -27,6 +27,7 @@ class SpotlightController extends Controller
                 'sector' => $profile->sector,
                 'overall_score' => $profile->overall_score,
                 'spotlight_one_liner' => $profile->spotlight_one_liner,
+                'spotlight_summary' => $profile->spotlight_summary,
                 'has_reviewed_pitch_deck' => $profile->founder?->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->exists() ?? false,
                 'is_published' => $profile->spotlightEntry?->published_at !== null,
                 'verified_badges_count' => $profile->verified_badges_count,
@@ -37,7 +38,35 @@ class SpotlightController extends Controller
 
     public function update(Request $request, FounderProfile $profile): RedirectResponse
     {
-        $data = $request->validate(['publish' => ['required', 'boolean']]);
+        $data = $request->validate([
+            'publish' => ['sometimes', 'boolean'],
+            'spotlight_one_liner' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'spotlight_summary' => ['sometimes', 'nullable', 'string', 'max:500'],
+        ]);
+
+        abort_unless(array_key_exists('publish', $data) || array_key_exists('spotlight_one_liner', $data) || array_key_exists('spotlight_summary', $data), 422, 'Choose content to update or a publishing action.');
+
+        $content = array_intersect_key($data, array_flip(['spotlight_one_liner', 'spotlight_summary']));
+
+        if ($content !== []) {
+            $profile->update($content);
+
+            AuditLog::create([
+                'event' => 'spotlight.content_updated',
+                'actor_type' => $request->user()::class,
+                'actor_id' => $request->user()->id,
+                'auditable_type' => $profile::class,
+                'auditable_id' => $profile->id,
+                'metadata' => ['profile_id' => $profile->id, 'fields' => array_keys($content)],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        }
+
+        if (! array_key_exists('publish', $data)) {
+            return back()->with('success', 'Spotlight content updated.');
+        }
+
         $shouldPublish = $data['publish'];
 
         if ($shouldPublish) {

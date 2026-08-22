@@ -40,7 +40,7 @@
 
   <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
     <a href="{{ $verificationUrl }}" class="cta-button">
-      View Your Investor Page
+      View Your Pinpoint Profile
     </a>
   </div>
 

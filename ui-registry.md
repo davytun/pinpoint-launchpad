@@ -21,7 +21,7 @@ Use one focused form panel plus a distinct status or trust panel. Avoid nested c
 ### Investor Landing
 
 File: resources/js/pages/Investor/Landing.tsx
-Last updated: 2026-08-15
+Last updated: 2026-08-22
 
 | Property | Class |
 | --- | --- |
@@ -125,7 +125,7 @@ Last updated: 2026-08-15
 
 | Property | Class |
 | --- | --- |
-| Background | `bg-white` table surface, `bg-zinc-50` table header |
+| Background | `bg-white` table surface, `bg-zinc-50` table header, `bg-zinc-50/70` inline editor |
 | Border | `border border-zinc-200`, `border-t border-zinc-100` rows |
 | Border radius | `rounded-2xl` table shell, `rounded-xl` note field and decisions |
 | Text â€” primary | `text-zinc-950` |
@@ -210,10 +210,10 @@ Last updated: 2026-08-15
 | Border radius | `rounded-2xl` table shell, `rounded-xl` staff actions |
 | Text — primary | `text-zinc-950` |
 | Text — secondary | `text-zinc-600` |
-| Spacing | `px-6 py-4` table cells |
-| Hover state | `hover:bg-[#2D4182]` publish action |
+| Spacing | `px-6 py-4` table cells, `px-6 py-5` inline editor, `gap-5` form fields |
+| Hover state | `hover:bg-[#2D4182]` publish and save actions |
 | Shadow | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` |
 | Accent usage | `#3A54A5` marks the published state and forward action |
 
 **Pattern notes:**
-Staff publishing is a conventional readiness table. Reviewed deck status must be visible at the decision point, and unready startups cannot be published from the UI.
+Staff publishing is a conventional readiness table. Reviewed deck status must be visible at the decision point, and unready startups cannot be published from the UI. Copy corrections expand inline beneath the relevant row, using the same rounded field vocabulary as founder editing, so the action retains context and does not alter publication status.

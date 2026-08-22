@@ -21,9 +21,7 @@ class VerificationPageLiveMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: 'Your Investor Page is Now Live — Pinpoint Launchpad',
-        );
+        return new Envelope(subject: 'Your Pinpoint profile is now live');
     }
 
     public function content(): Content
@@ -31,10 +29,10 @@ class VerificationPageLiveMail extends Mailable
         return new Content(
             view: 'emails.verification.page-live',
             with: [
-                'founder'         => $this->founder,
-                'profile'         => $this->profile,
-                'verificationUrl' => url('/verify/' . $this->profile->slug),
-                'recipientEmail'  => $this->founder->email,
+                'founder' => $this->founder,
+                'profile' => $this->profile,
+                'verificationUrl' => url('/verify/'.$this->profile->slug),
+                'recipientEmail' => $this->founder->email,
             ],
         );
     }

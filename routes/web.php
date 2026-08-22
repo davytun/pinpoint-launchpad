@@ -99,6 +99,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/investor-accounts', [InvestorAccountController::class, 'index'])->name('investor-accounts.index');
         Route::get('/investor-accounts/{investor}', [InvestorAccountController::class, 'show'])->name('investor-accounts.show');
         Route::patch('/investor-accounts/{investor}', [InvestorAccountController::class, 'update'])->name('investor-accounts.update');
+    });
+
+    Route::middleware('require.role:superadmin,investor_relations')->group(function () {
         Route::get('/spotlight', [AdminSpotlightController::class, 'index'])->name('spotlight.index');
         Route::patch('/spotlight/{profile}', [AdminSpotlightController::class, 'update'])->name('spotlight.update');
         Route::get('/dealflow/interests', [App\Http\Controllers\Admin\InvestorInterestController::class, 'index'])->name('dealflow.interests.index');
@@ -212,7 +215,7 @@ Route::prefix('diagnostic')->name('diagnostic.')->group(function () {
 Route::get('/assessment', [CheckoutController::class, 'assessment'])->name('assessment');
 Route::post('/assessment/apply', [CheckoutController::class, 'applyAssessment'])->name('assessment.apply')->middleware('throttle:5,1');
 
-// PIN Investor Page
+// Investor onboarding
 Route::get('/investor', [InvestorController::class, 'index'])->name('investor.index');
 Route::post('/investor/apply', [InvestorController::class, 'store'])->name('investor.apply')->middleware('throttle:5,1');
 

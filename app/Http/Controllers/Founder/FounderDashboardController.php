@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Founder;
 
 use App\Http\Controllers\Controller;
-use App\Mail\InvestorAccessApprovedMail;
 use App\Models\Founder;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Mail;
 use App\Models\InvestorInterest;
-use App\Models\InvestorDataRoomGrant;
-use App\Models\AuditLog;
+use App\Http\Requests\Founder\ReviewInvestorInterestRequest;
+use App\Services\InvestorInterestWorkflowService;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -116,6 +113,8 @@ class FounderDashboardController extends Controller
                 ->map(fn ($interest) => [
                     'id' => $interest->id,
                     'investor_name' => $interest->investor->profile->full_name ?? 'Anonymous Investor',
+                    'investor_email' => $interest->investor->email,
+                    'firm_name' => $interest->investor->profile->company_name,
                     'type' => $interest->type,
                     'message' => $interest->message,
                     'status' => $interest->status,
@@ -156,48 +155,18 @@ class FounderDashboardController extends Controller
         ]);
     }
 
-    public function updateRequestStatus(Request $request, InvestorInterest $accessRequest): RedirectResponse
+    public function updateRequestStatus(ReviewInvestorInterestRequest $request, InvestorInterest $accessRequest, InvestorInterestWorkflowService $workflow): RedirectResponse
     {
-        $request->validate([
-            'status' => ['required', 'string', 'in:approved,rejected'],
-        ]);
-
         $profile = $accessRequest->profile;
         if (! $profile || $profile->founder_id !== Auth::guard('founder')->id()) {
             abort(403, 'Unauthorized action.');
         }
 
-        $accessRequest->update([
-            'status' => $request->input('status'),
-            'reviewed_at' => now(),
-            'reviewed_by_founder' => Auth::guard('founder')->id(),
-        ]);
+        $workflow->review($accessRequest, Auth::guard('founder')->user(), $request->validated('status'), $request->ip(), $request->userAgent());
 
-        if ($request->input('status') === 'approved') {
-            InvestorDataRoomGrant::updateOrCreate(
-                ['investor_id' => $accessRequest->investor_id, 'profile_id' => $profile->id],
-                ['granted_by_founder' => Auth::guard('founder')->id(), 'granted_at' => now(), 'revoked_at' => null]
-            );
-
-            $accessRequest->investor->notify(new \App\Notifications\InvestorDataRoomGrantedNotification($profile));
-        }
-
-        AuditLog::create([
-            'event' => 'founder.interest_reviewed',
-            'actor_type' => Auth::guard('founder')->user()::class,
-            'actor_id' => Auth::guard('founder')->id(),
-            'auditable_type' => $accessRequest::class,
-            'auditable_id' => $accessRequest->id,
-            'metadata' => ['status' => $request->input('status')],
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        // TODO: Dispatch notification to Admin
-
-        $msg = $request->input('status') === 'approved'
-            ? 'Interest approved. The investor has been granted access to your data room.'
-            : 'Interest rejected.';
+        $msg = $request->validated('status') === 'approved'
+            ? ($accessRequest->type === 'data_room_access' ? 'Interest approved. The investor has been granted access to your data room.' : 'Interest approved. Pinpoint Investor Relations will coordinate the next step.')
+            : 'Interest denied.';
 
         return back()->with('success', $msg);
     }

@@ -51,9 +51,9 @@ interface InvestorAccessRequest {
     investor_name: string;
     investor_email: string;
     firm_name: string | null;
-    linkedin_url: string | null;
     message: string | null;
-    status: 'pending' | 'approved' | 'rejected';
+    type: 'more_details' | 'founder_call' | 'data_room_access';
+    status: 'pending' | 'approved' | 'denied';
     created_at: string;
 }
 
@@ -337,7 +337,7 @@ export default function FounderDashboard({
         value: pillar_scores[k] ?? 0,
     }));
 
-    function handleRequestStatus(id: number, status: 'approved' | 'rejected') {
+    function handleRequestStatus(id: number, status: 'approved' | 'denied') {
         setUpdatingStatusId(id);
         router.patch(
             route('founder.access-requests.status', id),
@@ -582,7 +582,7 @@ export default function FounderDashboard({
                                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#3A54A5]/10 text-[#3A54A5]">
                                     <Lock className="size-4.5" />
                                 </div>
-                                <h2 className="text-[16px] font-bold text-zinc-800">Investor Access Requests</h2>
+                                <h2 className="text-[16px] font-bold text-zinc-800">Investor Interest Requests</h2>
                             </div>
                             <span className="text-zinc-555 text-[13px] font-semibold">
                                 {access_requests.length} total request{access_requests.length !== 1 ? 's' : ''}
@@ -591,10 +591,9 @@ export default function FounderDashboard({
 
                         {access_requests.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-8 text-center">
-                                <p className="text-zinc-450 text-sm font-medium">No data room access requests yet.</p>
+                                <p className="text-zinc-450 text-sm font-medium">No investor interest requests yet.</p>
                                 <p className="mt-1 text-xs text-zinc-400">
-                                    When venture investors view your profile page and request full access to your diligence assets, their requests
-                                    will appear here.
+                                    Requests for information, a founder call, or data-room access will appear here for your decision.
                                 </p>
                             </div>
                         ) : (
@@ -610,16 +609,9 @@ export default function FounderDashboard({
                                                             {req.firm_name}
                                                         </span>
                                                     )}
-                                                    {req.linkedin_url && (
-                                                        <a
-                                                            href={req.linkedin_url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="rounded-md border border-[#3A54A5]/25 bg-[#3A54A5]/5 px-2 py-0.5 text-[10.5px] font-bold text-[#3A54A5] hover:bg-[#3A54A5]/10"
-                                                        >
-                                                            LinkedIn
-                                                        </a>
-                                                    )}
+                                                    <span className="rounded-md border border-[#3A54A5]/25 bg-[#3A54A5]/5 px-2 py-0.5 text-[10.5px] font-bold text-[#3A54A5]">
+                                                        {req.type.replaceAll('_', ' ')}
+                                                    </span>
                                                 </div>
                                                 <div className="text-zinc-555 text-xs font-semibold">
                                                     Email:{' '}
@@ -648,21 +640,21 @@ export default function FounderDashboard({
                                                             Approve
                                                         </button>
                                                         <button
-                                                            onClick={() => handleRequestStatus(req.id, 'rejected')}
+                                                            onClick={() => handleRequestStatus(req.id, 'denied')}
                                                             disabled={updatingStatusId !== null}
                                                             className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
                                                         >
-                                                            Reject
+                                                            Deny
                                                         </button>
                                                     </>
                                                 ) : req.status === 'approved' ? (
                                                     <span className="border-emerald-250 animate-fade-in inline-flex items-center gap-1 rounded-full border bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs">
                                                         <CheckCircle2 className="size-3.5 text-emerald-600" />
-                                                        Approved &amp; Emailed
+                                                        {req.type === 'data_room_access' ? 'Data room granted' : 'Approved for IR follow-up'}
                                                     </span>
                                                 ) : (
                                                     <span className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-bold text-zinc-500">
-                                                        Rejected
+                                                        Denied
                                                     </span>
                                                 )}
                                             </div>

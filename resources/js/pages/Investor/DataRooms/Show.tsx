@@ -15,6 +15,7 @@ type Document = {
     original_filename: string;
     size_bytes: number;
     created_at: string;
+    download_url: string;
 };
 
 export default function DataRoomShow({ 
@@ -40,7 +41,7 @@ export default function DataRoomShow({
             <section className="mx-auto max-w-4xl px-6 py-10 sm:py-14">
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href={route('data-rooms.index')} className="inline-flex size-10 items-center justify-center rounded-full bg-white text-zinc-500 shadow-sm transition hover:text-zinc-900">
+                        <Link href={route('investor.data-rooms.index')} className="inline-flex size-10 items-center justify-center rounded-full bg-white text-zinc-500 shadow-sm transition hover:text-zinc-900">
                             <ArrowLeft className="size-5" />
                         </Link>
                         <div>
@@ -77,7 +78,7 @@ export default function DataRoomShow({
                                         </div>
                                     </div>
                                     <a 
-                                        href={route('data-rooms.download', { slug, document: doc.id })} 
+                                        href={doc.download_url}
                                         target="_blank"
                                         className="ml-4 flex shrink-0 items-center gap-2 rounded-xl bg-zinc-100 px-4 py-2 text-sm font-bold text-zinc-700 transition hover:bg-zinc-200 hover:text-zinc-900"
                                     >

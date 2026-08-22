@@ -217,3 +217,43 @@ Last updated: 2026-08-15
 
 **Pattern notes:**
 Staff publishing is a conventional readiness table. Reviewed deck status must be visible at the decision point, and unready startups cannot be published from the UI. Copy corrections expand inline beneath the relevant row, using the same rounded field vocabulary as founder editing, so the action retains context and does not alter publication status.
+
+### Investor Interest Workflow
+
+Files: resources/js/pages/Investor/Spotlight/Show.tsx, resources/js/pages/Investor/Interests.tsx, resources/js/pages/Investor/DataRooms/Show.tsx
+Last updated: 2026-08-22
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-[#f4f7ff]` page canvas; `bg-white` workflow surfaces |
+| Border | `border border-white/80` primary sections; `border-[#3A54A5]/12` for protected-access context |
+| Border radius | `rounded-2xl` workflow sections; `rounded-xl` controls and inline status panels |
+| Text — primary | `text-zinc-950` / `text-zinc-900` |
+| Text — secondary | `text-zinc-600` / `text-zinc-500` |
+| Spacing | `p-6 sm:p-8` sections; `gap-5` within forms and requests |
+| Hover state | `hover:bg-[#2D4182]` submit action; `hover:underline` for contextual links |
+| Shadow | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` workflow surfaces |
+| Accent usage | `#3A54A5` marks mediated action, secure access, and the single next step |
+
+**Pattern notes:**
+Interest uses a type-first choice followed by an optional concise message. Clearly separate a general interest approval from a data-room grant, and never show a document-access action unless the approved request type is `data_room_access`.
+
+### Admin Dealflow Access Log
+
+File: resources/js/pages/Admin/Dealflow/DataRooms.tsx
+Last updated: 2026-08-22
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-white` operational table surface; `bg-zinc-50` table headers |
+| Border | `border border-zinc-200`, `divide-zinc-100` table rows |
+| Border radius | `rounded-2xl` table shell |
+| Text — primary | `text-zinc-950` / `text-zinc-900` |
+| Text — secondary | `text-zinc-600` / `text-zinc-500` |
+| Spacing | `px-6 py-4` cells; `mt-8` between grant register and audit trail |
+| Hover state | `hover:bg-zinc-50/50` audit and grant rows |
+| Shadow | `shadow-xs` |
+| Accent usage | `#3A54A5` only for the audit-trail label |
+
+**Pattern notes:**
+Separate current access management from the immutable activity history. Both remain compact, conventional tables so Investor Relations can scan high-volume operational data without mixing action controls into the audit log.

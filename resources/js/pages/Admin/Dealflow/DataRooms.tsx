@@ -26,7 +26,19 @@ type PaginatedData<T> = {
     total: number;
 };
 
-export default function AdminDataRooms({ grants }: { grants: PaginatedData<Grant> }) {
+type AuditEvent = {
+    id: number;
+    event: string;
+    created_at: string | null;
+    actor: string;
+    profile_id: number | null;
+};
+
+function eventLabel(event: string) {
+    return event.replaceAll('.', ' ').replaceAll('_', ' ');
+}
+
+export default function AdminDataRooms({ grants, audit_events: auditEvents }: { grants: PaginatedData<Grant>; audit_events: AuditEvent[] }) {
     function revokeGrant(id: number) {
         if (confirm('Are you sure you want to revoke this investor\'s access to the data room?')) {
             router.patch(route('admin.dealflow.data-rooms.revoke', id), {}, {
@@ -106,6 +118,31 @@ export default function AdminDataRooms({ grants }: { grants: PaginatedData<Grant
                         </tbody>
                     </table>
                 </div>
+
+                <section className="mt-8" aria-labelledby="access-log-heading">
+                    <div className="mb-4">
+                        <p className="text-xs font-bold tracking-[0.14em] text-[#3A54A5] uppercase">Audit trail</p>
+                        <h2 id="access-log-heading" className="mt-1 text-xl font-black tracking-tight text-zinc-950">Recent access activity</h2>
+                        <p className="mt-1 text-sm text-zinc-500">Interest submissions, founder decisions, grants, revocations, and document downloads.</p>
+                    </div>
+                    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xs">
+                        <table className="w-full text-left text-sm text-zinc-600">
+                            <thead className="bg-zinc-50 text-xs font-bold text-zinc-500 uppercase">
+                                <tr><th className="px-6 py-4">Activity</th><th className="px-6 py-4">Actor</th><th className="px-6 py-4">Startup profile</th><th className="px-6 py-4">When</th></tr>
+                            </thead>
+                            <tbody className="divide-y divide-zinc-100">
+                                {auditEvents.length === 0 ? <tr><td colSpan={4} className="px-6 py-12 text-center text-zinc-500">No access activity has been recorded yet.</td></tr> : auditEvents.map((event) => (
+                                    <tr key={event.id} className="transition-colors hover:bg-zinc-50/50">
+                                        <td className="px-6 py-4 font-semibold capitalize text-zinc-900">{eventLabel(event.event)}</td>
+                                        <td className="px-6 py-4">{event.actor}</td>
+                                        <td className="px-6 py-4 text-xs font-medium text-zinc-500">{event.profile_id ? `#${event.profile_id}` : '—'}</td>
+                                        <td className="px-6 py-4 text-xs font-medium text-zinc-500">{event.created_at ? new Date(event.created_at).toLocaleString() : '—'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
         </AdminLayout>
     );

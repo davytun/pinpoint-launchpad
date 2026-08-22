@@ -16,7 +16,7 @@ class InvestorInterestReceivedNotification extends Notification implements Shoul
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database', 'mail'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -29,7 +29,7 @@ class InvestorInterestReceivedNotification extends Notification implements Shoul
                     ->line($investorName . ' has expressed interest in your startup.')
                     ->line('Type: ' . ucwords(str_replace('_', ' ', $this->interest->type)))
                     ->line('Message: ' . ($this->interest->message ?: 'No additional message provided.'))
-                    ->action('Review Request', url('/founder'))
+                    ->action('Review Request', route('founder.dashboard'))
                     ->line('You can approve this request in your Founder Dashboard to grant them access to your data room.');
     }
 
@@ -38,6 +38,8 @@ class InvestorInterestReceivedNotification extends Notification implements Shoul
         return [
             'interest_id' => $this->interest->id,
             'investor_id' => $this->interest->investor_id,
+            'profile_id' => $this->interest->profile_id,
+            'type' => 'investor_interest_received',
         ];
     }
 }

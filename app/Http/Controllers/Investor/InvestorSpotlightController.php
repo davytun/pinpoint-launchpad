@@ -50,6 +50,7 @@ class InvestorSpotlightController extends Controller
                         : null,
                 ] : null,
                 'can_view_pitch_deck' => $investor->hasApprovedKyc(),
+                'can_submit_interest' => $investor->canAccessProtectedInvestorContent(),
             ]),
         ]);
     }

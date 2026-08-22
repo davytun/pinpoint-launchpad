@@ -42,7 +42,7 @@ export default function DataRoomIndex({ grants }: { grants: Grant[] }) {
                         grants.map((grant) => (
                             <Link 
                                 key={grant.slug} 
-                                href={route('data-rooms.show', grant.slug)} 
+                                href={route('investor.data-rooms.show', grant.slug)}
                                 className="group flex flex-col justify-between rounded-2xl border border-white/80 bg-white p-6 shadow-[0_16px_36px_rgba(33,56,120,0.06)] transition hover:-translate-y-0.5 hover:border-[#3A54A5]/30"
                             >
                                 <div>

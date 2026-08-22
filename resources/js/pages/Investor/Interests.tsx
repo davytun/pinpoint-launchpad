@@ -6,7 +6,7 @@ type Interest = {
     id: number;
     type: string;
     message: string | null;
-    status: 'pending' | 'approved' | 'rejected';
+    status: 'pending' | 'approved' | 'denied';
     created_at: string;
     profile: {
         founder: {
@@ -18,13 +18,13 @@ type Interest = {
 
 const StatusIcon = ({ status }: { status: Interest['status'] }) => {
     if (status === 'approved') return <CheckCircle2 className="size-5 text-emerald-600" />;
-    if (status === 'rejected') return <XCircle className="size-5 text-red-600" />;
+    if (status === 'denied') return <XCircle className="size-5 text-red-600" />;
     return <Clock3 className="size-5 text-amber-600" />;
 };
 
 const StatusLabel = ({ status }: { status: Interest['status'] }) => {
     if (status === 'approved') return <span className="font-bold text-emerald-700">Approved</span>;
-    if (status === 'rejected') return <span className="font-bold text-red-700">Declined</span>;
+    if (status === 'denied') return <span className="font-bold text-red-700">Declined</span>;
     return <span className="font-bold text-amber-700">Pending Review</span>;
 };
 
@@ -87,9 +87,9 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                                         <StatusLabel status={interest.status} />
                                     </div>
                                 </div>
-                                {interest.status === 'approved' && (
+                                {interest.status === 'approved' && interest.type === 'data_room_access' && (
                                     <div className="mt-6 border-t border-zinc-100 pt-5">
-                                        <Link href={route('data-rooms.show', interest.profile.slug)} className="text-sm font-bold text-[#3A54A5] hover:underline">
+                                        <Link href={route('investor.data-rooms.show', interest.profile.slug)} className="text-sm font-bold text-[#3A54A5] hover:underline">
                                             View Data Room &rarr;
                                         </Link>
                                     </div>

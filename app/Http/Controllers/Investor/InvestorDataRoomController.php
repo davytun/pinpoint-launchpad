@@ -9,12 +9,15 @@ use App\Models\InvestorDataRoomGrant;
 use App\Services\DocumentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InvestorDataRoomController extends Controller
 {
+    private const DOCUMENT_LINK_TTL_MINUTES = 10;
+
     public function index(): Response
     {
         $investor = Auth::guard('investor')->user();
@@ -51,7 +54,18 @@ class InvestorDataRoomController extends Controller
             ->where('visibility', 'data_room')
             ->where('is_reviewed', true)
             ->latest()
-            ->get(['id', 'original_filename', 'size_bytes', 'created_at']);
+            ->get(['id', 'original_filename', 'file_size', 'created_at'])
+            ->map(fn (FounderDocument $document) => [
+                'id' => $document->id,
+                'original_filename' => $document->original_filename,
+                'size_bytes' => $document->file_size,
+                'created_at' => $document->created_at,
+                'download_url' => URL::temporarySignedRoute(
+                    'investor.data-rooms.download',
+                    now()->addMinutes(self::DOCUMENT_LINK_TTL_MINUTES),
+                    ['slug' => $grant->profile->slug, 'document' => $document->id],
+                ),
+            ]);
 
         return Inertia::render('Investor/DataRooms/Show', [
             'company_name' => $grant->profile->founder?->company_name,

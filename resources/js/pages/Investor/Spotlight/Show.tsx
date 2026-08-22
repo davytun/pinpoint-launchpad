@@ -1,9 +1,11 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, BadgeCheck, FileDown, FileText, LockKeyhole } from 'lucide-react';
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 type RadarData = Record<string, number> | null;
 
@@ -26,6 +28,7 @@ type Entry = {
         download_url: string | null;
     } | null;
     can_view_pitch_deck: boolean;
+    can_submit_interest: boolean;
 };
 
 const PILLARS = [
@@ -41,6 +44,12 @@ const PILLARS = [
 export default function SpotlightShow({ entry }: { entry: Entry }) {
     const radarItems = PILLARS.map(([key, subject]) => ({ subject, value: entry.radar_data?.[key] ?? 0 }));
     const hasRadarData = radarItems.some((item) => item.value > 0);
+    const interestForm = useForm<{ type: 'more_details' | 'founder_call' | 'data_room_access'; message: string }>({ type: 'more_details', message: '' });
+
+    function submitInterest(event: React.FormEvent) {
+        event.preventDefault();
+        interestForm.post(route('investor.interests.store', entry.slug));
+    }
 
     return (
         <main className="min-h-screen bg-[#f4f7ff] text-zinc-950">
@@ -161,6 +170,34 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                             )}
                         </div>
                     </div>
+                </section>
+                <section className="mt-7 rounded-2xl border border-white/80 bg-white p-6 shadow-[0_16px_36px_rgba(33,56,120,0.06)] sm:p-8" aria-labelledby="interest-heading">
+                    <p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Pinpoint-mediated</p>
+                    <h2 id="interest-heading" className="mt-2 text-xl font-extrabold text-zinc-950">Express interest</h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">Choose a next step. Founder contact details remain private and Pinpoint stays in the loop.</p>
+                    {entry.can_submit_interest ? (
+                        <form onSubmit={submitInterest} className="mt-6 flex max-w-3xl flex-col gap-5">
+                            <fieldset>
+                                <legend className="text-sm font-bold text-zinc-900">What would you like to do?</legend>
+                                <ToggleGroup type="single" variant="outline" value={interestForm.data.type} onValueChange={(value) => value && interestForm.setData('type', value as typeof interestForm.data.type)} className="mt-3 grid justify-start gap-2 sm:grid-cols-3">
+                                    <ToggleGroupItem value="more_details" className="h-auto justify-start whitespace-normal px-4 py-3 text-left text-sm">Share more details</ToggleGroupItem>
+                                    <ToggleGroupItem value="founder_call" className="h-auto justify-start whitespace-normal px-4 py-3 text-left text-sm">Arrange a founder call</ToggleGroupItem>
+                                    <ToggleGroupItem value="data_room_access" className="h-auto justify-start whitespace-normal px-4 py-3 text-left text-sm">Request data-room access</ToggleGroupItem>
+                                </ToggleGroup>
+                            </fieldset>
+                            <div>
+                                <label htmlFor="interest-message" className="text-sm font-bold text-zinc-900">Short message <span className="font-medium text-zinc-500">(optional)</span></label>
+                                <Textarea id="interest-message" value={interestForm.data.message} onChange={(event) => interestForm.setData('message', event.target.value)} aria-invalid={Boolean(interestForm.errors.message)} aria-describedby={interestForm.errors.message ? 'interest-message-error' : undefined} maxLength={500} placeholder="Add context for Pinpoint and the founder." className="mt-2 border-zinc-200 bg-white text-zinc-950" />
+                                {interestForm.errors.message && <p id="interest-message-error" className="mt-2 text-sm font-medium text-rose-700">{interestForm.errors.message}</p>}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-4">
+                                <Button type="submit" disabled={interestForm.processing} className="rounded-xl bg-[#3A54A5] hover:bg-[#2D4182]">{interestForm.processing ? 'Submitting…' : 'Submit interest'}</Button>
+                                <p className="text-xs leading-5 text-zinc-500">Only an approved data-room request grants access to detailed documents.</p>
+                            </div>
+                        </form>
+                    ) : (
+                        <div className="mt-6 rounded-xl border border-[#3A54A5]/12 bg-[#eef2ff] p-4 text-sm leading-6 text-zinc-700">Complete KYC approval to submit an interest or request access. <Link href={route('investor.kyc.create')} className="font-bold text-[#3A54A5] hover:underline">Complete KYC</Link></div>
+                    )}
                 </section>
             </section>
         </main>

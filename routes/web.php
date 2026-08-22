@@ -238,7 +238,7 @@ Route::prefix('investor')->name('investor.')->group(function () {
 
     Route::get('/data-rooms', [InvestorDataRoomController::class, 'index'])->middleware(['auth.investor', 'kyc.approved'])->name('data-rooms.index');
     Route::get('/data-rooms/{slug}', [InvestorDataRoomController::class, 'show'])->middleware(['auth.investor', 'kyc.approved'])->name('data-rooms.show');
-    Route::get('/data-rooms/{slug}/document/{document}', [InvestorDataRoomController::class, 'download'])->middleware(['auth.investor', 'kyc.approved'])->name('data-rooms.download');
+    Route::get('/data-rooms/{slug}/document/{document}', [InvestorDataRoomController::class, 'download'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('data-rooms.download');
 });
 
 Route::prefix('admin')->name('admin.')->middleware('require.role:superadmin,compliance')->group(function () {

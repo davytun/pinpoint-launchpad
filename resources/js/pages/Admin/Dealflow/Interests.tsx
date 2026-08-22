@@ -6,7 +6,7 @@ type Interest = {
     id: number;
     type: string;
     message: string | null;
-    status: 'pending' | 'approved' | 'rejected';
+    status: 'pending' | 'approved' | 'denied';
     created_at: string;
     investor: {
         profile: {
@@ -29,7 +29,7 @@ type PaginatedData<T> = {
 
 function StatusBadge({ status }: { status: Interest['status'] }) {
     if (status === 'approved') return <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-800"><BadgeCheck className="size-3.5" /> Approved</span>;
-    if (status === 'rejected') return <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-800"><XCircle className="size-3.5" /> Rejected</span>;
+    if (status === 'denied') return <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-800"><XCircle className="size-3.5" /> Denied</span>;
     return <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800"><Clock3 className="size-3.5" /> Pending</span>;
 }
 

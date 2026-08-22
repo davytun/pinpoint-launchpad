@@ -257,3 +257,23 @@ Last updated: 2026-08-22
 
 **Pattern notes:**
 Separate current access management from the immutable activity history. Both remain compact, conventional tables so Investor Relations can scan high-volume operational data without mixing action controls into the audit log.
+
+### Notification Centre
+
+File: resources/js/pages/Notifications/Index.tsx
+Last updated: 2026-08-22
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-[#f4f7ff]` canvas; `bg-white` notification list |
+| Border | `border border-white/80` list shell; `border-zinc-100` list rows |
+| Border radius | `rounded-2xl` list shell; `rounded-xl` read action |
+| Text — primary | `text-zinc-950` / `text-zinc-900` |
+| Text — secondary | `text-zinc-600` / `text-zinc-500` |
+| Spacing | `px-6 py-5` notification rows; `gap-4` header actions |
+| Hover state | Native button focus/interaction, without decorative card treatment |
+| Shadow | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` |
+| Accent usage | `#3A54A5` for unread markers and the platform-alert label |
+
+**Pattern notes:**
+Unread state is a subtle tinted row plus a compact dot, not a warning treatment. The notification centre preserves each alert until the recipient deliberately reads it or uses the explicit bulk action.

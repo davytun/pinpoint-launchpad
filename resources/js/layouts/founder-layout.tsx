@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Link, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FileText, LayoutDashboard, LogOut, Menu, MessageSquare, Sparkles, X } from 'lucide-react';
+import { Bell, FileText, LayoutDashboard, LogOut, Menu, MessageSquare, Sparkles, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -149,15 +149,17 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { url } = usePage();
     const trapRef = useRef<HTMLDivElement | null>(null);
+    const unreadNotifications = usePage<{ platform_unread_notifications?: { founder?: number } }>().props.platform_unread_notifications?.founder ?? 0;
 
     const navItems = useMemo<NavItem[]>(
         () => [
             { icon: LayoutDashboard, label: 'Dashboard', href: route('founder.dashboard'), disabled: false },
             { icon: FileText, label: 'Documents', href: route('founder.documents.index'), disabled: false },
             { icon: MessageSquare, label: 'Messages', href: route('founder.messages.index'), disabled: false },
+            { icon: Bell, label: unreadNotifications ? `Alerts (${unreadNotifications})` : 'Alerts', href: route('founder.notifications.index'), disabled: false },
             { icon: Sparkles, label: 'Spotlight', href: route('founder.spotlight.edit'), disabled: false },
         ],
-        [],
+        [unreadNotifications],
     );
 
     // Focus trap for mobile sidebar

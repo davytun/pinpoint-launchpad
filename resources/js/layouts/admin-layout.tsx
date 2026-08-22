@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { Award, BookOpen, DollarSign, LayoutDashboard, LogOut, Menu, MessageSquare, Settings, UserCog, Users, X } from 'lucide-react';
+import { Award, Bell, BookOpen, DollarSign, LayoutDashboard, LogOut, Menu, MessageSquare, Settings, UserCog, Users, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
 interface AdminUser {
@@ -71,6 +71,7 @@ function SidebarContent({
     isCompliance,
     isInvestorRelations,
     unreadMessages,
+    unreadNotifications,
     isActive,
     logout,
     onNav,
@@ -83,6 +84,7 @@ function SidebarContent({
     isCompliance: boolean;
     isInvestorRelations: boolean;
     unreadMessages: number;
+    unreadNotifications: number;
     isActive: (path: string) => boolean;
     logout: () => void;
     onNav?: () => void;
@@ -116,6 +118,7 @@ function SidebarContent({
                     onClick={onNav}
                     badge={unreadMessages}
                 />
+                <NavItem href="/admin/notifications" icon={Bell} label="Alerts" active={isActive('/admin/notifications')} onClick={onNav} badge={unreadNotifications} />
 
                 {(isSuperAdmin || isSupport) && (
                     <>
@@ -202,15 +205,17 @@ function SidebarContent({
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-    const { auth, admin_unread_messages } = usePage<{
+    const { auth, admin_unread_messages, platform_unread_notifications } = usePage<{
         auth: { user: AdminUser };
         admin_unread_messages?: number;
+        platform_unread_notifications?: { admin?: number };
     }>().props;
 
     const user = auth?.user ?? null;
     const currentUrl = usePage().url as string;
     const role = user?.role ?? 'support';
     const unreadMessages = admin_unread_messages ?? 0;
+    const unreadNotifications = platform_unread_notifications?.admin ?? 0;
 
     const isSuperAdmin = role === 'superadmin';
     const isAnalyst = role === 'analyst';
@@ -248,7 +253,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         return currentUrl === path || currentUrl.startsWith(path + '/') || currentUrl.startsWith(path + '?');
     }
 
-    const sidebarProps = { user, role, isSuperAdmin, isAnalyst, isSupport, isCompliance, isInvestorRelations, unreadMessages, isActive, logout };
+    const sidebarProps = { user, role, isSuperAdmin, isAnalyst, isSupport, isCompliance, isInvestorRelations, unreadMessages, unreadNotifications, isActive, logout };
 
     return (
         <div className="flex min-h-screen bg-slate-50 text-zinc-900 antialiased selection:bg-[#3A54A5]/20 selection:text-zinc-800">

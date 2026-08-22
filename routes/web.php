@@ -73,6 +73,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->middleware('require.role:superadmin,analyst,support')
         ->name('dashboard');
 
+    Route::middleware('require.role:superadmin,analyst,support,compliance,investor_relations')->group(function () {
+        Route::get('/notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+        Route::patch('/notifications/read-all', [App\Http\Controllers\Admin\NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::patch('/notifications/{notification}/read', [App\Http\Controllers\Admin\NotificationController::class, 'read'])->name('notifications.read');
+    });
+
     // Messages — all admin roles
     Route::prefix('messages')->name('messages.')->middleware('require.role:superadmin,analyst,support')->group(function () {
         Route::get('/', [AdminMessageController::class, 'inbox'])->name('inbox');
@@ -102,6 +108,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     Route::middleware('require.role:superadmin,investor_relations')->group(function () {
+        Route::get('/announcements', [App\Http\Controllers\Admin\PlatformAnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/announcements', [App\Http\Controllers\Admin\PlatformAnnouncementController::class, 'store'])->name('announcements.store');
         Route::get('/spotlight', [AdminSpotlightController::class, 'index'])->name('spotlight.index');
         Route::patch('/spotlight/{profile}', [AdminSpotlightController::class, 'update'])->name('spotlight.update');
         Route::get('/dealflow/interests', [App\Http\Controllers\Admin\InvestorInterestController::class, 'index'])->name('dealflow.interests.index');
@@ -233,6 +241,9 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::get('/spotlight/{slug}/pitch-deck/preview', [InvestorSpotlightController::class, 'previewPitchDeck'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('spotlight.pitch-deck.preview');
     Route::get('/spotlight/{slug}/pitch-deck', [InvestorSpotlightController::class, 'downloadPitchDeck'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('spotlight.pitch-deck');
     Route::post('/spotlight/{slug}/interest', [InvestorInterestController::class, 'store'])->middleware(['auth.investor', 'kyc.approved'])->name('interests.store');
+    Route::get('/notifications', [App\Http\Controllers\Investor\NotificationController::class, 'index'])->middleware('auth.investor')->name('notifications.index');
+    Route::patch('/notifications/read-all', [App\Http\Controllers\Investor\NotificationController::class, 'readAll'])->middleware('auth.investor')->name('notifications.read-all');
+    Route::patch('/notifications/{notification}/read', [App\Http\Controllers\Investor\NotificationController::class, 'read'])->middleware('auth.investor')->name('notifications.read');
 
     Route::get('/interests', [InvestorInterestController::class, 'index'])->middleware('auth.investor')->name('interests.index');
 
@@ -305,6 +316,9 @@ Route::prefix('founder')->name('founder.')->group(function () {
 
     // Protected dashboard routes
     Route::middleware(['auth.founder', 'founder.session'])->group(function () {
+        Route::get('/notifications', [App\Http\Controllers\Founder\NotificationController::class, 'index'])->name('notifications.index');
+        Route::patch('/notifications/read-all', [App\Http\Controllers\Founder\NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::patch('/notifications/{notification}/read', [App\Http\Controllers\Founder\NotificationController::class, 'read'])->name('notifications.read');
         Route::get('/dashboard', [FounderDashboardController::class, 'index'])->name('dashboard');
         Route::get('/spotlight', [FounderSpotlightController::class, 'edit'])->name('spotlight.edit');
         Route::patch('/spotlight', [FounderSpotlightController::class, 'update'])->name('spotlight.update');

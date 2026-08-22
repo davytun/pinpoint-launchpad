@@ -62,6 +62,11 @@ class HandleInertiaRequests extends Middleware
             'admin_unread_messages' => Auth::guard('web')->user()?->isAdmin()
                 ? MessageThread::sum('admin_unread_count')
                 : null,
+            'platform_unread_notifications' => [
+                'admin' => Auth::guard('web')->user()?->unreadNotifications()->count() ?? 0,
+                'founder' => Auth::guard('founder')->user()?->unreadNotifications()->count() ?? 0,
+                'investor' => Auth::guard('investor')->user()?->unreadNotifications()->count() ?? 0,
+            ],
             'csrf_token' => csrf_token(),
         ]);
     }

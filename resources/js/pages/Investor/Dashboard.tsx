@@ -2,8 +2,8 @@ import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Head, Link, router } from '@inertiajs/react';
-import { ArrowRight, BadgeCheck, Clock3, FileLock2, ShieldCheck } from 'lucide-react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { ArrowRight, BadgeCheck, Bell, Clock3, FileLock2, ShieldCheck } from 'lucide-react';
 
 type Investor = {
     kyc_status: 'not_submitted' | 'pending' | 'approved' | 'rejected';
@@ -17,6 +17,7 @@ const accessItems = [
 ];
 
 export default function Dashboard({ investor }: { investor: Investor }) {
+    const unreadNotifications = usePage<{ platform_unread_notifications?: { investor?: number } }>().props.platform_unread_notifications?.investor ?? 0;
     const approved = investor.kyc_status === 'approved';
     const pending = investor.kyc_status === 'pending';
     const rejected = investor.kyc_status === 'rejected';
@@ -49,6 +50,7 @@ export default function Dashboard({ investor }: { investor: Investor }) {
                                 My Interests
                             </Link>
                         )}
+                        <Link href={route('investor.notifications.index')} className="inline-flex items-center gap-1.5 hover:text-zinc-950"><Bell className="size-4" />Alerts{unreadNotifications > 0 && <span className="rounded-full bg-[#3A54A5] px-1.5 py-0.5 text-[10px] text-white">{unreadNotifications}</span>}</Link>
                         {approved && (
                             <Link href={route('investor.data-rooms.index')} className="hover:text-zinc-950">
                                 Data Rooms

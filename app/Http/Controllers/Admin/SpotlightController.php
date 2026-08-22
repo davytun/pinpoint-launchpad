@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\FounderProfile;
 use App\Models\SpotlightEntry;
+use App\Models\Investor;
+use App\Notifications\SpotlightPublishedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -105,6 +107,10 @@ class SpotlightController extends Controller
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
+
+        if ($shouldPublish) {
+            Investor::where('account_status', Investor::ACCOUNT_STATUS_ACTIVE)->each(fn (Investor $investor) => $investor->notify(new SpotlightPublishedNotification($profile)));
+        }
 
         return back()->with('success', $shouldPublish ? 'Startup published to Spotlight.' : 'Startup removed from Spotlight.');
     }

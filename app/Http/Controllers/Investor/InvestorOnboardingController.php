@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Investor\StoreInvestorOnboardingRequest;
 use App\Models\AuditLog;
 use App\Models\Investor;
+use App\Notifications\InvestorJoinedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +50,7 @@ class InvestorOnboardingController extends Controller
                 'user_agent' => $request->userAgent(),
             ]);
             Auth::guard('investor')->login($investor);
+            DB::afterCommit(fn () => Investor::where('account_status', Investor::ACCOUNT_STATUS_ACTIVE)->whereKeyNot($investor->id)->each(fn (Investor $recipient) => $recipient->notify(new InvestorJoinedNotification())));
         });
 
         return redirect()->route('investor.dashboard')

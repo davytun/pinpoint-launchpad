@@ -64,7 +64,7 @@ export default function SpotlightIndex({ profiles }: { profiles: Profile[] }) {
                 </div>
 
                 <div className="mt-7 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_16px_36px_rgba(33,56,120,0.06)]">
-                    <table className="w-full min-w-[860px] text-left">
+                    <table className="w-full min-w-215 text-left">
                         <thead className="bg-zinc-50 text-xs font-bold tracking-wider text-zinc-500 uppercase">
                             <tr>
                                 <th className="px-6 py-4">Startup</th>

@@ -47,7 +47,7 @@ function NavItem({
                     : 'text-zinc-550 border border-transparent hover:bg-zinc-100 hover:text-zinc-950',
             ].join(' ')}
         >
-            <Icon className={`size-[18px] shrink-0 transition-colors ${active ? 'text-[#3A54A5]' : 'group-hover:text-zinc-650 text-zinc-400'}`} />
+            <Icon className={`size-4.5 shrink-0 transition-colors ${active ? 'text-[#3A54A5]' : 'group-hover:text-zinc-650 text-zinc-400'}`} />
             <span className="flex-1 truncate">{label}</span>
             {badge != null && badge > 0 && (
                 <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#3A54A5] px-1.5 text-[10px] font-bold text-white">

@@ -17,21 +17,35 @@ class SpotlightController extends Controller
     {
         $profiles = FounderProfile::with(['founder:id,company_name', 'spotlightEntry'])
             ->withCount(['badges as verified_badges_count' => fn ($query) => $query->where('is_verified', true)])
-            ->whereNotNull('spotlight_one_liner')
-            ->whereNotNull('spotlight_summary')
+            ->where(function ($query) {
+                $query->whereNotNull('spotlight_one_liner')
+                    ->orWhereNotNull('spotlight_summary')
+                    ->orWhere(fn ($liveProfiles) => $liveProfiles->where('is_public', true)->whereNotNull('verified_at'));
+            })
             ->latest('verified_at')
             ->get()
-            ->map(fn (FounderProfile $profile) => [
+            ->map(function (FounderProfile $profile) {
+                $hasReviewedPitchDeck = $profile->founder?->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->exists() ?? false;
+                $requirements = collect([
+                    ! $profile->isLive() ? 'PARAGON profile is not live' : null,
+                    ! $profile->spotlight_one_liner ? 'One-liner is missing' : null,
+                    ! $profile->spotlight_summary ? 'Summary is missing' : null,
+                    ! $hasReviewedPitchDeck ? 'Reviewed pitch deck is missing' : null,
+                ])->filter()->values();
+
+                return [
                 'id' => $profile->id,
                 'company_name' => $profile->founder?->company_name,
                 'sector' => $profile->sector,
                 'overall_score' => $profile->overall_score,
                 'spotlight_one_liner' => $profile->spotlight_one_liner,
                 'spotlight_summary' => $profile->spotlight_summary,
-                'has_reviewed_pitch_deck' => $profile->founder?->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->exists() ?? false,
+                'has_reviewed_pitch_deck' => $hasReviewedPitchDeck,
                 'is_published' => $profile->spotlightEntry?->published_at !== null,
                 'verified_badges_count' => $profile->verified_badges_count,
-            ]);
+                'publish_requirements' => $requirements,
+            ];
+            });
 
         return Inertia::render('Admin/Spotlight/Index', ['profiles' => $profiles]);
     }

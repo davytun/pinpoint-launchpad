@@ -14,6 +14,7 @@ type Profile = {
     has_reviewed_pitch_deck: boolean;
     is_published: boolean;
     verified_badges_count: number;
+    publish_requirements: string[];
 };
 
 export default function SpotlightIndex({ profiles }: { profiles: Profile[] }) {
@@ -117,7 +118,7 @@ export default function SpotlightIndex({ profiles }: { profiles: Profile[] }) {
                                                     size="sm"
                                                     variant={profile.is_published ? 'outline' : 'default'}
                                                     className={profile.is_published ? 'rounded-xl' : 'rounded-xl bg-[#3A54A5] hover:bg-[#2D4182]'}
-                                                    disabled={!profile.is_published && !profile.has_reviewed_pitch_deck}
+                                                    disabled={!profile.is_published && profile.publish_requirements.length > 0}
                                                     onClick={() => updatePublishState(profile, !profile.is_published)}
                                                 >
                                                     {profile.is_published ? (
@@ -131,6 +132,11 @@ export default function SpotlightIndex({ profiles }: { profiles: Profile[] }) {
                                                     )}
                                                 </Button>
                                             </div>
+                                            {!profile.is_published && profile.publish_requirements.length > 0 && (
+                                                <p className="mt-2 max-w-64 text-right text-xs leading-5 text-amber-700">
+                                                    {profile.publish_requirements.join(' · ')}
+                                                </p>
+                                            )}
                                         </td>
                                     </tr>
                                     {editingProfileId === profile.id && (

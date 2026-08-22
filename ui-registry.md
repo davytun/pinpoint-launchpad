@@ -181,7 +181,7 @@ Founder publishing preparation uses one editable surface and one operational-sta
 ### Investor Spotlight
 
 Files: resources/js/pages/Investor/Spotlight/Index.tsx, resources/js/pages/Investor/Spotlight/Show.tsx
-Last updated: 2026-08-15
+Last updated: 2026-08-22
 
 | Property | Class |
 | --- | --- |
@@ -196,7 +196,7 @@ Last updated: 2026-08-15
 | Accent usage | `#3A54A5` for PARAGON status, verified markers, and document download |
 
 **Pattern notes:**
-Spotlight feels editorial rather than like a generic deal grid. Each startup leads with a factual one-liner; detailed content and the pitch deck are visually separated as progressively protected access.
+Spotlight feels editorial rather than like a generic deal grid. Each startup leads with a factual one-liner; detailed content and the pitch deck are visually separated as progressively protected access. The detail page pairs verified signals with a restrained PARAGON radar and always includes a text equivalent for assistive technology. An approved PDF preview stays inside the protected-document panel; non-PDF decks retain a secure download action, and pre-KYC investors see a direct lock explanation instead of a disabled-looking control.
 
 ### Admin Spotlight Management
 

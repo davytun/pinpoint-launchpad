@@ -104,4 +104,19 @@ class DocumentService
             $document->original_filename
         );
     }
+
+    public function preview(FounderDocument $document): StreamedResponse
+    {
+        return Storage::disk('local')->response(
+            $document->file_path,
+            $document->original_filename,
+            [
+                'Cache-Control' => 'private, no-store, max-age=0',
+                'Content-Security-Policy' => "frame-ancestors 'self'",
+                'X-Content-Type-Options' => 'nosniff',
+                'X-Frame-Options' => 'SAMEORIGIN',
+            ],
+            'inline',
+        );
+    }
 }

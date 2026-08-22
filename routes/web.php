@@ -345,11 +345,6 @@ Route::prefix('founder')->name('founder.')->group(function () {
 Route::prefix('verify')->name('verify.')->group(function () {
     Route::get('/sample-unicorn', [VerificationController::class, 'sample'])->name('sample');
     Route::get('/{slug}', [VerificationController::class, 'show'])->name('show');
-    Route::post('/{slug}/request-access', [VerificationController::class, 'requestAccess'])
-        ->name('request-access')
-        ->middleware('throttle:3,10');
-    Route::get('/{slug}/document/{document}/download', [VerificationController::class, 'downloadDocument'])
-        ->name('document.download');
 });
 
 // Tester guide PDF — token-protected, no auth required

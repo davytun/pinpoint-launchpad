@@ -1,12 +1,10 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Clock, FileText, Loader2, Lock, Shield } from 'lucide-react';
+import { Clock, FileText, Lock, Shield } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
 
 import SideRays from '@/components/SideRays';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,13 +25,6 @@ interface RadarData {
     [key: string]: number | undefined;
 }
 
-interface UnlockedDocument {
-    id: number;
-    size: string;
-    category?: string | null;
-    name?: string | null;
-}
-
 interface PageProps {
     profile_id: number | null;
     founder_name: string;
@@ -51,10 +42,6 @@ interface PageProps {
     access_request_count?: number;
     is_sample?: boolean;
     slug: string;
-    flash?: { success?: string; info?: string; error?: string };
-    is_unlocked?: boolean;
-    token?: string | null;
-    unlocked_documents?: UnlockedDocument[];
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -123,138 +110,6 @@ function diligenceRows(tier?: string | null) {
     return base;
 }
 
-// ─── Access Request Form ──────────────────────────────────────────────────────
-
-function AccessRequestModal({ open, onClose, slug, isSample }: { open: boolean; onClose: () => void; slug: string; isSample: boolean }) {
-    const [form, setForm] = useState({
-        investor_name: '',
-        investor_email: '',
-        firm_name: '',
-        linkedin_url: '',
-        message: '',
-    });
-    const [submitting, setSubmitting] = useState(false);
-
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        setSubmitting(true);
-        router.post(route('verify.request-access', slug), form, {
-            preserveScroll: true,
-            onFinish: () => setSubmitting(false),
-            onSuccess: () => onClose(),
-        });
-    }
-
-    const inputClass =
-        'w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-955 placeholder:text-zinc-400 transition-colors focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none shadow-xs';
-
-    return (
-        <Dialog
-            open={open}
-            onOpenChange={(v) => {
-                if (!v) onClose();
-            }}
-        >
-            <DialogContent className="rounded-4xl border-zinc-200/80 bg-white/95 p-7 text-zinc-900 shadow-2xl backdrop-blur-xl sm:max-w-md">
-                <DialogHeader>
-                    {isSample ? (
-                        <>
-                            <DialogTitle className="text-zinc-955 text-xl font-extrabold">Sample Profile</DialogTitle>
-                            <DialogDescription className="text-zinc-555 mt-1 font-medium">
-                                This is a sample profile. Request access on a real founder's page.
-                            </DialogDescription>
-                        </>
-                    ) : (
-                        <>
-                            <DialogTitle className="text-zinc-955 text-xl font-extrabold">Request Data Room Access</DialogTitle>
-                            <DialogDescription className="text-zinc-555 mt-1 font-medium">
-                                Tell the founder who you are. They'll review and approve your request.
-                            </DialogDescription>
-                        </>
-                    )}
-                </DialogHeader>
-
-                {!isSample && (
-                    <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Full Name</label>
-                            <input
-                                type="text"
-                                required
-                                value={form.investor_name}
-                                onChange={(e) => setForm((f) => ({ ...f, investor_name: e.target.value }))}
-                                className={inputClass}
-                                placeholder="Jane Smith"
-                            />
-                        </div>
-
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Work Email</label>
-                            <input
-                                type="email"
-                                required
-                                value={form.investor_email}
-                                onChange={(e) => setForm((f) => ({ ...f, investor_email: e.target.value }))}
-                                className={inputClass}
-                                placeholder="jane@firm.com"
-                            />
-                        </div>
-
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Venture Firm</label>
-                            <input
-                                type="text"
-                                value={form.firm_name}
-                                onChange={(e) => setForm((f) => ({ ...f, firm_name: e.target.value }))}
-                                className={inputClass}
-                                placeholder="Capital Ventures"
-                            />
-                        </div>
-
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">LinkedIn Profile</label>
-                            <input
-                                type="url"
-                                value={form.linkedin_url}
-                                onChange={(e) => setForm((f) => ({ ...f, linkedin_url: e.target.value }))}
-                                className={inputClass}
-                                placeholder="https://linkedin.com/in/janesmith"
-                            />
-                        </div>
-
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold tracking-wider text-zinc-500 uppercase">Note (Optional)</label>
-                            <textarea
-                                value={form.message}
-                                onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-                                className={cn(inputClass, 'min-h-20 resize-y')}
-                                placeholder="Briefly state your investment thesis or interest..."
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={submitting}
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-colors hover:bg-[#2D4182] hover:shadow-lg disabled:opacity-60"
-                        >
-                            {submitting ? (
-                                <>
-                                    <Loader2 className="size-4 animate-spin" /> Submitting...
-                                </>
-                            ) : (
-                                <>
-                                    Submit Request
-                                    <ArrowRight className="size-4" />
-                                </>
-                            )}
-                        </button>
-                    </form>
-                )}
-            </DialogContent>
-        </Dialog>
-    );
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function VerificationShow({
@@ -270,15 +125,7 @@ export default function VerificationShow({
     expires_at,
     days_until_expiry,
     is_sample = false,
-    slug,
-    flash,
-    is_unlocked = false,
-    token = null,
-    unlocked_documents = [],
 }: PageProps) {
-    const [modalOpen, setModalOpen] = useState(false);
-    const [reqSubmitted, setReqSubmitted] = useState(false);
-
     const color = scoreColor(overall_score);
     const radarItems = PILLAR_KEYS.map((k) => ({
         subject: PILLAR_LABELS[k],
@@ -286,11 +133,6 @@ export default function VerificationShow({
     }));
     const rows = diligenceRows(tier);
     const showExpiryWarning = !is_sample && days_until_expiry != null && days_until_expiry <= 14;
-
-    // Flash success from redirect
-    useEffect(() => {
-        if (flash?.success) setReqSubmitted(true);
-    }, [flash?.success]);
 
     const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
@@ -332,7 +174,7 @@ export default function VerificationShow({
                             <div>
                                 <h3 className="text-base font-extrabold text-zinc-950">Important Notice: Moving to Secure Access</h3>
                                 <p className="mt-1 text-zinc-700">
-                                    Pinpoint is transitioning to a secure Investor Portal. In 30 days, public verification pages will be deprecated.
+                                    Pinpoint is transitioning to a secure Investor Portal. Public verification pages are now deprecated.
                                     To continue reviewing detailed PARAGON reports and data rooms, please create your verified investor account.
                                 </p>
                                 <a href="/investor" className="mt-4 inline-block rounded-xl bg-[#3A54A5] px-5 py-2.5 font-bold text-white shadow-sm transition hover:bg-[#2D4182]">
@@ -463,163 +305,31 @@ export default function VerificationShow({
                                 <div>
                                     <h2 className="text-lg font-extrabold tracking-tight text-zinc-950">Verified Diligence Assets</h2>
                                     <p className="mt-0.5 text-[13px] font-semibold text-zinc-500">
-                                        Access verified financial audits and diagnostic reports.
+                                        Access verified financial audits and diagnostic reports through the Investor Portal.
                                     </p>
                                 </div>
-                                {is_unlocked ? (
-                                    <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs">
-                                        <CheckCircle2 className="text-emerald-650 size-4" />
-                                        Secure Access Unlocked
-                                    </span>
-                                ) : reqSubmitted ? (
-                                    <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 shadow-xs">
-                                        <CheckCircle2 className="text-emerald-650 size-4" />
-                                        Request submitted
-                                    </span>
-                                ) : (
-                                    <button
-                                        onClick={() => setModalOpen(true)}
-                                        className="rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-[#3A54A5]/25 transition-colors hover:bg-[#2D4182]"
-                                    >
-                                        Request Access to Full Data Room
-                                    </button>
-                                )}
                             </div>
 
                             <div className="divide-y divide-zinc-100">
-                                {rows.map((row, i) => {
-                                    const matchingDoc = is_unlocked
-                                        ? (unlocked_documents || []).find((d: UnlockedDocument) => {
-                                              const cat = d.category?.toLowerCase() || '';
-                                              const name = row.name.toLowerCase();
-                                              if (name.includes('assessment') && (cat.includes('assessment') || cat.includes('other'))) return true;
-                                              if (
-                                                  name.includes('radar') &&
-                                                  (cat.includes('diagnostics') || cat.includes('model') || cat.includes('economics'))
-                                              )
-                                                  return true;
-                                              if (
-                                                  name.includes('stress-test') &&
-                                                  (cat.includes('forecast') || cat.includes('bank') || cat.includes('statement'))
-                                              )
-                                                  return true;
-                                              if (name.includes('cap table') && cat.includes('cap')) return true;
-                                              if (
-                                                  name.includes('economics') &&
-                                                  (cat.includes('unit') || cat.includes('economics') || cat.includes('forecast'))
-                                              )
-                                                  return true;
-                                              if (
-                                                  name.includes('incorporation') &&
-                                                  (cat.includes('incorporation') || cat.includes('legal') || cat.includes('articles'))
-                                              )
-                                                  return true;
-                                              return false;
-                                          })
-                                        : null;
-
-                                    return (
-                                        <div key={i} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                                            <div className="flex items-center gap-4">
-                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 text-zinc-400">
-                                                    <FileText className="size-5" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-[14px] leading-snug font-bold text-zinc-900">{row.name}</h3>
-                                                    <p className="mt-0.5 text-[11px] font-semibold text-zinc-500">{row.level}</p>
-                                                </div>
+                                {rows.map((row, i) => (
+                                    <div key={i} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 text-zinc-400">
+                                                <FileText className="size-5" />
                                             </div>
-
                                             <div>
-                                                {!is_unlocked ? (
-                                                    <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-zinc-50 px-3 py-1.5 text-xs font-bold text-zinc-400 select-none">
-                                                        <Lock className="size-3.5" /> Locked
-                                                    </span>
-                                                ) : matchingDoc ? (
-                                                    <a
-                                                        href={
-                                                            route('verify.document.download', { slug, document: matchingDoc.id }) + '?token=' + token
-                                                        }
-                                                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-700"
-                                                    >
-                                                        Download ({matchingDoc.size})
-                                                    </a>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/60 bg-zinc-50 px-3 py-1.5 text-xs font-bold text-zinc-400 select-none">
-                                                        Pending Upload
-                                                    </span>
-                                                )}
+                                                <h3 className="text-[14px] leading-snug font-bold text-zinc-900">{row.name}</h3>
+                                                <p className="mt-0.5 text-[11px] font-semibold text-zinc-500">{row.level}</p>
                                             </div>
                                         </div>
-                                    );
-                                })}
 
-                                {is_unlocked &&
-                                    (() => {
-                                        const unmatched = (unlocked_documents || []).filter((d: UnlockedDocument) => {
-                                            const cat = d.category?.toLowerCase() || '';
-                                            const wasMatched = rows.some((row) => {
-                                                const name = row.name.toLowerCase();
-                                                if (name.includes('assessment') && (cat.includes('assessment') || cat.includes('other'))) return true;
-                                                if (
-                                                    name.includes('radar') &&
-                                                    (cat.includes('diagnostics') || cat.includes('model') || cat.includes('economics'))
-                                                )
-                                                    return true;
-                                                if (
-                                                    name.includes('stress-test') &&
-                                                    (cat.includes('forecast') || cat.includes('bank') || cat.includes('statement'))
-                                                )
-                                                    return true;
-                                                if (name.includes('cap table') && cat.includes('cap')) return true;
-                                                if (
-                                                    name.includes('economics') &&
-                                                    (cat.includes('unit') || cat.includes('economics') || cat.includes('forecast'))
-                                                )
-                                                    return true;
-                                                if (
-                                                    name.includes('incorporation') &&
-                                                    (cat.includes('incorporation') || cat.includes('legal') || cat.includes('articles'))
-                                                )
-                                                    return true;
-                                                return false;
-                                            });
-                                            return !wasMatched;
-                                        });
-
-                                        if (unmatched.length === 0) return null;
-
-                                        return (
-                                            <div className="mt-6 border-t border-zinc-100 pt-5">
-                                                <h4 className="mb-3 text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
-                                                    Additional Diligence Materials
-                                                </h4>
-                                                <div className="space-y-3">
-                                                    {unmatched.map((doc: UnlockedDocument) => (
-                                                        <div key={doc.id} className="flex items-center justify-between">
-                                                            <div className="flex items-center gap-4">
-                                                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-zinc-400">
-                                                                    <FileText className="size-4.5" />
-                                                                </div>
-                                                                <div>
-                                                                    <h5 className="text-[13.5px] leading-snug font-bold text-zinc-800">{doc.name}</h5>
-                                                                    <p className="mt-0.5 text-[11px] font-semibold text-zinc-500">{doc.category}</p>
-                                                                </div>
-                                                            </div>
-                                                            <a
-                                                                href={
-                                                                    route('verify.document.download', { slug, document: doc.id }) + '?token=' + token
-                                                                }
-                                                                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-700"
-                                                            >
-                                                                Download ({doc.size})
-                                                            </a>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        );
-                                    })()}
+                                        <div>
+                                            <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-zinc-50 px-3 py-1.5 text-xs font-bold text-zinc-400 select-none">
+                                                <Lock className="size-3.5" /> Portal Only
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </motion.div>
@@ -631,8 +341,6 @@ export default function VerificationShow({
                     </div>
                 </div>
             </div>
-
-            <AccessRequestModal open={modalOpen} onClose={() => setModalOpen(false)} slug={slug} isSample={is_sample} />
         </>
     );
 }

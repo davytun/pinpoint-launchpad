@@ -54,6 +54,11 @@ class Investor extends Authenticatable
         return $this->hasMany(InvestorKycSubmission::class)->latest();
     }
 
+    public function latestKycSubmission(): HasOne
+    {
+        return $this->hasOne(InvestorKycSubmission::class)->latestOfMany();
+    }
+
     public function interests(): HasMany
     {
         return $this->hasMany(InvestorInterest::class);

@@ -1,14 +1,148 @@
-import { Head, router } from '@inertiajs/react';
-import { Check, Clock3, X } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
 
 import AdminLayout from '@/layouts/admin-layout';
-import { Button } from '@/components/ui/button';
 
-type Status = 'pending_review' | 'active' | 'rejected';
-type Investor = { id: number; email: string; account_status: Status; created_at: string; profile: { full_name: string; company_name: string | null; investor_type: 'individual' | 'corporate'; phone: string } };
+type KycStatus = 'not_submitted' | 'pending' | 'approved' | 'rejected';
 
-export default function InvestorAccountsIndex({ investors, activeStatus }: { investors: { data: Investor[]; links: { url: string | null; label: string; active: boolean }[] }; activeStatus: string }) {
-    const updateStatus = (investor: Investor, account_status: Status) => router.patch(route('admin.investor-accounts.update', investor.id), { account_status }, { preserveScroll: true });
-    const filters: { label: string; value: string }[] = [{ label: 'All', value: 'all' }, { label: 'Pending review', value: 'pending_review' }, { label: 'Active', value: 'active' }, { label: 'Rejected', value: 'rejected' }];
-    return <AdminLayout><Head title="Investor accounts" /><div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"><div className="flex flex-col justify-between gap-5 border-b border-zinc-200 pb-6 sm:flex-row sm:items-end"><div><p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Investor Relations</p><h1 className="mt-2 text-3xl font-black tracking-tight text-zinc-950">Investor accounts</h1><p className="mt-2 text-sm text-zinc-600">Review onboarding submissions and activate investor access.</p></div><div className="flex flex-wrap gap-2">{filters.map((filter) => <Button key={filter.value} size="sm" variant={activeStatus === filter.value ? 'default' : 'outline'} className={activeStatus === filter.value ? 'rounded-xl bg-[#3A54A5] hover:bg-[#2D4182]' : 'rounded-xl'} onClick={() => router.get(route('admin.investor-accounts.index'), filter.value === 'all' ? {} : { status: filter.value }, { preserveState: true })}>{filter.label}</Button>)}</div></div><div className="mt-7 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_16px_36px_rgba(33,56,120,0.06)]"><div className="overflow-x-auto"><table className="w-full min-w-190 text-left"><thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-bold tracking-wider text-zinc-500 uppercase"><tr><th className="px-6 py-4">Investor</th><th className="px-6 py-4">Type</th><th className="px-6 py-4">Contact</th><th className="px-6 py-4">Submitted</th><th className="px-6 py-4">Status</th><th className="px-6 py-4 text-right">Action</th></tr></thead><tbody>{investors.data.length === 0 ? <tr><td colSpan={6} className="px-6 py-16 text-center text-sm text-zinc-500">No investor accounts match this filter.</td></tr> : investors.data.map((investor) => <tr key={investor.id} className="border-b border-zinc-100 last:border-0"><td className="px-6 py-4"><p className="font-bold text-zinc-950">{investor.profile.full_name}</p>{investor.profile.company_name && <p className="mt-1 text-xs text-zinc-500">{investor.profile.company_name}</p>}</td><td className="px-6 py-4 text-sm capitalize text-zinc-600">{investor.profile.investor_type}</td><td className="px-6 py-4 text-sm text-zinc-600"><p>{investor.email}</p><p className="mt-1 text-xs text-zinc-500">{investor.profile.phone}</p></td><td className="px-6 py-4 text-sm text-zinc-600">{new Date(investor.created_at).toLocaleDateString()}</td><td className="px-6 py-4"><span className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${investor.account_status === 'active' ? 'bg-emerald-50 text-emerald-700' : investor.account_status === 'rejected' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>{investor.account_status.replace('_', ' ')}</span></td><td className="px-6 py-4 text-right">{investor.account_status === 'pending_review' ? <div className="flex justify-end gap-2"><Button size="sm" className="rounded-xl bg-[#3A54A5] hover:bg-[#2D4182]" onClick={() => updateStatus(investor, 'active')}><Check data-icon="inline-start" /> Activate</Button><Button size="sm" variant="outline" className="rounded-xl text-rose-700 hover:bg-rose-50" onClick={() => updateStatus(investor, 'rejected')}><X data-icon="inline-start" /> Reject</Button></div> : <Button size="sm" variant="outline" className="rounded-xl" onClick={() => updateStatus(investor, 'pending_review')}><Clock3 data-icon="inline-start" /> Return to review</Button>}</td></tr>)}</tbody></table></div></div></div></AdminLayout>;
+type Investor = {
+    id: number;
+    email: string;
+    kyc_status: KycStatus;
+    profile: { full_name: string; company_name: string | null; investor_type: 'individual' | 'corporate'; phone: string | null };
+    latest_kyc_submission: { original_name: string; created_at: string } | null;
+};
+
+type StatusFilter = KycStatus | 'all';
+
+const filters: { label: string; value: StatusFilter }[] = [
+    { label: 'All investors', value: 'all' },
+    { label: 'KYC pending', value: 'pending' },
+    { label: 'Not submitted', value: 'not_submitted' },
+    { label: 'Approved', value: 'approved' },
+    { label: 'Rejected', value: 'rejected' },
+];
+
+const statusClasses: Record<KycStatus, string> = {
+    not_submitted: 'border-zinc-200 bg-zinc-50 text-zinc-600',
+    pending: 'border-amber-200 bg-amber-50 text-amber-800',
+    approved: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    rejected: 'border-rose-200 bg-rose-50 text-rose-700',
+};
+
+const statusLabel: Record<KycStatus, string> = {
+    not_submitted: 'Not submitted',
+    pending: 'Pending review',
+    approved: 'KYC approved',
+    rejected: 'KYC rejected',
+};
+
+export default function InvestorAccountsIndex({
+    investors,
+    activeKycStatus,
+}: {
+    investors: { data: Investor[]; links: { url: string | null; label: string; active: boolean }[] };
+    activeKycStatus: StatusFilter;
+}) {
+    return (
+        <AdminLayout>
+            <Head title="Investor reviews" />
+
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <div className="flex flex-col justify-between gap-5 border-b border-zinc-200 pb-6 sm:flex-row sm:items-end">
+                    <div>
+                        <p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Investor Relations</p>
+                        <h1 className="mt-2 text-3xl font-black tracking-tight text-zinc-950">Investor reviews</h1>
+                        <p className="mt-2 max-w-2xl text-sm text-zinc-600">
+                            Review investor profiles and follow the KYC status that controls protected deal access.
+                        </p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                        {filters.map((filter) => (
+                            <Link
+                                key={filter.value}
+                                href={route('admin.investor-accounts.index', filter.value === 'all' ? {} : { kyc_status: filter.value })}
+                                className={
+                                    activeKycStatus === filter.value
+                                        ? 'rounded-xl bg-[#3A54A5] px-3 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#2D4182]'
+                                        : 'rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-bold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50'
+                                }
+                            >
+                                {filter.label}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="mt-7 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_16px_36px_rgba(33,56,120,0.06)]">
+                    {investors.data.length === 0 ? (
+                        <div className="px-6 py-16 text-center">
+                            <p className="text-sm font-semibold text-zinc-900">No investors match this KYC status.</p>
+                            <p className="mt-1 text-sm text-zinc-500">Try another filter to review a different group.</p>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full min-w-[880px] text-left">
+                                <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-bold tracking-wider text-zinc-500 uppercase">
+                                    <tr>
+                                        <th className="px-6 py-4">Investor</th>
+                                        <th className="px-6 py-4">Contact</th>
+                                        <th className="px-6 py-4">KYC status</th>
+                                        <th className="px-6 py-4">Latest submission</th>
+                                        <th className="px-6 py-4 text-right">Review</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {investors.data.map((investor) => (
+                                        <tr
+                                            key={investor.id}
+                                            className="border-b border-zinc-100 transition-colors last:border-0 hover:bg-zinc-50/70"
+                                        >
+                                            <td className="px-6 py-4">
+                                                <p className="font-bold text-zinc-950">{investor.profile.full_name}</p>
+                                                <p className="mt-1 text-xs text-zinc-500">
+                                                    {investor.profile.company_name ?? investor.profile.investor_type}
+                                                </p>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <p className="text-sm text-zinc-700">{investor.email}</p>
+                                                {investor.profile.phone && <p className="mt-1 text-xs text-zinc-500">{investor.profile.phone}</p>}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span
+                                                    className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold ${statusClasses[investor.kyc_status]}`}
+                                                >
+                                                    {statusLabel[investor.kyc_status]}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-zinc-600">
+                                                {investor.latest_kyc_submission ? (
+                                                    <>
+                                                        <p className="font-medium text-zinc-800">{investor.latest_kyc_submission.original_name}</p>
+                                                        <p className="mt-1 text-xs text-zinc-500">
+                                                            {new Date(investor.latest_kyc_submission.created_at).toLocaleDateString()}
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    <span className="text-zinc-400">No document yet</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <Link
+                                                    href={route('admin.investor-accounts.show', investor.id)}
+                                                    className="text-xs font-extrabold tracking-wider text-[#3A54A5] uppercase transition-colors hover:text-[#2D4182]"
+                                                >
+                                                    Open review
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </AdminLayout>
+    );
 }

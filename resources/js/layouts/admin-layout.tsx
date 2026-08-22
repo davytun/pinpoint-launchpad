@@ -128,8 +128,13 @@ function SidebarContent({
                 {(isSuperAdmin || isInvestorRelations || isCompliance) && (
                     <>
                         <NavSection label="Investors" />
-                        {(isSuperAdmin || isInvestorRelations) && <NavItem href="/admin/investor-accounts" icon={Users} label="Investor Accounts" active={isActive('/admin/investor-accounts')} onClick={onNav} />}
-                        {(isSuperAdmin || isCompliance) && <NavItem href="/admin/investor-kyc" icon={Award} label="KYC Queue" active={isActive('/admin/investor-kyc')} onClick={onNav} />}
+                        <NavItem
+                            href="/admin/investor-accounts?kyc_status=pending"
+                            icon={Users}
+                            label="Investor Reviews"
+                            active={isActive('/admin/investor-accounts')}
+                            onClick={onNav}
+                        />
                     </>
                 )}
 
@@ -137,8 +142,20 @@ function SidebarContent({
                     <>
                         <NavSection label="Dealflow" />
                         <NavItem href="/admin/spotlight" icon={Award} label="Spotlight" active={isActive('/admin/spotlight')} onClick={onNav} />
-                        <NavItem href="/admin/dealflow/interests" icon={MessageSquare} label="Interests" active={isActive('/admin/dealflow/interests')} onClick={onNav} />
-                        <NavItem href="/admin/dealflow/data-rooms" icon={Users} label="Data Rooms" active={isActive('/admin/dealflow/data-rooms')} onClick={onNav} />
+                        <NavItem
+                            href="/admin/dealflow/interests"
+                            icon={MessageSquare}
+                            label="Interests"
+                            active={isActive('/admin/dealflow/interests')}
+                            onClick={onNav}
+                        />
+                        <NavItem
+                            href="/admin/dealflow/data-rooms"
+                            icon={Users}
+                            label="Data Rooms"
+                            active={isActive('/admin/dealflow/data-rooms')}
+                            onClick={onNav}
+                        />
                     </>
                 )}
 

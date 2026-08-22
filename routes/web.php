@@ -95,14 +95,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/investors/{application}/status', [AdminInvestorApplicationController::class, 'updateStatus'])->name('investors.status');
     });
 
-    Route::middleware('require.role:superadmin,investor_relations')->group(function () {
+    Route::middleware('require.role:superadmin,compliance,investor_relations')->group(function () {
         Route::get('/investor-accounts', [InvestorAccountController::class, 'index'])->name('investor-accounts.index');
+        Route::get('/investor-accounts/{investor}', [InvestorAccountController::class, 'show'])->name('investor-accounts.show');
         Route::patch('/investor-accounts/{investor}', [InvestorAccountController::class, 'update'])->name('investor-accounts.update');
         Route::get('/spotlight', [AdminSpotlightController::class, 'index'])->name('spotlight.index');
         Route::patch('/spotlight/{profile}', [AdminSpotlightController::class, 'update'])->name('spotlight.update');
-        Route::get('/dealflow/interests', [\App\Http\Controllers\Admin\InvestorInterestController::class, 'index'])->name('dealflow.interests.index');
-        Route::get('/dealflow/data-rooms', [\App\Http\Controllers\Admin\InvestorDataRoomController::class, 'index'])->name('dealflow.data-rooms.index');
-        Route::patch('/dealflow/data-rooms/{grant}/revoke', [\App\Http\Controllers\Admin\InvestorDataRoomController::class, 'revoke'])->name('dealflow.data-rooms.revoke');
+        Route::get('/dealflow/interests', [App\Http\Controllers\Admin\InvestorInterestController::class, 'index'])->name('dealflow.interests.index');
+        Route::get('/dealflow/data-rooms', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'index'])->name('dealflow.data-rooms.index');
+        Route::patch('/dealflow/data-rooms/{grant}/revoke', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'revoke'])->name('dealflow.data-rooms.revoke');
     });
 
     // Founders — superadmin + analyst
@@ -228,16 +229,17 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::get('/spotlight/{slug}', [InvestorSpotlightController::class, 'show'])->middleware('auth.investor')->name('spotlight.show');
     Route::get('/spotlight/{slug}/pitch-deck', [InvestorSpotlightController::class, 'downloadPitchDeck'])->middleware(['auth.investor', 'kyc.approved'])->name('spotlight.pitch-deck');
     Route::post('/spotlight/{slug}/interest', [InvestorInterestController::class, 'store'])->middleware(['auth.investor', 'kyc.approved'])->name('interests.store');
-    
+
     Route::get('/interests', [InvestorInterestController::class, 'index'])->middleware('auth.investor')->name('interests.index');
-    
+
     Route::get('/data-rooms', [InvestorDataRoomController::class, 'index'])->middleware(['auth.investor', 'kyc.approved'])->name('data-rooms.index');
     Route::get('/data-rooms/{slug}', [InvestorDataRoomController::class, 'show'])->middleware(['auth.investor', 'kyc.approved'])->name('data-rooms.show');
     Route::get('/data-rooms/{slug}/document/{document}', [InvestorDataRoomController::class, 'download'])->middleware(['auth.investor', 'kyc.approved'])->name('data-rooms.download');
 });
 
 Route::prefix('admin')->name('admin.')->middleware('require.role:superadmin,compliance')->group(function () {
-    Route::get('/investor-kyc', [AdminInvestorKycController::class, 'index'])->name('investor-kyc.index');
+    Route::get('/investor-kyc', fn () => redirect()->route('admin.investor-accounts.index', ['kyc_status' => 'pending']))->name('investor-kyc.index');
+    Route::get('/investor-kyc/{submission}/preview', [AdminInvestorKycController::class, 'preview'])->name('investor-kyc.preview');
     Route::get('/investor-kyc/{submission}/download', [AdminInvestorKycController::class, 'download'])->name('investor-kyc.download');
     Route::patch('/investor-kyc/{submission}', [AdminInvestorKycController::class, 'review'])->name('investor-kyc.review');
 });

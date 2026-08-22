@@ -70,7 +70,10 @@ test('a reviewed KYC submission cannot receive a second decision', function () {
         ->assertSessionHas('success');
 
     $this->actingAs($superAdmin)
-        ->patch(route('admin.investor-kyc.review', $submission), ['status' => InvestorKycSubmission::STATUS_REJECTED])
+        ->patch(route('admin.investor-kyc.review', $submission), [
+            'status' => InvestorKycSubmission::STATUS_REJECTED,
+            'review_notes' => 'This second decision must be rejected.',
+        ])
         ->assertSessionHasErrors('status');
 
     expect($submission->fresh()->status)->toBe(InvestorKycSubmission::STATUS_APPROVED)
@@ -94,6 +97,26 @@ test('a compliance officer can download an encrypted KYC document', function () 
 
     $this->assertDatabaseHas('audit_logs', [
         'event' => 'investor.kyc_downloaded',
+        'actor_id' => $compliance->id,
+        'auditable_id' => $submission->id,
+    ]);
+});
+
+test('a compliance officer can preview an encrypted KYC document in the review workspace', function () {
+    Storage::fake('local');
+    $compliance = User::factory()->create(['role' => 'compliance']);
+    $submission = pendingKycSubmissionForReview();
+    Storage::disk('local')->put($submission->storage_path, Crypt::encryptString('verified KYC preview contents'));
+
+    $this->actingAs($compliance)
+        ->get(route('admin.investor-kyc.preview', $submission))
+        ->assertOk()
+        ->assertHeader('content-type', 'application/pdf')
+        ->assertHeader('content-disposition', 'inline; filename="identity.pdf"')
+        ->assertSee('verified KYC preview contents');
+
+    $this->assertDatabaseHas('audit_logs', [
+        'event' => 'investor.kyc_viewed',
         'actor_id' => $compliance->id,
         'auditable_id' => $submission->id,
     ]);

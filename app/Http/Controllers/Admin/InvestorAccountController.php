@@ -15,13 +15,26 @@ class InvestorAccountController extends Controller
 {
     public function index(Request $request): Response
     {
-        $status = $request->string('status')->toString();
+        $kycStatus = $request->string('kyc_status')->toString();
 
         return Inertia::render('Admin/InvestorAccounts/Index', [
-            'investors' => Investor::query()->with('profile')
-                ->when(in_array($status, ['pending_review', 'active', 'rejected']), fn ($query) => $query->where('account_status', $status))
+            'investors' => Investor::query()->with(['profile', 'latestKycSubmission'])
+                ->when(in_array($kycStatus, [
+                    Investor::KYC_STATUS_NOT_SUBMITTED,
+                    Investor::KYC_STATUS_PENDING,
+                    Investor::KYC_STATUS_APPROVED,
+                    Investor::KYC_STATUS_REJECTED,
+                ], true), fn ($query) => $query->where('kyc_status', $kycStatus))
                 ->latest()->paginate(20)->withQueryString(),
-            'activeStatus' => $status ?: 'all',
+            'activeKycStatus' => $kycStatus ?: 'all',
+        ]);
+    }
+
+    public function show(Request $request, Investor $investor): Response
+    {
+        return Inertia::render('Admin/InvestorAccounts/Show', [
+            'investor' => $investor->load(['profile', 'kycSubmissions']),
+            'canReviewKyc' => $request->user()->isSuperAdmin() || $request->user()->isCompliance(),
         ]);
     }
 

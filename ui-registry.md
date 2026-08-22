@@ -1,7 +1,7 @@
 ### Investor Onboarding Form
 
 File: resources/js/pages/Investor/Onboarding.tsx
-Last updated: 2026-08-15
+Last updated: 2026-08-20
 
 | Property | Class |
 | --- | --- |
@@ -58,25 +58,25 @@ Last updated: 2026-08-15
 **Pattern notes:**
 Light portal forms must set text and input color classes explicitly because global tokens are dark. Keep authentication to one focused rounded panel.
 
-### Investor Relations Queue
+### Investor Review Workspace
 
-File: resources/js/pages/Admin/InvestorAccounts/Index.tsx
-Last updated: 2026-08-15
+Files: resources/js/pages/Admin/InvestorAccounts/Index.tsx, resources/js/pages/Admin/InvestorAccounts/Show.tsx
+Last updated: 2026-08-20
 
 | Property | Class |
 | --- | --- |
 | Background | `bg-white` table surface |
 | Border | `border border-zinc-200` |
 | Border radius | `rounded-2xl` table shell; `rounded-xl` controls |
-| Text — primary | `text-zinc-950` |
-| Text — secondary | `text-zinc-600` |
-| Spacing | `px-6 py-4` table cells; `gap-2` actions |
-| Hover state | `hover:bg-[#2D4182]` activate action; `hover:bg-rose-50` reject action |
+| Text — primary | `text-zinc-950` / `text-zinc-900` |
+| Text — secondary | `text-zinc-600` / `text-zinc-500` |
+| Spacing | `px-6 py-4` table cells; `p-6` review panels; `gap-7` between workspace sections |
+| Hover state | `hover:bg-zinc-50` row and inactive filter; `hover:text-[#2D4182]` review link |
 | Shadow | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` |
-| Accent usage | `#3A54A5` only for selected filters and activation |
+| Accent usage | `#3A54A5` only for the active KYC filter, review link, and profile/verification markers |
 
 **Pattern notes:**
-Use conventional rows and explicit action labels for review decisions. Status needs its own semantic color, while Pinpoint blue remains reserved for the forward action.
+Use the list as an orientation layer and the detail page as the focused review workspace. KYC is the review state, never account activation. Use semantic status chips for KYC outcome and keep the row action to one quiet “Open review” link. Within the detail page, reveal the encrypted document inline behind a deliberate “View secure document” action, retain a quiet download link, and place pending-only approval or rejection controls directly beneath the document context.
 
 ### Admin Settings Group
 
@@ -101,7 +101,7 @@ Settings are grouped by operational outcome and use compact explanatory copy. Do
 ### Investor KYC Upload
 
 File: resources/js/pages/Investor/Kyc.tsx
-Last updated: 2026-08-15
+Last updated: 2026-08-20
 
 | Property | Class |
 | --- | --- |
@@ -116,7 +116,7 @@ Last updated: 2026-08-15
 | Accent usage | `#3A54A5` for the lock marker, upload icon, and submission action |
 
 **Pattern notes:**
-Sensitive uploads use one focused panel, plain reassurance copy, and explicit light field colors. The upload target uses a dashed neutral border rather than another nested card.
+Sensitive uploads use one focused panel, plain reassurance copy, and explicit light field colors. The upload target uses a dashed neutral border rather than another nested card. Keep the upload area conditional on the KYC state: amber pending and green approved states lock it with an inline status panel; rejected state exposes the reviewer note in a rose `Alert` above the replacement upload.
 
 ### Compliance KYC Queue
 
@@ -156,7 +156,7 @@ Last updated: 2026-08-15
 | Accent usage | `#3A54A5` for status icon, access labels, and forward action |
 
 **Pattern notes:**
-The investor home states the exact verification outcome in one central panel and puts the longer-term access model in a quieter supporting panel. Do not expose unavailable dealflow as a fake navigation target.
+The investor home states the exact verification outcome in one central panel and puts the longer-term access model in a quieter supporting panel. Use a semantic `Badge` for the KYC state and an `Alert` only when a compliance note requires attention. Do not expose unavailable dealflow as a fake navigation target.
 
 ### Founder Spotlight Preparation
 

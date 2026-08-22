@@ -56,7 +56,10 @@ class InvestorAuthController extends Controller
     public function dashboard(): Response
     {
         return Inertia::render('Investor/Dashboard', [
-            'investor' => Auth::guard('investor')->user()->load('profile:investor_id,full_name'),
+            'investor' => Auth::guard('investor')->user()->load([
+                'profile:investor_id,full_name',
+                'kycSubmissions:id,investor_id,status,original_name,review_notes,reviewed_at',
+            ]),
         ]);
     }
 }

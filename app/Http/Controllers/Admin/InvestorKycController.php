@@ -14,22 +14,10 @@ use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
-use Inertia\Response;
 use Throwable;
 
 class InvestorKycController extends Controller
 {
-    public function index(): Response
-    {
-        return Inertia::render('Admin/InvestorKyc/Index', [
-            'submissions' => InvestorKycSubmission::with('investor.profile')
-                ->where('status', InvestorKycSubmission::STATUS_PENDING)
-                ->latest()
-                ->paginate(20),
-        ]);
-    }
-
     public function review(ReviewInvestorKycRequest $request, InvestorKycSubmission $submission): RedirectResponse
     {
         $data = $request->validated();
@@ -84,6 +72,16 @@ class InvestorKycController extends Controller
 
     public function download(Request $request, InvestorKycSubmission $submission): HttpResponse
     {
+        return $this->documentResponse($request, $submission, 'attachment', 'investor.kyc_downloaded');
+    }
+
+    public function preview(Request $request, InvestorKycSubmission $submission): HttpResponse
+    {
+        return $this->documentResponse($request, $submission, 'inline', 'investor.kyc_viewed');
+    }
+
+    private function documentResponse(Request $request, InvestorKycSubmission $submission, string $disposition, string $auditEvent): HttpResponse
+    {
         $disk = Storage::disk('local');
 
         abort_unless($disk->exists($submission->storage_path), 404);
@@ -101,7 +99,7 @@ class InvestorKycController extends Controller
             : 'application/octet-stream';
 
         AuditLog::create([
-            'event' => 'investor.kyc_downloaded',
+            'event' => $auditEvent,
             'actor_type' => $request->user()::class,
             'actor_id' => $request->user()->id,
             'auditable_type' => $submission::class,
@@ -112,7 +110,7 @@ class InvestorKycController extends Controller
 
         return response($contents, 200, [
             'Content-Type' => $mimeType,
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Content-Disposition' => "{$disposition}; filename=\"{$filename}\"",
         ]);
     }
 }

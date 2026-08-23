@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-
+import { ArrowLeft } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
 
@@ -76,8 +76,11 @@ export default function AdminQuestionsIndex() {
                             <p className="mb-0.5 text-[11px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Admin</p>
                             <h1 className="text-2xl font-extrabold text-zinc-950">Diagnostic Questions</h1>
                         </div>
-                        <Link href={route('admin.waitlist.index')} className="text-zinc-550 hover:text-zinc-955 text-xs font-bold transition-colors">
-                            ← Waitlist
+                        <Link
+                            href={route('admin.waitlist.index')}
+                            className="text-zinc-555 hover:text-zinc-955 inline-flex items-center gap-1.5 text-sm font-bold transition-colors"
+                        >
+                            <ArrowLeft className="size-4" /> Waitlist
                         </Link>
                     </div>
 

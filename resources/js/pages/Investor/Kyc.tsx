@@ -198,10 +198,10 @@ export default function Kyc({
                                             className="h-14 w-full rounded-2xl bg-[#3A54A5] text-base font-bold shadow-lg shadow-[#3A54A5]/20 transition-all hover:bg-[#2D4182] hover:shadow-xl hover:shadow-[#3A54A5]/30 active:scale-[0.98]"
                                         >
                                             {form.processing
-                                                ? 'Uploading securely via 256-bit encryption…'
+                                                ? 'Uploading…'
                                                 : isRejected
-                                                  ? 'Submit replacement for review'
-                                                  : 'Submit document for review'}
+                                                    ? 'Resubmit Document for Review'
+                                                    : 'Submit Document for Review'}
                                         </Button>
                                     </form>
                                 )}

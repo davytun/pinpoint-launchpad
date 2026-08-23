@@ -193,11 +193,11 @@ class FounderAuthController extends Controller
             $request->only('email')
         );
 
-        if ($status === Password::RESET_LINK_SENT) {
+        if ($status === Password::RESET_LINK_SENT || $status === Password::INVALID_USER) {
             return back()->with('success', 'If an account exists with that email, you will receive a reset link shortly.');
         }
 
-        return back()->withErrors(['email' => 'Unable to send reset link.']);
+        return back()->withErrors(['email' => __($status)]);
     }
 
     public function showResetPassword(Request $request): Response

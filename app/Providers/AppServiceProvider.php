@@ -46,6 +46,14 @@ class AppServiceProvider extends ServiceProvider
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);
             }
+            
+            if ($notifiable instanceof \App\Models\Investor) {
+                return route('investor.password.reset', [
+                    'token' => $token,
+                    'email' => $notifiable->getEmailForPasswordReset(),
+                ]);
+            }
+            
             return route('password.reset', [
                 'token' => $token,
                 'email' => $notifiable->getEmailForPasswordReset(),

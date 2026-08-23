@@ -10,14 +10,14 @@ interface PageProps {
     flash?: { success?: string; error?: string };
 }
 
-export default function FounderForgotPassword({ flash }: PageProps) {
+export default function InvestorForgotPassword({ flash }: PageProps) {
     const { data, setData, post, processing, errors, wasSuccessful } = useForm({
         email: '',
     });
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        post(route('founder.password.email'));
+        post(route('investor.password.email'));
     }
 
     const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
@@ -45,7 +45,7 @@ export default function FounderForgotPassword({ flash }: PageProps) {
 
             {/* Ambient top glow */}
             <div
-                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[400px] opacity-15"
+                className="pointer-events-none fixed inset-x-0 top-0 z-0 h-100 opacity-15"
                 style={{
                     background: 'radial-gradient(circle at top, #3A54A5, transparent 70%)',
                 }}
@@ -132,7 +132,7 @@ export default function FounderForgotPassword({ flash }: PageProps) {
 
                         <div className="mt-7 text-center">
                             <Link
-                                href={route('founder.login')}
+                                href={route('investor.login')}
                                 className="text-zinc-555 text-[12px] font-bold transition-colors duration-200 hover:text-zinc-950"
                             >
                                 <ArrowLeft className="mb-[2px] mr-1.5 inline-block size-3.5" /> Back to Sign In

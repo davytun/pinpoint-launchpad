@@ -233,6 +233,11 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::get('/login', [InvestorAuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [InvestorAuthController::class, 'login'])->name('login.store')->middleware('throttle:10,1');
     Route::post('/logout', [InvestorAuthController::class, 'logout'])->name('logout');
+
+    Route::get('/forgot-password', [InvestorAuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [InvestorAuthController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:3,1');
+    Route::get('/reset-password/{token}', [InvestorAuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [InvestorAuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:3,1');
     Route::get('/dashboard', [InvestorAuthController::class, 'dashboard'])->middleware('auth.investor')->name('dashboard');
     Route::get('/kyc', [InvestorKycController::class, 'create'])->middleware('auth.investor')->name('kyc.create');
     Route::post('/kyc', [InvestorKycController::class, 'store'])->middleware('auth.investor')->name('kyc.store');

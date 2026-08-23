@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-
+import { ArrowLeft } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
 
@@ -48,7 +48,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                         href={route('admin.questions.index')}
                         className="text-zinc-555 hover:text-zinc-955 mb-8 inline-flex items-center gap-1.5 text-xs font-bold transition-colors"
                     >
-                        ← Back to Questions
+                        <ArrowLeft className="size-4" /> Back to Questions
                     </Link>
 
                     {/* Header */}
@@ -128,7 +128,7 @@ export default function AdminQuestionsEdit({ question }: PageProps) {
                                     <span
                                         className={cn(
                                             'inline-block h-5 w-5 rounded-full bg-white shadow transition-transform duration-200',
-                                            form.data.is_active ? 'translate-x-[20px]' : 'translate-x-[2px]',
+                                            form.data.is_active ? 'translate-x-5' : 'translate-x-0.5',
                                         )}
                                     />
                                 </button>

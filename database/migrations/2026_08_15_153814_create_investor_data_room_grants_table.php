@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('investor_data_room_grants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('investor_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('profile_id')->constrained('founder_profiles')->cascadeOnDelete();
-            $table->foreignId('granted_by_founder')->constrained('founders')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('investor_id')->constrained('investors')->cascadeOnDelete();
+            $table->foreignUlid('profile_id')->constrained('founder_profiles')->cascadeOnDelete();
+            $table->foreignUlid('granted_by_founder')->constrained('founders')->cascadeOnDelete();
             $table->timestamp('granted_at');
             $table->timestamp('revoked_at')->nullable();
             $table->timestamps();

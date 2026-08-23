@@ -5,7 +5,7 @@ import AdminLayout from '@/layouts/admin-layout';
 type KycStatus = 'not_submitted' | 'pending' | 'approved' | 'rejected';
 
 type Investor = {
-    id: number;
+    id: string;
     email: string;
     kyc_status: KycStatus;
     profile: { full_name: string; company_name: string | null; investor_type: 'individual' | 'corporate'; phone: string | null };

@@ -12,7 +12,7 @@ import AdminLayout from '@/layouts/admin-layout';
 type KycStatus = 'not_submitted' | 'pending' | 'approved' | 'rejected';
 
 type KycSubmission = {
-    id: number;
+    id: string;
     document_type: string;
     original_name: string;
     mime_type: string;
@@ -23,7 +23,7 @@ type KycSubmission = {
 };
 
 type Investor = {
-    id: number;
+    id: string;
     email: string;
     kyc_status: KycStatus;
     kyc_approved_at: string | null;

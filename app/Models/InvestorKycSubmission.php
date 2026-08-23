@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\InvestorKycSubmissionFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class InvestorKycSubmission extends Model
 {
     /** @use HasFactory<InvestorKycSubmissionFactory> */
-    use HasFactory;
+    use HasFactory, HasUlids;
 
     public const STATUS_PENDING = 'pending';
 

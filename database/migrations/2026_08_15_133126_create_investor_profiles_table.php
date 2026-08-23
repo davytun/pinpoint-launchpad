@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('investor_profiles', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('investor_id')->unique()->constrained()->cascadeOnDelete();
+            $table->foreignUlid('investor_id')->unique()->constrained('investors')->cascadeOnDelete();
             $table->enum('investor_type', ['individual', 'corporate']);
             $table->string('full_name');
             $table->string('company_name')->nullable();

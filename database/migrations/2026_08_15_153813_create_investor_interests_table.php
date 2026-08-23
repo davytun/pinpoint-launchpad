@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('investor_interests', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('investor_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('profile_id')->constrained('founder_profiles')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('investor_id')->constrained('investors')->cascadeOnDelete();
+            $table->foreignUlid('profile_id')->constrained('founder_profiles')->cascadeOnDelete();
             $table->enum('type', ['more_details', 'founder_call', 'data_room_access']);
             $table->text('message')->nullable();
             $table->enum('status', ['pending', 'approved', 'denied'])->default('pending');
-            $table->foreignId('reviewed_by_founder')->nullable()->constrained('founders')->nullOnDelete();
+            $table->foreignUlid('reviewed_by_founder')->nullable()->constrained('founders')->nullOnDelete();
             $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
 

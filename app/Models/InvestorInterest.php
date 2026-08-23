@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InvestorInterest extends Model
 {
+    use HasUlids;
     protected $fillable = ['investor_id', 'profile_id', 'type', 'message', 'status', 'reviewed_by_founder', 'reviewed_at'];
 
     protected function casts(): array

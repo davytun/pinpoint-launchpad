@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('waitlist_entries', function (Blueprint $table) {
-            $table->id();
+            $table->ulid('id')->primary();
             $table->enum('type', ['founder', 'investor']);
             $table->string('name', 100);
             $table->string('email', 150)->unique();

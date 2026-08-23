@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('founder_documents', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('founder_id')->constrained('founders')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('founder_id')->constrained('founders')->cascadeOnDelete();
             $table->foreignId('payment_id')->nullable()->constrained('payments')->nullOnDelete();
             $table->enum('category', [
                 'cap_table',

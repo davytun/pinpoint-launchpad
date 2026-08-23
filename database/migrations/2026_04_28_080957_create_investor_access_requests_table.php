@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('investor_access_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('profile_id')->constrained('founder_profiles')->cascadeOnDelete();
+            $table->foreignUlid('profile_id')->constrained('founder_profiles')->cascadeOnDelete();
             $table->string('investor_name');
             $table->string('investor_email');
             $table->string('firm_name')->nullable();

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('investor_applications', function (Blueprint $table) {
-            $table->id();
-            $table->string('investor_type'); // angel, vc, family_office, syndicate, dfi, corporate
+            $table->ulid('id')->primary();
+            $table->string('investor_type');
             $table->string('name');
             $table->string('email');
             $table->string('organisation')->nullable();

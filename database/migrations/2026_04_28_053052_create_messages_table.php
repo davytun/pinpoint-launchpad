@@ -9,10 +9,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('messages', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('thread_id')->constrained('message_threads')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('thread_id')->constrained('message_threads')->cascadeOnDelete();
             $table->enum('sender_type', ['founder', 'admin']);
-            $table->unsignedBigInteger('sender_id');
+            $table->string('sender_id');
             $table->text('body')->nullable();
             $table->boolean('has_attachment')->default(false);
             $table->string('attachment_filename')->nullable();

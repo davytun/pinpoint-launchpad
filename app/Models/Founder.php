@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +13,7 @@ use App\Models\User;
 
 class Founder extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, HasUlids, Notifiable;
 
     protected $fillable = [
         'email',

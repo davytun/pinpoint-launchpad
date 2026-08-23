@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('investor_kyc_submissions', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('investor_id')->constrained()->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('investor_id')->constrained('investors')->cascadeOnDelete();
             $table->enum('document_type', ['valid_id', 'company_certificate']);
             $table->string('storage_path');
             $table->string('original_name');

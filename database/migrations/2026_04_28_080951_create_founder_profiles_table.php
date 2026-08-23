@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('founder_profiles', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('founder_id')->unique()->constrained('founders')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('founder_id')->unique()->constrained('founders')->cascadeOnDelete();
             $table->foreignId('payment_id')->nullable()->constrained('payments')->nullOnDelete();
             $table->string('slug')->unique();
             $table->boolean('is_public')->default(false);

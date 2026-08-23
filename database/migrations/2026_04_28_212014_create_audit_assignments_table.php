@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('audit_assignments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('founder_id')->unique()->constrained('founders')->cascadeOnDelete();
+            $table->foreignUlid('founder_id')->unique()->constrained('founders')->cascadeOnDelete();
             $table->foreignId('analyst_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('assigned_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('assigned_at');

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('spotlight_entries', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('profile_id')->unique()->constrained('founder_profiles')->cascadeOnDelete();
+            $table->foreignUlid('profile_id')->unique()->constrained('founder_profiles')->cascadeOnDelete();
             $table->timestamp('published_at')->nullable();
             $table->foreignId('published_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

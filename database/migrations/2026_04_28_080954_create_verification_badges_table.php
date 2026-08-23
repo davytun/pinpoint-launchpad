@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('verification_badges', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('profile_id')->constrained('founder_profiles')->cascadeOnDelete();
+            $table->foreignUlid('profile_id')->constrained('founder_profiles')->cascadeOnDelete();
             $table->enum('badge_type', [
                 'legal',
                 'financial',

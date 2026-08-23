@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('message_threads', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('founder_id')->unique()->constrained('founders')->cascadeOnDelete();
+            $table->ulid('id')->primary();
+            $table->foreignUlid('founder_id')->unique()->constrained('founders')->cascadeOnDelete();
             $table->timestamp('last_message_at')->nullable();
             $table->unsignedInteger('founder_unread_count')->default(0);
             $table->unsignedInteger('admin_unread_count')->default(0);

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\InvestorFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -12,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 class Investor extends Authenticatable
 {
     /** @use HasFactory<InvestorFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasUlids, Notifiable;
 
     public const ACCOUNT_STATUS_ACTIVE = 'active';
 

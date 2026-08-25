@@ -1,5 +1,5 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { Award, Bell, BookOpen, DollarSign, LayoutDashboard, LogOut, Menu, MessageSquare, Settings, UserCog, Users, X } from 'lucide-react';
+import { Award, Bell, BookOpen, DollarSign, LayoutDashboard, LogOut, Menu, MessageSquare, Settings, ShieldCheck, UserCog, Users, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
 interface AdminUser {
@@ -124,7 +124,7 @@ function SidebarContent({
                     <>
                         <NavSection label="Operations" />
                         <NavItem href="/admin/waitlist" icon={Users} label="Waitlist" active={isActive('/admin/waitlist')} onClick={onNav} />
-                        <NavItem href="/admin/investors" icon={Users} label="Investors" active={isActive('/admin/investors')} onClick={onNav} />
+                        <NavItem href="/admin/investors" icon={Users} label="Applications" active={isActive('/admin/investors')} onClick={onNav} />
                     </>
                 )}
 
@@ -133,8 +133,8 @@ function SidebarContent({
                         <NavSection label="Investors" />
                         <NavItem
                             href="/admin/investor-accounts?kyc_status=pending"
-                            icon={Users}
-                            label="Investor Reviews"
+                            icon={ShieldCheck}
+                            label="KYC Reviews"
                             active={isActive('/admin/investor-accounts')}
                             onClick={onNav}
                         />

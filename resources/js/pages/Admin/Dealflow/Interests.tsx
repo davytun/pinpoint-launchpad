@@ -3,7 +3,7 @@ import AdminLayout from '@/layouts/admin-layout';
 import { BadgeCheck, Clock3, XCircle } from 'lucide-react';
 
 type Interest = {
-    id: number;
+    id: string;
     type: string;
     message: string | null;
     status: 'pending' | 'approved' | 'denied';

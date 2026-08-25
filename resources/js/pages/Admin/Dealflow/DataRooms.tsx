@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { FolderLock, ShieldAlert } from 'lucide-react';
 
 type Grant = {
-    id: number;
+    id: string;
     granted_at: string;
     revoked_at: string | null;
     investor: {
@@ -31,7 +31,7 @@ type AuditEvent = {
     event: string;
     created_at: string | null;
     actor: string;
-    profile_id: number | null;
+    profile_id: string | null;
 };
 
 function eventLabel(event: string) {
@@ -39,7 +39,7 @@ function eventLabel(event: string) {
 }
 
 export default function AdminDataRooms({ grants, audit_events: auditEvents }: { grants: PaginatedData<Grant>; audit_events: AuditEvent[] }) {
-    function revokeGrant(id: number) {
+    function revokeGrant(id: string) {
         if (confirm('Are you sure you want to revoke this investor\'s access to the data room?')) {
             router.patch(route('admin.dealflow.data-rooms.revoke', id), {}, {
                 preserveScroll: true

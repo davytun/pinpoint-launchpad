@@ -5,7 +5,7 @@ import { Eye, EyeOff, FileCheck2, FilePenLine, Save, X } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
 type Profile = {
-    id: number;
+    id: string;
     company_name: string | null;
     sector: string | null;
     overall_score: number | null;
@@ -18,7 +18,7 @@ type Profile = {
 };
 
 export default function SpotlightIndex({ profiles }: { profiles: Profile[] }) {
-    const [editingProfileId, setEditingProfileId] = useState<number | null>(null);
+    const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
     const [draft, setDraft] = useState({ spotlight_one_liner: '', spotlight_summary: '' });
     const [errors, setErrors] = useState<Record<string, string>>({});
 

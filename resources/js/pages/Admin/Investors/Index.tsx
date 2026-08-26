@@ -588,7 +588,7 @@ function DossierDrawer({
                     </div>
 
                     {/* Content Stream: Polar 2-Column Key-Value Properties */}
-                    <div className="flex-1 min-h-0 overflow-y-auto p-6 space-y-6">
+                    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
                         {/* Section: Applicant Details */}
                         <div>
                             <h4 className="text-xs font-semibold text-zinc-950 mb-3">Applicant Details</h4>
@@ -1029,7 +1029,7 @@ export default function ApplicationsIndex({
                 </div>
 
                 {/* ── Table Container (Resend Refero Spec) ────────────────────── */}
-                <div className="flex-1 min-h-0 overflow-y-auto flex flex-col justify-between">
+                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col justify-between">
                     <div>
                         {/* Clean Minimalist Header*/}
                         <div className="flex items-center gap-4 px-5 py-2.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 select-none mb-1">

@@ -100,6 +100,62 @@ class InvestorInterestWorkflowService
         });
     }
 
+    public function reviewByAdmin(InvestorInterest $interest, User $admin, string $status, ?string $ipAddress, ?string $userAgent): InvestorInterest
+    {
+        return DB::transaction(function () use ($interest, $admin, $status, $ipAddress, $userAgent) {
+            $founderId = $interest->profile?->founder_id;
+
+            $interest->update([
+                'status' => $status,
+                'reviewed_by_founder' => $founderId,
+                'reviewed_at' => now(),
+            ]);
+
+            $grant = null;
+
+            if ($status === 'approved' && $interest->type === 'data_room_access') {
+                $grant = InvestorDataRoomGrant::updateOrCreate(
+                    ['investor_id' => $interest->investor_id, 'profile_id' => $interest->profile_id],
+                    ['granted_by_founder' => $founderId, 'granted_at' => now(), 'revoked_at' => null],
+                );
+
+                AuditLog::create([
+                    'event' => 'data_room.granted_by_admin',
+                    'actor_type' => $admin::class,
+                    'actor_id' => $admin->id,
+                    'auditable_type' => $grant::class,
+                    'auditable_id' => $grant->id,
+                    'metadata' => ['interest_id' => $interest->id, 'profile_id' => $interest->profile_id],
+                    'ip_address' => $ipAddress,
+                    'user_agent' => $userAgent,
+                ]);
+            }
+
+            AuditLog::create([
+                'event' => "investor.interest_{$status}_by_admin",
+                'actor_type' => $admin::class,
+                'actor_id' => $admin->id,
+                'auditable_type' => $interest::class,
+                'auditable_id' => $interest->id,
+                'metadata' => [
+                    'profile_id' => $interest->profile_id,
+                    'type' => $interest->type,
+                    'data_room_grant_id' => $grant?->id,
+                ],
+                'ip_address' => $ipAddress,
+                'user_agent' => $userAgent,
+            ]);
+
+            DB::afterCommit(function () use ($interest, $status, $grant) {
+                $interest->loadMissing(['investor.profile', 'profile.founder']);
+                $interest->investor?->notify(new InvestorInterestDecisionNotification($interest, $status, $grant !== null));
+                $this->notifyDealflowStaff(new DealflowAdminNotification('interest_decided', $interest, $status));
+            });
+
+            return $interest;
+        });
+    }
+
     public function revoke(InvestorDataRoomGrant $grant, User $actor, ?string $ipAddress, ?string $userAgent): void
     {
         if ($grant->revoked_at !== null) {
@@ -124,6 +180,36 @@ class InvestorInterestWorkflowService
                 $grant->loadMissing(['investor.profile', 'profile.founder']);
                 $grant->investor->notify(new InvestorDataRoomRevokedNotification($grant));
                 $this->notifyDealflowStaff(new DealflowAdminNotification('access_revoked', null, null, $grant));
+            });
+        });
+    }
+
+    public function reinstate(InvestorDataRoomGrant $grant, User $actor, ?string $ipAddress, ?string $userAgent): void
+    {
+        if ($grant->revoked_at === null) {
+            return;
+        }
+
+        DB::transaction(function () use ($grant, $actor, $ipAddress, $userAgent) {
+            $grant->update([
+                'revoked_at' => null,
+                'granted_at' => now(),
+            ]);
+
+            AuditLog::create([
+                'event' => 'data_room.reinstated',
+                'actor_type' => $actor::class,
+                'actor_id' => $actor->id,
+                'auditable_type' => $grant::class,
+                'auditable_id' => $grant->id,
+                'metadata' => ['profile_id' => $grant->profile_id, 'investor_id' => $grant->investor_id],
+                'ip_address' => $ipAddress,
+                'user_agent' => $userAgent,
+            ]);
+
+            DB::afterCommit(function () use ($grant) {
+                $grant->loadMissing(['investor.profile', 'profile.founder']);
+                $this->notifyDealflowStaff(new DealflowAdminNotification('data_room_granted', null, null, $grant));
             });
         });
     }

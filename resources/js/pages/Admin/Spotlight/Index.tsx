@@ -255,8 +255,8 @@ function SpotlightDrawer({
                     </button>
                 </div>
 
-                {/* ── Drawer Content Body ───────────────────────────────────── */}
-                <div className="flex-1 min-h-0 overflow-y-auto p-6 space-y-6">
+                {/* ── Drawer Body ───────────────────────────────────────────── */}
+                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
                     {/* Publishing Readiness Warning (if requirements pending) */}
                     {!profile.is_published && profile.publish_requirements.length > 0 && (
                         <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3.5 space-y-2 text-xs">
@@ -733,7 +733,7 @@ export default function SpotlightIndex({
                     </div>
 
                     {/* Scrollable Rows */}
-                    <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-zinc-100">
+                    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar divide-y divide-zinc-100">
                         {profiles.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
                                 <p className="text-xs text-zinc-400">No spotlight startups found matching this filter.</p>

@@ -203,7 +203,7 @@ export default function AdminMessagesInbox({
                     </div>
 
                     {/* Thread Items List (Independently Scrollable) */}
-                    <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-1">
+                    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-2 space-y-1">
                         {filteredThreads.length === 0 ? (
                             <div className="p-8 text-center">
                                 <Icon icon="solar:inbox-line-linear" className="mx-auto size-8 text-zinc-300 mb-2" />
@@ -306,7 +306,7 @@ export default function AdminMessagesInbox({
                                 </div>
 
                                 {/* Message Timeline (Independently Scrollable Stream) */}
-                                <div ref={threadRef} className="flex-1 min-h-0 overflow-y-auto p-6 space-y-6">
+                                <div ref={threadRef} className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
                                     {messages.map((msg, idx) => {
                                         const isFounder = msg.is_from_founder;
 
@@ -443,7 +443,7 @@ export default function AdminMessagesInbox({
 
                             {/* Right Sub-Pane: Clean Structured Inspector (Mercury / Polar Spec) */}
                             {founder && (
-                                <aside className="hidden w-84 shrink-0 border-l border-zinc-100 bg-[#FAFBFD] p-5 h-full max-h-full overflow-y-auto xl:flex xl:flex-col justify-between">
+                                <aside className="hidden w-84 shrink-0 border-l border-zinc-100 bg-[#FAFBFD] p-5 h-full max-h-full overflow-y-auto no-scrollbar xl:flex xl:flex-col justify-between">
                                     <div className="space-y-5">
                                         {/* Top Profile Summary Card */}
                                         <div className="flex items-start gap-3.5">

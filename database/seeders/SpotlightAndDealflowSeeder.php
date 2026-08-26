@@ -338,5 +338,146 @@ class SpotlightAndDealflowSeeder extends Seeder
                 'is_reviewed' => false, // Needs review!
             ]
         );
+
+        // -------------------------------------------------------------
+        // Seed Investor Interests & Dealflow Pipeline
+        // -------------------------------------------------------------
+        $david = Investor::where('email', 'davidakintunde433@gmail.com')->first() ?? $investor;
+        $elena = Investor::where('email', 'elena.rostova@genevahorizon.ch')->first();
+        $marcus = Investor::where('email', 'marcus.vance@vancecap.co.uk')->first();
+        $chen = Investor::where('email', 'chen.wei@silkroadbiotech.hk')->first();
+        $fatima = Investor::where('email', 'fatima.almansoor@oasisfo.ae')->first();
+
+        // 1. David Akintunde -> PayFlow Africa (Approved Data Room)
+        if ($david && $payflowProfile) {
+            $i1 = InvestorInterest::updateOrCreate(
+                ['investor_id' => $david->id, 'profile_id' => $payflowProfile->id],
+                [
+                    'type' => 'data_room_access',
+                    'message' => 'We are evaluating lead investment positions for your $3.5M Seed round. Requesting full data room access to review monthly cohort retention and regulatory licenses.',
+                    'status' => 'approved',
+                    'reviewed_by_founder' => $payflowFounder->id,
+                    'reviewed_at' => now()->subDays(2),
+                    'created_at' => now()->subDays(3),
+                ]
+            );
+
+            InvestorDataRoomGrant::updateOrCreate(
+                ['investor_id' => $david->id, 'profile_id' => $payflowProfile->id],
+                [
+                    'granted_by_founder' => $payflowFounder->id,
+                    'granted_at' => now()->subDays(2),
+                    'revoked_at' => null,
+                ]
+            );
+        }
+
+        // 2. David Akintunde -> AgriDrone Robotics (Pending Founder Call)
+        if ($david && $agriProfile) {
+            InvestorInterest::updateOrCreate(
+                ['investor_id' => $david->id, 'profile_id' => $agriProfile->id],
+                [
+                    'type' => 'founder_call',
+                    'message' => 'Excited about your hyperspectral scouting in West Africa. Would like to schedule an introductory partner call with Kofi to discuss fleet scalability.',
+                    'status' => 'pending',
+                    'reviewed_by_founder' => null,
+                    'reviewed_at' => null,
+                    'created_at' => now()->subHours(6),
+                ]
+            );
+        }
+
+        // 3. Dr. Chen Wei -> BioLogix Diagnostics (Approved Data Room)
+        if ($chen && $bioProfile) {
+            InvestorInterest::updateOrCreate(
+                ['investor_id' => $chen->id, 'profile_id' => $bioProfile->id],
+                [
+                    'type' => 'data_room_access',
+                    'message' => 'Our biotech fund is actively deploying across decentralized diagnostic platforms. Please grant data room access for clinical trial validation data and IP filings.',
+                    'status' => 'approved',
+                    'reviewed_by_founder' => $bioFounder->id,
+                    'reviewed_at' => now()->subDay(),
+                    'created_at' => now()->subDays(2),
+                ]
+            );
+
+            InvestorDataRoomGrant::updateOrCreate(
+                ['investor_id' => $chen->id, 'profile_id' => $bioProfile->id],
+                [
+                    'granted_by_founder' => $bioFounder->id,
+                    'granted_at' => now()->subDay(),
+                    'revoked_at' => null,
+                ]
+            );
+        }
+
+        // 4. Marcus Vance -> SolarGrid Nexus (Pending More Details)
+        if ($marcus && $solarProfile) {
+            InvestorInterest::updateOrCreate(
+                ['investor_id' => $marcus->id, 'profile_id' => $solarProfile->id],
+                [
+                    'type' => 'more_details',
+                    'message' => 'Could you provide additional details on your LoRa smart meter unit economics, hardware warranty terms, and average digital bill collection cycle?',
+                    'status' => 'pending',
+                    'reviewed_by_founder' => null,
+                    'reviewed_at' => null,
+                    'created_at' => now()->subHours(18),
+                ]
+            );
+        }
+
+        // 5. Elena Rostova -> PayFlow Africa (Pending Founder Call)
+        if ($elena && $payflowProfile) {
+            InvestorInterest::updateOrCreate(
+                ['investor_id' => $elena->id, 'profile_id' => $payflowProfile->id],
+                [
+                    'type' => 'founder_call',
+                    'message' => 'Geneva Horizon would like to coordinate a 45-minute diligence session regarding cross-border banking corridors and treasury settlement flows.',
+                    'status' => 'pending',
+                    'reviewed_by_founder' => null,
+                    'reviewed_at' => null,
+                    'created_at' => now()->subHours(22),
+                ]
+            );
+        }
+
+        // 6. Fatima Al-Mansoor -> AgriDrone Robotics (Denied Data Room)
+        if ($fatima && $agriProfile) {
+            InvestorInterest::updateOrCreate(
+                ['investor_id' => $fatima->id, 'profile_id' => $agriProfile->id],
+                [
+                    'type' => 'data_room_access',
+                    'message' => 'Requesting access to your technical architecture deck and current contract pipeline with regional farming syndicates.',
+                    'status' => 'denied',
+                    'reviewed_by_founder' => $agriFounder->id,
+                    'reviewed_at' => now()->subDays(4),
+                    'created_at' => now()->subDays(5),
+                ]
+            );
+        }
+
+        // 7. Marcus Vance -> PayFlow Africa (Approved Data Room)
+        if ($marcus && $payflowProfile) {
+            InvestorInterest::updateOrCreate(
+                ['investor_id' => $marcus->id, 'profile_id' => $payflowProfile->id],
+                [
+                    'type' => 'data_room_access',
+                    'message' => 'Following up from the London fintech roundtable. Requesting data room clearance for Vance Syndicate partner committee review.',
+                    'status' => 'approved',
+                    'reviewed_by_founder' => $payflowFounder->id,
+                    'reviewed_at' => now()->subDays(3),
+                    'created_at' => now()->subDays(4),
+                ]
+            );
+
+            InvestorDataRoomGrant::updateOrCreate(
+                ['investor_id' => $marcus->id, 'profile_id' => $payflowProfile->id],
+                [
+                    'granted_by_founder' => $payflowFounder->id,
+                    'granted_at' => now()->subDays(3),
+                    'revoked_at' => null,
+                ]
+            );
+        }
     }
 }

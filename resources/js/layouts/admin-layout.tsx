@@ -142,12 +142,12 @@ function SidebarContent({
 }) {
     return (
         <TooltipProvider>
-            <div className="flex h-full flex-col justify-between">
-                {/* Top Workspace Header */}
-                <div>
+            <div className="flex h-full min-h-0 flex-col justify-between overflow-hidden">
+                {/* Top Workspace Header (Fixed) */}
+                <div className="shrink-0">
                     <div
                         className={cn(
-                            'group mb-5 flex items-center transition-all cursor-pointer',
+                            'group mb-3 flex items-center transition-all cursor-pointer',
                             collapsed
                                 ? 'justify-center py-2'
                                 : 'justify-between gap-3 rounded-2xl px-3.5 py-2.5 hover:bg-[#EAEAEA]/70',
@@ -194,8 +194,10 @@ function SidebarContent({
                             </>
                         )}
                     </div>
+                </div>
 
-                    {/* Navigation Links with Clean Linear Icons */}
+                {/* Navigation Links (Scrollable without visible scrollbars) */}
+                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar py-1">
                     <nav className="flex flex-col space-y-1">
                         <NavSection label="Main" collapsed={collapsed} />
                         <NavItem
@@ -353,8 +355,8 @@ function SidebarContent({
                     </nav>
                 </div>
 
-                {/* Bottom User Area */}
-                <div className="mt-6 pt-2 pb-1">
+                {/* Bottom User Area (Fixed) */}
+                <div className="shrink-0 mt-auto pt-2 pb-1 border-t border-zinc-200/60">
                     {collapsed ? (
                         <Tooltip delayDuration={150}>
                             <TooltipTrigger asChild>
@@ -495,10 +497,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <div className="h-screen max-h-screen overflow-hidden bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white flex flex-col lg:flex-row p-3 lg:p-3.5 gap-3.5">
-            {/* ── Desktop Sidebar (Strictly bounded height) ── */}
+            {/* ── Desktop Sidebar (Strictly bounded height, no scrollbar visible) ── */}
             <aside
                 className={cn(
-                    'hidden lg:flex shrink-0 flex-col justify-between py-2 select-none transition-all duration-200 ease-in-out h-full max-h-full overflow-y-auto',
+                    'hidden lg:flex shrink-0 flex-col justify-between py-2 select-none transition-all duration-200 ease-in-out h-full max-h-full overflow-hidden no-scrollbar',
                     collapsed ? 'w-16 px-1' : 'w-72 px-1.5',
                 )}
             >
@@ -509,7 +511,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {sidebarOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden" aria-modal="true">
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setSidebarOpen(false)} />
-                    <aside className="absolute inset-y-0 left-0 flex w-80 flex-col bg-[#F4F4F6] p-4 shadow-2xl border-r border-zinc-200/80">
+                    <aside className="absolute inset-y-0 left-0 flex w-80 flex-col bg-[#F4F4F6] p-4 shadow-2xl border-r border-zinc-200/80 no-scrollbar">
                         <button
                             onClick={() => setSidebarOpen(false)}
                             className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-xl text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700"

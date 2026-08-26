@@ -20,11 +20,98 @@ class AdminMessageController extends Controller
 {
     public function __construct(private readonly MessageService $messageService) {}
 
-    public function inbox(): Response
+    public function inbox(Request $request): Response
     {
-        $threads = MessageThread::with([
-                'founder:id,full_name,company_name,email',
-            ])
+        $threads = $this->getThreadsData();
+        $selectedThreadId = $request->query('thread');
+
+        $activeThreadModel = null;
+        if ($selectedThreadId) {
+            $activeThreadModel = MessageThread::with(['founder.diagnosticSession', 'founder.payment'])->find($selectedThreadId);
+        }
+
+        if (!$activeThreadModel && $threads->isNotEmpty()) {
+            $firstId = $threads->first()['id'];
+            $activeThreadModel = MessageThread::with(['founder.diagnosticSession', 'founder.payment'])->find($firstId);
+        }
+
+        $activeThreadData = null;
+        $messagesData = [];
+        $founderData = null;
+
+        if ($activeThreadModel) {
+            $this->messageService->markThreadRead($activeThreadModel, 'admin');
+            $founder = $activeThreadModel->founder;
+            $activeThreadData = [
+                'id'           => $activeThreadModel->id,
+                'founder_id'   => $founder?->id,
+                'founder_name' => $founder?->full_name ?? 'Deleted Founder',
+                'company_name' => $founder?->company_name ?? 'N/A',
+                'email'        => $founder?->email ?? 'N/A',
+            ];
+            $messagesData = $this->getMessagesData($activeThreadModel, $founder);
+            $founderData = $founder ? [
+                'id'                 => $founder->id,
+                'full_name'          => $founder->full_name ?? 'Deleted Founder',
+                'company_name'       => $founder->company_name ?? 'N/A',
+                'email'              => $founder->email ?? 'N/A',
+                'phone'              => $founder->phone ?? null,
+                'tier'               => $founder->payment?->tier ?? 'foundation',
+                'diagnostic_score'   => $founder->diagnosticSession?->overall_score ?? null,
+                'diagnostic_status'  => $founder->diagnosticSession?->status ?? 'pending',
+                'created_at'         => $founder->created_at?->format('d M Y'),
+            ] : null;
+        }
+
+        return Inertia::render('Admin/Messages/Inbox', [
+            'threads'       => $threads,
+            'active_thread' => $activeThreadData,
+            'messages'      => $messagesData,
+            'founder'       => $founderData,
+            'total_unread'  => MessageThread::sum('admin_unread_count'),
+        ]);
+    }
+
+    public function show(MessageThread $thread): Response
+    {
+        $threads = $this->getThreadsData();
+        $thread->load(['founder.diagnosticSession', 'founder.payment']);
+        $founder = $thread->founder;
+
+        $this->messageService->markThreadRead($thread, 'admin');
+
+        $activeThreadData = [
+            'id'           => $thread->id,
+            'founder_id'   => $founder?->id,
+            'founder_name' => $founder?->full_name ?? 'Deleted Founder',
+            'company_name' => $founder?->company_name ?? 'N/A',
+            'email'        => $founder?->email ?? 'N/A',
+        ];
+        $messagesData = $this->getMessagesData($thread, $founder);
+        $founderData = $founder ? [
+            'id'                 => $founder->id,
+            'full_name'          => $founder->full_name ?? 'Deleted Founder',
+            'company_name'       => $founder->company_name ?? 'N/A',
+            'email'              => $founder->email ?? 'N/A',
+            'phone'              => $founder->phone ?? null,
+            'tier'               => $founder->payment?->tier ?? 'foundation',
+            'diagnostic_score'   => $founder->diagnosticSession?->overall_score ?? null,
+            'diagnostic_status'  => $founder->diagnosticSession?->status ?? 'pending',
+            'created_at'         => $founder->created_at?->format('d M Y'),
+        ] : null;
+
+        return Inertia::render('Admin/Messages/Inbox', [
+            'threads'       => $threads,
+            'active_thread' => $activeThreadData,
+            'messages'      => $messagesData,
+            'founder'       => $founderData,
+            'total_unread'  => MessageThread::sum('admin_unread_count'),
+        ]);
+    }
+
+    private function getThreadsData()
+    {
+        return MessageThread::with(['founder:id,full_name,company_name,email'])
             ->withCount(['messages as total_messages'])
             ->orderBy('last_message_at', 'desc')
             ->get()
@@ -41,21 +128,11 @@ class AdminMessageController extends Controller
                     60
                 ),
             ]);
-
-        return Inertia::render('Admin/Messages/Inbox', [
-            'threads'      => $threads,
-            'total_unread' => MessageThread::sum('admin_unread_count'),
-        ]);
     }
 
-    public function show(MessageThread $thread): Response
+    private function getMessagesData(MessageThread $thread, $founder)
     {
-        $thread->load('founder:id,full_name,company_name,email,payment_id');
-        $founder = $thread->founder;
-
-        $this->messageService->markThreadRead($thread, 'admin');
-
-        $messages = $thread->messages()
+        return $thread->messages()
             ->visible()
             ->oldest()
             ->get()
@@ -67,27 +144,10 @@ class AdminMessageController extends Controller
                 'has_attachment'      => $msg->has_attachment,
                 'attachment_filename' => $msg->attachment_filename,
                 'attachment_size'     => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
-                'created_at'          => $msg->created_at->format('d M Y, H:i'),
+                'created_at'          => $msg->created_at->format('d M, H:i'),
                 'created_at_date'     => $msg->created_at->format('Y-m-d'),
                 'is_from_founder'     => $msg->isFromFounder(),
             ]);
-
-        return Inertia::render('Admin/Messages/Show', [
-            'thread'   => [
-                'id'            => $thread->id,
-                'founder_id'    => $founder?->id,
-                'founder_name'  => $founder?->full_name ?? 'Deleted Founder',
-                'company_name'  => $founder?->company_name ?? 'N/A',
-                'email'         => $founder?->email ?? 'N/A',
-            ],
-            'messages' => $messages,
-            'founder'  => [
-                'id'           => $founder?->id,
-                'full_name'    => $founder?->full_name ?? 'Deleted Founder',
-                'company_name' => $founder?->company_name ?? 'N/A',
-                'email'        => $founder?->email ?? 'N/A',
-            ],
-        ]);
     }
 
     public function reply(Request $request, MessageThread $thread): RedirectResponse

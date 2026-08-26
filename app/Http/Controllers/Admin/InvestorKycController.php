@@ -94,7 +94,7 @@ class InvestorKycController extends Controller
 
         $filename = trim(str_replace(["\0", "\r", "\n", '"'], '', basename(str_replace('\\', '/', $submission->original_name))));
         $filename = $filename !== '' ? $filename : 'kyc-document';
-        $mimeType = in_array($submission->mime_type, ['application/pdf', 'image/jpeg', 'image/png'], true)
+        $mimeType = in_array($submission->mime_type, ['application/pdf', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'], true)
             ? $submission->mime_type
             : 'application/octet-stream';
 

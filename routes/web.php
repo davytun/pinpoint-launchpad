@@ -127,6 +127,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('founders/{founder}/documents')->name('documents.')->group(function () {
             Route::get('/', [AdminDocumentController::class, 'index'])->name('index');
             Route::get('/{document}/download', [AdminDocumentController::class, 'download'])->name('download');
+            Route::get('/{document}/preview', [AdminDocumentController::class, 'preview'])->name('preview');
             Route::patch('/{document}/reviewed', [AdminDocumentController::class, 'markReviewed'])->name('reviewed');
             Route::patch('/{document}/note', [AdminDocumentController::class, 'addNote'])->name('note');
         });

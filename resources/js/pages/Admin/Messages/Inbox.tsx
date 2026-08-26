@@ -72,7 +72,6 @@ export default function AdminMessagesInbox({
     active_thread,
     messages,
     founder,
-    total_unread,
 }: PageProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterTab, setFilterTab] = useState<'all' | 'unread'>('all');
@@ -283,9 +282,14 @@ export default function AdminMessagesInbox({
                                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-xs font-bold text-white shadow-2xs">
                                             {getInitials(active_thread.founder_name)}
                                         </div>
-                                        <h2 className="truncate text-[14.5px] font-bold text-zinc-950">
-                                            {active_thread.founder_name ?? 'Founder'}
-                                        </h2>
+                                        <div className="min-w-0">
+                                            <h2 className="truncate text-[14.5px] font-bold text-zinc-950">
+                                                {active_thread.founder_name ?? 'Founder'}
+                                            </h2>
+                                            <p className="truncate text-[11.5px] text-zinc-500">
+                                                {active_thread.company_name !== 'N/A' ? active_thread.company_name : active_thread.email}
+                                            </p>
+                                        </div>
                                     </div>
 
                                     <div className="flex items-center gap-2">
@@ -379,7 +383,7 @@ export default function AdminMessagesInbox({
                                     {attachment && (
                                         <div className="mb-2 flex items-center gap-2 rounded-xl bg-zinc-100 px-3 py-1.5 text-xs text-zinc-800 w-fit">
                                             <Icon icon="solar:paperclip-linear" className="size-3.5 text-zinc-500" />
-                                            <span className="font-semibold max-w-[200px] truncate">{attachment.name}</span>
+                                            <span className="font-semibold max-w-50 truncate">{attachment.name}</span>
                                             <button
                                                 type="button"
                                                 onClick={removeAttachment}
@@ -437,104 +441,120 @@ export default function AdminMessagesInbox({
                                 </div>
                             </div>
 
-                            {/* Right Sub-Pane: Context Inspector (Independently Scrollable) */}
+                            {/* Right Sub-Pane: Clean Structured Inspector (Mercury / Polar Spec) */}
                             {founder && (
-                                <aside className="hidden w-76 shrink-0 border-l border-zinc-100 bg-[#FAFBFD] p-5 h-full max-h-full overflow-y-auto xl:flex xl:flex-col">
-                                    <div className="flex items-center justify-between mb-5">
-                                        <h3 className="text-[13px] font-bold text-zinc-950">Details</h3>
-                                    </div>
-
-                                    {/* Section 1: Information */}
-                                    <div className="space-y-3 mb-6">
-                                        <p className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Information</p>
-                                        <div className="grid grid-cols-[80px_1fr] items-center gap-2 text-xs">
-                                            <span className="text-zinc-400">Status</span>
-                                            <div className="flex items-center gap-1.5">
-                                                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                                                <span className="font-semibold text-zinc-900">In Progress</span>
+                                <aside className="hidden w-84 shrink-0 border-l border-zinc-100 bg-[#FAFBFD] p-5 h-full max-h-full overflow-y-auto xl:flex xl:flex-col justify-between">
+                                    <div className="space-y-5">
+                                        {/* Top Profile Summary Card */}
+                                        <div className="flex items-start gap-3.5">
+                                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-sm font-bold text-white shadow-2xs">
+                                                {getInitials(founder.full_name)}
                                             </div>
-
-                                            <span className="text-zinc-400">Tier</span>
-                                            <span className="font-semibold text-zinc-900 uppercase">
-                                                {founder.tier ?? 'Foundation'}
-                                            </span>
-
-                                            <span className="text-zinc-400">Assigned</span>
-                                            <span className="font-semibold text-zinc-900">Analyst Team</span>
-
-                                            <span className="text-zinc-400">Score</span>
-                                            <span className="font-bold text-zinc-950">
-                                                {founder.diagnostic_score != null ? `${founder.diagnostic_score} / 100` : 'Pending'}
-                                            </span>
+                                            <div className="min-w-0 flex-1">
+                                                <h3 className="truncate text-[15px] font-bold text-zinc-950 leading-tight">
+                                                    {founder.full_name ?? '—'}
+                                                </h3>
+                                                <p className="truncate text-[12.5px] font-medium text-zinc-500 mt-0.5">
+                                                    {founder.company_name !== 'N/A' ? founder.company_name : 'No Company'}
+                                                </p>
+                                                <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                                                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10.5px] font-bold text-emerald-700">
+                                                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                        Active
+                                                    </span>
+                                                    <span className="inline-flex items-center rounded-md bg-zinc-100 border border-zinc-200/60 px-2 py-0.5 text-[10.5px] font-bold text-zinc-700 uppercase tracking-wide">
+                                                        {founder.tier ?? 'Foundation'}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Section 2: Contact */}
-                                    <div className="space-y-3 mb-6">
-                                        <p className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Contact</p>
-                                        <div className="grid grid-cols-[80px_1fr] items-start gap-2 text-xs">
-                                            <span className="text-zinc-400 pt-0.5">Name</span>
-                                            <span className="font-semibold text-zinc-900">{founder.full_name ?? '—'}</span>
-
-                                            <span className="text-zinc-400 pt-0.5">Email</span>
-                                            <div className="flex items-center gap-1.5 min-w-0">
-                                                <span className="truncate font-mono text-[11.5px] text-zinc-800">{founder.email}</span>
-                                                <button
-                                                    onClick={copyEmail}
-                                                    title="Copy email"
-                                                    className="text-zinc-400 hover:text-zinc-700"
-                                                >
-                                                    <Icon
-                                                        icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'}
-                                                        className="size-3 text-zinc-500"
-                                                    />
-                                                </button>
+                                        {/* Section: Properties Table (Bordered Panel) */}
+                                        <div className="rounded-2xl border border-zinc-200/80 bg-white overflow-hidden divide-y divide-zinc-100/90 shadow-2xs">
+                                            <div className="flex items-center justify-between p-3 text-xs">
+                                                <span className="font-medium text-zinc-400">Email</span>
+                                                <div className="flex items-center gap-1.5 min-w-0">
+                                                    <span className="font-mono text-[12px] text-zinc-800 truncate max-w-35">
+                                                        {founder.email}
+                                                    </span>
+                                                    <button
+                                                        onClick={copyEmail}
+                                                        title="Copy email"
+                                                        className="text-zinc-400 hover:text-zinc-800 transition-colors"
+                                                    >
+                                                        <Icon
+                                                            icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'}
+                                                            className="size-3.5 text-zinc-500"
+                                                        />
+                                                    </button>
+                                                </div>
                                             </div>
-
-                                            <span className="text-zinc-400 pt-0.5">Company</span>
-                                            <span className="font-semibold text-zinc-900">
-                                                {founder.company_name !== 'N/A' ? founder.company_name : '—'}
-                                            </span>
 
                                             {founder.phone && (
-                                                <>
-                                                    <span className="text-zinc-400 pt-0.5">Phone</span>
-                                                    <span className="font-mono text-[11.5px] text-zinc-800">{founder.phone}</span>
-                                                </>
+                                                <div className="flex items-center justify-between p-3 text-xs">
+                                                    <span className="font-medium text-zinc-400">Phone</span>
+                                                    <span className="font-mono text-[12px] text-zinc-800">
+                                                        {founder.phone}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            <div className="flex items-center justify-between p-3 text-xs">
+                                                <span className="font-medium text-zinc-400">Diagnostic Score</span>
+                                                <span className="font-bold text-zinc-950">
+                                                    {founder.diagnostic_score != null ? `${founder.diagnostic_score} / 100` : 'Pending'}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center justify-between p-3 text-xs">
+                                                <span className="font-medium text-zinc-400">Assigned</span>
+                                                <span className="font-semibold text-zinc-800">Analyst Team</span>
+                                            </div>
+
+                                            {founder.created_at && (
+                                                <div className="flex items-center justify-between p-3 text-xs">
+                                                    <span className="font-medium text-zinc-400">Member Since</span>
+                                                    <span className="font-semibold text-zinc-800">{founder.created_at}</span>
+                                                </div>
                                             )}
                                         </div>
-                                    </div>
 
-                                    {/* Section 3: Thread Metadata */}
-                                    <div className="space-y-3 mb-6">
-                                        <p className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Thread</p>
-                                        <div className="grid grid-cols-[80px_1fr] items-start gap-2 text-xs">
-                                            <span className="text-zinc-400">Subject</span>
-                                            <span className="font-semibold text-zinc-900">Diligence & Matching</span>
-
-                                            <span className="text-zinc-400">Summary</span>
-                                            <span className="text-zinc-600 leading-relaxed">
-                                                Founder uploaded updated metrics and presentation deck.
-                                            </span>
+                                        {/* Section: Thread Context Card */}
+                                        <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-3.5 space-y-1">
+                                            <p className="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400">
+                                                Thread Context
+                                            </p>
+                                            <p className="text-xs font-bold text-zinc-900">
+                                                Diligence & Matching
+                                            </p>
+                                            <p className="text-[11.5px] text-zinc-500 leading-relaxed font-normal">
+                                                Founder uploaded updated metrics and presentation deck for review.
+                                            </p>
                                         </div>
                                     </div>
 
-                                    {/* Quick Actions */}
-                                    <div className="mt-auto pt-4 space-y-2 border-t border-zinc-200/70">
+                                    {/* Action Links */}
+                                    <div className="pt-4 space-y-2 border-t border-zinc-200/70 mt-6">
                                         <Link
                                             href={`/admin/founders/${founder.id}`}
-                                            className="flex w-full items-center justify-between rounded-xl border border-zinc-200/80 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 shadow-2xs hover:bg-zinc-50 transition-colors"
+                                            className="group flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white p-3 text-[12.5px] font-semibold text-zinc-800 shadow-2xs hover:bg-zinc-50 hover:border-zinc-300 transition-all"
                                         >
-                                            <span>Founder Overview</span>
-                                            <Icon icon="solar:arrow-right-up-linear" className="size-3.5 text-zinc-400" />
+                                            <div className="flex items-center gap-2.5">
+                                                <Icon icon="solar:user-circle-linear" className="size-4 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
+                                                <span>Founder Overview</span>
+                                            </div>
+                                            <Icon icon="solar:alt-arrow-right-linear" className="size-3.5 text-zinc-400 group-hover:text-zinc-700 transition-transform group-hover:translate-x-0.5" />
                                         </Link>
 
                                         <Link
                                             href={`/admin/profiles/${founder.id}`}
-                                            className="flex w-full items-center justify-between rounded-xl border border-zinc-200/80 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 shadow-2xs hover:bg-zinc-50 transition-colors"
+                                            className="group flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white p-3 text-[12.5px] font-semibold text-zinc-800 shadow-2xs hover:bg-zinc-50 hover:border-zinc-300 transition-all"
                                         >
-                                            <span>Diagnostic Audit</span>
-                                            <Icon icon="solar:arrow-right-up-linear" className="size-3.5 text-zinc-400" />
+                                            <div className="flex items-center gap-2.5">
+                                                <Icon icon="solar:chart-square-linear" className="size-4 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
+                                                <span>Diagnostic Audit</span>
+                                            </div>
+                                            <Icon icon="solar:alt-arrow-right-linear" className="size-3.5 text-zinc-400 group-hover:text-zinc-700 transition-transform group-hover:translate-x-0.5" />
                                         </Link>
                                     </div>
                                 </aside>

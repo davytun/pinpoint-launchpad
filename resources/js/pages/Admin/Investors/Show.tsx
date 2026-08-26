@@ -1,22 +1,14 @@
+import { Icon } from '@iconify/react';
+import { Head, Link, router } from '@inertiajs/react';
+import {useState } from 'react';
+
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
-import { Head, Link, router, usePage } from '@inertiajs/react';
-import {
-    ArrowLeft,
-    Check,
-    CheckCircle2,
-    ExternalLink,
-    Globe,
-    Mail,
-    MapPin,
-    Tag,
-    User,
-    X,
-} from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface InvestorApplication {
-    id: number;
+    id: string;
     investor_type: 'angel' | 'vc' | 'family_office' | 'syndicate' | 'dfi' | 'corporate';
     name: string;
     email: string;
@@ -34,11 +26,11 @@ interface InvestorApplication {
     thesis_notes: string | null;
     status: 'pending' | 'approved' | 'rejected' | 'request_more_info';
     confirmations: {
-        investor_status: boolean;
-        risk_understood: boolean;
-        no_recommendation: boolean;
-        aml_source_of_funds: boolean;
-        terms_agreed: boolean;
+        investor_status?: boolean;
+        risk_understood?: boolean;
+        no_recommendation?: boolean;
+        aml_source_of_funds?: boolean;
+        terms_agreed?: boolean;
     } | null;
     submitted_at: string | null;
     created_at: string;
@@ -47,6 +39,8 @@ interface InvestorApplication {
 interface PageProps {
     application: InvestorApplication;
 }
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const INVESTOR_TYPE_LABELS: Record<string, string> = {
     angel: 'Angel Investor',
@@ -57,73 +51,72 @@ const INVESTOR_TYPE_LABELS: Record<string, string> = {
     corporate: 'Corporate / CVC',
 };
 
-const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-    pending:           { label: 'Pending Review',  className: 'border-amber-200 bg-amber-50 text-amber-700' },
-    approved:          { label: 'Approved',         className: 'border-emerald-200 bg-emerald-50 text-emerald-700' },
-    rejected:          { label: 'Rejected',         className: 'border-rose-200 bg-rose-50 text-rose-700' },
-    request_more_info: { label: 'Needs More Info',  className: 'border-blue-200 bg-blue-50 text-blue-700' },
-};
-
-function fmt(dateStr: string | null): string {
-    if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+function getInitials(name?: string | null): string {
+    if (!name) return 'I';
+    return name
+        .split(' ')
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase();
 }
 
-function humanize(str: string): string {
+function formatDate(dateStr: string | null): string {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+function humanize(str: string | null): string {
+    if (!str) return '—';
     return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function DataRow({ label, value }: { label: string; value: React.ReactNode }) {
-    return (
-        <div className="flex items-start justify-between gap-4 py-3 border-b border-zinc-100 last:border-0">
-            <span className="text-xs font-semibold text-zinc-500 shrink-0">{label}</span>
-            <span className="text-sm font-bold text-zinc-900 text-right">{value || '—'}</span>
-        </div>
-    );
+// ─── Status Capsule Pill ──────────────────────────────────────────────────────
+
+function StatusPill({ status }: { status: InvestorApplication['status'] }) {
+    switch (status) {
+        case 'approved':
+            return (
+                <span className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200/70 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                    Approved
+                </span>
+            );
+        case 'pending':
+            return (
+                <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200/70 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                    Pending Review
+                </span>
+            );
+        case 'request_more_info':
+            return (
+                <span className="inline-flex items-center rounded-full bg-blue-50 border border-blue-200/70 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
+                    Needs Info
+                </span>
+            );
+        case 'rejected':
+            return (
+                <span className="inline-flex items-center rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-500">
+                    Rejected
+                </span>
+            );
+        default:
+            return null;
+    }
 }
 
-function FlashBanner() {
-    const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
-    const [visible, setVisible] = useState(false);
-    const [msg, setMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
-    const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+// ─── Main Review Page (Polar Style) ───────────────────────────────────────────
 
-    useEffect(() => {
-        const text = flash?.success || flash?.error;
-        const type = flash?.success ? 'success' : 'error';
-        if (!text) return;
-        clearTimeout(timerRef.current);
-        setMsg({ text, type });
-        setVisible(true);
-        timerRef.current = setTimeout(() => setVisible(false), 5000);
-    }, [flash]);
-
-    if (!msg || !visible) return null;
-
-    return (
-        <div
-            className={cn(
-                'mb-6 flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-semibold',
-                msg.type === 'success'
-                    ? 'border-emerald-500/25 bg-emerald-50 text-emerald-700'
-                    : 'border-rose-500/25 bg-rose-50 text-rose-700',
-            )}
-        >
-            <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0" />
-                {msg.text}
-            </div>
-            <button onClick={() => setVisible(false)}>
-                <X className="h-3.5 w-3.5" />
-            </button>
-        </div>
-    );
-}
-
-export default function Show({ application }: PageProps) {
+export default function ApplicationShow({ application }: PageProps) {
     const [updating, setUpdating] = useState(false);
+    const [copied, setCopied] = useState(false);
 
-    const updateStatus = (status: string) => {
+    function updateStatus(status: string) {
         setUpdating(true);
         router.patch(
             `/admin/investors/${application.id}/status`,
@@ -133,313 +126,310 @@ export default function Show({ application }: PageProps) {
                 preserveScroll: true,
             },
         );
-    };
+    }
 
-    const statusCfg = STATUS_CONFIG[application.status] || STATUS_CONFIG.pending;
+    function copyEmail() {
+        navigator.clipboard.writeText(application.email);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }
 
     return (
         <AdminLayout>
-            <Head title={`${application.name} — Investor Application`} />
+            <Head title={`${application.name} — Review`} />
 
-            <div className="space-y-6">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 pb-5">
-                    <div className="flex items-center gap-4">
+            {/* ── Main Container (Polar Refero Spec) ───────────────────────────── */}
+            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] overflow-hidden">
+                {/* ── Header Bar ─────────────────────────────────────────────── */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 lg:px-8 py-5 border-b border-zinc-100 shrink-0 bg-white">
+                    <div className="flex items-center gap-4 min-w-0">
                         <Link
                             href="/admin/investors"
-                            className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-500 hover:text-zinc-900 hover:border-zinc-300 transition-colors shrink-0"
+                            className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/80 bg-white text-zinc-500 shadow-2xs hover:bg-zinc-50 hover:text-zinc-950 transition-colors shrink-0"
+                            title="Back to Applications"
                         >
-                            <ArrowLeft className="h-4 w-4" />
+                            <Icon icon="solar:alt-arrow-left-linear" className="size-4" />
                         </Link>
-                        <div>
-                            <h1 className="font-display text-2xl font-black tracking-tight text-zinc-950">{application.name}</h1>
-                            <p className="mt-0.5 text-sm text-zinc-500">
-                                {INVESTOR_TYPE_LABELS[application.investor_type] || humanize(application.investor_type)}
+
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-700">
+                            {getInitials(application.name)}
+                        </div>
+
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-2.5">
+                                <h1 className="truncate text-lg font-bold tracking-tight text-zinc-950">
+                                    {application.name}
+                                </h1>
+                                <StatusPill status={application.status} />
+                            </div>
+                            <p className="truncate text-xs text-zinc-500 mt-0.5">
+                                {application.email}
                                 {application.organisation && ` · ${application.organisation}`}
+                                {application.role && ` · ${application.role}`}
                             </p>
                         </div>
                     </div>
 
-                    <span className={cn('inline-flex h-8 items-center rounded-xl border px-4 text-xs font-bold tracking-wider uppercase shrink-0', statusCfg.className)}>
-                        {statusCfg.label}
-                    </span>
+                    {/* Decision Action Buttons */}
+                    <div className="flex items-center gap-2 shrink-0">
+                        <button
+                            type="button"
+                            onClick={() => updateStatus('approved')}
+                            disabled={updating || application.status === 'approved'}
+                            className={cn(
+                                'flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-all shadow-2xs',
+                                application.status === 'approved'
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-not-allowed'
+                                    : 'bg-zinc-950 hover:bg-zinc-800 text-white',
+                            )}
+                        >
+                            <Icon icon="solar:check-circle-linear" className="size-3.5" />
+                            <span>Approve</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => updateStatus('request_more_info')}
+                            disabled={updating || application.status === 'request_more_info'}
+                            className={cn(
+                                'flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all shadow-2xs',
+                                application.status === 'request_more_info'
+                                    ? 'border-blue-200 bg-blue-50 text-blue-800 cursor-not-allowed'
+                                    : 'border-zinc-200/90 bg-white hover:bg-zinc-50 text-zinc-800',
+                            )}
+                        >
+                            <Icon icon="solar:info-circle-linear" className="size-3.5 text-blue-600" />
+                            <span>Request Info</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => updateStatus('rejected')}
+                            disabled={updating || application.status === 'rejected'}
+                            className={cn(
+                                'rounded-xl px-3 py-2 text-xs font-medium transition-colors',
+                                application.status === 'rejected'
+                                    ? 'text-zinc-400 cursor-not-allowed'
+                                    : 'text-zinc-400 hover:text-rose-600',
+                            )}
+                        >
+                            Reject
+                        </button>
+                    </div>
                 </div>
 
-                <FlashBanner />
+                {/* ── Content Stream ─────────────────────────────────────────── */}
+                <div className="flex-1 min-h-0 overflow-y-auto p-6 lg:p-8 space-y-6">
+                    {/* Polar Top Metric Strip */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/50 p-4">
+                            <span className="text-[11px] font-medium text-zinc-500 block">Investor Type</span>
+                            <p className="mt-1 text-sm font-semibold text-zinc-950">
+                                {INVESTOR_TYPE_LABELS[application.investor_type] || humanize(application.investor_type)}
+                            </p>
+                        </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/50 p-4">
+                            <span className="text-[11px] font-medium text-zinc-500 block">Cheque Size</span>
+                            <p className="mt-1 text-sm font-semibold text-zinc-950">
+                                {application.cheque_size ?? '—'}
+                            </p>
+                        </div>
 
-                    {/* Left: Application Details */}
-                    <div className="lg:col-span-2 space-y-6">
+                        <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/50 p-4">
+                            <span className="text-[11px] font-medium text-zinc-500 block">Deals per Year</span>
+                            <p className="mt-1 text-sm font-semibold text-zinc-950">
+                                {application.deals_per_year ?? '—'}
+                            </p>
+                        </div>
 
-                        {/* Contact card */}
-                        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs">
-                            <h2 className="text-sm font-black text-zinc-900 uppercase tracking-widest mb-4">Contact Details</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="flex items-start gap-3">
-                                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-                                        <User className="h-4 w-4 text-zinc-500" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Full Name</p>
-                                        <p className="text-sm font-bold text-zinc-900">{application.name}</p>
+                        <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/50 p-4">
+                            <span className="text-[11px] font-medium text-zinc-500 block">Jurisdiction</span>
+                            <p className="mt-1 text-sm font-semibold text-zinc-950">
+                                {application.country}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Polar 2-Column Key-Value Properties Panel */}
+                    <div className="rounded-2xl border border-zinc-200/80 bg-white p-6 space-y-6 shadow-2xs">
+                        {/* Section: Applicant Details */}
+                        <div>
+                            <h2 className="text-xs font-semibold text-zinc-950 mb-3">Applicant Details</h2>
+                            <div className="divide-y divide-zinc-100 text-xs">
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Full Name</span>
+                                    <span className="font-medium text-zinc-900">{application.name}</span>
+                                </div>
+
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Email Address</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium text-zinc-900">{application.email}</span>
+                                        <button onClick={copyEmail} className="text-zinc-400 hover:text-zinc-800">
+                                            <Icon
+                                                icon={copied ? 'solar:check-circle-linear' : 'solar:copy-linear'}
+                                                className="size-3.5"
+                                            />
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-3">
-                                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-                                        <Mail className="h-4 w-4 text-zinc-500" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Email</p>
-                                        <a href={`mailto:${application.email}`} className="text-sm font-bold text-[#3A54A5] hover:underline">
-                                            {application.email}
-                                        </a>
-                                    </div>
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Organisation</span>
+                                    <span className="font-medium text-zinc-900">
+                                        {application.organisation ?? 'Independent Investor'}
+                                    </span>
                                 </div>
 
-                                <div className="flex items-start gap-3">
-                                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-                                        <Tag className="h-4 w-4 text-zinc-500" />
+                                {application.role && (
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Role / Title</span>
+                                        <span className="font-medium text-zinc-900">{application.role}</span>
                                     </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Organisation & Role</p>
-                                        <p className="text-sm font-bold text-zinc-900">{application.organisation || 'Independent'}</p>
-                                        {application.role && <p className="text-xs text-zinc-500">{application.role}</p>}
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start gap-3">
-                                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-                                        <MapPin className="h-4 w-4 text-zinc-500" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Country</p>
-                                        <p className="text-sm font-bold text-zinc-900">{application.country}</p>
-                                    </div>
-                                </div>
+                                )}
 
                                 {application.website && (
-                                    <div className="flex items-start gap-3 sm:col-span-2">
-                                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
-                                            <Globe className="h-4 w-4 text-zinc-500" />
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Website</span>
+                                        <a
+                                            href={application.website}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 font-medium text-zinc-900 hover:underline"
+                                        >
+                                            <span>{application.website.replace(/^https?:\/\//, '')}</span>
+                                            <Icon icon="solar:arrow-right-up-linear" className="size-3 text-zinc-400" />
+                                        </a>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Submitted At</span>
+                                    <span className="font-medium text-zinc-900">
+                                        {formatDate(application.submitted_at ?? application.created_at)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Section: Investment Mandate */}
+                        <div className="pt-4 border-t border-zinc-100">
+                            <h2 className="text-xs font-semibold text-zinc-950 mb-3">Investment Mandate</h2>
+                            <div className="divide-y divide-zinc-100 text-xs">
+                                {application.sectors && application.sectors.length > 0 && (
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Target Sectors</span>
+                                        <div className="flex flex-wrap gap-1.5 justify-end">
+                                            {application.sectors.map((s) => (
+                                                <span
+                                                    key={s}
+                                                    className="rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-700"
+                                                >
+                                                    {humanize(s)}
+                                                </span>
+                                            ))}
                                         </div>
-                                        <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Website / LinkedIn</p>
-                                            <a
-                                                href={application.website}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="flex items-center gap-1.5 text-sm font-bold text-[#3A54A5] hover:underline"
-                                            >
-                                                {application.website}
-                                                <ExternalLink className="h-3 w-3 shrink-0" />
-                                            </a>
+                                    </div>
+                                )}
+
+                                {application.stages && application.stages.length > 0 && (
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Target Stages</span>
+                                        <div className="flex flex-wrap gap-1.5 justify-end">
+                                            {application.stages.map((s) => (
+                                                <span
+                                                    key={s}
+                                                    className="rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-700"
+                                                >
+                                                    {humanize(s)}
+                                                </span>
+                                            ))}
                                         </div>
+                                    </div>
+                                )}
+
+                                {application.geographies && application.geographies.length > 0 && (
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Target Geographies</span>
+                                        <div className="flex flex-wrap gap-1.5 justify-end">
+                                            {application.geographies.map((g) => (
+                                                <span
+                                                    key={g}
+                                                    className="rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] font-medium text-zinc-700"
+                                                >
+                                                    {humanize(g)}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {application.instrument && (
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Preferred Instrument</span>
+                                        <span className="font-medium text-zinc-900">{application.instrument}</span>
+                                    </div>
+                                )}
+
+                                {application.fund_detail && (
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Fund Detail</span>
+                                        <span className="font-medium text-zinc-900">{application.fund_detail}</span>
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Mandate card */}
-                        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs">
-                            <h2 className="text-sm font-black text-zinc-900 uppercase tracking-widest mb-4">Investment Mandate</h2>
-                            <div className="divide-y divide-zinc-100">
-                                <DataRow
-                                    label="Investor Type"
-                                    value={INVESTOR_TYPE_LABELS[application.investor_type] || humanize(application.investor_type)}
-                                />
-                                <DataRow
-                                    label="Stages"
-                                    value={
-                                        application.stages && application.stages.length > 0 ? (
-                                            <div className="flex flex-wrap justify-end gap-1.5">
-                                                {application.stages.map((s) => (
-                                                    <span key={s} className="inline-flex rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                                                        {humanize(s)}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        ) : null
-                                    }
-                                />
-                                <DataRow
-                                    label="Sectors"
-                                    value={
-                                        application.sectors && application.sectors.length > 0 ? (
-                                            <div className="flex flex-wrap justify-end gap-1.5">
-                                                {application.sectors.map((s) => (
-                                                    <span key={s} className="inline-flex rounded-md border border-[#3A54A5]/20 bg-[#3A54A5]/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#3A54A5]">
-                                                        {humanize(s)}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        ) : null
-                                    }
-                                />
-                                <DataRow
-                                    label="Geographies"
-                                    value={
-                                        application.geographies && application.geographies.length > 0 ? (
-                                            <div className="flex flex-wrap justify-end gap-1.5">
-                                                {application.geographies.map((g) => (
-                                                    <span key={g} className="inline-flex rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                                                        {humanize(g)}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        ) : null
-                                    }
-                                />
-                                <DataRow label="Typical Cheque Size" value={application.cheque_size} />
-                                <DataRow label="Preferred Instrument" value={application.instrument} />
-                                <DataRow label="Deals per Year" value={application.deals_per_year} />
-                                {application.fund_detail && (
-                                    <DataRow label="Fund / AUM Detail" value={application.fund_detail} />
-                                )}
+                        {/* Section: Thesis Notes */}
+                        {application.thesis_notes && (
+                            <div className="pt-4 border-t border-zinc-100">
+                                <h2 className="text-xs font-semibold text-zinc-950 mb-2">Thesis & Strategic Focus</h2>
+                                <p className="text-xs text-zinc-700 leading-relaxed font-normal bg-zinc-50/70 border border-zinc-100 p-3.5 rounded-xl">
+                                    "{application.thesis_notes}"
+                                </p>
                             </div>
+                        )}
 
-                            {application.thesis_notes && (
-                                <div className="mt-4 border-t border-zinc-100 pt-4">
-                                    <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2">Thesis Notes</p>
-                                    <p className="text-sm text-zinc-700 leading-relaxed whitespace-pre-line">{application.thesis_notes}</p>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Confirmations card */}
-                        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs">
-                            <h2 className="text-sm font-black text-zinc-900 uppercase tracking-widest mb-4">Eligibility Confirmations</h2>
-                            <div className="space-y-3">
+                        {/* Section: Compliance Affirmations */}
+                        <div className="pt-4 border-t border-zinc-100">
+                            <h2 className="text-xs font-semibold text-zinc-950 mb-3">Regulatory Confirmations</h2>
+                            <div className="space-y-2.5 text-xs">
                                 {[
                                     {
                                         key: 'investor_status',
-                                        label: 'Qualifies as a sophisticated / professional / HNW investor under applicable law, including the Investments and Securities Act 2025.',
+                                        label: 'Qualifies as a sophisticated / professional / HNW investor.',
                                     },
                                     {
                                         key: 'risk_understood',
-                                        label: 'Understands that early-stage investment is high-risk and illiquid, and decisions are made on own judgement.',
-                                    },
-                                    {
-                                        key: 'no_recommendation',
-                                        label: 'Understands that Pinpoint provides curated visibility only — not advice, endorsement, or arrangement.',
+                                        label: 'Understands venture investment is high-risk and illiquid.',
                                     },
                                     {
                                         key: 'aml_source_of_funds',
-                                        label: 'Confirms funds derive from lawful sources and agrees to provide identity / source-of-funds information as requested.',
+                                        label: 'Confirms capital derives from lawful sources and agrees to KYC.',
                                     },
                                     {
                                         key: 'terms_agreed',
-                                        label: 'Has read and agreed to the Investor Terms, Terms of Service, and Privacy Policy.',
+                                        label: 'Agrees to Platform Investor Terms & Syndicate Rules.',
                                     },
                                 ].map((item) => {
-                                    const checked = application.confirmations?.[item.key as keyof typeof application.confirmations] ?? false;
+                                    const checked =
+                                        application.confirmations?.[
+                                            item.key as keyof typeof application.confirmations
+                                        ] ?? true;
+
                                     return (
-                                        <div key={item.key} className="flex items-start gap-3">
-                                            <div className={cn(
-                                                'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border',
-                                                checked
-                                                    ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
-                                                    : 'border-rose-200 bg-rose-50 text-rose-500'
-                                            )}>
-                                                {checked ? <Check className="h-3 w-3 stroke-[3]" /> : <X className="h-3 w-3 stroke-[2.5]" />}
-                                            </div>
-                                            <p className="text-xs text-zinc-600 leading-relaxed">{item.label}</p>
+                                        <div key={item.key} className="flex items-center gap-2">
+                                            <Icon
+                                                icon={checked ? 'solar:check-circle-linear' : 'solar:close-circle-linear'}
+                                                className={cn('size-3.5 shrink-0', checked ? 'text-emerald-600' : 'text-rose-500')}
+                                            />
+                                            <span className="text-zinc-600">{item.label}</span>
                                         </div>
                                     );
                                 })}
                             </div>
                         </div>
-                    </div>
-
-                    {/* Right: Review Panel */}
-                    <div className="space-y-6">
-                        {/* Timestamps */}
-                        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs">
-                            <h2 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Timeline</h2>
-                            <div className="space-y-3">
-                                <div>
-                                    <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Submitted</p>
-                                    <p className="text-xs font-semibold text-zinc-700 mt-0.5">{fmt(application.submitted_at)}</p>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Received</p>
-                                    <p className="text-xs font-semibold text-zinc-700 mt-0.5">{fmt(application.created_at)}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Current status */}
-                        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs">
-                            <h2 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-3">Current Status</h2>
-                            <span className={cn('inline-flex h-8 items-center rounded-xl border px-4 text-xs font-bold tracking-wider uppercase', statusCfg.className)}>
-                                {statusCfg.label}
-                            </span>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-xs space-y-3">
-                            <h2 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Review Actions</h2>
-
-                            <button
-                                onClick={() => updateStatus('approved')}
-                                disabled={updating || application.status === 'approved'}
-                                className={cn(
-                                    'w-full flex items-center justify-center gap-2 h-10 rounded-xl border text-xs font-bold tracking-wider uppercase transition-all',
-                                    application.status === 'approved'
-                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 opacity-60 cursor-not-allowed'
-                                        : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 active:scale-[0.98]'
-                                )}
-                            >
-                                <CheckCircle2 className="h-3.5 w-3.5" />
-                                Approve
-                            </button>
-
-                            <button
-                                onClick={() => updateStatus('request_more_info')}
-                                disabled={updating || application.status === 'request_more_info'}
-                                className={cn(
-                                    'w-full flex items-center justify-center gap-2 h-10 rounded-xl border text-xs font-bold tracking-wider uppercase transition-all',
-                                    application.status === 'request_more_info'
-                                        ? 'border-blue-200 bg-blue-50 text-blue-700 opacity-60 cursor-not-allowed'
-                                        : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 active:scale-[0.98]'
-                                )}
-                            >
-                                Request More Info
-                            </button>
-
-                            <button
-                                onClick={() => updateStatus('rejected')}
-                                disabled={updating || application.status === 'rejected'}
-                                className={cn(
-                                    'w-full flex items-center justify-center gap-2 h-10 rounded-xl border text-xs font-bold tracking-wider uppercase transition-all',
-                                    application.status === 'rejected'
-                                        ? 'border-rose-200 bg-rose-50 text-rose-700 opacity-60 cursor-not-allowed'
-                                        : 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 active:scale-[0.98]'
-                                )}
-                            >
-                                <X className="h-3.5 w-3.5" />
-                                Reject
-                            </button>
-
-                            {application.status !== 'pending' && (
-                                <button
-                                    onClick={() => updateStatus('pending')}
-                                    disabled={updating}
-                                    className="w-full flex items-center justify-center gap-2 h-10 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-600 text-xs font-bold tracking-wider uppercase transition-all hover:bg-zinc-100"
-                                >
-                                    Reset to Pending
-                                </button>
-                            )}
-                        </div>
-
-                        <Link
-                            href="/admin/investors"
-                            className="flex h-9 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white text-xs font-bold text-zinc-500 uppercase tracking-wider transition-colors hover:text-zinc-900 hover:border-zinc-300 w-full"
-                        >
-                            <ArrowLeft className="h-3.5 w-3.5" />
-                            Back to list
-                        </Link>
                     </div>
                 </div>
             </div>

@@ -1,148 +1,1232 @@
-import { Head, Link } from '@inertiajs/react';
+import { Icon } from '@iconify/react';
+import { Head, router } from '@inertiajs/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
+import { cn } from '@/lib/utils';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type KycStatus = 'not_submitted' | 'pending' | 'approved' | 'rejected';
 
-type Investor = {
+interface InvestorProfile {
+    full_name: string;
+    company_name: string | null;
+    investor_type: 'individual' | 'corporate';
+    phone: string | null;
+    address: string | null;
+}
+
+interface KycSubmission {
+    id: string;
+    original_name: string;
+    document_type: string | null;
+    mime_type: string | null;
+    size_bytes: number | null;
+    status: 'pending' | 'approved' | 'rejected';
+    review_notes: string | null;
+    reviewed_at: string | null;
+    created_at: string;
+}
+
+interface InvestorAccount {
     id: string;
     email: string;
+    account_status: 'active' | 'suspended';
     kyc_status: KycStatus;
-    profile: { full_name: string; company_name: string | null; investor_type: 'individual' | 'corporate'; phone: string | null };
-    latest_kyc_submission: { original_name: string; created_at: string } | null;
-};
+    kyc_approved_at: string | null;
+    created_at: string;
+    profile: InvestorProfile | null;
+    latest_kyc_submission: KycSubmission | null;
+}
 
-type StatusFilter = KycStatus | 'all';
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
 
-const filters: { label: string; value: StatusFilter }[] = [
-    { label: 'All investors', value: 'all' },
-    { label: 'KYC pending', value: 'pending' },
-    { label: 'Not submitted', value: 'not_submitted' },
-    { label: 'Approved', value: 'approved' },
-    { label: 'Rejected', value: 'rejected' },
+interface Paginated<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: PaginationLink[];
+}
+
+interface Totals {
+    all: number;
+    pending: number;
+    approved: number;
+    not_submitted: number;
+    rejected: number;
+}
+
+interface PageProps {
+    investors: Paginated<InvestorAccount>;
+    activeKycStatus: 'all' | KycStatus;
+    activeType: 'all' | 'individual' | 'corporate';
+    search: string;
+    totals: Totals;
+}
+
+// ─── Preset Compliance Rejection Reasons ──────────────────────────────────────
+
+const REJECTION_PRESETS = [
+    {
+        id: 'expired',
+        label: 'Document has expired or is outdated',
+        template: 'The submitted document cannot be verified because it has expired. Please re-submit a valid, unexpired government-issued copy.',
+    },
+    {
+        id: 'blurry',
+        label: 'Image / scan is blurry, cropped, or unreadable',
+        template: 'The uploaded file is unclear, low resolution, or cropped. Please upload a clear, full-page high-resolution copy.',
+    },
+    {
+        id: 'name_mismatch',
+        label: 'Name does not match investor legal profile',
+        template: 'The name on the identity document does not match the legal registration details provided. Please submit matching documentation or update your profile.',
+    },
+    {
+        id: 'ownership',
+        label: 'Missing beneficial ownership or corporate resolution',
+        template: 'For corporate/fund accounts, a valid certificate of incumbency or resolution confirming authorized signatories is required.',
+    },
+    {
+        id: 'unsupported',
+        label: 'Unsupported document type or issuing authority',
+        template: 'The submitted document type is not accepted for institutional compliance verification. Please provide an international passport or national identity card.',
+    },
+    {
+        id: 'other',
+        label: 'Other / Custom Compliance Reason',
+        template: '',
+    },
 ];
 
-const statusClasses: Record<KycStatus, string> = {
-    not_submitted: 'border-zinc-200 bg-zinc-50 text-zinc-600',
-    pending: 'border-amber-200 bg-amber-50 text-amber-800',
-    approved: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    rejected: 'border-rose-200 bg-rose-50 text-rose-700',
-};
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const statusLabel: Record<KycStatus, string> = {
-    not_submitted: 'Not submitted',
-    pending: 'Pending review',
-    approved: 'KYC approved',
-    rejected: 'KYC rejected',
-};
+function getInitials(name?: string | null): string {
+    if (!name) return 'I';
+    return name
+        .split(' ')
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase();
+}
+
+function formatDate(dateStr: string | null): string {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+
+    if (diffMins < 5) return 'just now';
+    if (diffMins < 60) return `${diffMins}min ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function humanize(str: string | null): string {
+    if (!str) return '—';
+    return str.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function buildParams(overrides: Record<string, string | undefined>, current: Partial<PageProps>) {
+    const p: Record<string, string> = {};
+    const status = overrides.kyc_status !== undefined ? overrides.kyc_status : current.activeKycStatus !== 'all' ? current.activeKycStatus : undefined;
+    const type = overrides.type !== undefined ? overrides.type : current.activeType !== 'all' ? current.activeType : undefined;
+    const srch = overrides.search !== undefined ? overrides.search : current.search;
+    if (status) p.kyc_status = status;
+    if (type) p.type = type;
+    if (srch) p.search = srch;
+    return p;
+}
+
+// ─── KYC Status Badge (Resend Capsule) ────────────────────────────────────────
+
+function KycStatusBadge({ status }: { status: KycStatus }) {
+    switch (status) {
+        case 'approved':
+            return (
+                <span className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200/70 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                    KYC Verified
+                </span>
+            );
+        case 'pending':
+            return (
+                <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200/70 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                    Pending Review
+                </span>
+            );
+        case 'rejected':
+            return (
+                <span className="inline-flex items-center rounded-full bg-rose-50 border border-rose-200/70 px-2.5 py-0.5 text-xs font-semibold text-rose-700">
+                    Rejected
+                </span>
+            );
+        case 'not_submitted':
+        default:
+            return (
+                <span className="inline-flex items-center rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-500">
+                    Not Submitted
+                </span>
+            );
+    }
+}
+
+// ─── Reject KYC Compliance Note Modal (Refero Step 4 Spec) ────────────────────
+
+function RejectKycModal({
+    investor,
+    onClose,
+    onSuccess,
+}: {
+    investor: InvestorAccount;
+    onClose: () => void;
+    onSuccess: (updated: InvestorAccount) => void;
+}) {
+    const docName = investor.latest_kyc_submission?.original_name ?? 'ID document';
+    const [selectedId, setSelectedId] = useState('expired');
+    const [notes, setNotes] = useState(
+        `The submitted document (${docName}) cannot be verified because it has expired. Please re-submit a valid, unexpired government-issued copy.`,
+    );
+    const [submitting, setSubmitting] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    function handleSelectPreset(preset: typeof REJECTION_PRESETS[0]) {
+        setSelectedId(preset.id);
+        if (preset.id === 'other') {
+            setNotes('');
+            setTimeout(() => textareaRef.current?.focus(), 50);
+        } else {
+            setNotes(
+                `The submitted document (${docName}) cannot be verified: ${preset.template}`,
+            );
+        }
+    }
+
+    function handleSubmit(e?: React.FormEvent) {
+        if (e) e.preventDefault();
+        if (!investor.latest_kyc_submission) return;
+        if (!notes.trim()) {
+            setErrorMsg('Please provide a specific compliance rejection note.');
+            textareaRef.current?.focus();
+            return;
+        }
+
+        setSubmitting(true);
+        setErrorMsg(null);
+
+        router.patch(
+            `/admin/investor-kyc/${investor.latest_kyc_submission.id}`,
+            {
+                status: 'rejected',
+                review_notes: notes.trim(),
+            },
+            {
+                onSuccess: () => {
+                    setSubmitting(false);
+                    onSuccess({
+                        ...investor,
+                        kyc_status: 'rejected',
+                        latest_kyc_submission: {
+                            ...investor.latest_kyc_submission!,
+                            status: 'rejected',
+                            review_notes: notes.trim(),
+                        },
+                    });
+                },
+                onError: (err) => {
+                    setSubmitting(false);
+                    setErrorMsg(Object.values(err)[0] ?? 'Failed to submit rejection.');
+                },
+                preserveScroll: true,
+            },
+        );
+    }
+
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            if (e.key === 'Escape') onClose();
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') handleSubmit();
+        }
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [notes]);
+
+    return (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+            <div
+                className="fixed inset-0 bg-zinc-950/25 backdrop-blur-xs transition-opacity duration-200"
+                onClick={onClose}
+            />
+
+            <div className="relative z-10 w-full max-w-lg rounded-[22px] border border-zinc-200/90 bg-white p-6 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-150 space-y-5">
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                    <div>
+                        <h3 className="text-base font-bold tracking-tight text-zinc-950">
+                            Reject KYC Submission
+                        </h3>
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                            {investor.profile?.full_name ?? investor.email} · <span className="font-medium text-zinc-700">{docName}</span>
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+                    >
+                        <Icon icon="solar:close-circle-linear" className="size-4" />
+                    </button>
+                </div>
+
+                {errorMsg && (
+                    <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3 text-xs text-rose-700 font-medium">
+                        {errorMsg}
+                    </div>
+                )}
+
+                {/* Reason Selection Cards */}
+                <div className="space-y-2">
+                    <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+                        Compliance Failure Reason
+                    </span>
+
+                    <div className="space-y-1.5">
+                        {REJECTION_PRESETS.map((preset) => {
+                            const isSelected = selectedId === preset.id;
+                            return (
+                                <div
+                                    key={preset.id}
+                                    onClick={() => handleSelectPreset(preset)}
+                                    className={cn(
+                                        'flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-xs transition-all cursor-pointer select-none',
+                                        isSelected
+                                            ? 'border-zinc-950 bg-[#FAFBFD] text-zinc-950 font-medium shadow-2xs'
+                                            : 'border-zinc-200/80 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50/50',
+                                    )}
+                                >
+                                    <span className="leading-snug pr-2">{preset.label}</span>
+                                    <div
+                                        className={cn(
+                                            'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors',
+                                            isSelected ? 'border-zinc-950 bg-zinc-950 text-white' : 'border-zinc-300 bg-white',
+                                        )}
+                                    >
+                                        {isSelected && <div className="size-1.5 rounded-full bg-white" />}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Detailed Compliance Note */}
+                <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+                            Compliance Note (Sent to Investor)
+                        </span>
+                        <span className="text-[10.5px] text-zinc-400 font-medium">Required</span>
+                    </div>
+                    <textarea
+                        ref={textareaRef}
+                        rows={3}
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        placeholder={selectedId === 'other' ? 'Type specific compliance reason and instructions for the investor...' : 'Detailed compliance notes...'}
+                        className="w-full rounded-xl border border-zinc-200/90 bg-[#FAFBFD] p-3 text-xs text-zinc-900 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-400 focus:outline-none resize-none transition-colors leading-relaxed shadow-2xs"
+                    />
+                </div>
+
+                {/* Footer Actions */}
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={submitting}
+                        className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                    >
+                        <span>Cancel</span>
+                        <kbd className="rounded bg-zinc-100 px-1 py-0.2 text-[10px] font-mono text-zinc-500">Esc</kbd>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => handleSubmit()}
+                        disabled={submitting || !notes.trim()}
+                        className="flex items-center gap-2 rounded-full bg-rose-600 px-4 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-rose-700 transition-all disabled:opacity-50"
+                    >
+                        {submitting ? (
+                            <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
+                        ) : (
+                            <Icon icon="solar:close-circle-linear" className="size-3.5" />
+                        )}
+                        <span>Confirm Rejection</span>
+                        <kbd className="rounded bg-rose-700 px-1 py-0.2 text-[10px] font-mono text-rose-200">⌘↵</kbd>
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ─── KYC Slide-Over Inspector Drawer (With Inline Visible Document) ────────────
+
+function KycDrawer({
+    investor,
+    onClose,
+    onOpenRejectModal,
+    onUpdateInvestor,
+}: {
+    investor: InvestorAccount;
+    onClose: () => void;
+    onOpenRejectModal: () => void;
+    onUpdateInvestor?: (updated: InvestorAccount) => void;
+}) {
+    const [updating, setUpdating] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+
+    const submission = investor.latest_kyc_submission;
+    const isPdf = submission?.mime_type === 'application/pdf' || submission?.original_name.endsWith('.pdf');
+
+    function approveKyc() {
+        if (!submission) return;
+        setUpdating(true);
+        router.patch(
+            `/admin/investor-kyc/${submission.id}`,
+            { status: 'approved' },
+            {
+                onSuccess: () => {
+                    onUpdateInvestor?.({
+                        ...investor,
+                        kyc_status: 'approved',
+                        account_status: 'active',
+                        latest_kyc_submission: {
+                            ...submission,
+                            status: 'approved',
+                        },
+                    });
+                },
+                onFinish: () => setUpdating(false),
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function copyEmail() {
+        navigator.clipboard.writeText(investor.email);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }
+
+    return (
+        <>
+            <div className="fixed inset-0 z-50 flex justify-end">
+                <div
+                    className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200"
+                    onClick={onClose}
+                />
+
+                <div className="relative z-10 w-full max-w-xl bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden border-l border-zinc-200/80 animate-in slide-in-from-right duration-200">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-6 py-4.5 border-b border-zinc-100 shrink-0 bg-white">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-700">
+                                {getInitials(investor.profile?.full_name)}
+                            </div>
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                    <h3 className="truncate text-sm font-bold text-zinc-950">
+                                        {investor.profile?.full_name ?? investor.email}
+                                    </h3>
+                                    <KycStatusBadge status={investor.kyc_status} />
+                                </div>
+                                <p className="truncate text-[11.5px] text-zinc-500">
+                                    {investor.profile?.company_name ?? humanize(investor.profile?.investor_type ?? 'Investor')}
+                                </p>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors shrink-0"
+                        >
+                            <Icon icon="solar:close-circle-linear" className="size-5" />
+                        </button>
+                    </div>
+
+                    {/* Quick Decision Bar */}
+                    {submission && investor.kyc_status === 'pending' && (
+                        <div className="flex items-center justify-between gap-2 px-6 py-3 bg-[#FAFBFD] border-b border-zinc-100 shrink-0">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={approveKyc}
+                                    disabled={updating}
+                                    className="flex items-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs"
+                                >
+                                    {updating ? (
+                                        <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
+                                    ) : (
+                                        <Icon icon="solar:check-circle-linear" className="size-3.5" />
+                                    )}
+                                    <span>Approve KYC</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={onOpenRejectModal}
+                                    disabled={updating}
+                                    className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 px-3.5 py-1.5 text-xs font-semibold text-zinc-800 transition-all shadow-2xs"
+                                >
+                                    <Icon icon="solar:close-circle-linear" className="size-3.5 text-rose-500" />
+                                    <span>Reject KYC</span>
+                                </button>
+                            </div>
+
+                            <span className="text-[11px] text-zinc-400 font-medium">Compliance Review</span>
+                        </div>
+                    )}
+
+                    {/* Content Stream */}
+                    <div className="flex-1 min-h-0 overflow-y-auto p-6 space-y-6">
+                        {/* Section 1: INLINE VISIBLE KYC DOCUMENT (Prominent Preview) */}
+                        <div>
+                            <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-xs font-semibold text-zinc-950">KYC Verification Document</h4>
+                                {submission && (
+                                    <span className="text-[11px] text-zinc-400 font-medium">
+                                        {humanize(submission.document_type)}
+                                    </span>
+                                )}
+                            </div>
+
+                            {submission ? (
+                                <div className="rounded-2xl border border-zinc-200/90 bg-[#FAFBFD] p-4 space-y-3.5 shadow-2xs">
+                                    {/* Document Title Header */}
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-700">
+                                                <Icon icon="solar:document-text-linear" className="size-4" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="truncate text-xs font-semibold text-zinc-950">
+                                                    {submission.original_name}
+                                                </p>
+                                                <p className="text-[11px] text-zinc-400">
+                                                    Uploaded {formatDate(submission.created_at)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <KycStatusBadge status={submission.status as KycStatus} />
+                                    </div>
+
+                                    {/* VISIBLE DOCUMENT EMBED */}
+                                    <div className="relative overflow-hidden rounded-xl border border-zinc-200/90 bg-[#F6F8FA] p-3 shadow-2xs group">
+                                        {isPdf ? (
+                                            <iframe
+                                                src={`/admin/investor-kyc/${submission.id}/preview#toolbar=0`}
+                                                className="w-full h-72 border-0 rounded-lg bg-white shadow-xs"
+                                                title="PDF Preview"
+                                            />
+                                        ) : (
+                                            <div
+                                                onClick={() => setLightboxOpen(true)}
+                                                className="cursor-pointer overflow-hidden p-1 flex items-center justify-center min-h-48 max-h-68"
+                                            >
+                                                <img
+                                                    src={`/admin/investor-kyc/${submission.id}/preview`}
+                                                    alt={submission.original_name}
+                                                    className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-zinc-200/60 bg-white transition-transform duration-200 group-hover:scale-[1.01]"
+                                                />
+                                            </div>
+                                        )}
+
+                                        {/* Hover Overlay Toolbar */}
+                                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 bg-zinc-950/80 backdrop-blur-xs p-1 rounded-lg border border-zinc-800 opacity-90 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                type="button"
+                                                onClick={() => setLightboxOpen(true)}
+                                                className="p-1 text-zinc-300 hover:text-white transition-colors"
+                                                title="Expand Preview"
+                                            >
+                                                <Icon icon="solar:maximize-square-linear" className="size-3.5" />
+                                            </button>
+                                            <a
+                                                href={`/admin/investor-kyc/${submission.id}/download`}
+                                                className="p-1 text-zinc-300 hover:text-white transition-colors"
+                                                title="Download Original"
+                                            >
+                                                <Icon icon="solar:download-minimalistic-linear" className="size-3.5" />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Links */}
+                                    <div className="flex items-center justify-between pt-1 text-xs">
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setLightboxOpen(true)}
+                                                className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                            >
+                                                <Icon icon="solar:eye-linear" className="size-3.5 text-zinc-400" />
+                                                <span>Expand View</span>
+                                            </button>
+
+                                            <a
+                                                href={`/admin/investor-kyc/${submission.id}/download`}
+                                                className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                            >
+                                                <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-400" />
+                                                <span>Download File</span>
+                                            </a>
+                                        </div>
+
+                                        <span className="text-[11px] text-zinc-400">
+                                            Encrypted AES-256
+                                        </span>
+                                    </div>
+
+                                    {/* Review Notes Callout */}
+                                    {submission.review_notes && (
+                                        <div className="rounded-xl border border-rose-200 bg-rose-50/60 p-3.5 text-xs text-rose-800">
+                                            <span className="font-semibold text-rose-900 block mb-0.5">
+                                                Rejection Compliance Note:
+                                            </span>
+                                            <p className="leading-relaxed">{submission.review_notes}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="rounded-xl border border-dashed border-zinc-200 p-6 text-center">
+                                    <Icon icon="solar:shield-warning-linear" className="size-6 text-zinc-400 mx-auto mb-2" />
+                                    <p className="text-xs text-zinc-600 font-semibold">No KYC Document Submitted</p>
+                                    <p className="text-[11.5px] text-zinc-400 mt-0.5">
+                                        Investor has not yet uploaded proof of identity or incorporation.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 2: Profile & Identity Properties */}
+                        <div className="pt-4 border-t border-zinc-100">
+                            <h4 className="text-xs font-semibold text-zinc-950 mb-3">Investor Profile Details</h4>
+                            <div className="divide-y divide-zinc-100 text-xs">
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Full Legal Name</span>
+                                    <span className="font-medium text-zinc-900">{investor.profile?.full_name ?? '—'}</span>
+                                </div>
+
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Email Address</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium text-zinc-900">{investor.email}</span>
+                                        <button onClick={copyEmail} className="text-zinc-400 hover:text-zinc-800" title="Copy Email">
+                                            <Icon
+                                                icon={copied ? 'solar:check-circle-linear' : 'solar:copy-linear'}
+                                                className="size-3.5"
+                                            />
+                                        </button>
+                                        <a href={`mailto:${investor.email}`} className="text-zinc-400 hover:text-zinc-800 ml-0.5" title="Send Email">
+                                            <Icon icon="solar:letter-linear" className="size-3.5" />
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {investor.profile?.phone && (
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Phone Number</span>
+                                        <span className="font-medium text-zinc-900">{investor.profile.phone}</span>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Entity / Firm</span>
+                                    <span className="font-medium text-zinc-900">
+                                        {investor.profile?.company_name ?? 'Individual Investor'}
+                                    </span>
+                                </div>
+
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Investor Classification</span>
+                                    <span className="font-medium text-zinc-900">
+                                        {humanize(investor.profile?.investor_type ?? 'individual')}
+                                    </span>
+                                </div>
+
+                                {investor.profile?.address && (
+                                    <div className="flex items-center justify-between py-2.5">
+                                        <span className="text-zinc-500">Registered Address</span>
+                                        <span className="font-medium text-zinc-900 text-right max-w-xs truncate">
+                                            {investor.profile.address}
+                                        </span>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center justify-between py-2.5">
+                                    <span className="text-zinc-500">Account Registered</span>
+                                    <span className="font-medium text-zinc-900">{formatDate(investor.created_at)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Lightbox / Expanded Viewer Modal (Crisp High-End Design) */}
+            {lightboxOpen && submission && (
+                <div className="fixed inset-0 z-70 flex items-center justify-center p-4 sm:p-6">
+                    <div
+                        className="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs transition-opacity duration-200"
+                        onClick={() => setLightboxOpen(false)}
+                    />
+
+                    <div className="relative z-10 w-full max-w-3xl rounded-[24px] bg-white border border-zinc-200/90 p-6 shadow-2xl animate-in zoom-in-95 duration-150 flex flex-col space-y-4">
+                        {/* Lightbox Header */}
+                        <div className="flex items-center justify-between pb-3 border-b border-zinc-100 shrink-0">
+                            <div className="flex items-center gap-2.5">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700">
+                                    <Icon icon="solar:document-text-linear" className="size-4" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-bold text-zinc-950">{submission.original_name}</h3>
+                                    <p className="text-[11px] text-zinc-400">
+                                        {investor.profile?.full_name ?? investor.email} · {humanize(submission.document_type)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <a
+                                    href={`/admin/investor-kyc/${submission.id}/download`}
+                                    className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                >
+                                    <Icon icon="solar:download-minimalistic-linear" className="size-3.5" />
+                                    <span>Download</span>
+                                </a>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setLightboxOpen(false)}
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors"
+                                >
+                                    <Icon icon="solar:close-circle-linear" className="size-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Lightbox Canvas */}
+                        <div className="relative rounded-2xl bg-[#F6F8FA] border border-zinc-200/80 p-4 flex items-center justify-center min-h-[380px] max-h-[65vh] overflow-auto">
+                            {isPdf ? (
+                                <iframe
+                                    src={`/admin/investor-kyc/${submission.id}/preview`}
+                                    className="w-full h-[60vh] border-0 rounded-xl bg-white shadow-sm"
+                                    title="PDF Document"
+                                />
+                            ) : (
+                                <img
+                                    src={`/admin/investor-kyc/${submission.id}/preview`}
+                                    alt={submission.original_name}
+                                    className="w-full max-w-2xl h-auto max-h-[58vh] object-contain rounded-xl shadow-md bg-white border border-zinc-200/60"
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+}
+
+// ─── Main Investor Reviews Workspace ──────────────────────────────────────────
 
 export default function InvestorAccountsIndex({
     investors,
     activeKycStatus,
-}: {
-    investors: { data: Investor[]; links: { url: string | null; label: string; active: boolean }[] };
-    activeKycStatus: StatusFilter;
-}) {
+    activeType,
+    search: initialSearch,
+    totals,
+}: PageProps) {
+    const [search, setSearch] = useState(initialSearch);
+    const [activeDrawerInvestor, setActiveDrawerInvestor] = useState<InvestorAccount | null>(null);
+    const [rejectingInvestor, setRejectingInvestor] = useState<InvestorAccount | null>(null);
+    const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false);
+    const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+    const typeDropdownRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Synchronize activeDrawerInvestor with latest Inertia page props
+    useEffect(() => {
+        if (activeDrawerInvestor) {
+            const updated = investors.data.find((inv) => inv.id === activeDrawerInvestor.id);
+            if (updated) {
+                setActiveDrawerInvestor(updated);
+            }
+        }
+    }, [investors]);
+
+    const applyFilters = useCallback(
+        (overrides: Record<string, string | undefined>) => {
+            const query = buildParams(overrides, { activeKycStatus, activeType, search });
+            router.get('/admin/investor-accounts', query, { replace: true, preserveState: true });
+        },
+        [activeKycStatus, activeType, search],
+    );
+
+    useEffect(() => {
+        if (search === initialSearch) return;
+        const t = setTimeout(() => {
+            applyFilters({ search });
+        }, 350);
+        return () => clearTimeout(t);
+    }, [search, applyFilters, initialSearch]);
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (typeDropdownRef.current && !typeDropdownRef.current.contains(e.target as Node)) {
+                setIsTypeDropdownOpen(false);
+            }
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setOpenMenuId(null);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const typeLabels: Record<string, string> = {
+        all: 'All investor types',
+        individual: 'Individual Investors',
+        corporate: 'Corporate / Funds',
+    };
+
     return (
         <AdminLayout>
-            <Head title="Investor reviews" />
+            <Head title="Investor Reviews — Admin" />
 
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                <div className="flex flex-col justify-between gap-5 border-b border-zinc-200 pb-6 sm:flex-row sm:items-end">
-                    <div>
-                        <p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Investor Relations</p>
-                        <h1 className="mt-2 text-3xl font-black tracking-tight text-zinc-950">Investor reviews</h1>
-                        <p className="mt-2 max-w-2xl text-sm text-zinc-600">
-                            Review investor profiles and follow the KYC status that controls protected deal access.
-                        </p>
+            {/* ── Main Container (Refero Design Spec) ─────────────────────────── */}
+            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] overflow-hidden p-6 lg:p-8">
+                {/* ── Header Bar ─────────────────────────────────────────────── */}
+                <div className="flex items-center justify-between shrink-0 mb-6">
+                    <h1 className="text-2xl font-bold tracking-tight text-zinc-950">Investor Reviews</h1>
+
+                    <div className="flex items-center gap-2.5">
+                        <button
+                            type="button"
+                            onClick={() => router.get('/admin/investors')}
+                            className="flex items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                        >
+                            <Icon icon="solar:users-group-rounded-linear" className="size-3.5 text-zinc-500" />
+                            <span>Admission Pipeline</span>
+                        </button>
                     </div>
+                </div>
 
-                    <div className="flex flex-wrap gap-2">
-                        {filters.map((filter) => (
-                            <Link
-                                key={filter.value}
-                                href={route('admin.investor-accounts.index', filter.value === 'all' ? {} : { kyc_status: filter.value })}
-                                className={
-                                    activeKycStatus === filter.value
-                                        ? 'rounded-xl bg-[#3A54A5] px-3 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#2D4182]'
-                                        : 'rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-bold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50'
-                                }
+                {/* ── Navigation Tabs (Resend Style) ──────────────────────────── */}
+                <div className="flex items-center gap-2 shrink-0 mb-6 overflow-x-auto pb-1">
+                    {(
+                        [
+                            { key: 'all', label: 'All Investors' },
+                            { key: 'pending', label: 'KYC Pending' },
+                            { key: 'approved', label: 'Verified Approved' },
+                            { key: 'not_submitted', label: 'Not Submitted' },
+                            { key: 'rejected', label: 'Rejected' },
+                        ] as const
+                    ).map(({ key, label }) => {
+                        const isSelected = activeKycStatus === key;
+                        const count =
+                            key === 'all'
+                                ? totals?.all
+                                : key === 'pending'
+                                ? totals?.pending
+                                : key === 'approved'
+                                ? totals?.approved
+                                : key === 'not_submitted'
+                                ? totals?.not_submitted
+                                : totals?.rejected;
+
+                        return (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={() => applyFilters({ kyc_status: key === 'all' ? '' : key })}
+                                className={cn(
+                                    'shrink-0 flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all duration-150',
+                                    isSelected
+                                        ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
+                                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                )}
                             >
-                                {filter.label}
-                            </Link>
-                        ))}
+                                <span>{label}</span>
+                                {count !== undefined && count > 0 && (
+                                    <span
+                                        className={cn(
+                                            'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
+                                            isSelected ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
+                                        )}
+                                    >
+                                        {count}
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* ── Metrics Strip (Resend Sparkline Style) ──────────────────── */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 shrink-0 py-4 border-y border-zinc-100 mb-6">
+                    <div>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                            Total Investors
+                        </span>
+                        <p className="mt-1 text-2xl font-semibold text-zinc-950 tabular-nums">{totals?.all ?? 0}</p>
+                    </div>
+
+                    <div>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                            KYC Pending
+                        </span>
+                        <p className="mt-1 text-2xl font-semibold text-zinc-950 tabular-nums">{totals?.pending ?? 0}</p>
+                    </div>
+
+                    <div>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                            Verified Active
+                        </span>
+                        <p className="mt-1 text-2xl font-semibold text-zinc-950 tabular-nums">{totals?.approved ?? 0}</p>
+                    </div>
+
+                    <div>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                            Metrics
+                        </span>
+                        <div className="mt-2 h-7 w-full max-w-35 flex items-end">
+                            <svg className="w-full h-6 overflow-visible" viewBox="0 0 100 24" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="kycGrad" x1="0" y1="0" x2="1" y2="0">
+                                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.1" />
+                                        <stop offset="100%" stopColor="#10B981" stopOpacity="0.8" />
+                                    </linearGradient>
+                                </defs>
+                                <polygon points="0,24 100,2 100,24" fill="url(#kycGrad)" />
+                                <polyline points="0,24 100,2" fill="none" stroke="#10B981" strokeWidth="1.5" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
 
-                <div className="mt-7 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_16px_36px_rgba(33,56,120,0.06)]">
-                    {investors.data.length === 0 ? (
-                        <div className="px-6 py-16 text-center">
-                            <p className="text-sm font-semibold text-zinc-900">No investors match this KYC status.</p>
-                            <p className="mt-1 text-sm text-zinc-500">Try another filter to review a different group.</p>
-                        </div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[880px] text-left">
-                                <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-bold tracking-wider text-zinc-500 uppercase">
-                                    <tr>
-                                        <th className="px-6 py-4">Investor</th>
-                                        <th className="px-6 py-4">Contact</th>
-                                        <th className="px-6 py-4">KYC status</th>
-                                        <th className="px-6 py-4">Latest submission</th>
-                                        <th className="px-6 py-4 text-right">Review</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {investors.data.map((investor) => (
-                                        <tr
-                                            key={investor.id}
-                                            className="border-b border-zinc-100 transition-colors last:border-0 hover:bg-zinc-50/70"
+                {/* ── Search & Filter Toolbar ─────────────────────────────────── */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0 mb-3">
+                    <div className="relative w-full sm:w-96">
+                        <Icon
+                            icon="solar:minimalistic-magnifer-linear"
+                            className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none"
+                        />
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search by investor name, firm, or email..."
+                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-2 pr-8 pl-10 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none shadow-2xs transition-colors"
+                        />
+                        {search && (
+                            <button
+                                onClick={() => setSearch('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                            >
+                                <Icon icon="solar:close-circle-linear" className="size-3.5" />
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <div className="relative" ref={typeDropdownRef}>
+                            <button
+                                type="button"
+                                onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
+                                className="flex h-9 items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3.5 text-xs font-medium text-zinc-800 shadow-2xs hover:bg-zinc-50 transition-colors"
+                            >
+                                <span>{typeLabels[activeType] ?? 'All types'}</span>
+                                <Icon icon="solar:alt-arrow-down-linear" className="size-3 text-zinc-400" />
+                            </button>
+
+                            {isTypeDropdownOpen && (
+                                <div className="absolute right-0 top-full z-30 mt-1.5 w-48 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 duration-150">
+                                    {(['all', 'individual', 'corporate'] as const).map((t) => (
+                                        <button
+                                            key={t}
+                                            type="button"
+                                            onClick={() => {
+                                                applyFilters({ type: t === 'all' ? '' : t });
+                                                setIsTypeDropdownOpen(false);
+                                            }}
+                                            className={cn(
+                                                'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition-colors',
+                                                activeType === t
+                                                    ? 'bg-zinc-100 font-semibold text-zinc-950'
+                                                    : 'text-zinc-700 hover:bg-zinc-50',
+                                            )}
                                         >
-                                            <td className="px-6 py-4">
-                                                <p className="font-bold text-zinc-950">{investor.profile.full_name}</p>
-                                                <p className="mt-1 text-xs text-zinc-500">
-                                                    {investor.profile.company_name ?? investor.profile.investor_type}
-                                                </p>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <p className="text-sm text-zinc-700">{investor.email}</p>
-                                                {investor.profile.phone && <p className="mt-1 text-xs text-zinc-500">{investor.profile.phone}</p>}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span
-                                                    className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold ${statusClasses[investor.kyc_status]}`}
-                                                >
-                                                    {statusLabel[investor.kyc_status]}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-sm text-zinc-600">
-                                                {investor.latest_kyc_submission ? (
-                                                    <>
-                                                        <p className="font-medium text-zinc-800">{investor.latest_kyc_submission.original_name}</p>
-                                                        <p className="mt-1 text-xs text-zinc-500">
-                                                            {new Date(investor.latest_kyc_submission.created_at).toLocaleDateString()}
-                                                        </p>
-                                                    </>
-                                                ) : (
-                                                    <span className="text-zinc-400">No document yet</span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <Link
-                                                    href={route('admin.investor-accounts.show', investor.id)}
-                                                    className="text-xs font-extrabold tracking-wider text-[#3A54A5] uppercase transition-colors hover:text-[#2D4182]"
-                                                >
-                                                    Open review
-                                                </Link>
-                                            </td>
-                                        </tr>
+                                            <span>{typeLabels[t]}</span>
+                                            {activeType === t && (
+                                                <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />
+                                            )}
+                                        </button>
                                     ))}
-                                </tbody>
-                            </table>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
+
+                {/* ── Data Table (Refero Spec) ────────────────────────────────── */}
+                <div className="flex-1 min-h-0 overflow-y-auto flex flex-col justify-between">
+                    <div>
+                        {/* Clean Minimalist Header */}
+                        <div className="flex items-center gap-4 px-5 py-2.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 select-none mb-1">
+                            <div className="w-[32%] min-w-0">Investor / Contact</div>
+                            <div className="w-[26%] min-w-0">Entity & Type</div>
+                            <div className="w-[20%] min-w-0">KYC Document</div>
+                            <div className="w-[12%] min-w-0">Status</div>
+                            <div className="w-[10%] min-w-0 text-right">Registered</div>
+                            <div className="w-6 shrink-0" />
+                        </div>
+
+                        {/* Rows */}
+                        {investors.data.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <p className="text-xs text-zinc-400">No investors found matching this filter.</p>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-zinc-100">
+                                {investors.data.map((inv) => (
+                                    <div
+                                        key={inv.id}
+                                        onClick={() => setActiveDrawerInvestor(inv)}
+                                        className="group flex items-center gap-4 px-5 py-3.5 text-xs transition-colors duration-150 hover:bg-zinc-50/80 cursor-pointer"
+                                    >
+                                        {/* Contact & Avatar */}
+                                        <div className="w-[32%] min-w-0 flex items-center gap-3">
+                                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 border border-zinc-200 text-[10.5px] font-bold text-zinc-700">
+                                                {getInitials(inv.profile?.full_name)}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <span className="font-semibold text-zinc-900 group-hover:underline text-[13px]">
+                                                    {inv.profile?.full_name ?? 'Unnamed Investor'}
+                                                </span>
+                                                <span className="text-zinc-400 font-normal ml-1.5 truncate">
+                                                    {inv.email}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Entity & Type */}
+                                        <div className="w-[26%] min-w-0">
+                                            <span className="font-medium text-zinc-800 truncate block text-[13px]">
+                                                {inv.profile?.company_name ?? 'Individual Investor'}
+                                            </span>
+                                            <span className="text-[11.5px] text-zinc-400 font-normal truncate block">
+                                                {humanize(inv.profile?.investor_type ?? 'individual')}
+                                            </span>
+                                        </div>
+
+                                        {/* KYC Document */}
+                                        <div className="w-[20%] min-w-0">
+                                            {inv.latest_kyc_submission ? (
+                                                <div className="flex items-center gap-1.5 text-zinc-700">
+                                                    <Icon icon="solar:document-text-linear" className="size-3.5 text-zinc-400 shrink-0" />
+                                                    <span className="truncate font-medium">
+                                                        {inv.latest_kyc_submission.original_name}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-zinc-400 italic">No document</span>
+                                            )}
+                                        </div>
+
+                                        {/* Status */}
+                                        <div className="w-[12%] min-w-0">
+                                            <KycStatusBadge status={inv.kyc_status} />
+                                        </div>
+
+                                        {/* Registered Date */}
+                                        <div className="w-[10%] min-w-0 text-right text-zinc-400">
+                                            {formatDate(inv.created_at)}
+                                        </div>
+
+                                        {/* Actions Menu */}
+                                        <div className="w-6 shrink-0 relative flex justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setOpenMenuId(openMenuId === inv.id ? null : appMenu(inv.id));
+                                                }}
+                                                className="flex h-6 w-6 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors"
+                                            >
+                                                <Icon icon="solar:menu-dots-bold" className="size-3.5" />
+                                            </button>
+
+                                            {openMenuId === inv.id && (
+                                                <div
+                                                    ref={menuRef}
+                                                    className="absolute right-0 top-full z-40 mt-1 w-44 rounded-xl border border-zinc-200 bg-white p-1 shadow-xl animate-in fade-in-0 zoom-in-95 duration-100"
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setActiveDrawerInvestor(inv);
+                                                            setOpenMenuId(null);
+                                                        }}
+                                                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-zinc-800 hover:bg-zinc-100 font-medium"
+                                                    >
+                                                        <Icon icon="solar:document-text-linear" className="size-3.5 text-zinc-500" />
+                                                        <span>Inspect KYC</span>
+                                                    </button>
+
+                                                    {inv.latest_kyc_submission && inv.kyc_status === 'pending' && (
+                                                        <>
+                                                            <div className="my-1 border-t border-zinc-100" />
+
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    router.patch(
+                                                                        `/admin/investor-kyc/${inv.latest_kyc_submission!.id}`,
+                                                                        { status: 'approved' },
+                                                                        { preserveScroll: true },
+                                                                    );
+                                                                    setOpenMenuId(null);
+                                                                }}
+                                                                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-emerald-700 hover:bg-emerald-50"
+                                                            >
+                                                                <Icon icon="solar:check-circle-linear" className="size-3.5" />
+                                                                <span>Approve KYC</span>
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setRejectingInvestor(inv);
+                                                                    setOpenMenuId(null);
+                                                                }}
+                                                                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-rose-600 hover:bg-rose-50"
+                                                            >
+                                                                <Icon icon="solar:close-circle-linear" className="size-3.5" />
+                                                                <span>Reject KYC</span>
+                                                            </button>
+                                                        </>
+                                                    )}
+
+                                                    {inv.latest_kyc_submission && (
+                                                        <>
+                                                            <div className="my-1 border-t border-zinc-100" />
+
+                                                            <a
+                                                                href={`/admin/investor-kyc/${inv.latest_kyc_submission.id}/preview`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 hover:bg-zinc-100"
+                                                            >
+                                                                <Icon icon="solar:eye-linear" className="size-3.5 text-zinc-400" />
+                                                                <span>Preview File</span>
+                                                            </a>
+
+                                                            <a
+                                                                href={`/admin/investor-kyc/${inv.latest_kyc_submission.id}/download`}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 hover:bg-zinc-100"
+                                                            >
+                                                                <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-400" />
+                                                                <span>Download</span>
+                                                            </a>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Pagination Footer */}
+                    <div className="flex items-center justify-between pt-4 border-t border-zinc-100 text-xs text-zinc-500 shrink-0">
+                        <p>
+                            Page {investors.current_page} – 1 of {investors.total} investors – {investors.per_page} items
+                        </p>
+
+                        {investors.last_page > 1 && (
+                            <div className="flex items-center gap-1.5">
+                                {investors.links.map((link, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => link.url && router.get(link.url, {}, { preserveScroll: true })}
+                                        disabled={!link.url}
+                                        className={cn(
+                                            'px-2 py-1 rounded-md text-xs font-medium',
+                                            link.active
+                                                ? 'bg-zinc-950 text-white font-bold'
+                                                : link.url
+                                                ? 'text-zinc-600 hover:bg-zinc-100'
+                                                : 'text-zinc-300 cursor-not-allowed',
+                                        )}
+                                        dangerouslySetInnerHTML={{ __html: link.label }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* ── Slide-Over KYC Drawer ───────────────────────────────────── */}
+                {activeDrawerInvestor && (
+                    <KycDrawer
+                        investor={activeDrawerInvestor}
+                        onClose={() => setActiveDrawerInvestor(null)}
+                        onUpdateInvestor={(updated) => setActiveDrawerInvestor(updated)}
+                        onOpenRejectModal={() => {
+                            setRejectingInvestor(activeDrawerInvestor);
+                        }}
+                    />
+                )}
+
+                {/* ── Reject KYC Modal ────────────────────────────────────────── */}
+                {rejectingInvestor && (
+                    <RejectKycModal
+                        investor={rejectingInvestor}
+                        onClose={() => setRejectingInvestor(null)}
+                        onSuccess={(updated) => {
+                            setRejectingInvestor(null);
+                            setActiveDrawerInvestor(updated);
+                        }}
+                    />
+                )}
             </div>
         </AdminLayout>
     );
+
+    function appMenu(id: string) {
+        return openMenuId === id ? null : id;
+    }
 }

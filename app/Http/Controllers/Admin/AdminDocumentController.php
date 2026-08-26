@@ -37,6 +37,8 @@ class AdminDocumentController extends Controller
                 'reviewed_by'       => $doc->reviewer?->name,
                 'analyst_note'      => $doc->analyst_note,
                 'created_at'        => $doc->created_at->format('d M Y H:i'),
+                'download_url'      => route('admin.documents.download', [$founder->id, $doc->id]),
+                'preview_url'       => route('admin.documents.preview', [$founder->id, $doc->id]),
             ]);
 
         return Inertia::render('Admin/Documents/Index', [
@@ -54,6 +56,11 @@ class AdminDocumentController extends Controller
     public function download(Founder $founder, FounderDocument $document): StreamedResponse
     {
         return $this->documents->download($document);
+    }
+
+    public function preview(Founder $founder, FounderDocument $document): StreamedResponse
+    {
+        return $this->documents->preview($document);
     }
 
     public function markReviewed(Founder $founder, FounderDocument $document): \Illuminate\Http\RedirectResponse

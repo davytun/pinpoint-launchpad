@@ -2,13 +2,16 @@
 
 namespace Database\Seeders;
 
+use App\Models\AuditAssignment;
 use App\Models\AuditLog;
+use App\Models\DiagnosticSession;
 use App\Models\Founder;
 use App\Models\FounderDocument;
 use App\Models\FounderProfile;
 use App\Models\Investor;
 use App\Models\InvestorDataRoomGrant;
 use App\Models\InvestorInterest;
+use App\Models\Payment;
 use App\Models\SpotlightEntry;
 use App\Models\User;
 use App\Models\VerificationBadge;
@@ -478,6 +481,137 @@ class SpotlightAndDealflowSeeder extends Seeder
                     'revoked_at' => null,
                 ]
             );
+        }
+
+        // -------------------------------------------------------------
+        // Populate Founder Diagnostics, Payments, and Analyst Audits
+        // -------------------------------------------------------------
+        $analystSarah = User::where('email', 'sarah.jenkins@pinpointlaunchpad.com')->first();
+        $analystDapo = User::where('email', 'dapo.adeleke@pinpointlaunchpad.com')->first();
+
+        $founderConfigs = [
+            'chioma@payflow.africa' => [
+                'score' => 92,
+                'score_band' => 'high',
+                'tier' => 'institutional',
+                'audit_status' => 'complete',
+                'analyst' => $analystSarah,
+                'notes' => 'Traction and cap table fully verified. Ready for syndicate spotlights.',
+            ],
+            'kofi@agridrone.io' => [
+                'score' => 85,
+                'score_band' => 'high',
+                'tier' => 'growth',
+                'audit_status' => 'complete',
+                'analyst' => $analystSarah,
+                'notes' => 'Hardware IP assignment and regional pilot LOIs confirmed.',
+            ],
+            'tariq@biologix.health' => [
+                'score' => 89,
+                'score_band' => 'high',
+                'tier' => 'growth',
+                'audit_status' => 'in_progress',
+                'analyst' => $analystDapo,
+                'notes' => 'Reviewing clinical trial safety documentation and CE mark application.',
+            ],
+            'amina@solargrid.energy' => [
+                'score' => 78,
+                'score_band' => 'mid_high',
+                'tier' => 'growth',
+                'audit_status' => 'needs_info',
+                'analyst' => $analystDapo,
+                'notes' => 'Awaiting breakdown of distributor receivables and battery degradation warranty.',
+            ],
+            'ethan.blake@refero.design' => [
+                'score' => 74,
+                'score_band' => 'mid_high',
+                'tier' => 'foundation',
+                'audit_status' => 'in_progress',
+                'analyst' => $analystSarah,
+                'notes' => 'Evaluating unit economics model and SaaS retention metrics.',
+            ],
+            'connie.perry@apexai.io' => [
+                'score' => 68,
+                'score_band' => 'mid_low',
+                'tier' => 'foundation',
+                'audit_status' => 'pending',
+                'analyst' => null,
+                'notes' => null,
+            ],
+            'marcus.vance@solarispay.com' => [
+                'score' => 81,
+                'score_band' => 'mid_high',
+                'tier' => 'growth',
+                'audit_status' => 'on_hold',
+                'analyst' => null,
+                'notes' => 'Hold pending clarification on payment gateway sponsor license in UK.',
+            ],
+        ];
+
+        foreach ($founderConfigs as $email => $cfg) {
+            $founder = Founder::where('email', $email)->first();
+            if (! $founder) {
+                continue;
+            }
+
+            // 1. Diagnostic Session
+            $diag = DiagnosticSession::updateOrCreate(
+                ['email' => $founder->email],
+                [
+                    'name' => $founder->full_name,
+                    'company_name' => $founder->company_name,
+                    'answers' => [
+                        'm1' => 5,
+                        'p1' => 5,
+                        't1' => 4,
+                        'tm1' => 5,
+                        'f1' => 4,
+                    ],
+                    'score' => $cfg['score'],
+                    'score_band' => $cfg['score_band'],
+                    'pillar_scores' => [
+                        'market' => min(100, $cfg['score'] + rand(-4, 4)),
+                        'product' => min(100, $cfg['score'] + rand(-4, 4)),
+                        'traction' => min(100, $cfg['score'] + rand(-4, 4)),
+                        'team' => min(100, $cfg['score'] + rand(-4, 4)),
+                        'financials' => min(100, $cfg['score'] + rand(-4, 4)),
+                    ],
+                    'completed_at' => now()->subDays(12),
+                ]
+            );
+
+            // 2. Payment & Audit Status
+            $payment = Payment::updateOrCreate(
+                ['customer_email' => $founder->email],
+                [
+                    'diagnostic_session_id' => $diag->id,
+                    'tier' => $cfg['tier'],
+                    'total_amount' => $cfg['tier'] === 'institutional' ? 150000 : ($cfg['tier'] === 'growth' ? 75000 : 35000),
+                    'currency' => 'USD',
+                    'paid_at' => now()->subDays(10),
+                ]
+            );
+            $payment->status = 'paid';
+            $payment->audit_status = $cfg['audit_status'];
+            $payment->save();
+
+            // 3. Link to Founder
+            $founder->diagnostic_session_id = $diag->id;
+            $founder->payment_id = $payment->id;
+            $founder->save();
+
+            // 4. Audit Assignment
+            if ($cfg['analyst']) {
+                AuditAssignment::updateOrCreate(
+                    ['founder_id' => $founder->id],
+                    [
+                        'analyst_id' => $cfg['analyst']->id,
+                        'assigned_by' => $admin?->id,
+                        'assigned_at' => now()->subDays(5),
+                        'notes' => $cfg['notes'],
+                    ]
+                );
+            }
         }
     }
 }

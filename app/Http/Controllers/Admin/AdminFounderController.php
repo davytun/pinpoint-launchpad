@@ -7,6 +7,7 @@ use App\Mail\AnalystAssignedMail;
 use App\Mail\AuditStatusUpdatedMail;
 use App\Models\AuditAssignment;
 use App\Models\Founder;
+use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,13 +18,18 @@ use Inertia\Response;
 
 class AdminFounderController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $user = Auth::user();
+        $status = $request->query('status', 'all');
+        $analystFilter = $request->query('analyst_id', 'all');
+        $search = trim((string) $request->query('search', ''));
 
         $query = Founder::with([
             'payment',
             'diagnosticSession',
+            'profile',
+            'documents',
             'auditAssignment.analyst',
         ]);
 
@@ -32,29 +38,88 @@ class AdminFounderController extends Controller
             $query->whereIn('id', $founderIds);
         }
 
-        $founders = $query->latest()->paginate(20)->through(fn ($f) => [
-            'id'               => $f->id,
-            'full_name'        => $f->full_name,
-            'company_name'     => $f->company_name,
-            'email'            => $f->email,
-            'score'            => $f->score,
-            'score_band'       => $f->score_band,
-            'tier'             => $f->tier,
-            'audit_status'     => $f->payment?->audit_status,
-            'assigned_analyst' => $f->auditAssignment?->analyst
-                ? ['id' => $f->auditAssignment->analyst->id, 'name' => $f->auditAssignment->analyst->name]
-                : null,
-            'created_at'       => $f->created_at->format('d M Y'),
-        ]);
+        if ($status !== 'all') {
+            $query->whereHas('payment', fn ($pq) => $pq->where('audit_status', $status));
+        }
+
+        if ($analystFilter !== 'all') {
+            if ($analystFilter === 'unassigned') {
+                $query->whereDoesntHave('auditAssignment');
+            } else {
+                $query->whereHas('auditAssignment', fn ($aq) => $aq->where('analyst_id', $analystFilter));
+            }
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('company_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $allFounders = Founder::with(['payment', 'auditAssignment'])->get();
+        $totals = [
+            'total' => $allFounders->count(),
+            'pending' => $allFounders->filter(fn ($f) => ($f->payment?->audit_status ?? 'pending') === 'pending')->count(),
+            'in_progress' => $allFounders->filter(fn ($f) => $f->payment?->audit_status === 'in_progress')->count(),
+            'needs_info' => $allFounders->filter(fn ($f) => $f->payment?->audit_status === 'needs_info')->count(),
+            'on_hold' => $allFounders->filter(fn ($f) => $f->payment?->audit_status === 'on_hold')->count(),
+            'complete' => $allFounders->filter(fn ($f) => $f->payment?->audit_status === 'complete')->count(),
+            'unassigned' => $allFounders->filter(fn ($f) => $f->auditAssignment === null)->count(),
+        ];
+
+        $founders = $query->latest()->paginate(15)->withQueryString()->through(function ($f) {
+            $score = $f->score ?? $f->profile?->overall_score;
+            $scoreBand = $f->score_band ?? ($score ? ($score >= 85 ? 'high' : ($score >= 75 ? 'mid_high' : ($score >= 60 ? 'mid_low' : 'low'))) : null);
+            $tier = $f->tier ?? ($score ? ($score >= 85 ? 'institutional' : ($score >= 70 ? 'growth' : 'foundation')) : 'foundation');
+
+            return [
+                'id'               => $f->id,
+                'full_name'        => $f->full_name,
+                'company_name'     => $f->company_name,
+                'email'            => $f->email,
+                'phone'            => $f->phone,
+                'score'            => $score,
+                'score_band'       => $scoreBand,
+                'tier'             => $tier,
+                'tier_label'       => Payment::getTierLabel($tier),
+                'audit_status'     => $f->payment?->audit_status ?? 'pending',
+                'assigned_analyst' => $f->auditAssignment?->analyst
+                    ? [
+                        'id' => $f->auditAssignment->analyst->id,
+                        'name' => $f->auditAssignment->analyst->name,
+                        'email' => $f->auditAssignment->analyst->email,
+                    ]
+                    : null,
+                'assigned_at'      => $f->auditAssignment?->assigned_at?->toISOString(),
+                'audit_notes'      => $f->auditAssignment?->notes,
+                'documents_count'  => $f->documents->count(),
+                'pillar_scores'    => $f->diagnosticSession?->pillar_scores,
+                'profile'          => $f->profile ? [
+                    'id' => $f->profile->id,
+                    'slug' => $f->profile->slug,
+                    'sector' => $f->profile->sector,
+                    'batch' => $f->profile->batch,
+                    'is_public' => $f->profile->is_public,
+                ] : null,
+                'created_at'       => $f->created_at->toISOString(),
+                'created_at_human' => $f->created_at->format('d M Y'),
+            ];
+        });
 
         $analysts = $user->isSuperAdmin()
             ? User::where('role', 'analyst')->select('id', 'name', 'email')->get()
             : collect();
 
         return Inertia::render('Admin/Founders/Index', [
-            'founders'  => $founders,
-            'analysts'  => $analysts,
-            'user_role' => $user->role,
+            'founders'      => $founders,
+            'analysts'      => $analysts,
+            'user_role'     => $user->role,
+            'activeStatus'  => $status,
+            'activeAnalyst' => $analystFilter,
+            'search'        => $search,
+            'totals'        => $totals,
         ]);
     }
 
@@ -89,7 +154,7 @@ class AdminFounderController extends Controller
                 'phone'        => $founder->phone,
                 'created_at'   => $founder->created_at->format('d M Y'),
                 'last_login_at'=> $founder->last_login_at?->format('d M Y, H:i'),
-                'score'        => $founder->score,
+                'score'        => $founder->score ?? $founder->profile?->overall_score,
                 'score_band'   => $founder->score_band,
                 'tier'         => $founder->tier,
                 'pillar_scores'=> $founder->diagnosticSession?->pillar_scores,
@@ -142,9 +207,14 @@ class AdminFounderController extends Controller
     public function assign(Request $request, Founder $founder): RedirectResponse
     {
         $request->validate([
-            'analyst_id' => ['required', 'exists:users,id'],
+            'analyst_id' => ['nullable', 'exists:users,id'],
             'notes'      => ['nullable', 'string', 'max:500'],
         ]);
+
+        if (!$request->analyst_id) {
+            AuditAssignment::where('founder_id', $founder->id)->delete();
+            return back()->with('success', 'Analyst assignment cleared.');
+        }
 
         $analyst = User::findOrFail($request->analyst_id);
 
@@ -162,7 +232,11 @@ class AdminFounderController extends Controller
             ]
         );
 
-        Mail::to($analyst->email)->queue(new AnalystAssignedMail($analyst, $founder));
+        try {
+            Mail::to($analyst->email)->queue(new AnalystAssignedMail($analyst, $founder));
+        } catch (\Throwable $e) {
+            // Queue mail safely
+        }
 
         return back()->with('success', 'Analyst assigned successfully.');
     }
@@ -179,15 +253,28 @@ class AdminFounderController extends Controller
             'audit_status' => ['required', 'in:pending,in_progress,needs_info,on_hold,complete'],
         ]);
 
-        if (!$founder->payment) {
-            return back()->withErrors(['audit_status' => 'No payment record found for this founder.']);
+        $payment = $founder->payment;
+        if (!$payment) {
+            $payment = Payment::create([
+                'customer_email' => $founder->email,
+                'tier' => 'foundation',
+                'total_amount' => 35000,
+                'currency' => 'USD',
+            ]);
+            $payment->status = 'paid';
+            $founder->payment_id = $payment->id;
+            $founder->save();
         }
 
-        $founder->payment->audit_status = $request->audit_status;
-        $founder->payment->save();
+        $payment->audit_status = $request->audit_status;
+        $payment->save();
 
-        Mail::to($founder->email)->queue(new AuditStatusUpdatedMail($founder, $request->audit_status));
+        try {
+            Mail::to($founder->email)->queue(new AuditStatusUpdatedMail($founder, $request->audit_status));
+        } catch (\Throwable $e) {
+            // Queue mail safely
+        }
 
-        return back()->with('success', 'Audit status updated.');
+        return back()->with('success', 'Audit status updated successfully.');
     }
 }

@@ -17,5 +17,23 @@ class AdminSeeder extends Seeder
                 'role' => 'superadmin',
             ]
         );
+
+        User::firstOrCreate(
+            ['email' => 'sarah.jenkins@pinpointlaunchpad.com'],
+            [
+                'name' => 'Sarah Jenkins',
+                'password' => bcrypt('password123'),
+                'role' => 'analyst',
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'dapo.adeleke@pinpointlaunchpad.com'],
+            [
+                'name' => 'Dapo Adeleke',
+                'password' => bcrypt('password123'),
+                'role' => 'analyst',
+            ]
+        );
     }
 }

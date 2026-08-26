@@ -1,6 +1,6 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Search, UserPlus, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { Icon } from '@iconify/react';
+import { Head, router } from '@inertiajs/react';
+import { useCallback, useEffect, useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
@@ -13,331 +13,883 @@ interface Analyst {
     email: string;
 }
 
+interface FounderProfileSummary {
+    id: string;
+    slug: string;
+    sector: string;
+    batch?: string | null;
+    is_public: boolean;
+}
+
 interface FounderRow {
-    id: number;
+    id: string;
     full_name: string | null;
     company_name: string | null;
     email: string;
+    phone?: string | null;
     score: number | null;
     score_band: string | null;
     tier: string | null;
-    audit_status: string | null;
-    assigned_analyst: { id: number; name: string } | null;
+    tier_label: string;
+    audit_status: string;
+    assigned_analyst: Analyst | null;
+    assigned_at: string | null;
+    audit_notes: string | null;
+    documents_count: number;
+    pillar_scores: Record<string, number> | null;
+    profile: FounderProfileSummary | null;
     created_at: string;
+    created_at_human: string;
 }
 
-interface PaginationLink {
-    url: string | null;
-    label: string;
-    active: boolean;
+interface Totals {
+    total: number;
+    pending: number;
+    in_progress: number;
+    needs_info: number;
+    on_hold: number;
+    complete: number;
+    unassigned: number;
 }
 
-interface Paginated<T> {
+interface PaginatedData<T> {
     data: T[];
     current_page: number;
     last_page: number;
+    per_page: number;
     total: number;
-    links: PaginationLink[];
+    from: number | null;
+    to: number | null;
+    links: { url: string | null; label: string; active: boolean }[];
 }
 
 interface PageProps {
-    founders: Paginated<FounderRow>;
+    founders: PaginatedData<FounderRow>;
     analysts: Analyst[];
-    user_role: 'superadmin' | 'analyst' | 'support';
+    user_role: 'superadmin' | 'analyst' | 'support' | 'investor_relations';
+    activeStatus: string;
+    activeAnalyst: string;
+    search: string;
+    totals: Totals;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const auditStatusColors: Record<string, string> = {
-    pending: 'bg-zinc-100 text-zinc-650 border border-zinc-200',
-    in_progress: 'bg-amber-50 text-amber-700 border border-amber-250',
-    needs_info: 'bg-red-50 text-red-700 border border-red-250',
-    on_hold: 'bg-orange-50 text-orange-700 border border-orange-250',
-    complete: 'bg-emerald-50 text-emerald-700 border border-emerald-250',
-};
+function getInitials(name?: string | null): string {
+    if (!name) return 'FD';
+    return name
+        .split(' ')
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase();
+}
 
-const auditStatusLabel: Record<string, string> = {
-    pending: 'Pending',
-    in_progress: 'In Progress',
-    needs_info: 'Needs Info',
-    on_hold: 'On Hold',
-    complete: 'Complete',
-};
-
-const scoreBandColor: Record<string, string> = {
-    low: 'text-red-600 font-bold',
-    mid_low: 'text-amber-600 font-bold',
-    mid_high: 'text-[#3A54A5] font-bold',
-    high: 'text-emerald-650 font-bold',
-};
-
-// ─── Assign Modal ─────────────────────────────────────────────────────────────
-
-function AssignModal({
-    founderId,
-    founderName,
-    analysts,
-    onClose,
-}: {
-    founderId: number;
-    founderName: string;
-    analysts: Analyst[];
-    onClose: () => void;
-}) {
-    const { data, setData, post, processing, errors } = useForm({
-        analyst_id: '',
-        notes: '',
+function formatDate(isoString?: string | null): string {
+    if (!isoString) return '—';
+    const d = new Date(isoString);
+    return d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
     });
+}
 
-    function submit(e: React.FormEvent) {
-        e.preventDefault();
-        post(route('admin.founders.assign', { founder: founderId }), {
-            onSuccess: () => onClose(),
-        });
+function formatRelativeTime(isoString?: string | null): string {
+    if (!isoString) return '—';
+    const now = new Date();
+    const d = new Date(isoString);
+    const diffSeconds = Math.floor((now.getTime() - d.getTime()) / 1000);
+
+    if (diffSeconds < 60) return 'Just now';
+    if (diffSeconds < 3600) return `${Math.floor(diffSeconds / 60)}m ago`;
+    if (diffSeconds < 86400) return `${Math.floor(diffSeconds / 3600)}h ago`;
+    if (diffSeconds < 604800) return `${Math.floor(diffSeconds / 86400)}d ago`;
+    return formatDate(isoString);
+}
+
+function StatusBadge({ status }: { status: string }) {
+    switch (status) {
+        case 'complete':
+            return (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                    <Icon icon="solar:check-circle-linear" className="size-3 text-emerald-600" />
+                    <span>Complete</span>
+                </span>
+            );
+        case 'in_progress':
+            return (
+                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-900">
+                    <Icon icon="solar:refresh-linear" className="size-3 text-zinc-600" />
+                    <span>In Progress</span>
+                </span>
+            );
+        case 'needs_info':
+            return (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                    <Icon icon="solar:danger-circle-linear" className="size-3 text-amber-600" />
+                    <span>Needs Info</span>
+                </span>
+            );
+        case 'on_hold':
+            return (
+                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
+                    <Icon icon="solar:pause-circle-linear" className="size-3 text-zinc-500" />
+                    <span>On Hold</span>
+                </span>
+            );
+        case 'pending':
+        default:
+            return (
+                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
+                    <Icon icon="solar:clock-circle-linear" className="size-3 text-zinc-400" />
+                    <span>Pending</span>
+                </span>
+            );
+    }
+}
+
+function ScoreBadge({ score, band }: { score: number | null; band?: string | null }) {
+    if (score === null || score === undefined) {
+        return <span className="text-zinc-400 font-medium text-xs">—</span>;
     }
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
-            <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-                <h2 className="mb-1 text-lg font-extrabold text-zinc-950">Assign Analyst</h2>
-                <p className="text-zinc-550 mb-5 text-sm">{founderName}</p>
+    const isHigh = score >= 85;
+    const isMid = score >= 75;
 
-                <form onSubmit={submit} className="space-y-4">
-                    <div>
-                        <label className="mb-1.5 block text-xs font-bold text-zinc-500">Analyst</label>
-                        <select
-                            value={data.analyst_id}
-                            onChange={(e) => setData('analyst_id', e.target.value)}
-                            className="text-zinc-955 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-xs focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
-                            required
-                        >
-                            <option value="">Select analyst…</option>
-                            {analysts.map((a) => (
-                                <option key={a.id} value={a.id}>
-                                    {a.name} ({a.email})
-                                </option>
+    return (
+        <div className="flex items-center gap-1.5">
+            <span
+                className={cn(
+                    'font-mono text-xs font-bold tabular-nums',
+                    isHigh ? 'text-zinc-950' : isMid ? 'text-zinc-800' : 'text-zinc-600',
+                )}
+            >
+                {score}
+            </span>
+            <span className="text-[10px] text-zinc-400 font-mono">/100</span>
+            {isHigh && (
+                <span title="High Velocity">
+                    <Icon icon="solar:bolt-linear" className="size-3 text-amber-500" />
+                </span>
+            )}
+        </div>
+    );
+}
+
+// ─── Slide-Over Founder Detail & Audit Drawer ─────────────────────────────────
+
+function FounderAuditDrawer({
+    founder,
+    analysts,
+    userRole,
+    onClose,
+    onUpdateFounder,
+}: {
+    founder: FounderRow;
+    analysts: Analyst[];
+    userRole: string;
+    onClose: () => void;
+    onUpdateFounder: (updated: FounderRow) => void;
+}) {
+    const isSuperAdmin = userRole === 'superadmin';
+    const [selectedStatus, setSelectedStatus] = useState(founder.audit_status);
+    const [selectedAnalystId, setSelectedAnalystId] = useState<string>(
+        founder.assigned_analyst ? String(founder.assigned_analyst.id) : '',
+    );
+    const [notes, setNotes] = useState(founder.audit_notes ?? '');
+    const [updatingStatus, setUpdatingStatus] = useState(false);
+    const [updatingAnalyst, setUpdatingAnalyst] = useState(false);
+    const [copiedEmail, setCopiedEmail] = useState(false);
+
+    const founderName = founder.full_name ?? founder.email;
+    const companyName = founder.company_name ?? 'Startup';
+
+    function handleStatusChange(newStatus: string) {
+        setSelectedStatus(newStatus);
+        setUpdatingStatus(true);
+        router.patch(
+            route('admin.founders.audit-status', { founder: founder.id }),
+            { audit_status: newStatus },
+            {
+                onSuccess: () => {
+                    onUpdateFounder({
+                        ...founder,
+                        audit_status: newStatus,
+                    });
+                },
+                onFinish: () => setUpdatingStatus(false),
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function handleAssignAnalyst(e: React.FormEvent) {
+        e.preventDefault();
+        setUpdatingAnalyst(true);
+        router.post(
+            route('admin.founders.assign', { founder: founder.id }),
+            {
+                analyst_id: selectedAnalystId ? selectedAnalystId : null,
+                notes: notes,
+            },
+            {
+                onSuccess: () => {
+                    const matched = analysts.find((a) => String(a.id) === selectedAnalystId) ?? null;
+                    onUpdateFounder({
+                        ...founder,
+                        assigned_analyst: matched,
+                        assigned_at: matched ? new Date().toISOString() : null,
+                        audit_notes: notes,
+                    });
+                },
+                onFinish: () => setUpdatingAnalyst(false),
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function copyEmail() {
+        navigator.clipboard.writeText(founder.email);
+        setCopiedEmail(true);
+        setTimeout(() => setCopiedEmail(false), 2000);
+    }
+
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            if (e.key === 'Escape') onClose();
+        }
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
+    return (
+        <div className="fixed inset-0 z-50 flex justify-end">
+            {/* Backdrop */}
+            <div
+                className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200"
+                onClick={onClose}
+            />
+
+            {/* Slide-over Content Canvas */}
+            <div className="relative z-10 w-full max-w-xl bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden border-l border-zinc-200 animate-in slide-in-from-right duration-200">
+                {/* ── Drawer Header ────────────────────────────────────────── */}
+                <div className="flex items-center justify-between px-6 py-4.5 border-b border-zinc-100 shrink-0 bg-white">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-white text-xs font-bold shadow-xs">
+                            {getInitials(founderName)}
+                        </div>
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                                <h3 className="truncate text-sm font-bold text-zinc-950">{founderName}</h3>
+                                <StatusBadge status={founder.audit_status} />
+                            </div>
+                            <p className="truncate text-xs text-zinc-400">
+                                {companyName} · Registered {formatRelativeTime(founder.created_at)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors shrink-0"
+                    >
+                        <Icon icon="solar:close-circle-linear" className="size-5" />
+                    </button>
+                </div>
+
+                {/* ── Fast Action Toolbar ───────────────────────────────────── */}
+                <div className="flex items-center justify-between gap-3 px-6 py-3 bg-[#FAFBFD] border-b border-zinc-100 shrink-0">
+                    <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
+                            Audit Status:
+                        </span>
+                        <div className="flex items-center gap-1">
+                            {['pending', 'in_progress', 'needs_info', 'complete'].map((st) => (
+                                <button
+                                    key={st}
+                                    type="button"
+                                    onClick={() => handleStatusChange(st)}
+                                    disabled={updatingStatus || founder.audit_status === st}
+                                    className={cn(
+                                        'px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all capitalize',
+                                        founder.audit_status === st
+                                            ? 'bg-zinc-950 text-white shadow-2xs'
+                                            : 'bg-white border border-zinc-200/80 text-zinc-600 hover:bg-zinc-50',
+                                    )}
+                                >
+                                    {st.replace('_', ' ')}
+                                </button>
                             ))}
-                        </select>
-                        {errors.analyst_id && <p className="text-red-650 mt-1 text-xs">{errors.analyst_id}</p>}
+                        </div>
                     </div>
-                    <div>
-                        <label className="mb-1.5 block text-xs font-bold text-zinc-500">Notes (optional)</label>
-                        <textarea
-                            value={data.notes}
-                            onChange={(e) => setData('notes', e.target.value)}
-                            rows={3}
-                            maxLength={500}
-                            placeholder="Internal notes for the analyst…"
-                            className="text-zinc-955 w-full resize-none rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-sm shadow-xs placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
-                        />
+
+                    {updatingStatus && (
+                        <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin text-zinc-400" />
+                    )}
+                </div>
+
+                {/* ── Drawer Body (Scrollable, No scrollbars) ───────────────── */}
+                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
+                    {/* Section 1: PARAGON Diagnostic Scores Card */}
+                    <div className="rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4.5 space-y-3.5 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
+                                    PARAGON Diagnostic Score
+                                </span>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="text-2xl font-bold text-zinc-950 font-mono">
+                                        {founder.score ?? '—'}
+                                    </span>
+                                    <span className="text-xs text-zinc-400 font-mono">/ 100</span>
+                                </div>
+                            </div>
+
+                            <div className="text-right">
+                                <span className="text-[11px] font-medium text-zinc-400 block">Venture Tier</span>
+                                <span className="text-xs font-semibold text-zinc-900 capitalize">
+                                    {founder.tier_label}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Pillar Progress Bars */}
+                        {founder.pillar_scores && (
+                            <div className="space-y-2 pt-2 border-t border-zinc-100">
+                                {Object.entries(founder.pillar_scores).map(([pillar, val]) => (
+                                    <div key={pillar} className="space-y-1">
+                                        <div className="flex items-center justify-between text-[11px]">
+                                            <span className="font-medium text-zinc-600 capitalize">{pillar}</span>
+                                            <span className="font-bold text-zinc-900 font-mono">{val}%</span>
+                                        </div>
+                                        <div className="h-1.5 w-full rounded-full bg-zinc-200/60 overflow-hidden">
+                                            <div
+                                                className="h-full bg-zinc-900 rounded-full transition-all duration-300"
+                                                style={{ width: `${Math.min(100, Math.max(0, val))}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                    <div className="flex justify-end gap-3 pt-2">
+
+                    {/* Section 2: Analyst Assignment & Internal Notes */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
+                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
+                                Assigned Analyst & Review Notes
+                            </h4>
+                            <span className="text-[11px] text-zinc-400">
+                                {founder.assigned_analyst ? 'Lead Assigned' : 'Unassigned'}
+                            </span>
+                        </div>
+
+                        <form onSubmit={handleAssignAnalyst} className="rounded-2xl border border-zinc-200/80 bg-white p-4 space-y-3 shadow-2xs">
+                            <div>
+                                <label className="block text-[11px] font-semibold text-zinc-500 mb-1">
+                                    Assigned Audit Lead
+                                </label>
+                                {isSuperAdmin ? (
+                                    <select
+                                        value={selectedAnalystId}
+                                        onChange={(e) => setSelectedAnalystId(e.target.value)}
+                                        className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-zinc-400 focus:outline-none shadow-2xs"
+                                    >
+                                        <option value="">No Analyst Assigned (Unassigned)</option>
+                                        {analysts.map((a) => (
+                                            <option key={a.id} value={String(a.id)}>
+                                                {a.name} ({a.email})
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <p className="text-xs font-semibold text-zinc-900">
+                                        {founder.assigned_analyst?.name ?? 'No analyst assigned yet'}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="block text-[11px] font-semibold text-zinc-500 mb-1">
+                                    Internal Analyst Notes & Audit Directives
+                                </label>
+                                <textarea
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    rows={2}
+                                    placeholder="Internal verification notes, requested documents, or cap table observations..."
+                                    className="w-full rounded-xl border border-zinc-200 bg-white p-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none shadow-2xs resize-none"
+                                />
+                            </div>
+
+                            <div className="flex justify-end pt-1">
+                                <button
+                                    type="submit"
+                                    disabled={updatingAnalyst}
+                                    className="flex items-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs disabled:opacity-50"
+                                >
+                                    {updatingAnalyst ? (
+                                        <Icon icon="solar:refresh-linear" className="size-3 animate-spin" />
+                                    ) : (
+                                        <Icon icon="solar:check-circle-linear" className="size-3 text-emerald-400" />
+                                    )}
+                                    <span>Save Assignment & Notes</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* Section 3: Founder & Venture Record */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
+                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
+                                Founder Dossier & Contact
+                            </h4>
+                            <span className="text-[11px] text-zinc-400">KYC Profile</span>
+                        </div>
+
+                        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 space-y-2.5 shadow-2xs text-xs">
+                            <div className="flex items-center justify-between py-1.5 border-b border-zinc-100">
+                                <span className="text-zinc-400">Full Legal Name</span>
+                                <span className="font-semibold text-zinc-950">{founderName}</span>
+                            </div>
+
+                            <div className="flex items-center justify-between py-1.5 border-b border-zinc-100">
+                                <span className="text-zinc-400">Company Name</span>
+                                <span className="font-medium text-zinc-900">{companyName}</span>
+                            </div>
+
+                            <div className="flex items-center justify-between py-1.5 border-b border-zinc-100">
+                                <span className="text-zinc-400">Official Email</span>
+                                <div className="flex items-center gap-2">
+                                    <span className="font-medium text-zinc-900 font-mono text-[11px]">
+                                        {founder.email}
+                                    </span>
+                                    <button
+                                        onClick={copyEmail}
+                                        className="text-zinc-400 hover:text-zinc-800 transition-colors"
+                                        title="Copy Email"
+                                    >
+                                        <Icon
+                                            icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'}
+                                            className="size-3.5"
+                                        />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {founder.phone && (
+                                <div className="flex items-center justify-between py-1.5 border-b border-zinc-100">
+                                    <span className="text-zinc-400">Direct Phone</span>
+                                    <span className="font-medium text-zinc-900 font-mono text-[11px]">
+                                        {founder.phone}
+                                    </span>
+                                </div>
+                            )}
+
+                            <div className="flex items-center justify-between py-1.5">
+                                <span className="text-zinc-400">Audit Documents Submitted</span>
+                                <span className="font-semibold text-zinc-900">{founder.documents_count} Files</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Sticky Action Footer ─────────────────────────────────── */}
+                <div className="flex items-center justify-between gap-3 px-6 py-3.5 border-t border-zinc-100 bg-[#FAFBFD] shrink-0">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
+                    >
+                        Close
+                    </button>
+
+                    <div className="flex items-center gap-2">
                         <button
                             type="button"
-                            onClick={onClose}
-                            className="text-zinc-650 rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold shadow-xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
+                            onClick={() => router.get('/admin/messages')}
+                            className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
                         >
-                            Cancel
+                            <Icon icon="solar:chat-round-dots-linear" className="size-3.5 text-zinc-500" />
+                            <span>Message Founder</span>
                         </button>
+
                         <button
-                            type="submit"
-                            disabled={processing}
-                            className="rounded-xl bg-[#3A54A5] px-4 py-2 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-colors hover:bg-[#2D4182] hover:shadow-lg disabled:opacity-50"
+                            type="button"
+                            onClick={() => router.get(route('admin.founders.show', { founder: founder.id }))}
+                            className="flex items-center gap-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 px-4 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs"
                         >
-                            {processing ? 'Assigning…' : 'Assign'}
+                            <span>Open Full Dossier</span>
+                            <Icon icon="solar:arrow-right-linear" className="size-3.5" />
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Main Founders Workspace Component ────────────────────────────────────────
 
-export default function AdminFoundersIndex({ founders, analysts, user_role }: PageProps) {
-    const { flash } = usePage<{ flash: { success?: string } }>().props;
-    const isSuperAdmin = user_role === 'superadmin';
+export default function AdminFoundersIndex({
+    founders,
+    analysts = [],
+    user_role = 'superadmin',
+    activeStatus = 'all',
+    activeAnalyst = 'all',
+    search: initialSearch = '',
+    totals = {
+        total: 0,
+        pending: 0,
+        in_progress: 0,
+        needs_info: 0,
+        on_hold: 0,
+        complete: 0,
+        unassigned: 0,
+    },
+}: PageProps) {
+    const [search, setSearch] = useState(initialSearch);
+    const [activeDrawerFounder, setActiveDrawerFounder] = useState<FounderRow | null>(null);
 
-    const [search, setSearch] = useState('');
-    const [statusFilter, setStatus] = useState('all');
-    const [assignModal, setAssignModal] = useState<{ id: number; name: string } | null>(null);
+    // Keep drawer reactive to prop changes
+    useEffect(() => {
+        if (activeDrawerFounder) {
+            const updated = founders.data.find((f) => f.id === activeDrawerFounder.id);
+            if (updated) {
+                setActiveDrawerFounder(updated);
+            }
+        }
+    }, [founders]);
 
-    const statuses = ['all', 'pending', 'in_progress', 'needs_info', 'on_hold', 'complete'];
+    const applyFilters = useCallback(
+        (overrides: Record<string, string | undefined>) => {
+            const p: Record<string, string> = {};
+            const st = overrides.status !== undefined ? overrides.status : activeStatus !== 'all' ? activeStatus : undefined;
+            const an = overrides.analyst_id !== undefined ? overrides.analyst_id : activeAnalyst !== 'all' ? activeAnalyst : undefined;
+            const sr = overrides.search !== undefined ? overrides.search : search;
 
-    const filtered = founders.data.filter((f) => {
-        const matchSearch =
-            !search ||
-            (f.full_name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            (f.company_name ?? '').toLowerCase().includes(search.toLowerCase()) ||
-            f.email.toLowerCase().includes(search.toLowerCase());
-        const matchStatus = statusFilter === 'all' || f.audit_status === statusFilter;
-        return matchSearch && matchStatus;
-    });
+            if (st) p.status = st;
+            if (an) p.analyst_id = an;
+            if (sr) p.search = sr;
+
+            router.get('/admin/founders', p, { replace: true, preserveState: true });
+        },
+        [activeStatus, activeAnalyst, search],
+    );
+
+    useEffect(() => {
+        if (search === initialSearch) return;
+        const t = setTimeout(() => {
+            applyFilters({ search });
+        }, 300);
+        return () => clearTimeout(t);
+    }, [search, applyFilters, initialSearch]);
 
     return (
         <AdminLayout>
-            <Head title="Founders — Admin" />
+            <Head title="Founders Directory & Audit Hub — Admin" />
 
-            {assignModal && (
-                <AssignModal founderId={assignModal.id} founderName={assignModal.name} analysts={analysts} onClose={() => setAssignModal(null)} />
-            )}
-
-            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-                <div className="mb-6 flex items-center justify-between">
+            {/* ── Main Full-Height Container (Refero Spec) ─────────────────────── */}
+            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-xs overflow-hidden p-6 lg:p-8">
+                {/* ── Top Header Strip ────────────────────────────────────────── */}
+                <div className="flex items-center justify-between shrink-0 mb-6">
                     <div>
-                        <h1 className="text-2xl font-extrabold text-zinc-950">Founders</h1>
-                        <p className="text-zinc-555 mt-1 text-sm font-medium">{founders.total} total</p>
+                        <h1 className="text-xl font-bold tracking-tight text-zinc-950">Founders Directory & Audit Hub</h1>
+                        <p className="text-xs text-zinc-500 mt-0.5">
+                            Manage diagnostic assessments, PARAGON audit progress, venture tiering, and analyst assignments.
+                        </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => router.get('/admin/messages')}
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                        >
+                            <Icon icon="solar:chat-round-dots-linear" className="size-3.5 text-zinc-500" />
+                            <span>Founder Messages</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => router.get('/admin/spotlight')}
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                        >
+                            <Icon icon="solar:crown-linear" className="size-3.5 text-zinc-500" />
+                            <span>Spotlight Startups</span>
+                        </button>
                     </div>
                 </div>
 
-                {flash?.success && (
-                    <div className="mb-4 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
-                        {flash.success}
+                {/* ── Minimalist Monochrome Metric Strip (Refero Spec) ────────── */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 mb-6">
+                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
+                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                            Total Founders
+                        </span>
+                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
+                            {totals.total}
+                        </span>
                     </div>
-                )}
 
-                {/* Filters */}
-                <div className="mb-4 flex flex-wrap items-center gap-3">
-                    <div className="relative max-w-xs min-w-[200px] flex-1">
-                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
+                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                            Audit In Progress
+                        </span>
+                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
+                            {totals.in_progress}
+                        </span>
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
+                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                            Audits Complete
+                        </span>
+                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
+                            {totals.complete}
+                        </span>
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
+                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                            Needs Attention
+                        </span>
+                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
+                            {totals.needs_info + totals.on_hold}
+                        </span>
+                    </div>
+                </div>
+
+                {/* ── Status Tab Navigation ────────────────────────────────────── */}
+                <div className="flex items-center justify-between gap-4 shrink-0 pb-3 border-b border-zinc-100 mb-4">
+                    <div className="flex items-center gap-1.5 overflow-x-auto">
+                        {[
+                            { id: 'all', label: 'All Founders', count: totals.total },
+                            { id: 'in_progress', label: 'In Progress', count: totals.in_progress },
+                            { id: 'complete', label: 'Complete', count: totals.complete },
+                            { id: 'needs_info', label: 'Needs Info', count: totals.needs_info },
+                            { id: 'pending', label: 'Pending', count: totals.pending },
+                            { id: 'on_hold', label: 'On Hold', count: totals.on_hold },
+                        ].map((tab) => (
+                            <button
+                                key={tab.id}
+                                type="button"
+                                onClick={() => applyFilters({ status: tab.id === 'all' ? '' : tab.id })}
+                                className={cn(
+                                    'shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                                    (tab.id === 'all' && activeStatus === 'all') || activeStatus === tab.id
+                                        ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
+                                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                )}
+                            >
+                                <span>{tab.label}</span>
+                                <span
+                                    className={cn(
+                                        'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
+                                        (tab.id === 'all' && activeStatus === 'all') || activeStatus === tab.id
+                                            ? 'bg-zinc-950 text-white'
+                                            : 'bg-zinc-200/70 text-zinc-600',
+                                    )}
+                                >
+                                    {tab.count}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Analyst Lead Filter */}
+                    <div className="shrink-0 flex items-center gap-2">
+                        <select
+                            value={activeAnalyst}
+                            onChange={(e) => applyFilters({ analyst_id: e.target.value === 'all' ? '' : e.target.value })}
+                            className="rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs text-zinc-700 focus:border-zinc-400 focus:outline-none shadow-2xs"
+                        >
+                            <option value="all">All Audit Leads</option>
+                            <option value="unassigned">Unassigned Only ({totals.unassigned})</option>
+                            {analysts.map((a) => (
+                                <option key={a.id} value={String(a.id)}>
+                                    Lead: {a.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* ── Search Bar Strip ────────────────────────────────────────── */}
+                <div className="flex items-center justify-between gap-3 shrink-0 mb-3">
+                    <div className="relative w-full max-w-md">
+                        <Icon
+                            icon="solar:minimalistic-magnifer-linear"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none"
+                        />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search name or company…"
-                            className="text-zinc-955 w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-4 pl-9 text-sm shadow-xs placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
+                            placeholder="Search founder name, company, or email..."
+                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none shadow-2xs transition-colors"
                         />
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {statuses.map((s) => (
+                        {search && (
                             <button
-                                key={s}
-                                onClick={() => setStatus(s)}
-                                className={cn(
-                                    'rounded-full border px-3.5 py-1.5 text-xs font-bold capitalize shadow-xs transition-colors',
-                                    statusFilter === s
-                                        ? 'border-[#3A54A5]/25 bg-[#3A54A5]/10 text-[#3A54A5]'
-                                        : 'text-zinc-650 border-zinc-200 bg-white hover:bg-zinc-100 hover:text-zinc-950',
-                                )}
+                                onClick={() => setSearch('')}
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
                             >
-                                {s === 'all' ? 'All' : (auditStatusLabel[s] ?? s)}
+                                <Icon icon="solar:close-circle-linear" className="size-3.5" />
                             </button>
-                        ))}
+                        )}
                     </div>
                 </div>
 
-                {/* Table */}
-                <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
-                    {filtered.length === 0 ? (
-                        <div className="text-zinc-550 py-16 text-center text-sm font-medium">No founders match your filter.</div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[900px] text-sm">
-                                <thead>
-                                    <tr className="border-b border-zinc-200 bg-zinc-50/50">
-                                        {['Founder', 'Company', 'Score', 'Tier', 'Audit Status', 'Assigned Analyst', 'Actions'].map((h) => (
-                                            <th
-                                                key={h}
-                                                className="px-5 py-3.5 text-left text-[10px] font-bold tracking-widest text-zinc-500 uppercase"
-                                            >
-                                                {h}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-zinc-200/80">
-                                    {filtered.map((f) => (
-                                        <tr key={f.id} className="group transition-colors hover:bg-zinc-50/40">
-                                            <td className="px-5 py-4">
-                                                <p className="font-semibold text-zinc-900">{f.full_name ?? '—'}</p>
-                                                <p className="max-w-[140px] truncate text-xs text-zinc-500">{f.email}</p>
-                                            </td>
-                                            <td className="text-zinc-650 px-5 py-4 font-medium">{f.company_name ?? '—'}</td>
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center gap-1.5">
-                                                    <span className={`font-mono font-bold ${scoreBandColor[f.score_band ?? ''] ?? 'text-zinc-800'}`}>
-                                                        {f.score ?? '—'}
-                                                    </span>
-                                                    {(f.score ?? 0) > 85 && (
-                                                        <span title="High Velocity">
-                                                            <Zap className="size-3.5 text-amber-500" />
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="text-zinc-650 px-5 py-4 font-medium capitalize">{f.tier ?? '—'}</td>
-                                            <td className="px-5 py-4">
-                                                {f.audit_status ? (
-                                                    <span
-                                                        className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${auditStatusColors[f.audit_status] ?? 'border-zinc-200 bg-zinc-100 text-zinc-500'}`}
-                                                    >
-                                                        {auditStatusLabel[f.audit_status] ?? f.audit_status}
-                                                    </span>
-                                                ) : (
-                                                    <span className="font-semibold text-zinc-400">—</span>
-                                                )}
-                                            </td>
-                                            <td className="px-5 py-4">
-                                                {f.assigned_analyst ? (
-                                                    <span className="text-zinc-650 text-sm font-semibold">{f.assigned_analyst.name}</span>
-                                                ) : (
-                                                    <span className="border-amber-250 rounded-full border bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-700">
-                                                        Unassigned
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <Link
-                                                        href={route('admin.founders.show', { founder: f.id })}
-                                                        className="text-xs font-extrabold tracking-wider text-[#3A54A5] uppercase transition-colors hover:text-[#2D4182]"
-                                                    >
-                                                        View
-                                                    </Link>
-                                                    {isSuperAdmin && (
-                                                        <button
-                                                            onClick={() => setAssignModal({ id: f.id, name: f.full_name ?? f.email })}
-                                                            className="text-zinc-550 flex items-center gap-1 text-xs font-extrabold tracking-wider uppercase transition-colors hover:text-zinc-950"
-                                                        >
-                                                            <UserPlus className="size-3" />
-                                                            Assign
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </div>
+                {/* ── Data Table (Fixed Header + No-Scrollbar Rows) ────────────── */}
+                <div className="flex-1 min-h-0 flex flex-col justify-between overflow-hidden">
+                    {/* Fixed Table Header */}
+                    <div className="flex items-center gap-4 px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 select-none shrink-0">
+                        <div className="w-56 shrink-0">Founder / Contact</div>
+                        <div className="w-48 shrink-0">Company</div>
+                        <div className="w-28 shrink-0">PARAGON Score</div>
+                        <div className="w-36 shrink-0">Venture Tier</div>
+                        <div className="w-32 shrink-0">Audit Status</div>
+                        <div className="min-w-0 flex-1">Assigned Analyst</div>
+                        <div className="w-32 shrink-0 text-right">Actions</div>
+                    </div>
 
-                {/* Pagination */}
-                {founders.last_page > 1 && (
-                    <div className="mt-4 flex items-center justify-between text-sm font-semibold text-zinc-500">
-                        <span>
-                            Page {founders.current_page} of {founders.last_page}
-                        </span>
-                        <div className="flex gap-2">
-                            {founders.links.map((link, i) =>
-                                link.url ? (
-                                    <Link
+                    {/* Scrollable Table Rows (No scrollbar) */}
+                    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar divide-y divide-zinc-100">
+                        {founders.data.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16 text-center">
+                                <Icon icon="solar:user-speak-linear" className="size-8 text-zinc-300 mb-2" />
+                                <p className="text-xs text-zinc-400">No founders found matching this filter.</p>
+                            </div>
+                        ) : (
+                            founders.data.map((f) => {
+                                const founderName = f.full_name ?? f.email;
+                                const companyName = f.company_name ?? 'Startup';
+
+                                return (
+                                    <div
+                                        key={f.id}
+                                        onClick={() => setActiveDrawerFounder(f)}
+                                        className="group flex items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80 cursor-pointer"
+                                    >
+                                        {/* Founder Column */}
+                                        <div className="w-56 shrink-0 flex items-center gap-2.5 min-w-0">
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-100 border border-zinc-200 text-[11px] font-bold text-zinc-700">
+                                                {getInitials(founderName)}
+                                            </div>
+                                            <div className="min-w-0 pr-1">
+                                                <span className="font-semibold text-zinc-950 group-hover:underline text-[12.5px] block truncate">
+                                                    {founderName}
+                                                </span>
+                                                <span className="text-zinc-400 text-[11px] truncate block font-mono">
+                                                    {f.email}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Company Column */}
+                                        <div className="w-48 shrink-0 min-w-0">
+                                            <span className="font-medium text-zinc-900 truncate block text-[12px]">
+                                                {companyName}
+                                            </span>
+                                            <span className="text-[11px] text-zinc-400 truncate block">
+                                                {f.profile?.sector ?? 'General Tech'}
+                                            </span>
+                                        </div>
+
+                                        {/* PARAGON Score */}
+                                        <div className="w-28 shrink-0">
+                                            <ScoreBadge score={f.score} band={f.score_band} />
+                                        </div>
+
+                                        {/* Venture Tier */}
+                                        <div className="w-36 shrink-0">
+                                            <span className="text-zinc-700 font-medium text-[11.5px]">
+                                                {f.tier_label}
+                                            </span>
+                                        </div>
+
+                                        {/* Audit Status */}
+                                        <div className="w-32 shrink-0">
+                                            <StatusBadge status={f.audit_status} />
+                                        </div>
+
+                                        {/* Assigned Analyst */}
+                                        <div className="min-w-0 flex-1 truncate">
+                                            {f.assigned_analyst ? (
+                                                <div className="flex items-center gap-1.5 text-zinc-800 font-medium text-[11.5px]">
+                                                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-900 text-[9px] font-bold text-white">
+                                                        {getInitials(f.assigned_analyst.name)}
+                                                    </div>
+                                                    <span className="truncate">{f.assigned_analyst.name}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50/80 border border-amber-200/60 px-2 py-0.2 text-[10.5px] font-medium text-amber-700">
+                                                    Unassigned
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="w-32 shrink-0 text-right">
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setActiveDrawerFounder(f);
+                                                }}
+                                                className="whitespace-nowrap rounded-lg border border-zinc-200/80 bg-white px-3 py-1 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                            >
+                                                Inspect & Act
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+
+                    {/* Table Footer & Pagination */}
+                    <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-xs text-zinc-400 shrink-0">
+                        <p>
+                            Showing {founders.from ?? 0} to {founders.to ?? 0} of {founders.total} founders
+                        </p>
+
+                        {founders.links.length > 3 && (
+                            <div className="flex items-center gap-1">
+                                {founders.links.map((link, i) => (
+                                    <button
                                         key={i}
-                                        href={link.url}
+                                        onClick={() => link.url && router.get(link.url, {}, { preserveScroll: true })}
+                                        disabled={!link.url}
                                         className={cn(
-                                            'rounded-lg border px-3 py-1.5 text-xs shadow-xs transition-colors',
+                                            'px-2 py-1 rounded-md text-xs font-medium',
                                             link.active
-                                                ? 'border-transparent bg-[#3A54A5] text-white'
-                                                : 'text-zinc-650 hover:bg-zinc-150 border-zinc-200 bg-white hover:text-zinc-950',
+                                                ? 'bg-zinc-950 text-white font-bold'
+                                                : link.url
+                                                ? 'text-zinc-600 hover:bg-zinc-100'
+                                                : 'text-zinc-300 cursor-not-allowed',
                                         )}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />
-                                ) : null,
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
+                </div>
+
+                {/* ── Slide-Over Founder Audit Drawer ──────────────────────────── */}
+                {activeDrawerFounder && (
+                    <FounderAuditDrawer
+                        founder={activeDrawerFounder}
+                        analysts={analysts}
+                        userRole={user_role}
+                        onClose={() => setActiveDrawerFounder(null)}
+                        onUpdateFounder={(updated) => setActiveDrawerFounder(updated)}
+                    />
                 )}
             </div>
         </AdminLayout>

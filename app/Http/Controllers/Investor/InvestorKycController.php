@@ -27,6 +27,12 @@ class InvestorKycController extends Controller
     {
         $investor = $request->user('investor');
 
+        if ($investor->hasApprovedKyc()) {
+            return back()->withErrors([
+                'document' => 'Your KYC is already verified and approved. Additional document submissions are not permitted.',
+            ]);
+        }
+
         if ($investor->hasPendingKyc() || $investor->kycSubmissions()->where('status', InvestorKycSubmission::STATUS_PENDING)->exists()) {
             return back()->withErrors([
                 'document' => 'Your KYC document is already under review. Please wait for a decision before submitting another one.',

@@ -31,7 +31,7 @@ class VerificationPageLiveMail extends Mailable
             with: [
                 'founder' => $this->founder,
                 'profile' => $this->profile,
-                'verificationUrl' => url('/verify/'.$this->profile->slug),
+                'verificationUrl' => url('/investor/spotlight/'.$this->profile->slug),
                 'recipientEmail' => $this->founder->email,
             ],
         );

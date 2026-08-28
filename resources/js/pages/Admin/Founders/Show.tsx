@@ -191,7 +191,7 @@ export default function AdminFoundersShow({
 
                         {profile && (
                             <a
-                                href={`/verify/${profile.slug}`}
+                                href={`/investor/spotlight/${profile.slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
@@ -491,12 +491,12 @@ export default function AdminFoundersShow({
                                     </div>
                                     <div className="flex gap-2 pt-2">
                                         <a
-                                            href={`/verify/${profile.slug}`}
+                                            href={`/investor/spotlight/${profile.slug}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex-1 rounded-xl border border-zinc-200 bg-white py-2 text-center text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                                         >
-                                            View Public Page
+                                            Spotlight Page
                                         </a>
                                         <Link
                                             href={route('admin.spotlight.index')}

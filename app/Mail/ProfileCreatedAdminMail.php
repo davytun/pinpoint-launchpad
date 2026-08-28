@@ -33,7 +33,7 @@ class ProfileCreatedAdminMail extends Mailable
             with: [
                 'founder'         => $this->founder,
                 'profile'         => $this->profile,
-                'verificationUrl' => url('/verify/' . $this->profile->slug),
+                'verificationUrl' => url('/investor/spotlight/' . $this->profile->slug),
                 'adminUrl'        => url('/admin/profiles/' . $this->profile->id),
                 'recipientEmail'  => config('mail.admin_address'),
             ],

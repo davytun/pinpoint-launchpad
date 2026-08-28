@@ -244,8 +244,8 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::get('/dashboard', [InvestorAuthController::class, 'dashboard'])->middleware('auth.investor')->name('dashboard');
     Route::get('/kyc', [InvestorKycController::class, 'create'])->middleware('auth.investor')->name('kyc.create');
     Route::post('/kyc', [InvestorKycController::class, 'store'])->middleware('auth.investor')->name('kyc.store');
-    Route::get('/spotlight', [InvestorSpotlightController::class, 'index'])->middleware('auth.investor')->name('spotlight.index');
-    Route::get('/spotlight/{slug}', [InvestorSpotlightController::class, 'show'])->middleware('auth.investor')->name('spotlight.show');
+    Route::get('/spotlight', [InvestorSpotlightController::class, 'index'])->middleware(['auth.investor', 'kyc.approved'])->name('spotlight.index');
+    Route::get('/spotlight/{slug}', [InvestorSpotlightController::class, 'show'])->middleware(['auth.investor', 'kyc.approved'])->name('spotlight.show');
     Route::get('/spotlight/{slug}/pitch-deck/preview', [InvestorSpotlightController::class, 'previewPitchDeck'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('spotlight.pitch-deck.preview');
     Route::get('/spotlight/{slug}/pitch-deck', [InvestorSpotlightController::class, 'downloadPitchDeck'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('spotlight.pitch-deck');
     Route::post('/spotlight/{slug}/interest', [InvestorInterestController::class, 'store'])->middleware(['auth.investor', 'kyc.approved'])->name('interests.store');

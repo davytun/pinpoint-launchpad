@@ -40,14 +40,14 @@ class AppServiceProvider extends ServiceProvider
 
         // Resolve password reset URL conflict between different auth guards
         \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function ($notifiable, string $token) {
-            if ($notifiable instanceof \App\Models\Founder) {
+            if ($notifiable instanceof Founder) {
                 return route('founder.password.reset', [
                     'token' => $token,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);
             }
             
-            if ($notifiable instanceof \App\Models\Investor) {
+            if ($notifiable instanceof Investor) {
                 return route('investor.password.reset', [
                     'token' => $token,
                     'email' => $notifiable->getEmailForPasswordReset(),

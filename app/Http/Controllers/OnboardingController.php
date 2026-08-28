@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\FounderSetupInviteMail;
+use App\Models\Founder;
 use App\Models\Payment;
 use App\Models\Signature;
 use App\Services\BoldSignService;
@@ -183,7 +185,7 @@ class OnboardingController extends Controller
 
         $setupUrl = null;
         if ($signature->isSigned()) {
-            $founder = \App\Models\Founder::query()->where('email', $signature->signer_email)->first();
+            $founder = Founder::query()->where('email', $signature->signer_email)->first();
             if (! $founder || ! $founder->hasSetupAccount()) {
                 $setupToken = Cache::get('founder_setup_token_' . $signature->signer_email);
                 if (! $setupToken) {
@@ -242,7 +244,7 @@ class OnboardingController extends Controller
         $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
 
         Mail::to($signature->signer_email)
-            ->queue(new \App\Mail\FounderSetupInviteMail($signature->signer_email, $setupUrl));
+            ->queue(new FounderSetupInviteMail($signature->signer_email, $setupUrl));
 
         return response()->json(['message' => 'Invite resent.']);
     }

@@ -50,17 +50,31 @@ function temporarySpotlightDocumentUrl(string $routeName, FounderProfile $profil
     return URL::temporarySignedRoute($routeName, now()->addMinutes(10), ['slug' => $profile->slug]);
 }
 
-test('active investors can browse published Spotlight summaries before KYC approval', function () {
+test('only KYC-approved investors can access the Spotlight index and show pages', function () {
     [$founder, $profile] = investorSpotlightEntry();
-    $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_PENDING]);
+    $pendingInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_PENDING]);
+    $notSubmittedInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_NOT_SUBMITTED]);
+    $rejectedInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_REJECTED]);
+    $approvedInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
 
-    $this->actingAs($investor, 'investor')
+    // Unapproved states are redirected to /investor/kyc
+    $this->actingAs($pendingInvestor, 'investor')->get(route('investor.spotlight.index'))->assertRedirect(route('investor.kyc.create'));
+    $this->actingAs($pendingInvestor, 'investor')->get(route('investor.spotlight.show', $profile->slug))->assertRedirect(route('investor.kyc.create'));
+
+    $this->actingAs($notSubmittedInvestor, 'investor')->get(route('investor.spotlight.index'))->assertRedirect(route('investor.kyc.create'));
+    $this->actingAs($rejectedInvestor, 'investor')->get(route('investor.spotlight.index'))->assertRedirect(route('investor.kyc.create'));
+
+    // Approved investor can access Spotlight index and show pages
+    $this->actingAs($approvedInvestor, 'investor')
+        ->get(route('investor.spotlight.index'))
+        ->assertOk();
+
+    $this->actingAs($approvedInvestor, 'investor')
         ->get(route('investor.spotlight.show', $profile->slug))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('Investor/Spotlight/Show')
-            ->where('entry.slug', $profile->slug)
-            ->where('entry.can_view_pitch_deck', false));
+            ->where('entry.slug', $profile->slug));
 });
 
 test('only KYC-approved investors can preview a reviewed published PDF pitch deck and the preview is audited', function () {

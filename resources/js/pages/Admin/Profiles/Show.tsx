@@ -131,12 +131,12 @@ export default function AdminProfilesShow({ profile, founder, badges, access_req
                         </div>
                         <div className="flex items-center gap-3">
                             <a
-                                href={`/verify/${profile.slug}`}
+                                href={`/investor/spotlight/${profile.slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex h-9 items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-4 text-xs font-semibold text-zinc-800 shadow-2xs hover:bg-zinc-50 transition-colors"
                             >
-                                <span>View Public Page</span>
+                                <span>View Spotlight Page</span>
                                 <Icon icon="solar:external-link-linear" className="size-3.5 text-zinc-400" />
                             </a>
                             <button

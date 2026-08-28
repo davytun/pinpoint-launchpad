@@ -302,11 +302,11 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                                         <td className="px-5 py-3.5 text-right">
                                             <div className="flex items-center justify-end gap-1 text-zinc-400">
                                                 <a
-                                                    href={`/verify/${profile.slug}`}
+                                                    href={`/investor/spotlight/${profile.slug}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"
-                                                    title="View Public Page"
+                                                    title="View Spotlight Page"
                                                 >
                                                     <Icon icon="solar:external-link-linear" className="size-4" />
                                                 </a>

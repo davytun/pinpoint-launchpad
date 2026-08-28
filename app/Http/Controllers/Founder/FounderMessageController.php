@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Founder;
 
 use App\Http\Controllers\Controller;
 use App\Mail\NewMessageAdminMail;
+use App\Models\Founder;
 use App\Models\Message;
 use App\Services\MessageService;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,7 @@ class FounderMessageController extends Controller
 
     public function index(): Response
     {
-        /** @var \App\Models\Founder $founder */
+        /** @var Founder $founder */
         $founder = Auth::guard('founder')->user();
         $thread  = $this->messageService->getOrCreateThread($founder);
 
@@ -68,7 +69,7 @@ class FounderMessageController extends Controller
             return back()->withErrors(['body' => 'Please enter a message or attach a file.']);
         }
 
-        /** @var \App\Models\Founder $founder */
+        /** @var Founder $founder */
         $founder = Auth::guard('founder')->user();
         $thread  = $this->messageService->getOrCreateThread($founder);
 
@@ -93,7 +94,7 @@ class FounderMessageController extends Controller
 
     public function downloadAttachment(Message $message): StreamedResponse
     {
-        /** @var \App\Models\Founder $founder */
+        /** @var Founder $founder */
         $founder = Auth::guard('founder')->user();
 
         if ($message->thread->founder_id !== $founder->id) {

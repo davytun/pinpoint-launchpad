@@ -526,7 +526,26 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             )}
 
             {/* ── Main Canvas Content Region (Strictly h-full, zero outer scroll) ─── */}
-            <main className="flex-1 min-w-0 h-full max-h-full flex flex-col overflow-hidden">
+            <main className="flex-1 min-w-0 h-full max-h-full flex flex-col relative">
+                {/* ── Expand Sidebar Button (Floating on Left Edge) ── */}
+                {collapsed && (
+                    <div className="hidden lg:flex absolute top-6 -left-4 z-50">
+                        <TooltipProvider>
+                            <Tooltip delayDuration={150}>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={toggleCollapse}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white text-zinc-600 shadow-sm transition-all hover:bg-zinc-50 hover:text-zinc-900 ring-4 ring-[#F4F4F6]"
+                                    >
+                                        <Icon icon="solar:sidebar-minimalistic-linear" className="size-4.5" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">Expand Sidebar (⌘B / Ctrl+B)</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </div>
+                )}
+
                 {/* Mobile top bar */}
                 <header className="mb-3 flex h-14 items-center gap-3 rounded-2xl border border-zinc-200/80 bg-white px-5 shadow-2xs lg:hidden shrink-0">
                     <button
@@ -549,7 +568,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </header>
 
                 {/* Page content strictly bounded */}
-                <div className="flex-1 min-w-0 h-full max-h-full flex flex-col overflow-hidden">{children}</div>
+                <div className="flex-1 min-w-0 h-full max-h-full flex flex-col overflow-hidden relative z-0">
+                    {children}
+                </div>
             </main>
         </div>
     );

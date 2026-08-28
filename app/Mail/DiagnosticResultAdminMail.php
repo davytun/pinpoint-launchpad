@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\DiagnosticSession;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,7 +15,7 @@ class DiagnosticResultAdminMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public \App\Models\DiagnosticSession $session) {}
+    public function __construct(public DiagnosticSession $session) {}
 
     public function envelope(): Envelope
     {

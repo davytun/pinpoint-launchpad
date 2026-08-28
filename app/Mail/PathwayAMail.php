@@ -2,6 +2,9 @@
 
 namespace App\Mail;
 
+use App\Models\DiagnosticSession;
+use App\Models\Founder;
+use App\Models\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,7 +17,7 @@ class PathwayAMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public \App\Models\DiagnosticSession $session) {}
+    public function __construct(public DiagnosticSession $session) {}
 
     public function envelope(): Envelope
     {
@@ -32,10 +35,10 @@ class PathwayAMail extends Mailable implements ShouldQueue
 
     public function shouldSend(): bool
     {
-        $hasPaid = \App\Models\Payment::query()->where('customer_email', $this->session->email)
+        $hasPaid = Payment::query()->where('customer_email', $this->session->email)
             ->where('status', 'paid')
             ->exists();
-        $hasAccount = \App\Models\Founder::query()->where('email', $this->session->email)->exists();
+        $hasAccount = Founder::query()->where('email', $this->session->email)->exists();
 
         return ! ($hasPaid || $hasAccount);
     }

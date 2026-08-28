@@ -1,43 +1,20 @@
 <?php
 
-namespace Tests\Feature;
+test('sample unicorn profile is accessible for marketing', function () {
+    $this->get('/verify/sample-unicorn')->assertOk();
+});
 
-use Tests\TestCase;
+test('any other verify slug redirects to investor portal', function () {
+    $this->get('/verify/some-real-startup')->assertRedirect('/investor');
+});
 
-class RetireVerifyFlowTest extends TestCase
-{
-    /** @test */
-    public function sample_unicorn_profile_is_accessible_for_marketing()
-    {
-        $response = $this->get('/verify/sample-unicorn');
+test('old request access endpoint is removed and returns 404', function () {
+    $this->post('/verify/some-real-startup/request-access', [
+        'investor_name' => 'John Doe',
+        'investor_email' => 'john@example.com',
+    ])->assertNotFound();
+});
 
-        $response->assertStatus(200);
-    }
-
-    /** @test */
-    public function any_other_verify_slug_redirects_to_investor_portal()
-    {
-        $response = $this->get('/verify/some-real-startup');
-
-        $response->assertRedirect('/investor');
-    }
-
-    /** @test */
-    public function old_request_access_endpoint_is_removed_and_returns_404()
-    {
-        $response = $this->post('/verify/some-real-startup/request-access', [
-            'investor_name' => 'John Doe',
-            'investor_email' => 'john@example.com',
-        ]);
-
-        $response->assertStatus(404);
-    }
-
-    /** @test */
-    public function old_document_download_endpoint_is_removed_and_returns_404()
-    {
-        $response = $this->get('/verify/some-real-startup/document/1/download?token=abc');
-
-        $response->assertStatus(404);
-    }
-}
+test('old document download endpoint is removed and returns 404', function () {
+    $this->get('/verify/some-real-startup/document/1/download?token=abc')->assertNotFound();
+});

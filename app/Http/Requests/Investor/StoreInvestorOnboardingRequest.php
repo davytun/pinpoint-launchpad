@@ -25,7 +25,7 @@ class StoreInvestorOnboardingRequest extends FormRequest
         return [
             'investor_type' => ['required', Rule::in(['individual', 'corporate'])],
             'full_name' => ['required', 'string', 'min:2', 'max:120'],
-            'email' => ['required', 'email:rfc,dns', 'max:255', 'unique:investors,email'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:investors,email'],
             'phone' => ['required', 'string', 'max:40'],
             'address' => ['required', 'string', 'max:2000'],
             'company_name' => ['nullable', 'string', 'min:2', 'max:255', 'required_if:investor_type,corporate'],

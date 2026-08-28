@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 
-import { Activity, AlertTriangle, DollarSign, MessageSquare, Users, TrendingUp, CreditCard } from 'lucide-react';
+import { Activity, AlertTriangle, DollarSign, MessageSquare, Users, TrendingUp, CreditCard, AlertCircle, AlertOctagon, Filter } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, XAxis } from 'recharts';
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
@@ -30,6 +30,21 @@ interface AuditBreakdownItem {
     color: string;
 }
 
+interface FunnelMetrics {
+    signed_up: number;
+    completed_diagnostic: number;
+    uploaded_documents: number;
+    audit_complete: number;
+}
+
+interface SystemAlert {
+    id: string;
+    title: string;
+    description: string;
+    action_url: string;
+    type: 'error' | 'warning';
+}
+
 interface Metrics {
     my_open_messages?: number;
     total_founders?: number;
@@ -45,6 +60,7 @@ interface Metrics {
     waitlist_count?: { founders: number; investors: number };
     monthly_revenue?: MonthlyRevenue[];
     audit_breakdown?: AuditBreakdownItem[];
+    funnel?: FunnelMetrics;
 }
 
 interface ActivityItem {
@@ -58,6 +74,7 @@ interface PageProps {
     metrics: Metrics;
     recent_activity: ActivityItem[];
     needs_attention?: NeedsAttentionItem[];
+    system_alerts?: SystemAlert[];
     user_role: 'superadmin' | 'analyst' | 'support';
     date_range?: string;
 }
@@ -139,7 +156,7 @@ const revenueChartConfig = {
 
 function RevenueAreaChart({ data, thisMonth }: { data: MonthlyRevenue[]; thisMonth: number }) {
     return (
-        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] h-full flex flex-col">
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] flex flex-col h-[380px]">
             <div className="mb-2 flex items-center justify-between">
                 <p className="text-[13px] font-semibold text-zinc-500">Monthly Revenue</p>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-500">
@@ -178,7 +195,7 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
     const chartConfig = buildAuditConfig(data);
 
     return (
-        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] h-full">
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
             <div className="mb-6 flex items-center justify-between">
                 <p className="text-[13px] font-semibold text-zinc-500">Audit Pipeline</p>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400">
@@ -272,6 +289,107 @@ function WaitlistBars({ founders, investors }: { founders: number; investors: nu
     );
 }
 
+// ─── Funnel ───────────────────────────────────────────────────────────────────
+
+function FunnelChart({ data }: { data: FunnelMetrics }) {
+    const max = data.signed_up || 1; // prevent divide by zero
+    
+    const steps = [
+        { label: 'Signed Up', value: data.signed_up },
+        { label: 'Diagnostic', value: data.completed_diagnostic },
+        { label: 'Documents', value: data.uploaded_documents },
+        { label: 'Audit Complete', value: data.audit_complete },
+    ];
+
+    return (
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+            <div className="mb-6 flex items-center justify-between">
+                <p className="text-[13px] font-semibold text-zinc-500">Onboarding Funnel</p>
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400">
+                    <Filter className="size-3.5" />
+                </div>
+            </div>
+            
+            <div className="space-y-4">
+                {steps.map((step, idx) => {
+                    const percentage = Math.round((step.value / max) * 100);
+                    // Calculate drop-off from previous step
+                    const prevValue = idx === 0 ? step.value : steps[idx - 1].value;
+                    const dropoff = idx === 0 ? 0 : (prevValue > 0 ? Math.round(((prevValue - step.value) / prevValue) * 100) : 0);
+                    
+                    return (
+                        <div key={step.label} className="relative">
+                            <div className="flex justify-between items-end mb-1.5">
+                                <span className="text-[13px] font-semibold text-zinc-900">{step.label}</span>
+                                <div className="flex items-center gap-2">
+                                    {idx > 0 && dropoff > 0 && (
+                                        <span className="text-[11px] font-medium text-red-500">-{dropoff}% drop</span>
+                                    )}
+                                    <span className="text-[13px] font-bold text-zinc-900 tabular-nums">{step.value}</span>
+                                </div>
+                            </div>
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
+                                <div 
+                                    className="h-full rounded-full transition-all duration-500" 
+                                    style={{ 
+                                        width: `${percentage}%`,
+                                        backgroundColor: `rgba(24, 24, 27, ${1 - (idx * 0.15)})`
+                                    }} 
+                                />
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+// ─── System Alerts ────────────────────────────────────────────────────────────
+
+function SystemAlertsWidget({ alerts }: { alerts?: SystemAlert[] }) {
+    if (!alerts || alerts.length === 0) return null;
+    
+    return (
+        <div className="mb-10">
+            <div className="mb-4 flex items-center gap-2">
+                <h2 className="text-[13px] font-bold text-zinc-900 tracking-wider uppercase">System Alerts</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {alerts.map((alert) => (
+                    <Link 
+                        key={alert.id} 
+                        href={alert.action_url} 
+                        className={cn(
+                            "group relative flex flex-col justify-between p-4 sm:p-5 border rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5",
+                            alert.type === 'error' ? "bg-red-50/30 border-red-100" : "bg-amber-50/30 border-amber-100"
+                        )}
+                    >
+                        <div className="flex items-start justify-between gap-2">
+                            <h3 className={cn(
+                                "text-[11px] font-bold uppercase tracking-wider line-clamp-1",
+                                alert.type === 'error' ? "text-red-700" : "text-amber-700"
+                            )}>{alert.title}</h3>
+                            <div className={cn(
+                                "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                                alert.type === 'error' ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"
+                            )}>
+                                {alert.type === 'error' ? <AlertOctagon className="size-3.5" /> : <AlertCircle className="size-3.5" />}
+                            </div>
+                        </div>
+                        <div className="mt-3">
+                            <p className={cn(
+                                "text-[13px] font-medium leading-relaxed",
+                                alert.type === 'error' ? "text-red-900" : "text-amber-900"
+                            )}>{alert.description}</p>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 // ─── Activity feed ────────────────────────────────────────────────────────────
 
 const activityDotColor: Record<string, string> = {
@@ -295,7 +413,7 @@ const colorMap: Record<string, { bg: string; text: string }> = {
     gray: { bg: 'bg-zinc-100/80', text: 'text-zinc-600' },
 };
 
-export default function AdminDashboard({ metrics, recent_activity, needs_attention = [], user_role, date_range = 'all' }: PageProps) {
+export default function AdminDashboard({ metrics, recent_activity, needs_attention = [], system_alerts = [], user_role, date_range = 'all' }: PageProps) {
     const isSuperAdmin = user_role === 'superadmin';
     const isAnalyst = user_role === 'analyst';
 
@@ -344,6 +462,11 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                         )}
                     </div>
 
+                    {/* ── System Alerts ───────────────────────────────────────────────────────── */}
+                    {isSuperAdmin && system_alerts.length > 0 && (
+                        <SystemAlertsWidget alerts={system_alerts} />
+                    )}
+
                     {/* ── Needs Attention Workflow ───────────────────────────────────────── */}
                     {needs_attention.length > 0 && (
                         <div className="mb-10">
@@ -383,7 +506,6 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                     {/* ── Superadmin ── */}
                     {isSuperAdmin && (
                         <>
-
                             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
                                 <MetricCard
                                     label={date_range === 'all' ? 'Total Founders' : 'New Founders'}
@@ -396,12 +518,14 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                                     label="Total Revenue"
                                     value={fmtCurrency(metrics.total_revenue ?? 0)}
                                     icon={DollarSign}
+                                    href="/admin/revenue"
                                     variant="emerald"
                                 />
                                 <MetricCard
                                     label="Active Audits"
                                     value={metrics.active_audits ?? 0}
                                     icon={Activity}
+                                    href="/admin/founders?status=in_progress"
                                     variant="amber"
                                 />
                                 <MetricCard
@@ -409,56 +533,54 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                                     value={metrics.needs_info_count ?? 0}
                                     icon={AlertTriangle}
                                     pulse={(metrics.needs_info_count ?? 0) > 0}
-                                    href="/admin/founders"
+                                    href="/admin/founders?status=needs_info"
                                     variant="purple"
                                 />
                             </div>
 
-                            {/* Charts */}
-                            <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                                <div className="lg:col-span-2">
+                            {/* Charts & Activity (Masonry-style Columns) */}
+                            <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                                {/* Left Column: Charts and Activity */}
+                                <div className="lg:col-span-2 flex flex-col gap-6">
                                     {(metrics.monthly_revenue?.length ?? 0) > 0 && (
                                         <RevenueAreaChart data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
                                     )}
-                                </div>
-                                <div>
-                                    {(metrics.audit_breakdown?.length ?? 0) > 0 && <AuditDonut data={metrics.audit_breakdown!} />}
-                                </div>
-                            </div>
 
-                            {/* Lower Section (Activity & Tiers) */}
-                            <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                                <div className="lg:col-span-2">
-                                    <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-4">
-                                        <span className="text-[15px] font-semibold text-zinc-900">Recent Activity</span>
-                                    </div>
-                                    
-                                    {recent_activity.length === 0 ? (
-                                        <div className="rounded-[20px] border border-zinc-200/60 bg-white p-10 text-center text-sm font-medium text-zinc-500 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
-                                            No recent activity.
+                                    <div className="min-w-0">
+                                        <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-4">
+                                            <span className="text-[15px] font-semibold text-zinc-900">Recent Activity</span>
                                         </div>
-                                    ) : (
-                                        <div className="overflow-hidden rounded-[20px] border border-zinc-200/60 bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
-                                            {[...recent_activity].reverse().slice(0, 6).map((item, i) => (
-                                                <div key={i} className="flex items-start gap-4 p-4 sm:p-5 transition-colors hover:bg-zinc-50/50 border-b border-zinc-100 last:border-0">
-                                                    <span className={`mt-1 h-2 w-2 shrink-0 rounded-full shadow-xs ${activityDotColor[item.type] ?? 'bg-zinc-400'}`} />
-                                                    <div className="min-w-0 flex-1">
-                                                        <div className="flex flex-wrap items-center gap-x-2">
-                                                            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                                                                {activityTypeLabel[item.type]}
-                                                            </span>
-                                                            <p className="truncate text-[13.5px] font-semibold text-zinc-900">{item.description}</p>
+                                        
+                                        {recent_activity.length === 0 ? (
+                                            <div className="rounded-[20px] border border-zinc-200/60 bg-white p-10 text-center text-sm font-medium text-zinc-500 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+                                                No recent activity.
+                                            </div>
+                                        ) : (
+                                            <div className="overflow-hidden rounded-[20px] border border-zinc-200/60 bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+                                                {[...recent_activity].reverse().slice(0, 6).map((item, i) => (
+                                                    <div key={i} className="flex items-start gap-4 p-4 sm:p-5 transition-colors hover:bg-zinc-50/50 border-b border-zinc-100 last:border-0">
+                                                        <span className={`mt-1 h-2 w-2 shrink-0 rounded-full shadow-xs ${activityDotColor[item.type] ?? 'bg-zinc-400'}`} />
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="flex flex-wrap items-center gap-x-2">
+                                                                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                                                                    {activityTypeLabel[item.type]}
+                                                                </span>
+                                                                <p className="truncate text-[13.5px] font-semibold text-zinc-900">{item.description}</p>
+                                                            </div>
+                                                            {item.email && <p className="mt-1 truncate text-xs font-medium text-zinc-500">{item.email}</p>}
                                                         </div>
-                                                        {item.email && <p className="mt-1 truncate text-xs font-medium text-zinc-500">{item.email}</p>}
+                                                        <span className="shrink-0 text-[11px] font-medium text-zinc-400">{item.time}</span>
                                                     </div>
-                                                    <span className="shrink-0 text-[11px] font-medium text-zinc-400">{item.time}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
-                                <div className="space-y-6">
+                                {/* Right Column: Widgets */}
+                                <div className="flex flex-col gap-6">
+                                    {(metrics.audit_breakdown?.length ?? 0) > 0 && <AuditDonut data={metrics.audit_breakdown!} />}
+
                                     {/* Revenue by tier */}
                                     {metrics.revenue_by_tier && (
                                         <div>
@@ -481,6 +603,12 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                                             </div>
                                         </div>
                                     )}
+                                    
+                                    {/* Funnel Metrics */}
+                                    {metrics.funnel && (
+                                        <FunnelChart data={metrics.funnel} />
+                                    )}
+                                    
                                     {/* Waitlist Split */}
                                     {metrics.waitlist_count && (
                                         <WaitlistBars founders={metrics.waitlist_count.founders} investors={metrics.waitlist_count.investors} />
@@ -503,6 +631,7 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                                 label="Active Audits"
                                 value={metrics.active_audits ?? 0}
                                 icon={Activity}
+                                href="/admin/founders?status=in_progress"
                                 variant="emerald"
                             />
                             <MetricCard
@@ -510,6 +639,7 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                                 value={metrics.needs_info_count ?? 0}
                                 icon={AlertTriangle}
                                 pulse={(metrics.needs_info_count ?? 0) > 0}
+                                href="/admin/founders?status=needs_info"
                                 variant="amber"
                             />
                             <MetricCard

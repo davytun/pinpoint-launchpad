@@ -15,8 +15,12 @@ use Inertia\Response;
 
 class InvestorOnboardingController extends Controller
 {
-    public function create(): Response
+    public function create(): Response|RedirectResponse
     {
+        if (Auth::guard('investor')->check()) {
+            return redirect()->route('investor.dashboard');
+        }
+
         return Inertia::render('Investor/Onboarding');
     }
 
@@ -24,11 +28,12 @@ class InvestorOnboardingController extends Controller
     {
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated, $request): void {
+        $investor = DB::transaction(function () use ($validated, $request): Investor {
             $investor = Investor::create([
                 'email' => $validated['email'],
                 'password' => $validated['password'],
                 'account_status' => Investor::ACCOUNT_STATUS_ACTIVE,
+                'kyc_status' => Investor::KYC_STATUS_NOT_SUBMITTED,
                 'terms_accepted_at' => now(),
                 'aml_confirmed_at' => now(),
             ]);
@@ -43,15 +48,28 @@ class InvestorOnboardingController extends Controller
 
             AuditLog::create([
                 'event' => 'investor.onboarding_submitted',
+                'actor_type' => Investor::class,
+                'actor_id' => $investor->id,
                 'auditable_type' => Investor::class,
                 'auditable_id' => $investor->id,
                 'metadata' => ['investor_type' => $validated['investor_type']],
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);
-            Auth::guard('investor')->login($investor);
-            DB::afterCommit(fn () => Investor::where('account_status', Investor::ACCOUNT_STATUS_ACTIVE)->whereKeyNot($investor->id)->each(fn (Investor $recipient) => $recipient->notify(new InvestorJoinedNotification())));
+
+            return $investor;
         });
+
+        Auth::guard('investor')->login($investor);
+        $request->session()->regenerate();
+
+        try {
+            Investor::where('account_status', Investor::ACCOUNT_STATUS_ACTIVE)
+                ->whereKeyNot($investor->id)
+                ->each(fn (Investor $recipient) => $recipient->notify(new InvestorJoinedNotification()));
+        } catch (\Throwable) {
+            // Notification queue failure should not crash onboarding
+        }
 
         return redirect()->route('investor.dashboard')
             ->with('success', 'Your account has been created successfully. Please complete KYC to unlock full access.');

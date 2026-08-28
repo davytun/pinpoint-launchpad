@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\DiagnosticSession;
 use App\Models\FounderProfile;
 use App\Models\VerificationBadge;
 use Illuminate\Http\RedirectResponse;
@@ -45,12 +46,12 @@ class AdminProfileController extends Controller
         $profile->load([
             'founder:id,full_name,company_name,email',
             'badges',
-            'investorAccessRequests',
+            'investorInterests.investor.profile',
         ]);
 
         $diagnosticSession = null;
         if ($profile->founder?->email) {
-            $diagnosticSession = \App\Models\DiagnosticSession::byEmail($profile->founder->email)
+            $diagnosticSession = DiagnosticSession::byEmail($profile->founder->email)
                 ->latest('completed_at')
                 ->first();
         }
@@ -66,6 +67,20 @@ class AdminProfileController extends Controller
                 $overallScore = $diagnosticSession->score;
             }
         }
+
+        $accessRequests = $profile->investorInterests
+            ->map(fn ($i) => [
+                'id'             => $i->id,
+                'investor_name'  => $i->investor?->profile?->full_name ?? 'Investor',
+                'investor_email' => $i->investor?->email ?? '',
+                'firm_name'      => $i->investor?->profile?->company_name,
+                'type'           => $i->type,
+                'message'        => $i->message,
+                'status'         => $i->status,
+                'created_at'     => $i->created_at?->toISOString(),
+            ])
+            ->values()
+            ->all();
 
         return Inertia::render('Admin/Profiles/Show', [
             'profile' => [
@@ -87,7 +102,7 @@ class AdminProfileController extends Controller
                 'email'        => $profile->founder?->email,
             ],
             'badges'           => $profile->badges,
-            'access_requests'  => $profile->investorAccessRequests,
+            'access_requests'  => $accessRequests,
         ]);
     }
 
@@ -126,8 +141,22 @@ class AdminProfileController extends Controller
     {
         $profile->load([
             'founder:id,full_name,company_name',
-            'investorAccessRequests',
+            'investorInterests.investor.profile',
         ]);
+
+        $accessRequests = $profile->investorInterests
+            ->map(fn ($i) => [
+                'id'             => $i->id,
+                'investor_name'  => $i->investor?->profile?->full_name ?? 'Investor',
+                'investor_email' => $i->investor?->email ?? '',
+                'firm_name'      => $i->investor?->profile?->company_name,
+                'type'           => $i->type,
+                'message'        => $i->message,
+                'status'         => $i->status,
+                'created_at'     => $i->created_at?->toISOString(),
+            ])
+            ->values()
+            ->all();
 
         return Inertia::render('Admin/Profiles/AccessRequests', [
             'profile'         => [
@@ -135,7 +164,7 @@ class AdminProfileController extends Controller
                 'slug'         => $profile->slug,
                 'company_name' => $profile->founder?->company_name,
             ],
-            'access_requests' => $profile->investorAccessRequests,
+            'access_requests' => $accessRequests,
         ]);
     }
 }

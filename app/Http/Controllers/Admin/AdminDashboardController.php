@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditAssignment;
 use App\Models\DiagnosticSession;
 use App\Models\Founder;
+use App\Models\Investor;
+use App\Models\InvestorInterest;
 use App\Models\Message;
 use App\Models\MessageThread;
 use App\Models\Payment;
@@ -20,7 +22,7 @@ class AdminDashboardController extends Controller
     {
         $user = Auth::user();
         $metrics = [];
-        
+
         $dateRange = request('date_range', 'all');
         $startDate = match ($dateRange) {
             '7d' => now()->subDays(7),
@@ -44,8 +46,8 @@ class AdminDashboardController extends Controller
             } else {
                 $assignedFounderIds = AuditAssignment::where('analyst_id', $user->id)->pluck('founder_id');
                 $metrics['my_assigned']      = $assignedFounderIds->count();
-                $metrics['active_audits']    = Payment::whereIn('founder_id', $assignedFounderIds)->where('audit_status', 'in_progress')->count();
-                $metrics['needs_info_count'] = Payment::whereIn('founder_id', $assignedFounderIds)->where('audit_status', 'needs_info')->count();
+                $metrics['active_audits']    = Founder::whereIn('id', $assignedFounderIds)->whereHas('payment', fn ($q) => $q->where('audit_status', 'in_progress'))->count();
+                $metrics['needs_info_count'] = Founder::whereIn('id', $assignedFounderIds)->whereHas('payment', fn ($q) => $q->where('audit_status', 'needs_info'))->count();
             }
         }
 
@@ -88,9 +90,18 @@ class AdminDashboardController extends Controller
                 ['label' => 'On Hold',     'value' => Payment::where('audit_status', 'on_hold')->count(),     'color' => '#f97316'],
                 ['label' => 'Complete',    'value' => Payment::where('audit_status', 'complete')->count(),    'color' => '#10b981'],
             ];
+
+            // Funnel Metrics
+            $metrics['funnel'] = [
+                'signed_up' => Founder::count(),
+                'completed_diagnostic' => Founder::whereNotNull('diagnostic_session_id')->count(),
+                'uploaded_documents' => Founder::has('documents')->count(),
+                'audit_complete' => Founder::whereHas('payment', fn($q) => $q->where('audit_status', 'complete'))->count(),
+            ];
         }
 
         $needsAttention = [];
+        $systemAlerts = [];
 
         // 1. Unread Messages (Everyone)
         $unreadMessagesCount = MessageThread::where('admin_unread_count', '>', 0)->count();
@@ -98,7 +109,7 @@ class AdminDashboardController extends Controller
             $needsAttention[] = [
                 'id' => 'unread_messages',
                 'title' => 'Unread Messages',
-                'description' => "Founders are waiting for a response.",
+                'description' => 'Founders are waiting for a response.',
                 'count' => $unreadMessagesCount,
                 'action_url' => '/admin/messages',
                 'icon' => 'solar:letter-unread-bold-duotone',
@@ -106,24 +117,55 @@ class AdminDashboardController extends Controller
             ];
         }
 
-        if ($user->canManageAudit() && $user->isSuperAdmin()) {
-            // 2. Pending KYC
-            if (class_exists(\App\Models\Investor::class)) {
-                $pendingKycCount = \App\Models\Investor::where('kyc_status', 'pending')->count();
-                if ($pendingKycCount > 0) {
-                    $needsAttention[] = [
-                        'id' => 'pending_kyc',
-                        'title' => 'Pending KYC Reviews',
-                        'description' => "Investor accounts waiting for KYC approval.",
-                        'count' => $pendingKycCount,
-                        'action_url' => '/admin/investor-accounts?kyc_status=pending',
-                        'icon' => 'solar:shield-warning-bold-duotone',
-                        'color' => 'amber',
-                    ];
-                }
+        // 2. Pending KYC (Superadmin & Compliance)
+        if ($user->isSuperAdmin() || $user->isCompliance()) {
+            $pendingKycCount = Investor::where('kyc_status', 'pending')->count();
+            if ($pendingKycCount > 0) {
+                $needsAttention[] = [
+                    'id' => 'pending_kyc',
+                    'title' => 'Pending KYC Reviews',
+                    'description' => 'Investor accounts waiting for KYC verification.',
+                    'count' => $pendingKycCount,
+                    'action_url' => '/admin/investor-accounts?kyc_status=pending',
+                    'icon' => 'solar:shield-warning-bold-duotone',
+                    'color' => 'amber',
+                ];
             }
 
-            // 3. Pending Audits
+            // Stuck KYC Alert
+            $stuckKycCount = Investor::where('kyc_status', 'pending')
+                ->where('updated_at', '<', now()->subHours(48))
+                ->count();
+
+            if ($stuckKycCount > 0) {
+                $systemAlerts[] = [
+                    'id' => 'stuck_kyc',
+                    'title' => 'Stuck KYC Checks',
+                    'description' => "{$stuckKycCount} pending KYC check" . ($stuckKycCount > 1 ? 's' : '') . ' stuck for >48 hours.',
+                    'action_url' => '/admin/investor-accounts?kyc_status=pending',
+                    'type' => 'warning',
+                ];
+            }
+        }
+
+        // 3. Dealflow Requests (Superadmin & Investor Relations)
+        if ($user->isSuperAdmin() || $user->isInvestorRelations()) {
+            $pendingInterestsCount = InvestorInterest::where('status', 'pending')->count();
+            if ($pendingInterestsCount > 0) {
+                $needsAttention[] = [
+                    'id' => 'pending_interests',
+                    'title' => 'Dealflow Requests',
+                    'description' => 'Investor interest and data room requests pending decision.',
+                    'count' => $pendingInterestsCount,
+                    'action_url' => '/admin/dealflow/interests?status=pending',
+                    'icon' => 'solar:folder-with-files-bold-duotone',
+                    'color' => 'blue',
+                ];
+            }
+        }
+
+        // 4. Pending Audits (Superadmin & Analysts)
+        if ($user->canManageAudit()) {
             $pendingAuditsCount = Payment::where('audit_status', 'pending')->count();
             if ($pendingAuditsCount > 0) {
                 $needsAttention[] = [
@@ -131,10 +173,27 @@ class AdminDashboardController extends Controller
                     'title' => 'Pending Audits',
                     'description' => "New audits that haven't been started.",
                     'count' => $pendingAuditsCount,
-                    'action_url' => '/admin/revenue', // Since we don't have a dedicated audits page yet, just revenue or dashboard
+                    'action_url' => '/admin/founders?status=pending',
                     'icon' => 'solar:document-add-bold-duotone',
                     'color' => 'emerald',
                 ];
+            }
+
+            // Failed Payments Alert (Superadmin only)
+            if ($user->isSuperAdmin()) {
+                $failedPaymentsCount = Payment::where('status', 'failed')
+                    ->where('created_at', '>=', now()->subHours(24))
+                    ->count();
+
+                if ($failedPaymentsCount > 0) {
+                    $systemAlerts[] = [
+                        'id' => 'failed_payments',
+                        'title' => 'Failed Payments',
+                        'description' => "{$failedPaymentsCount} payment" . ($failedPaymentsCount > 1 ? 's' : '') . ' failed in the last 24 hours.',
+                        'action_url' => '/admin/revenue',
+                        'type' => 'error',
+                    ];
+                }
             }
         }
 
@@ -144,6 +203,7 @@ class AdminDashboardController extends Controller
             'metrics'         => $metrics,
             'recent_activity' => $recentActivity,
             'needs_attention' => $needsAttention,
+            'system_alerts'   => $systemAlerts,
             'user_role'       => $user->role,
             'date_range'      => $dateRange,
         ]);

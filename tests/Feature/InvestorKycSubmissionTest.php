@@ -63,7 +63,7 @@ test('an investor cannot submit another KYC document while one is pending', func
     expect(InvestorKycSubmission::count())->toBe(1);
 });
 
-test('a replacement submission returns an approved investor to KYC review', function () {
+test('an approved investor cannot submit replacement KYC documents', function () {
     Storage::fake('local');
     $investor = investorForKycSubmission([
         'kyc_status' => Investor::KYC_STATUS_APPROVED,
@@ -82,11 +82,9 @@ test('a replacement submission returns an approved investor to KYC review', func
     $response = $this->actingAs($investor, 'investor')
         ->post(route('investor.kyc.store'), ['document' => UploadedFile::fake()->create('replacement.pdf', 200, 'application/pdf')]);
 
-    $response->assertSessionHas('success');
+    $response->assertSessionHasErrors('document');
 
-    expect($investor->fresh()->kyc_status)->toBe(Investor::KYC_STATUS_PENDING)
-        ->and($investor->fresh()->kyc_approved_at)->toBeNull()
-        ->and(InvestorKycSubmission::count())->toBe(2);
-
-    $this->assertDatabaseHas('audit_logs', ['event' => 'investor.kyc_resubmitted']);
+    expect($investor->fresh()->kyc_status)->toBe(Investor::KYC_STATUS_APPROVED)
+        ->and($investor->fresh()->kyc_approved_at)->not->toBeNull()
+        ->and(InvestorKycSubmission::count())->toBe(1);
 });

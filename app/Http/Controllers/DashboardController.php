@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -12,7 +13,7 @@ class DashboardController extends Controller
         $signature = null;
 
         if ($request->session()->has('payment_id')) {
-            $payment   = \App\Models\Payment::with('signature')->find($request->session()->get('payment_id'));
+            $payment   = Payment::with('signature')->find($request->session()->get('payment_id'));
             $signature = $payment?->signature;
         }
 

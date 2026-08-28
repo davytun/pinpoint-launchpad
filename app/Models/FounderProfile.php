@@ -52,10 +52,6 @@ class FounderProfile extends Model
         return $this->hasMany(VerificationBadge::class, 'profile_id');
     }
 
-    public function investorAccessRequests(): HasMany
-    {
-        return $this->hasMany(InvestorAccessRequest::class, 'profile_id');
-    }
 
     public function spotlightEntry(): HasOne
     {

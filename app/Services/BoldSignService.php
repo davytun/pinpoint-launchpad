@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use App\Mail\SignatureAdminNotificationMail;
+use App\Mail\SignatureCompleteMail;
+use App\Models\Payment;
+use App\Models\Signature;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -203,7 +207,7 @@ class BoldSignService
             return;
         }
 
-        $signature = \App\Models\Signature::query()->where('boldsign_document_id', $documentId)->first();
+        $signature = Signature::query()->where('boldsign_document_id', $documentId)->first();
 
         if (! $signature) {
             Log::warning('BoldSign Completed: no Signature record found', ['documentId' => $documentId]);
@@ -231,7 +235,7 @@ class BoldSignService
             $signature->log('pdf_downloaded', ['path' => $pdfPath]);
         }
 
-        $tierLabel = \App\Models\Payment::getTierLabel($signature->metadata['tier'] ?? 'foundation');
+        $tierLabel = Payment::getTierLabel($signature->metadata['tier'] ?? 'foundation');
 
         // Generate a one-time setup token so the founder can create their dashboard account.
         // The token is validated in FounderAuthController::showSetup() and setup().
@@ -246,10 +250,10 @@ class BoldSignService
 
         // Send consolidated signature completion email containing the setup link
         Mail::to($signature->signer_email)
-            ->queue(new \App\Mail\SignatureCompleteMail($signature, $tierLabel, $setupUrl));
+            ->queue(new SignatureCompleteMail($signature, $tierLabel, $setupUrl));
 
         Mail::to(config('mail.admin_address'))
-            ->queue(new \App\Mail\SignatureAdminNotificationMail($signature, $tierLabel));
+            ->queue(new SignatureAdminNotificationMail($signature, $tierLabel));
 
         Log::info('BoldSign document signed, PDF stored, consolidated setup email dispatched', [
             'documentId'   => $documentId,
@@ -261,7 +265,7 @@ class BoldSignService
     private function handleDocumentDeclined(array $payload): void
     {
         $documentId = $payload['data']['documentId'] ?? null;
-        $signature  = \App\Models\Signature::query()->where('boldsign_document_id', $documentId)->first();
+        $signature  = Signature::query()->where('boldsign_document_id', $documentId)->first();
 
         if ($signature) {
             $signature->update(['status' => 'declined']);
@@ -273,7 +277,7 @@ class BoldSignService
     private function handleDocumentRevoked(array $payload): void
     {
         $documentId = $payload['data']['documentId'] ?? null;
-        $signature  = \App\Models\Signature::query()->where('boldsign_document_id', $documentId)->first();
+        $signature  = Signature::query()->where('boldsign_document_id', $documentId)->first();
 
         if ($signature) {
             $signature->update(['status' => 'revoked']);

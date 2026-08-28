@@ -147,6 +147,10 @@ class FounderDashboardController extends Controller
                 ->toArray()
             : [];
 
+        $pendingDiligenceCount = $founder->profile
+            ? $founder->profile->diligenceRequests()->where('status', 'waiting_for_founder')->count()
+            : 0;
+
         return Inertia::render('Founder/Dashboard', [
             'founder' => [
                 'id' => $founder->id,
@@ -176,6 +180,7 @@ class FounderDashboardController extends Controller
             ] : null,
             'spotlight_featured' => $founder->profile?->is_featured_in_spotlight ?? false,
             'access_requests' => $accessRequests,
+            'pending_diligence_count' => $pendingDiligenceCount,
         ]);
     }
 

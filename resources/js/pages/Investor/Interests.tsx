@@ -44,6 +44,12 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                 <PinpointLogo height={24} />
                 <div className="flex items-center gap-3">
                     <Link
+                        href={route('investor.diligence.index')}
+                        className="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-zinc-950"
+                    >
+                        Diligence Requests
+                    </Link>
+                    <Link
                         href={route('investor.spotlight.index')}
                         className="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-zinc-950"
                     >

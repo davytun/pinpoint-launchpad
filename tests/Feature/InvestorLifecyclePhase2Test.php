@@ -144,6 +144,7 @@ test('founder approves data room interest, creating grant and unlocking investor
     [$founder, $profile, $pitchDeck, $vdrDoc] = setupLiveSpotlightStartup();
 
     $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
+    $admin = User::factory()->create(['role' => 'investor_relations']);
     $interest = InvestorInterest::create([
         'investor_id' => $investor->id,
         'profile_id' => $profile->id,
@@ -151,7 +152,7 @@ test('founder approves data room interest, creating grant and unlocking investor
         'status' => 'pending',
     ]);
 
-    // Founder approves interest
+    // Founder authorizes interest to Pinpoint
     $response = $this->actingAs($founder, 'founder')
         ->patch(route('founder.access-requests.status', $interest), [
             'status' => 'approved',
@@ -160,9 +161,16 @@ test('founder approves data room interest, creating grant and unlocking investor
     $response->assertRedirect();
     $interest->refresh();
 
-    expect($interest->status)->toBe('approved')
+    expect($interest->founder_decision)->toBe('approved')
         ->and($interest->reviewed_by_founder)->toBe($founder->id)
-        ->and($interest->reviewed_at)->not->toBeNull();
+        ->and($interest->reviewed_at)->not->toBeNull()
+        ->and(InvestorDataRoomGrant::where('investor_id', $investor->id)->where('profile_id', $profile->id)->exists())->toBeFalse();
+
+    // Admin reviews and activates data room grant
+    $this->actingAs($admin)
+        ->patch(route('admin.dealflow.interests.update', $interest), [
+            'status' => 'approved',
+        ]);
 
     // Grant is created
     $grant = InvestorDataRoomGrant::where('investor_id', $investor->id)->where('profile_id', $profile->id)->first();

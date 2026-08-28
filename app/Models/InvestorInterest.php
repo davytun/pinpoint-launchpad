@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class InvestorInterest extends Model
 {
@@ -16,6 +17,7 @@ class InvestorInterest extends Model
         'type',
         'message',
         'status',
+        'deal_stage',
         'founder_decision',
         'reviewed_by_founder',
         'reviewed_at',
@@ -38,6 +40,7 @@ class InvestorInterest extends Model
     public function investor(): BelongsTo { return $this->belongsTo(Investor::class); }
     public function profile(): BelongsTo { return $this->belongsTo(FounderProfile::class, 'profile_id'); }
     public function reviewer(): BelongsTo { return $this->belongsTo(Founder::class, 'reviewed_by_founder'); }
+    public function diligenceRequests(): HasMany { return $this->hasMany(DiligenceRequest::class, 'interest_id'); }
 
     public function isFounderCall(): bool
     {
@@ -96,6 +99,10 @@ class InvestorInterest extends Model
 
     public function getEngagementStage(?InvestorDataRoomGrant $grant = null): string
     {
+        if ($this->deal_stage !== null) {
+            return $this->deal_stage;
+        }
+
         if ($this->status === 'denied' || $this->founder_decision === 'declined') {
             return 'declined';
         }

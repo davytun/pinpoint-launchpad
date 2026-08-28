@@ -810,6 +810,15 @@ export default function AdminInterests({
                     <div className="flex items-center gap-2">
                         <button
                             type="button"
+                            onClick={() => router.get('/admin/dealflow/diligence')}
+                            className="flex items-center gap-1.5 rounded-xl border border-indigo-200/90 bg-indigo-50/70 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-2xs hover:bg-indigo-100 transition-colors"
+                        >
+                            <Icon icon="solar:folder-with-files-bold" className="size-3.5 text-indigo-600" />
+                            <span>Post-Intro Diligence</span>
+                        </button>
+
+                        <button
+                            type="button"
                             onClick={() => router.get('/admin/dealflow/data-rooms')}
                             className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
                         >

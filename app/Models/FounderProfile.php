@@ -73,6 +73,11 @@ class FounderProfile extends Model
         return $this->dataRoomGrants();
     }
 
+    public function diligenceRequests(): HasMany
+    {
+        return $this->hasMany(DiligenceRequest::class, 'profile_id');
+    }
+
     public function isLive(): bool
     {
         return $this->is_public

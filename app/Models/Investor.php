@@ -70,6 +70,11 @@ class Investor extends Authenticatable
         return $this->hasMany(InvestorDataRoomGrant::class);
     }
 
+    public function diligenceRequests(): HasMany
+    {
+        return $this->hasMany(DiligenceRequest::class);
+    }
+
     public function hasApprovedKyc(): bool
     {
         return $this->kyc_status === self::KYC_STATUS_APPROVED;

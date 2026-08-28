@@ -186,9 +186,16 @@ test('complete cross-portal investor lifecycle with strict KYC gating, startup i
         ->and(InvestorDataRoomGrant::where('investor_id', $investor->id)->exists())->toBeFalse();
 
     // ─────────────────────────────────────────────────────────────────────────
-    // STEP 8: Founder A Approves Interest -> Grants Data Room Access for Startup A
+    // STEP 8: Founder A Authorizes Interest -> Admin Approves -> Grants Data Room Access for Startup A
     // ─────────────────────────────────────────────────────────────────────────
     $this->actingAs($founderA, 'founder')->patch(route('founder.access-requests.status', $interestA), [
+        'status' => 'approved',
+    ])->assertRedirect();
+
+    expect($interestA->fresh()->founder_decision)->toBe('approved')
+        ->and(InvestorDataRoomGrant::where('investor_id', $investor->id)->where('profile_id', $profileA->id)->exists())->toBeFalse();
+
+    $this->actingAs($admin)->patch(route('admin.dealflow.interests.update', $interestA), [
         'status' => 'approved',
     ])->assertRedirect();
 

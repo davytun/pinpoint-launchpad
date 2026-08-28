@@ -21,8 +21,9 @@ function phaseFiveProfile(): array
     return [$founder, $profile];
 }
 
-test('only an approved data room request creates a grant', function () {
+test('only an approved data room request creates a grant after founder and admin review', function () {
     [$founder, $profile] = phaseFiveProfile();
+    $admin = \App\Models\User::factory()->create(['role' => 'investor_relations']);
     $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
     $interest = InvestorInterest::create([
         'investor_id' => $investor->id,
@@ -34,7 +35,8 @@ test('only an approved data room request creates a grant', function () {
         ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
         ->assertRedirect();
 
-    expect($interest->fresh()->status)->toBe('approved')
+    expect($interest->fresh()->founder_decision)->toBe('approved')
+        ->and($interest->fresh()->status)->toBe('pending')
         ->and(InvestorDataRoomGrant::query()->where('investor_id', $investor->id)->exists())->toBeFalse();
 
     $dataRoomInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
@@ -48,13 +50,20 @@ test('only an approved data room request creates a grant', function () {
         ->patch(route('founder.access-requests.status', $dataRoomInterest), ['status' => 'approved'])
         ->assertRedirect();
 
+    expect($dataRoomInterest->fresh()->founder_decision)->toBe('approved')
+        ->and(InvestorDataRoomGrant::query()->where('investor_id', $dataRoomInvestor->id)->exists())->toBeFalse();
+
+    $this->actingAs($admin)
+        ->patch(route('admin.dealflow.interests.update', $dataRoomInterest), ['status' => 'approved'])
+        ->assertRedirect();
+
     $this->assertDatabaseHas('investor_data_room_grants', [
         'investor_id' => $dataRoomInvestor->id,
         'profile_id' => $profile->id,
         'granted_by_founder' => $founder->id,
         'revoked_at' => null,
     ]);
-    $this->assertDatabaseHas('audit_logs', ['event' => 'data_room.granted']);
+    $this->assertDatabaseHas('audit_logs', ['event' => 'data_room.granted_by_admin']);
 });
 
 test('a founder cannot decide another startup’s investor interest', function () {

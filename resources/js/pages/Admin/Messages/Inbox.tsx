@@ -441,7 +441,7 @@ export default function AdminMessagesInbox({
                                 </div>
                             </div>
 
-                            {/* Right Sub-Pane: Clean Structured Inspector (Mercury / Polar Spec) */}
+                            {/* Right Sub-Pane: Clean Structured Inspector */}
                             {founder && (
                                 <aside className="hidden w-84 shrink-0 border-l border-zinc-100 bg-[#FAFBFD] p-5 h-full max-h-full overflow-y-auto no-scrollbar xl:flex xl:flex-col justify-between">
                                     <div className="space-y-5">

@@ -87,7 +87,8 @@ const REJECTION_PRESETS = [
     {
         id: 'name_mismatch',
         label: 'Name does not match investor legal profile',
-        template: 'The name on the identity document does not match the legal registration details provided. Please submit matching documentation or update your profile.',
+        template:
+            'The name on the identity document does not match the legal registration details provided. Please submit matching documentation or update your profile.',
     },
     {
         id: 'ownership',
@@ -97,7 +98,8 @@ const REJECTION_PRESETS = [
     {
         id: 'unsupported',
         label: 'Unsupported document type or issuing authority',
-        template: 'The submitted document type is not accepted for institutional compliance verification. Please provide an international passport or national identity card.',
+        template:
+            'The submitted document type is not accepted for institutional compliance verification. Please provide an international passport or national identity card.',
     },
     {
         id: 'other',
@@ -139,7 +141,8 @@ function humanize(str: string | null): string {
 
 function buildParams(overrides: Record<string, string | undefined>, current: Partial<PageProps>) {
     const p: Record<string, string> = {};
-    const status = overrides.kyc_status !== undefined ? overrides.kyc_status : current.activeKycStatus !== 'all' ? current.activeKycStatus : undefined;
+    const status =
+        overrides.kyc_status !== undefined ? overrides.kyc_status : current.activeKycStatus !== 'all' ? current.activeKycStatus : undefined;
     const type = overrides.type !== undefined ? overrides.type : current.activeType !== 'all' ? current.activeType : undefined;
     const srch = overrides.search !== undefined ? overrides.search : current.search;
     if (status) p.kyc_status = status;
@@ -154,33 +157,33 @@ function KycStatusBadge({ status }: { status: KycStatus }) {
     switch (status) {
         case 'approved':
             return (
-                <span className="inline-flex items-center rounded-full bg-emerald-50 border border-emerald-200/70 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                <span className="inline-flex items-center rounded-full border border-emerald-200/70 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                     KYC Verified
                 </span>
             );
         case 'pending':
             return (
-                <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200/70 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                <span className="inline-flex items-center rounded-full border border-amber-200/70 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
                     Pending Review
                 </span>
             );
         case 'rejected':
             return (
-                <span className="inline-flex items-center rounded-full bg-rose-50 border border-rose-200/70 px-2.5 py-0.5 text-xs font-semibold text-rose-700">
+                <span className="inline-flex items-center rounded-full border border-rose-200/70 bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700">
                     Rejected
                 </span>
             );
         case 'not_submitted':
         default:
             return (
-                <span className="inline-flex items-center rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-500">
+                <span className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-500">
                     Not Submitted
                 </span>
             );
     }
 }
 
-// ─── Reject KYC Compliance Note Modal (Refero Step 4 Spec) ────────────────────
+// ─── Reject KYC Compliance Note Modal────────────────────
 
 function RejectKycModal({
     investor,
@@ -200,15 +203,13 @@ function RejectKycModal({
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    function handleSelectPreset(preset: typeof REJECTION_PRESETS[0]) {
+    function handleSelectPreset(preset: (typeof REJECTION_PRESETS)[0]) {
         setSelectedId(preset.id);
         if (preset.id === 'other') {
             setNotes('');
             setTimeout(() => textareaRef.current?.focus(), 50);
         } else {
-            setNotes(
-                `The submitted document (${docName}) cannot be verified: ${preset.template}`,
-            );
+            setNotes(`The submitted document (${docName}) cannot be verified: ${preset.template}`);
         }
     }
 
@@ -263,19 +264,14 @@ function RejectKycModal({
 
     return (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
-            <div
-                className="fixed inset-0 bg-zinc-950/25 backdrop-blur-xs transition-opacity duration-200"
-                onClick={onClose}
-            />
+            <div className="fixed inset-0 bg-zinc-950/25 backdrop-blur-xs transition-opacity duration-200" onClick={onClose} />
 
-            <div className="relative z-10 w-full max-w-lg rounded-[22px] border border-zinc-200/90 bg-white p-6 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-150 space-y-5">
+            <div className="animate-in fade-in-0 zoom-in-95 relative z-10 w-full max-w-lg space-y-5 rounded-[22px] border border-zinc-200/90 bg-white p-6 shadow-2xl duration-150">
                 {/* Header */}
                 <div className="flex items-start justify-between">
                     <div>
-                        <h3 className="text-base font-bold tracking-tight text-zinc-950">
-                            Reject KYC Submission
-                        </h3>
-                        <p className="text-xs text-zinc-500 mt-0.5">
+                        <h3 className="text-base font-bold tracking-tight text-zinc-950">Reject KYC Submission</h3>
+                        <p className="mt-0.5 text-xs text-zinc-500">
                             {investor.profile?.full_name ?? investor.email} · <span className="font-medium text-zinc-700">{docName}</span>
                         </p>
                     </div>
@@ -283,23 +279,17 @@ function RejectKycModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
                     >
                         <Icon icon="solar:close-circle-linear" className="size-4" />
                     </button>
                 </div>
 
-                {errorMsg && (
-                    <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3 text-xs text-rose-700 font-medium">
-                        {errorMsg}
-                    </div>
-                )}
+                {errorMsg && <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3 text-xs font-medium text-rose-700">{errorMsg}</div>}
 
                 {/* Reason Selection Cards */}
                 <div className="space-y-2">
-                    <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
-                        Compliance Failure Reason
-                    </span>
+                    <span className="block text-[11px] font-semibold tracking-wider text-zinc-500 uppercase">Compliance Failure Reason</span>
 
                     <div className="space-y-1.5">
                         {REJECTION_PRESETS.map((preset) => {
@@ -309,13 +299,13 @@ function RejectKycModal({
                                     key={preset.id}
                                     onClick={() => handleSelectPreset(preset)}
                                     className={cn(
-                                        'flex items-center justify-between px-3.5 py-2.5 rounded-xl border text-xs transition-all cursor-pointer select-none',
+                                        'flex cursor-pointer items-center justify-between rounded-xl border px-3.5 py-2.5 text-xs transition-all select-none',
                                         isSelected
-                                            ? 'border-zinc-950 bg-[#FAFBFD] text-zinc-950 font-medium shadow-2xs'
+                                            ? 'border-zinc-950 bg-[#FAFBFD] font-medium text-zinc-950 shadow-2xs'
                                             : 'border-zinc-200/80 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50/50',
                                     )}
                                 >
-                                    <span className="leading-snug pr-2">{preset.label}</span>
+                                    <span className="pr-2 leading-snug">{preset.label}</span>
                                     <div
                                         className={cn(
                                             'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors',
@@ -333,38 +323,42 @@ function RejectKycModal({
                 {/* Detailed Compliance Note */}
                 <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider block">
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-500 uppercase">
                             Compliance Note (Sent to Investor)
                         </span>
-                        <span className="text-[10.5px] text-zinc-400 font-medium">Required</span>
+                        <span className="text-[10.5px] font-medium text-zinc-400">Required</span>
                     </div>
                     <textarea
                         ref={textareaRef}
                         rows={3}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder={selectedId === 'other' ? 'Type specific compliance reason and instructions for the investor...' : 'Detailed compliance notes...'}
-                        className="w-full rounded-xl border border-zinc-200/90 bg-[#FAFBFD] p-3 text-xs text-zinc-900 placeholder:text-zinc-400 focus:bg-white focus:border-zinc-400 focus:outline-none resize-none transition-colors leading-relaxed shadow-2xs"
+                        placeholder={
+                            selectedId === 'other'
+                                ? 'Type specific compliance reason and instructions for the investor...'
+                                : 'Detailed compliance notes...'
+                        }
+                        className="w-full resize-none rounded-xl border border-zinc-200/90 bg-[#FAFBFD] p-3 text-xs leading-relaxed text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
                     />
                 </div>
 
                 {/* Footer Actions */}
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
+                <div className="flex items-center justify-end gap-2 border-t border-zinc-100 pt-2">
                     <button
                         type="button"
                         onClick={onClose}
                         disabled={submitting}
-                        className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+                        className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
                     >
                         <span>Cancel</span>
-                        <kbd className="rounded bg-zinc-100 px-1 py-0.2 text-[10px] font-mono text-zinc-500">Esc</kbd>
+                        <kbd className="py-0.2 rounded bg-zinc-100 px-1 font-mono text-[10px] text-zinc-500">Esc</kbd>
                     </button>
 
                     <button
                         type="button"
                         onClick={() => handleSubmit()}
                         disabled={submitting || !notes.trim()}
-                        className="flex items-center gap-2 rounded-full bg-rose-600 px-4 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-rose-700 transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-full bg-rose-600 px-4 py-1.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-rose-700 disabled:opacity-50"
                     >
                         {submitting ? (
                             <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
@@ -372,7 +366,7 @@ function RejectKycModal({
                             <Icon icon="solar:close-circle-linear" className="size-3.5" />
                         )}
                         <span>Confirm Rejection</span>
-                        <kbd className="rounded bg-rose-700 px-1 py-0.2 text-[10px] font-mono text-rose-200">⌘↵</kbd>
+                        <kbd className="py-0.2 rounded bg-rose-700 px-1 font-mono text-[10px] text-rose-200">⌘↵</kbd>
                     </button>
                 </div>
             </div>
@@ -433,23 +427,18 @@ function KycDrawer({
     return (
         <>
             <div className="fixed inset-0 z-50 flex justify-end">
-                <div
-                    className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200"
-                    onClick={onClose}
-                />
+                <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200" onClick={onClose} />
 
-                <div className="relative z-10 w-full max-w-xl bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden border-l border-zinc-200/80 animate-in slide-in-from-right duration-200">
+                <div className="animate-in slide-in-from-right relative z-10 flex h-full w-full max-w-xl flex-col justify-between overflow-hidden border-l border-zinc-200/80 bg-white shadow-2xl duration-200">
                     {/* Header */}
-                    <div className="flex items-center justify-between px-6 py-4.5 border-b border-zinc-100 shrink-0 bg-white">
-                        <div className="flex items-center gap-3 min-w-0">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-100 border border-zinc-200 text-xs font-semibold text-zinc-700">
+                    <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 bg-white px-6 py-4.5">
+                        <div className="flex min-w-0 items-center gap-3">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-xs font-semibold text-zinc-700">
                                 {getInitials(investor.profile?.full_name)}
                             </div>
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="truncate text-sm font-bold text-zinc-950">
-                                        {investor.profile?.full_name ?? investor.email}
-                                    </h3>
+                                    <h3 className="truncate text-sm font-bold text-zinc-950">{investor.profile?.full_name ?? investor.email}</h3>
                                     <KycStatusBadge status={investor.kyc_status} />
                                 </div>
                                 <p className="truncate text-[11.5px] text-zinc-500">
@@ -461,7 +450,7 @@ function KycDrawer({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors shrink-0"
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                         >
                             <Icon icon="solar:close-circle-linear" className="size-5" />
                         </button>
@@ -469,13 +458,13 @@ function KycDrawer({
 
                     {/* Quick Decision Bar */}
                     {submission && investor.kyc_status === 'pending' && (
-                        <div className="flex items-center justify-between gap-2 px-6 py-3 bg-[#FAFBFD] border-b border-zinc-100 shrink-0">
+                        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-100 bg-[#FAFBFD] px-6 py-3">
                             <div className="flex items-center gap-2">
                                 <button
                                     type="button"
                                     onClick={approveKyc}
                                     disabled={updating}
-                                    className="flex items-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs"
+                                    className="flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800"
                                 >
                                     {updating ? (
                                         <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
@@ -489,45 +478,37 @@ function KycDrawer({
                                     type="button"
                                     onClick={onOpenRejectModal}
                                     disabled={updating}
-                                    className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 px-3.5 py-1.5 text-xs font-semibold text-zinc-800 transition-all shadow-2xs"
+                                    className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"
                                 >
                                     <Icon icon="solar:close-circle-linear" className="size-3.5 text-rose-500" />
                                     <span>Reject KYC</span>
                                 </button>
                             </div>
 
-                            <span className="text-[11px] text-zinc-400 font-medium">Compliance Review</span>
+                            <span className="text-[11px] font-medium text-zinc-400">Compliance Review</span>
                         </div>
                     )}
 
                     {/* Content Stream */}
-                    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
+                    <div className="no-scrollbar min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
                         {/* Section 1: INLINE VISIBLE KYC DOCUMENT (Prominent Preview) */}
                         <div>
-                            <div className="flex items-center justify-between mb-3">
+                            <div className="mb-3 flex items-center justify-between">
                                 <h4 className="text-xs font-semibold text-zinc-950">KYC Verification Document</h4>
-                                {submission && (
-                                    <span className="text-[11px] text-zinc-400 font-medium">
-                                        {humanize(submission.document_type)}
-                                    </span>
-                                )}
+                                {submission && <span className="text-[11px] font-medium text-zinc-400">{humanize(submission.document_type)}</span>}
                             </div>
 
                             {submission ? (
-                                <div className="rounded-2xl border border-zinc-200/90 bg-[#FAFBFD] p-4 space-y-3.5 shadow-2xs">
+                                <div className="space-y-3.5 rounded-2xl border border-zinc-200/90 bg-[#FAFBFD] p-4 shadow-2xs">
                                     {/* Document Title Header */}
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2.5 min-w-0">
-                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-700">
+                                        <div className="flex min-w-0 items-center gap-2.5">
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-zinc-700">
                                                 <Icon icon="solar:document-text-linear" className="size-4" />
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="truncate text-xs font-semibold text-zinc-950">
-                                                    {submission.original_name}
-                                                </p>
-                                                <p className="text-[11px] text-zinc-400">
-                                                    Uploaded {formatDate(submission.created_at)}
-                                                </p>
+                                                <p className="truncate text-xs font-semibold text-zinc-950">{submission.original_name}</p>
+                                                <p className="text-[11px] text-zinc-400">Uploaded {formatDate(submission.created_at)}</p>
                                             </div>
                                         </div>
 
@@ -535,39 +516,39 @@ function KycDrawer({
                                     </div>
 
                                     {/* VISIBLE DOCUMENT EMBED */}
-                                    <div className="relative overflow-hidden rounded-xl border border-zinc-200/90 bg-[#F6F8FA] p-3 shadow-2xs group">
+                                    <div className="group relative overflow-hidden rounded-xl border border-zinc-200/90 bg-[#F6F8FA] p-3 shadow-2xs">
                                         {isPdf ? (
                                             <iframe
                                                 src={`/admin/investor-kyc/${submission.id}/preview#toolbar=0`}
-                                                className="w-full h-72 border-0 rounded-lg bg-white shadow-xs"
+                                                className="h-72 w-full rounded-lg border-0 bg-white shadow-xs"
                                                 title="PDF Preview"
                                             />
                                         ) : (
                                             <div
                                                 onClick={() => setLightboxOpen(true)}
-                                                className="cursor-pointer overflow-hidden p-1 flex items-center justify-center min-h-48 max-h-68"
+                                                className="flex max-h-68 min-h-48 cursor-pointer items-center justify-center overflow-hidden p-1"
                                             >
                                                 <img
                                                     src={`/admin/investor-kyc/${submission.id}/preview`}
                                                     alt={submission.original_name}
-                                                    className="w-full h-auto max-h-64 object-contain rounded-lg shadow-sm border border-zinc-200/60 bg-white transition-transform duration-200 group-hover:scale-[1.01]"
+                                                    className="h-auto max-h-64 w-full rounded-lg border border-zinc-200/60 bg-white object-contain shadow-sm transition-transform duration-200 group-hover:scale-[1.01]"
                                                 />
                                             </div>
                                         )}
 
                                         {/* Hover Overlay Toolbar */}
-                                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 bg-zinc-950/80 backdrop-blur-xs p-1 rounded-lg border border-zinc-800 opacity-90 group-hover:opacity-100 transition-opacity">
+                                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/80 p-1 opacity-90 backdrop-blur-xs transition-opacity group-hover:opacity-100">
                                             <button
                                                 type="button"
                                                 onClick={() => setLightboxOpen(true)}
-                                                className="p-1 text-zinc-300 hover:text-white transition-colors"
+                                                className="p-1 text-zinc-300 transition-colors hover:text-white"
                                                 title="Expand Preview"
                                             >
                                                 <Icon icon="solar:maximize-square-linear" className="size-3.5" />
                                             </button>
                                             <a
                                                 href={`/admin/investor-kyc/${submission.id}/download`}
-                                                className="p-1 text-zinc-300 hover:text-white transition-colors"
+                                                className="p-1 text-zinc-300 transition-colors hover:text-white"
                                                 title="Download Original"
                                             >
                                                 <Icon icon="solar:download-minimalistic-linear" className="size-3.5" />
@@ -581,7 +562,7 @@ function KycDrawer({
                                             <button
                                                 type="button"
                                                 onClick={() => setLightboxOpen(true)}
-                                                className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                                className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                                             >
                                                 <Icon icon="solar:eye-linear" className="size-3.5 text-zinc-400" />
                                                 <span>Expand View</span>
@@ -589,33 +570,29 @@ function KycDrawer({
 
                                             <a
                                                 href={`/admin/investor-kyc/${submission.id}/download`}
-                                                className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                                className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                                             >
                                                 <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-400" />
                                                 <span>Download File</span>
                                             </a>
                                         </div>
 
-                                        <span className="text-[11px] text-zinc-400">
-                                            Encrypted AES-256
-                                        </span>
+                                        <span className="text-[11px] text-zinc-400">Encrypted AES-256</span>
                                     </div>
 
                                     {/* Review Notes Callout */}
                                     {submission.review_notes && (
                                         <div className="rounded-xl border border-rose-200 bg-rose-50/60 p-3.5 text-xs text-rose-800">
-                                            <span className="font-semibold text-rose-900 block mb-0.5">
-                                                Rejection Compliance Note:
-                                            </span>
+                                            <span className="mb-0.5 block font-semibold text-rose-900">Rejection Compliance Note:</span>
                                             <p className="leading-relaxed">{submission.review_notes}</p>
                                         </div>
                                     )}
                                 </div>
                             ) : (
                                 <div className="rounded-xl border border-dashed border-zinc-200 p-6 text-center">
-                                    <Icon icon="solar:shield-warning-linear" className="size-6 text-zinc-400 mx-auto mb-2" />
-                                    <p className="text-xs text-zinc-600 font-semibold">No KYC Document Submitted</p>
-                                    <p className="text-[11.5px] text-zinc-400 mt-0.5">
+                                    <Icon icon="solar:shield-warning-linear" className="mx-auto mb-2 size-6 text-zinc-400" />
+                                    <p className="text-xs font-semibold text-zinc-600">No KYC Document Submitted</p>
+                                    <p className="mt-0.5 text-[11.5px] text-zinc-400">
                                         Investor has not yet uploaded proof of identity or incorporation.
                                     </p>
                                 </div>
@@ -623,8 +600,8 @@ function KycDrawer({
                         </div>
 
                         {/* Section 2: Profile & Identity Properties */}
-                        <div className="pt-4 border-t border-zinc-100">
-                            <h4 className="text-xs font-semibold text-zinc-950 mb-3">Investor Profile Details</h4>
+                        <div className="border-t border-zinc-100 pt-4">
+                            <h4 className="mb-3 text-xs font-semibold text-zinc-950">Investor Profile Details</h4>
                             <div className="divide-y divide-zinc-100 text-xs">
                                 <div className="flex items-center justify-between py-2.5">
                                     <span className="text-zinc-500">Full Legal Name</span>
@@ -636,12 +613,9 @@ function KycDrawer({
                                     <div className="flex items-center gap-2">
                                         <span className="font-medium text-zinc-900">{investor.email}</span>
                                         <button onClick={copyEmail} className="text-zinc-400 hover:text-zinc-800" title="Copy Email">
-                                            <Icon
-                                                icon={copied ? 'solar:check-circle-linear' : 'solar:copy-linear'}
-                                                className="size-3.5"
-                                            />
+                                            <Icon icon={copied ? 'solar:check-circle-linear' : 'solar:copy-linear'} className="size-3.5" />
                                         </button>
-                                        <a href={`mailto:${investor.email}`} className="text-zinc-400 hover:text-zinc-800 ml-0.5" title="Send Email">
+                                        <a href={`mailto:${investor.email}`} className="ml-0.5 text-zinc-400 hover:text-zinc-800" title="Send Email">
                                             <Icon icon="solar:letter-linear" className="size-3.5" />
                                         </a>
                                     </div>
@@ -656,24 +630,18 @@ function KycDrawer({
 
                                 <div className="flex items-center justify-between py-2.5">
                                     <span className="text-zinc-500">Entity / Firm</span>
-                                    <span className="font-medium text-zinc-900">
-                                        {investor.profile?.company_name ?? 'Individual Investor'}
-                                    </span>
+                                    <span className="font-medium text-zinc-900">{investor.profile?.company_name ?? 'Individual Investor'}</span>
                                 </div>
 
                                 <div className="flex items-center justify-between py-2.5">
                                     <span className="text-zinc-500">Investor Classification</span>
-                                    <span className="font-medium text-zinc-900">
-                                        {humanize(investor.profile?.investor_type ?? 'individual')}
-                                    </span>
+                                    <span className="font-medium text-zinc-900">{humanize(investor.profile?.investor_type ?? 'individual')}</span>
                                 </div>
 
                                 {investor.profile?.address && (
                                     <div className="flex items-center justify-between py-2.5">
                                         <span className="text-zinc-500">Registered Address</span>
-                                        <span className="font-medium text-zinc-900 text-right max-w-xs truncate">
-                                            {investor.profile.address}
-                                        </span>
+                                        <span className="max-w-xs truncate text-right font-medium text-zinc-900">{investor.profile.address}</span>
                                     </div>
                                 )}
 
@@ -695,9 +663,9 @@ function KycDrawer({
                         onClick={() => setLightboxOpen(false)}
                     />
 
-                    <div className="relative z-10 w-full max-w-3xl rounded-[24px] bg-white border border-zinc-200/90 p-6 shadow-2xl animate-in zoom-in-95 duration-150 flex flex-col space-y-4">
+                    <div className="animate-in zoom-in-95 relative z-10 flex w-full max-w-3xl flex-col space-y-4 rounded-[24px] border border-zinc-200/90 bg-white p-6 shadow-2xl duration-150">
                         {/* Lightbox Header */}
-                        <div className="flex items-center justify-between pb-3 border-b border-zinc-100 shrink-0">
+                        <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 pb-3">
                             <div className="flex items-center gap-2.5">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700">
                                     <Icon icon="solar:document-text-linear" className="size-4" />
@@ -713,7 +681,7 @@ function KycDrawer({
                             <div className="flex items-center gap-2">
                                 <a
                                     href={`/admin/investor-kyc/${submission.id}/download`}
-                                    className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                    className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                                 >
                                     <Icon icon="solar:download-minimalistic-linear" className="size-3.5" />
                                     <span>Download</span>
@@ -722,7 +690,7 @@ function KycDrawer({
                                 <button
                                     type="button"
                                     onClick={() => setLightboxOpen(false)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors"
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                                 >
                                     <Icon icon="solar:close-circle-linear" className="size-5" />
                                 </button>
@@ -730,18 +698,18 @@ function KycDrawer({
                         </div>
 
                         {/* Lightbox Canvas */}
-                        <div className="relative rounded-2xl bg-[#F6F8FA] border border-zinc-200/80 p-4 flex items-center justify-center min-h-95 max-h-[65vh] overflow-auto">
+                        <div className="relative flex max-h-[65vh] min-h-95 items-center justify-center overflow-auto rounded-2xl border border-zinc-200/80 bg-[#F6F8FA] p-4">
                             {isPdf ? (
                                 <iframe
                                     src={`/admin/investor-kyc/${submission.id}/preview`}
-                                    className="w-full h-[60vh] border-0 rounded-xl bg-white shadow-sm"
+                                    className="h-[60vh] w-full rounded-xl border-0 bg-white shadow-sm"
                                     title="PDF Document"
                                 />
                             ) : (
                                 <img
                                     src={`/admin/investor-kyc/${submission.id}/preview`}
                                     alt={submission.original_name}
-                                    className="w-full max-w-2xl h-auto max-h-[58vh] object-contain rounded-xl shadow-md bg-white border border-zinc-200/60"
+                                    className="h-auto max-h-[58vh] w-full max-w-2xl rounded-xl border border-zinc-200/60 bg-white object-contain shadow-md"
                                 />
                             )}
                         </div>
@@ -754,13 +722,7 @@ function KycDrawer({
 
 // ─── Main Investor Reviews Workspace ──────────────────────────────────────────
 
-export default function InvestorAccountsIndex({
-    investors,
-    activeKycStatus,
-    activeType,
-    search: initialSearch,
-    totals,
-}: PageProps) {
+export default function InvestorAccountsIndex({ investors, activeKycStatus, activeType, search: initialSearch, totals }: PageProps) {
     const [search, setSearch] = useState(initialSearch);
     const [activeDrawerInvestor, setActiveDrawerInvestor] = useState<InvestorAccount | null>(null);
     const [rejectingInvestor, setRejectingInvestor] = useState<InvestorAccount | null>(null);
@@ -820,16 +782,16 @@ export default function InvestorAccountsIndex({
             <Head title="Investor Reviews — Admin" />
 
             {/* ── Main Container ─────────────────────────── */}
-            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col overflow-hidden rounded-3xl bg-white shadow-xs p-6 lg:p-8">
+            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-3xl bg-white p-6 shadow-xs lg:p-8">
                 {/* ── Header Bar ─────────────────────────────────────────────── */}
-                <div className="flex items-center justify-between shrink-0 mb-6">
+                <div className="mb-6 flex shrink-0 items-center justify-between">
                     <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Investor Reviews</h1>
 
                     <div className="flex items-center gap-2.5">
                         <button
                             type="button"
                             onClick={() => router.get('/admin/investors')}
-                            className="flex items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                            className="flex items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:users-group-rounded-linear" className="size-3.5 text-zinc-500" />
                             <span>Admission Pipeline</span>
@@ -838,7 +800,7 @@ export default function InvestorAccountsIndex({
                 </div>
 
                 {/* ── Navigation Tabs (Resend Style) ──────────────────────────── */}
-                <div className="flex items-center gap-2 shrink-0 mb-6 overflow-x-auto pb-1">
+                <div className="mb-6 flex shrink-0 items-center gap-2 overflow-x-auto pb-1">
                     {(
                         [
                             { key: 'all', label: 'All Investors' },
@@ -853,12 +815,12 @@ export default function InvestorAccountsIndex({
                             key === 'all'
                                 ? totals?.all
                                 : key === 'pending'
-                                ? totals?.pending
-                                : key === 'approved'
-                                ? totals?.approved
-                                : key === 'not_submitted'
-                                ? totals?.not_submitted
-                                : totals?.rejected;
+                                  ? totals?.pending
+                                  : key === 'approved'
+                                    ? totals?.approved
+                                    : key === 'not_submitted'
+                                      ? totals?.not_submitted
+                                      : totals?.rejected;
 
                         return (
                             <button
@@ -866,17 +828,17 @@ export default function InvestorAccountsIndex({
                                 type="button"
                                 onClick={() => applyFilters({ kyc_status: key === 'all' ? '' : key })}
                                 className={cn(
-                                    'shrink-0 flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all duration-150',
+                                    'flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all duration-150',
                                     isSelected
-                                        ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
-                                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                        ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
+                                        : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
                                 )}
                             >
                                 <span>{label}</span>
                                 {count !== undefined && count > 0 && (
                                     <span
                                         className={cn(
-                                            'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
+                                            'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
                                             isSelected ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
                                         )}
                                     >
@@ -889,46 +851,46 @@ export default function InvestorAccountsIndex({
                 </div>
 
                 {/* ── Minimalist Monochrome Metric Strip ────────── */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 shrink-0 mb-8">
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
-                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">Total Investors</span>
-                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">{totals?.all ?? 0}</span>
+                <div className="mb-8 grid shrink-0 grid-cols-2 gap-4 md:grid-cols-4">
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
+                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Total Investors</span>
+                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals?.all ?? 0}</span>
                     </div>
 
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
-                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">KYC Pending</span>
-                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">{totals?.pending ?? 0}</span>
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
+                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">KYC Pending</span>
+                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals?.pending ?? 0}</span>
                     </div>
 
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
-                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">Verified Active</span>
-                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">{totals?.approved ?? 0}</span>
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
+                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Verified Active</span>
+                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals?.approved ?? 0}</span>
                     </div>
 
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
-                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">Rejected</span>
-                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">{totals?.rejected ?? 0}</span>
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
+                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Rejected</span>
+                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals?.rejected ?? 0}</span>
                     </div>
                 </div>
 
                 {/* ── Search & Filter Toolbar ─────────────────────────────────── */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0 mb-3">
+                <div className="mb-3 flex shrink-0 flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
                     <div className="relative w-full sm:w-96">
                         <Icon
                             icon="solar:minimalistic-magnifer-linear"
-                            className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none"
+                            className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400"
                         />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search by investor name, firm, or email..."
-                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-2 pr-8 pl-10 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none shadow-2xs transition-colors"
+                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-2 pr-8 pl-10 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                         />
                         {search && (
                             <button
                                 onClick={() => setSearch('')}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                                className="absolute top-1/2 right-3 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
                             >
                                 <Icon icon="solar:close-circle-linear" className="size-3.5" />
                             </button>
@@ -940,14 +902,14 @@ export default function InvestorAccountsIndex({
                             <button
                                 type="button"
                                 onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                                className="flex h-9 items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3.5 text-xs font-medium text-zinc-800 shadow-2xs hover:bg-zinc-50 transition-colors"
+                                className="flex h-9 items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3.5 text-xs font-medium text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                             >
                                 <span>{typeLabels[activeType] ?? 'All types'}</span>
                                 <Icon icon="solar:alt-arrow-down-linear" className="size-3 text-zinc-400" />
                             </button>
 
                             {isTypeDropdownOpen && (
-                                <div className="absolute right-0 top-full z-30 mt-1.5 w-48 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 duration-150">
+                                <div className="animate-in fade-in-0 zoom-in-95 absolute top-full right-0 z-30 mt-1.5 w-48 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl duration-150">
                                     {(['all', 'individual', 'corporate'] as const).map((t) => (
                                         <button
                                             key={t}
@@ -958,15 +920,11 @@ export default function InvestorAccountsIndex({
                                             }}
                                             className={cn(
                                                 'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition-colors',
-                                                activeType === t
-                                                    ? 'bg-zinc-100 font-semibold text-zinc-950'
-                                                    : 'text-zinc-700 hover:bg-zinc-50',
+                                                activeType === t ? 'bg-zinc-100 font-semibold text-zinc-950' : 'text-zinc-700 hover:bg-zinc-50',
                                             )}
                                         >
                                             <span>{typeLabels[t]}</span>
-                                            {activeType === t && (
-                                                <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />
-                                            )}
+                                            {activeType === t && <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />}
                                         </button>
                                     ))}
                                 </div>
@@ -975,11 +933,11 @@ export default function InvestorAccountsIndex({
                     </div>
                 </div>
 
-                {/* ── Data Table (Refero Spec) ────────────────────────────────── */}
-                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col justify-between">
+                {/* ── Data Table ────────────────────────────────── */}
+                <div className="no-scrollbar flex min-h-0 flex-1 flex-col justify-between overflow-y-auto">
                     <div>
                         {/* Clean Minimalist Header */}
-                        <div className="flex items-center gap-4 px-5 py-2.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 select-none mb-1">
+                        <div className="mb-1 flex items-center gap-4 border-b border-zinc-100 px-5 py-2.5 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase select-none">
                             <div className="w-[32%] min-w-0">Investor / Contact</div>
                             <div className="w-[26%] min-w-0">Entity & Type</div>
                             <div className="w-[20%] min-w-0">KYC Document</div>
@@ -999,29 +957,27 @@ export default function InvestorAccountsIndex({
                                     <div
                                         key={inv.id}
                                         onClick={() => setActiveDrawerInvestor(inv)}
-                                        className="group flex items-center gap-4 px-5 py-3.5 text-xs transition-colors duration-150 hover:bg-zinc-50/80 cursor-pointer"
+                                        className="group flex cursor-pointer items-center gap-4 px-5 py-3.5 text-xs transition-colors duration-150 hover:bg-zinc-50/80"
                                     >
                                         {/* Contact & Avatar */}
-                                        <div className="w-[32%] min-w-0 flex items-center gap-3">
-                                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 border border-zinc-200 text-[10.5px] font-bold text-zinc-700">
+                                        <div className="flex w-[32%] min-w-0 items-center gap-3">
+                                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-[10.5px] font-bold text-zinc-700">
                                                 {getInitials(inv.profile?.full_name)}
                                             </div>
                                             <div className="min-w-0">
-                                                <span className="font-semibold text-zinc-900 group-hover:underline text-[13px]">
+                                                <span className="text-[13px] font-semibold text-zinc-900 group-hover:underline">
                                                     {inv.profile?.full_name ?? 'Unnamed Investor'}
                                                 </span>
-                                                <span className="text-zinc-400 font-normal ml-1.5 truncate">
-                                                    {inv.email}
-                                                </span>
+                                                <span className="ml-1.5 truncate font-normal text-zinc-400">{inv.email}</span>
                                             </div>
                                         </div>
 
                                         {/* Entity & Type */}
                                         <div className="w-[26%] min-w-0">
-                                            <span className="font-medium text-zinc-800 truncate block text-[13px]">
+                                            <span className="block truncate text-[13px] font-medium text-zinc-800">
                                                 {inv.profile?.company_name ?? 'Individual Investor'}
                                             </span>
-                                            <span className="text-[11.5px] text-zinc-400 font-normal truncate block">
+                                            <span className="block truncate text-[11.5px] font-normal text-zinc-400">
                                                 {humanize(inv.profile?.investor_type ?? 'individual')}
                                             </span>
                                         </div>
@@ -1030,10 +986,8 @@ export default function InvestorAccountsIndex({
                                         <div className="w-[20%] min-w-0">
                                             {inv.latest_kyc_submission ? (
                                                 <div className="flex items-center gap-1.5 text-zinc-700">
-                                                    <Icon icon="solar:document-text-linear" className="size-3.5 text-zinc-400 shrink-0" />
-                                                    <span className="truncate font-medium">
-                                                        {inv.latest_kyc_submission.original_name}
-                                                    </span>
+                                                    <Icon icon="solar:document-text-linear" className="size-3.5 shrink-0 text-zinc-400" />
+                                                    <span className="truncate font-medium">{inv.latest_kyc_submission.original_name}</span>
                                                 </div>
                                             ) : (
                                                 <span className="text-zinc-400 italic">No document</span>
@@ -1046,19 +1000,17 @@ export default function InvestorAccountsIndex({
                                         </div>
 
                                         {/* Registered Date */}
-                                        <div className="w-[10%] min-w-0 text-right text-zinc-400">
-                                            {formatDate(inv.created_at)}
-                                        </div>
+                                        <div className="w-[10%] min-w-0 text-right text-zinc-400">{formatDate(inv.created_at)}</div>
 
                                         {/* Actions Menu */}
-                                        <div className="w-6 shrink-0 relative flex justify-end">
+                                        <div className="relative flex w-6 shrink-0 justify-end">
                                             <button
                                                 type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setOpenMenuId(openMenuId === inv.id ? null : appMenu(inv.id));
                                                 }}
-                                                className="flex h-6 w-6 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors"
+                                                className="flex h-6 w-6 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                                             >
                                                 <Icon icon="solar:menu-dots-bold" className="size-3.5" />
                                             </button>
@@ -1066,7 +1018,7 @@ export default function InvestorAccountsIndex({
                                             {openMenuId === inv.id && (
                                                 <div
                                                     ref={menuRef}
-                                                    className="absolute right-0 top-full z-40 mt-1 w-44 rounded-xl border border-zinc-200 bg-white p-1 shadow-xl animate-in fade-in-0 zoom-in-95 duration-100"
+                                                    className="animate-in fade-in-0 zoom-in-95 absolute top-full right-0 z-40 mt-1 w-44 rounded-xl border border-zinc-200 bg-white p-1 shadow-xl duration-100"
                                                 >
                                                     <button
                                                         type="button"
@@ -1075,7 +1027,7 @@ export default function InvestorAccountsIndex({
                                                             setActiveDrawerInvestor(inv);
                                                             setOpenMenuId(null);
                                                         }}
-                                                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-zinc-800 hover:bg-zinc-100 font-medium"
+                                                        className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-100"
                                                     >
                                                         <Icon icon="solar:document-text-linear" className="size-3.5 text-zinc-500" />
                                                         <span>Inspect KYC</span>
@@ -1152,7 +1104,7 @@ export default function InvestorAccountsIndex({
                     </div>
 
                     {/* Pagination Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-zinc-100 text-xs text-zinc-500 shrink-0">
+                    <div className="flex shrink-0 items-center justify-between border-t border-zinc-100 pt-4 text-xs text-zinc-500">
                         <p>
                             Page {investors.current_page} – 1 of {investors.total} investors – {investors.per_page} items
                         </p>
@@ -1165,12 +1117,12 @@ export default function InvestorAccountsIndex({
                                         onClick={() => link.url && router.get(link.url, {}, { preserveScroll: true })}
                                         disabled={!link.url}
                                         className={cn(
-                                            'px-2 py-1 rounded-md text-xs font-medium',
+                                            'rounded-md px-2 py-1 text-xs font-medium',
                                             link.active
-                                                ? 'bg-zinc-950 text-white font-bold'
+                                                ? 'bg-zinc-950 font-bold text-white'
                                                 : link.url
-                                                ? 'text-zinc-600 hover:bg-zinc-100'
-                                                : 'text-zinc-300 cursor-not-allowed',
+                                                  ? 'text-zinc-600 hover:bg-zinc-100'
+                                                  : 'cursor-not-allowed text-zinc-300',
                                         )}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />

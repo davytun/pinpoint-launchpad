@@ -138,7 +138,7 @@ export default function ApplicationShow({ application }: PageProps) {
         <AdminLayout>
             <Head title={`${application.name} — Review`} />
 
-            {/* ── Main Container (Polar Refero Spec) ───────────────────────────── */}
+            {/* ── Main Container ───────────────────────────── */}
             <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] overflow-hidden">
                 {/* ── Header Bar ─────────────────────────────────────────────── */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 lg:px-8 py-5 border-b border-zinc-100 shrink-0 bg-white">

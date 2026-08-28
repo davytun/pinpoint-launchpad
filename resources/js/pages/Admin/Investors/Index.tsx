@@ -174,7 +174,7 @@ function StatusPill({ status }: { status: InvestorApplication['status'] }) {
     }
 }
 
-// ─── State-of-the-Art Refero Request Info Modal (Step 4 Spec) ─────────────────
+// ─── State-of-the-Art Refero Request Info Modal ─────────────────
 
 function RequestInfoModal({
     application,
@@ -871,9 +871,9 @@ export default function ApplicationsIndex({
         <AdminLayout>
             <Head title="Applications — Admin" />
 
-            {/* ── Main Container (Refero Design Spec) ─────────────────────────── */}
+            {/* ── Main Container ─────────────────────────── */}
             <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] overflow-hidden p-6 lg:p-8">
-                {/* ── Page Header (Refero Audience Spec) ──────────────────────── */}
+                {/* ── Page Header ──────────────────────── */}
                 <div className="flex items-center justify-between shrink-0 mb-6">
                     <h1 className="text-2xl font-bold tracking-tight text-zinc-950">Applications</h1>
 
@@ -1028,7 +1028,7 @@ export default function ApplicationsIndex({
                     </div>
                 </div>
 
-                {/* ── Table Container (Resend Refero Spec) ────────────────────── */}
+                {/* ── Table Container ────────────────────── */}
                 <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col justify-between">
                     <div>
                         {/* Clean Minimalist Header*/}

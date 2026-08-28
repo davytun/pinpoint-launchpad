@@ -16,6 +16,7 @@ class InvestorInterest extends Model
         'type',
         'message',
         'status',
+        'founder_decision',
         'reviewed_by_founder',
         'reviewed_at',
         'scheduled_at',
@@ -53,18 +54,29 @@ class InvestorInterest extends Model
         return $this->completed_at !== null;
     }
 
+    public function isAwaitingFounder(): bool
+    {
+        return $this->founder_decision === null || $this->founder_decision === 'pending';
+    }
+
+    public function isFounderAuthorized(): bool
+    {
+        return $this->founder_decision === 'approved';
+    }
+
+    public function isFounderDeclined(): bool
+    {
+        return $this->founder_decision === 'declined';
+    }
+
     public function getIntroductionStatus(): string
     {
         if ($this->type !== 'founder_call') {
             return 'not_requested';
         }
 
-        if ($this->status === 'denied') {
+        if ($this->status === 'denied' || $this->founder_decision === 'declined') {
             return 'denied';
-        }
-
-        if ($this->status === 'pending') {
-            return 'requested';
         }
 
         if ($this->completed_at !== null) {
@@ -75,16 +87,16 @@ class InvestorInterest extends Model
             return 'scheduled';
         }
 
-        return 'approved';
+        if ($this->status === 'approved' || $this->founder_decision === 'approved') {
+            return 'approved';
+        }
+
+        return 'requested';
     }
 
     public function getEngagementStage(?InvestorDataRoomGrant $grant = null): string
     {
-        if ($this->status === 'pending') {
-            return 'new_interest';
-        }
-
-        if ($this->status === 'denied') {
+        if ($this->status === 'denied' || $this->founder_decision === 'declined') {
             return 'declined';
         }
 
@@ -100,6 +112,49 @@ class InvestorInterest extends Model
             return 'data_room';
         }
 
-        return 'reviewing';
+        if ($this->founder_decision === 'approved') {
+            return 'coordinating';
+        }
+
+        return 'new_interest';
+    }
+
+    public function getInvestorFacingStatus(?InvestorDataRoomGrant $grant = null): string
+    {
+        if ($this->status === 'denied' || $this->founder_decision === 'declined') {
+            return 'Declined';
+        }
+
+        if ($this->type === 'data_room_access') {
+            if ($grant !== null && $grant->revoked_at === null) {
+                return 'Data Room Granted';
+            }
+            if ($grant !== null && $grant->revoked_at !== null) {
+                return 'Access Revoked';
+            }
+            if ($this->founder_decision === 'approved') {
+                return 'Founder Coordination in Progress';
+            }
+            return 'Pinpoint Reviewing';
+        }
+
+        if ($this->type === 'founder_call') {
+            if ($this->completed_at !== null) {
+                return 'Completed';
+            }
+            if ($this->scheduled_at !== null) {
+                return 'Scheduled';
+            }
+            if ($this->status === 'approved' || $this->founder_decision === 'approved') {
+                return 'Approved';
+            }
+            return 'Pinpoint Reviewing';
+        }
+
+        if ($this->status === 'approved') {
+            return 'Approved';
+        }
+
+        return 'Pinpoint Reviewing';
     }
 }

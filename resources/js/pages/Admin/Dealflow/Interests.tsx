@@ -48,6 +48,7 @@ interface Interest {
     type: 'data_room_access' | 'founder_call' | 'more_details';
     message: string | null;
     status: 'pending' | 'approved' | 'denied';
+    founder_decision?: 'approved' | 'declined' | 'pending' | null;
     reviewed_by_founder?: string | null;
     reviewed_at?: string | null;
     scheduled_at?: string | null;
@@ -406,6 +407,38 @@ function InterestDrawer({
                                 </div>
                             </div>
                         )}
+                    </div>
+
+                    {/* Section 1.5: Founder Authorization Status (Pinpoint Mediation) */}
+                    <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 text-xs space-y-2 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                            <span className="font-bold text-zinc-950 uppercase tracking-wider text-[11px]">
+                                Founder Authorization
+                            </span>
+                            {interest.founder_decision === 'approved' ? (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                                    <Icon icon="solar:check-circle-bold" className="size-3.5 text-emerald-600" />
+                                    <span>Authorized by Founder</span>
+                                </span>
+                            ) : interest.founder_decision === 'declined' ? (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
+                                    <Icon icon="solar:close-circle-bold" className="size-3.5 text-rose-600" />
+                                    <span>Declined by Founder</span>
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                                    <Icon icon="solar:clock-circle-bold" className="size-3.5 text-amber-600" />
+                                    <span>Awaiting Founder Response</span>
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-[11.5px] text-zinc-500">
+                            {interest.founder_decision === 'approved'
+                                ? 'The founder has authorized Pinpoint to finalize and execute this engagement.'
+                                : interest.founder_decision === 'declined'
+                                ? 'The founder declined willingness to proceed with this request.'
+                                : 'Pinpoint has requested authorization from the founder via the Founder Portal.'}
+                        </p>
                     </div>
 
                     {/* Section 2: Investor Message / Note */}
@@ -1083,9 +1116,18 @@ export default function AdminInterests({
                                             )}
                                         </div>
 
-                                        {/* Status */}
-                                        <div className="w-28 shrink-0">
+                                        {/* Status & Founder Auth */}
+                                        <div className="w-28 shrink-0 space-y-0.5">
                                             <StatusBadge status={item.status} />
+                                            {item.founder_decision === 'approved' && (
+                                                <span className="text-[10px] text-emerald-600 font-semibold block">Founder Authorized</span>
+                                            )}
+                                            {item.founder_decision === 'declined' && (
+                                                <span className="text-[10px] text-rose-600 font-semibold block">Founder Declined</span>
+                                            )}
+                                            {(item.founder_decision === null || item.founder_decision === 'pending') && item.status === 'pending' && (
+                                                <span className="text-[10px] text-amber-600 font-medium block">Awaiting Founder</span>
+                                            )}
                                         </div>
 
                                         {/* Submitted Date */}

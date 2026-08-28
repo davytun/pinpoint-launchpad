@@ -257,10 +257,11 @@ test('6. Unauthorized Admin roles cannot manage or decide introductions', functi
         ->assertForbidden();
 });
 
-test('7. Founder approves introduction request', function () {
+test('7. Founder authorizes introduction request for Admin coordination', function () {
     Notification::fake();
     [$founder, $profile] = setupPhase6Startup('Apex Tech', 'apex-tech');
     $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
+    $irStaff = User::factory()->create(['role' => 'investor_relations']);
 
     $interest = InvestorInterest::create([
         'investor_id' => $investor->id,
@@ -273,13 +274,17 @@ test('7. Founder approves introduction request', function () {
         ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
         ->assertRedirect();
 
-    expect($interest->fresh()->status)->toBe('approved');
+    $interest->refresh();
+    expect($interest->founder_decision)->toBe('approved')
+        ->and($interest->reviewed_by_founder)->toBe($founder->id)
+        ->and($interest->isFounderAuthorized())->toBeTrue();
+
     $this->assertDatabaseHas('audit_logs', [
-        'event' => 'introduction.approved',
+        'event' => 'investor.founder_authorized',
         'actor_id' => $founder->id,
     ]);
 
-    Notification::assertSentTo($investor, InvestorInterestDecisionNotification::class);
+    Notification::assertSentTo($irStaff, DealflowAdminNotification::class);
 });
 
 test('8. Investor receives correct introduction and diligence states on /interests', function () {
@@ -347,6 +352,7 @@ test('10. Rejection works cleanly for Founder and Admin', function () {
     Notification::fake();
     [$founder, $profile] = setupPhase6Startup('Apex Tech', 'apex-tech');
     $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
+    $irStaff = User::factory()->create(['role' => 'investor_relations']);
 
     $interest = InvestorInterest::create([
         'investor_id' => $investor->id,
@@ -359,16 +365,17 @@ test('10. Rejection works cleanly for Founder and Admin', function () {
         ->patch(route('founder.access-requests.status', $interest), ['status' => 'denied'])
         ->assertRedirect();
 
-    expect($interest->fresh()->status)->toBe('denied')
-        ->and($interest->fresh()->getIntroductionStatus())->toBe('denied')
-        ->and($interest->fresh()->getEngagementStage())->toBe('declined');
+    $interest->refresh();
+    expect($interest->founder_decision)->toBe('declined')
+        ->and($interest->getIntroductionStatus())->toBe('denied')
+        ->and($interest->getEngagementStage())->toBe('declined');
 
     $this->assertDatabaseHas('audit_logs', [
-        'event' => 'introduction.rejected',
+        'event' => 'investor.founder_declined',
         'actor_id' => $founder->id,
     ]);
 
-    Notification::assertSentTo($investor, InvestorInterestDecisionNotification::class);
+    Notification::assertSentTo($irStaff, DealflowAdminNotification::class);
 });
 
 test('11. Duplicate request behavior is idempotent and well-defined', function () {
@@ -478,7 +485,7 @@ test('14. Introduction decision does not automatically grant Data Room access', 
         ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
         ->assertRedirect();
 
-    expect($interest->fresh()->status)->toBe('approved')
+    expect($interest->fresh()->founder_decision)->toBe('approved')
         ->and(InvestorDataRoomGrant::where('investor_id', $investor->id)->exists())->toBeFalse();
 });
 

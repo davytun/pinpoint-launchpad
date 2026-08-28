@@ -17,6 +17,7 @@ class InvestorInterestController extends Controller
     {
         $status = $request->query('status', 'all');
         $type = $request->query('type', 'all');
+        $queue = $request->query('queue', 'all');
         $search = trim((string) $request->query('search', ''));
         $sector = $request->query('sector', 'all');
         $callStatus = $request->query('call_status', 'all');
@@ -28,6 +29,22 @@ class InvestorInterestController extends Controller
                 'reviewer',
             ])
             ->latest();
+
+        if ($queue === 'awaiting_founder') {
+            $query->where(function ($q) {
+                $q->whereNull('founder_decision')->orWhere('founder_decision', 'pending');
+            })->where('status', 'pending');
+        } elseif ($queue === 'founder_authorized') {
+            $query->where('founder_decision', 'approved')->where('status', 'pending');
+        } elseif ($queue === 'awaiting_schedule') {
+            $query->where('type', 'founder_call')->where('founder_decision', 'approved')->whereNull('scheduled_at');
+        } elseif ($queue === 'awaiting_grant') {
+            $query->where('type', 'data_room_access')->where('founder_decision', 'approved')->where('status', 'pending');
+        } elseif ($queue === 'completed') {
+            $query->where(function ($q) {
+                $q->whereNotNull('completed_at')->orWhere('status', 'approved');
+            });
+        }
 
         if ($status && $status !== 'all') {
             $query->where('status', $status);
@@ -66,6 +83,10 @@ class InvestorInterestController extends Controller
             'pending' => $allInterests->where('status', 'pending')->count(),
             'approved' => $allInterests->where('status', 'approved')->count(),
             'denied' => $allInterests->where('status', 'denied')->count(),
+            'awaiting_founder' => $allInterests->where('status', 'pending')->filter(fn ($i) => $i->founder_decision === null || $i->founder_decision === 'pending')->count(),
+            'founder_authorized' => $allInterests->where('status', 'pending')->where('founder_decision', 'approved')->count(),
+            'awaiting_schedule' => $allInterests->where('type', 'founder_call')->where('founder_decision', 'approved')->whereNull('scheduled_at')->count(),
+            'awaiting_grant' => $allInterests->where('type', 'data_room_access')->where('founder_decision', 'approved')->where('status', 'pending')->count(),
             'data_room_requests' => $allInterests->where('type', 'data_room_access')->count(),
             'founder_call_requests' => $allInterests->where('type', 'founder_call')->count(),
             'more_details_requests' => $allInterests->where('type', 'more_details')->count(),
@@ -85,6 +106,7 @@ class InvestorInterestController extends Controller
             'interests' => $query->paginate(15)->withQueryString(),
             'activeStatus' => $status,
             'activeType' => $type,
+            'activeQueue' => $queue,
             'activeSector' => $sector,
             'activeCallStatus' => $callStatus,
             'search' => $search,

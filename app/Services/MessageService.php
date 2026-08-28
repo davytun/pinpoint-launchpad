@@ -42,7 +42,7 @@ class MessageService
     public function sendMessage(
         MessageThread $thread,
         string $senderType,
-        int $senderId,
+        int|string $senderId,
         ?string $body,
         ?UploadedFile $attachment = null
     ): Message {

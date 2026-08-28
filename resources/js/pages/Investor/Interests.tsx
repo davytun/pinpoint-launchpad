@@ -7,6 +7,8 @@ type Interest = {
     type: 'more_details' | 'founder_call' | 'data_room_access';
     message: string | null;
     status: 'pending' | 'approved' | 'denied';
+    investor_facing_status?: string;
+    founder_decision?: string | null;
     created_at: string;
     scheduled_at?: string | null;
     completed_at?: string | null;
@@ -75,7 +77,7 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                         <div className="rounded-2xl border border-white/80 bg-white p-10 text-center shadow-[0_16px_36px_rgba(33,56,120,0.06)]">
                             <p className="text-lg font-bold text-zinc-900">No interests submitted yet.</p>
                             <p className="mt-2 text-sm text-zinc-600">
-                                Explore the Spotlight to discover verified startups and request introductions or data room access.
+                                Explore the Spotlight to discover verified startups and request introductions or data room access coordinated by Pinpoint IR.
                             </p>
                             <Link
                                 href={route('investor.spotlight.index')}
@@ -88,6 +90,14 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                         interests.map((interest) => {
                             const isFounderCall = interest.type === 'founder_call';
                             const isDataRoom = interest.type === 'data_room_access';
+
+                            const displayStatus = interest.investor_facing_status ?? (
+                                interest.status === 'approved'
+                                    ? (isFounderCall ? (interest.completed_at ? 'Completed' : interest.scheduled_at ? 'Scheduled' : 'Approved') : isDataRoom ? (interest.data_room_status === 'granted' ? 'Data Room Granted' : 'Access Revoked') : 'Approved')
+                                    : interest.status === 'denied'
+                                    ? 'Declined'
+                                    : 'Pinpoint Reviewing'
+                            );
 
                             return (
                                 <div
@@ -123,32 +133,27 @@ export default function Interests({ interests }: { interests: Interest[] }) {
 
                                         {/* Status Header Badge */}
                                         <div className="flex shrink-0 items-center gap-1.5 rounded-xl bg-zinc-50 px-3.5 py-2 border border-zinc-100 sm:self-start">
-                                            {interest.status === 'approved' ? (
+                                            {displayStatus === 'Data Room Granted' || displayStatus === 'Approved' || displayStatus === 'Scheduled' || displayStatus === 'Completed' ? (
                                                 <>
                                                     <CheckCircle2 className="size-4.5 text-emerald-600" />
                                                     <span className="text-xs font-bold text-emerald-700">
-                                                        {isFounderCall
-                                                            ? interest.completed_at
-                                                                ? 'Call Completed'
-                                                                : interest.scheduled_at
-                                                                ? 'Call Scheduled'
-                                                                : 'Intro Approved'
-                                                            : isDataRoom
-                                                            ? interest.data_room_status === 'granted'
-                                                                ? 'Access Granted'
-                                                                : 'Access Revoked'
-                                                            : 'Request Approved'}
+                                                        {displayStatus}
                                                     </span>
                                                 </>
-                                            ) : interest.status === 'denied' ? (
+                                            ) : displayStatus === 'Declined' || displayStatus === 'Access Revoked' ? (
                                                 <>
                                                     <XCircle className="size-4.5 text-rose-600" />
-                                                    <span className="text-xs font-bold text-rose-700">Declined</span>
+                                                    <span className="text-xs font-bold text-rose-700">{displayStatus}</span>
+                                                </>
+                                            ) : displayStatus === 'Founder Coordination in Progress' ? (
+                                                <>
+                                                    <Clock3 className="size-4.5 text-blue-600" />
+                                                    <span className="text-xs font-bold text-blue-700">Founder Coordination in Progress</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <Clock3 className="size-4.5 text-amber-600" />
-                                                    <span className="text-xs font-bold text-amber-700">Pending Review</span>
+                                                    <span className="text-xs font-bold text-amber-700">Pinpoint Reviewing</span>
                                                 </>
                                             )}
                                         </div>
@@ -187,14 +192,14 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                                                         </p>
                                                     )}
                                                     <p className="text-[11px] text-zinc-500 pt-1">
-                                                        Pinpoint Investor Relations will facilitate and ensure the session is productive.
+                                                        Pinpoint Investor Relations will coordinate and facilitate the session.
                                                     </p>
                                                 </div>
                                             )}
 
                                             {!interest.scheduled_at && !interest.completed_at && (
                                                 <p className="pl-6 text-[11.5px] text-zinc-600">
-                                                    The founder has accepted your request. Pinpoint Investor Relations is coordinating availability and will post meeting details here.
+                                                    Pinpoint Investor Relations is coordinating availability and will post verified meeting details here.
                                                 </p>
                                             )}
                                         </div>
@@ -206,7 +211,7 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                                             {interest.data_room_status === 'granted' ? (
                                                 <div className="flex items-center gap-3">
                                                     <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
-                                                        <Lock className="size-3.5" /> Data Room Clearance Active
+                                                        <Lock className="size-3.5" /> Data Room Clearance Active (Granted by Pinpoint)
                                                     </span>
                                                     <Link
                                                         href={route('investor.data-rooms.show', interest.profile.slug)}
@@ -218,7 +223,7 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                                             ) : (
                                                 <div className="flex items-center gap-1.5 text-xs font-bold text-rose-600">
                                                     <ShieldAlert className="size-3.5" />
-                                                    <span>Data room access was revoked by the startup or Pinpoint administration.</span>
+                                                    <span>Data room access was revoked by Pinpoint administration.</span>
                                                 </div>
                                             )}
                                         </div>

@@ -132,6 +132,8 @@ class FounderDashboardController extends Controller
                         'type' => $interest->type,
                         'message' => $interest->message,
                         'status' => $interest->status,
+                        'founder_decision' => $interest->founder_decision,
+                        'is_awaiting_founder' => $interest->isAwaitingFounder(),
                         'stage' => $interest->getEngagementStage($grant),
                         'introduction_status' => $interest->getIntroductionStatus(),
                         'data_room_granted' => $grant !== null,
@@ -187,8 +189,10 @@ class FounderDashboardController extends Controller
         $workflow->review($accessRequest, Auth::guard('founder')->user(), $request->validated('status'), $request->ip(), $request->userAgent());
 
         $msg = $request->validated('status') === 'approved'
-            ? ($accessRequest->type === 'data_room_access' ? 'Interest approved. The investor has been granted access to your data room.' : 'Interest approved. Pinpoint Investor Relations will coordinate the next step.')
-            : 'Interest denied.';
+            ? ($accessRequest->type === 'data_room_access' 
+                ? 'Authorization provided to Pinpoint. Investor Relations will activate secure access.' 
+                : 'Interest confirmed. Pinpoint Investor Relations will coordinate scheduling.')
+            : 'Request declined to Pinpoint Investor Relations.';
 
         return back()->with('success', $msg);
     }

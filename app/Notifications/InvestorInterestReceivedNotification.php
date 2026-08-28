@@ -24,13 +24,14 @@ class InvestorInterestReceivedNotification extends Notification implements Shoul
         $investorName = $this->interest->investor->profile->full_name ?? 'An investor';
         
         return (new MailMessage)
-                    ->subject('New Investor Interest - Pinpoint')
+                    ->subject('New Investor Engagement Request - Pinpoint')
                     ->greeting('Hello ' . $notifiable->full_name . ',')
-                    ->line($investorName . ' has expressed interest in your startup.')
-                    ->line('Type: ' . ucwords(str_replace('_', ' ', $this->interest->type)))
+                    ->line('Pinpoint Investor Relations is coordinating a new investor engagement request for your venture.')
+                    ->line('Investor: ' . $investorName)
+                    ->line('Request Type: ' . ucwords(str_replace('_', ' ', $this->interest->type)))
                     ->line('Message: ' . ($this->interest->message ?: 'No additional message provided.'))
-                    ->action('Review Request', route('founder.dashboard'))
-                    ->line('You can approve this request in your Founder Dashboard to grant them access to your data room.');
+                    ->action('Review Request with Pinpoint', route('founder.dashboard'))
+                    ->line('Please review and provide your authorization or confirmation in your Founder Dashboard.');
     }
 
     public function toArray(object $notifiable): array

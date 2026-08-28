@@ -47,14 +47,16 @@ interface Founder {
 }
 
 interface InvestorAccessRequest {
-    id: number;
+    id: string | number;
     investor_name: string;
     investor_type?: string;
     firm_name: string | null;
     message: string | null;
     type: 'more_details' | 'founder_call' | 'data_room_access';
     status: 'pending' | 'approved' | 'denied';
-    stage: 'new_interest' | 'reviewing' | 'data_room' | 'introduction' | 'active_discussion' | 'declined';
+    founder_decision?: 'approved' | 'declined' | 'pending' | null;
+    is_awaiting_founder?: boolean;
+    stage: 'new_interest' | 'reviewing' | 'coordinating' | 'data_room' | 'introduction' | 'active_discussion' | 'declined';
     introduction_status: 'not_requested' | 'requested' | 'approved' | 'scheduled' | 'completed' | 'denied';
     data_room_granted: boolean;
     scheduled_at?: string | null;
@@ -591,7 +593,7 @@ export default function FounderDashboard({
                                 </div>
                                 <div>
                                     <h2 className="text-[16px] font-bold text-zinc-800">Investor Engagement Pipeline</h2>
-                                    <p className="text-xs text-zinc-500">Track investor discovery, diligence clearances, and scheduled founder calls.</p>
+                                    <p className="text-xs text-zinc-500">Pinpoint Investor Relations mediates all investor discovery, data room authorizations, and introductions.</p>
                                 </div>
                             </div>
                             <span className="text-zinc-555 text-[13px] font-semibold">
@@ -603,7 +605,7 @@ export default function FounderDashboard({
                             <div className="flex flex-col items-center justify-center py-8 text-center">
                                 <p className="text-zinc-450 text-sm font-medium">No investor engagements yet.</p>
                                 <p className="mt-1 text-xs text-zinc-400">
-                                    When KYC-approved investors discover your startup and request information, a founder call, or data room access, they will appear here.
+                                    When KYC-approved investors discover your startup and Pinpoint coordinates information, a founder call, or data room access, requests will appear here.
                                 </p>
                             </div>
                         ) : (
@@ -612,6 +614,7 @@ export default function FounderDashboard({
                                     const stageColors: Record<string, string> = {
                                         new_interest: 'bg-amber-50 text-amber-700 border-amber-200',
                                         reviewing: 'bg-blue-50 text-blue-700 border-blue-200',
+                                        coordinating: 'bg-blue-50 text-blue-700 border-blue-200',
                                         data_room: 'bg-purple-50 text-purple-700 border-purple-200',
                                         introduction: 'bg-indigo-50 text-indigo-700 border-indigo-200',
                                         active_discussion: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -619,13 +622,16 @@ export default function FounderDashboard({
                                     };
 
                                     const stageLabels: Record<string, string> = {
-                                        new_interest: 'New Interest',
-                                        reviewing: 'Reviewing',
+                                        new_interest: 'Pending Authorization',
+                                        reviewing: 'Pinpoint Reviewing',
+                                        coordinating: 'Pinpoint Coordinating',
                                         data_room: 'Data Room Active',
                                         introduction: req.scheduled_at ? 'Intro Scheduled' : 'Intro Coordination',
                                         active_discussion: 'Active Discussion',
                                         declined: 'Declined',
                                     };
+
+                                    const isAwaitingFounder = req.is_awaiting_founder ?? (req.founder_decision === null || req.founder_decision === 'pending');
 
                                     return (
                                         <div key={req.id} className="py-4.5 first:pt-0 last:pb-0">
@@ -651,16 +657,38 @@ export default function FounderDashboard({
                                                     <div className="text-zinc-555 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold">
                                                         <span>Type: <strong className="text-zinc-800">{req.type.replaceAll('_', ' ')}</strong></span>
                                                         <span className="opacity-40">•</span>
-                                                        <span>Interest Date: {fmtDateTime(req.created_at)}</span>
+                                                        <span>Request Date: {fmtDateTime(req.created_at)}</span>
                                                         {req.data_room_granted && (
                                                             <>
                                                                 <span className="opacity-40">•</span>
                                                                 <span className="inline-flex items-center gap-1 font-bold text-purple-700">
-                                                                    <Lock className="size-3" /> Data Room Granted
+                                                                    <Lock className="size-3" /> Access Granted by Pinpoint
                                                                 </span>
                                                             </>
                                                         )}
                                                     </div>
+
+                                                    {/* Pinpoint Coordination Notice */}
+                                                    {isAwaitingFounder && (
+                                                        <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50/70 p-3 text-xs leading-relaxed font-medium text-amber-900">
+                                                            {req.type === 'data_room_access' ? (
+                                                                <>
+                                                                    <p className="font-bold text-amber-950">Authorization Required</p>
+                                                                    <p className="mt-0.5">Pinpoint Investor Relations requests your authorization to provide this verified investor data room access.</p>
+                                                                </>
+                                                            ) : req.type === 'founder_call' ? (
+                                                                <>
+                                                                    <p className="font-bold text-amber-950">Introduction Request</p>
+                                                                    <p className="mt-0.5">Pinpoint Investor Relations is coordinating an introductory call. Please confirm your willingness to meet.</p>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <p className="font-bold text-amber-950">Information Request</p>
+                                                                    <p className="mt-0.5">Pinpoint requests your confirmation to release verified information to this investor.</p>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    )}
 
                                                     {req.message && (
                                                         <div className="mt-2 max-w-2xl rounded-lg border-l-2 border-[#3A54A5] bg-zinc-50/80 p-3 text-xs leading-relaxed font-medium text-zinc-600 italic">
@@ -673,7 +701,7 @@ export default function FounderDashboard({
                                                         <div className="mt-2.5 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs text-emerald-900">
                                                             <CheckCircle2 className="size-4 shrink-0 text-emerald-600 mt-0.5" />
                                                             <div>
-                                                                <p className="font-bold">Introduction Call Scheduled</p>
+                                                                <p className="font-bold">Introduction Call Scheduled by Pinpoint IR</p>
                                                                 <p className="mt-0.5 text-emerald-800">
                                                                     Date & Time: {fmtDateTime(req.scheduled_at)}
                                                                 </p>
@@ -695,35 +723,39 @@ export default function FounderDashboard({
                                                 </div>
 
                                                 <div className="flex shrink-0 items-center gap-2 sm:mt-1">
-                                                    {req.status === 'pending' ? (
+                                                    {isAwaitingFounder ? (
                                                         <>
                                                             <button
                                                                 onClick={() => handleRequestStatus(req.id, 'approved')}
                                                                 disabled={updatingStatusId !== null}
                                                                 className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50 transition"
                                                             >
-                                                                Approve
+                                                                {req.type === 'data_room_access'
+                                                                    ? 'Authorize Access'
+                                                                    : req.type === 'founder_call'
+                                                                    ? 'Confirm Interest'
+                                                                    : 'Confirm'}
                                                             </button>
                                                             <button
                                                                 onClick={() => handleRequestStatus(req.id, 'denied')}
                                                                 disabled={updatingStatusId !== null}
                                                                 className="rounded-lg border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 transition"
                                                             >
-                                                                Deny
+                                                                Decline
                                                             </button>
                                                         </>
-                                                    ) : req.status === 'approved' ? (
+                                                    ) : req.founder_decision === 'approved' ? (
                                                         <span className="border-emerald-250 animate-fade-in inline-flex items-center gap-1 rounded-full border bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs">
                                                             <CheckCircle2 className="size-3.5 text-emerald-600" />
                                                             {req.type === 'data_room_access'
-                                                                ? 'Data room granted'
+                                                                ? (req.data_room_granted ? 'Access granted by Pinpoint' : 'Authorization provided to Pinpoint')
                                                                 : req.type === 'founder_call'
-                                                                ? (req.scheduled_at ? 'Call scheduled' : 'Intro approved (IR coordinating)')
-                                                                : 'Approved for follow-up'}
+                                                                ? (req.scheduled_at ? 'Call scheduled by Pinpoint' : 'Interest confirmed (Pinpoint coordinating)')
+                                                                : 'Confirmed to Pinpoint'}
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-bold text-zinc-500">
-                                                            Denied
+                                                            Declined to Pinpoint
                                                         </span>
                                                     )}
                                                 </div>

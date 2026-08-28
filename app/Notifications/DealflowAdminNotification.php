@@ -34,11 +34,14 @@ class DealflowAdminNotification extends Notification implements ShouldQueue
         $investor = $this->interest?->investor?->profile?->full_name ?? $this->grant?->investor?->profile?->full_name ?? 'an investor';
 
         return match ($this->event) {
-            'interest_submitted' => (new MailMessage)->subject('New investor interest')->line("{$investor} submitted an interest request for {$company}.")->action('Open Interest Log', route('admin.dealflow.interests.index')),
+            'interest_submitted' => (new MailMessage)->subject('New investor interest')->line("{$investor} submitted an interest request for {$company}.")->action('Open Dealflow Log', route('admin.dealflow.interests.index')),
+            'founder_authorized', 'founder_responded' => (new MailMessage)->subject('Founder authorized investor request')->line("{$company} provided authorization for {$investor}'s request. Admin action required.")->action('Open Dealflow Log', route('admin.dealflow.interests.index')),
+            'founder_declined' => (new MailMessage)->subject('Founder declined investor request')->line("{$company} declined {$investor}'s investor request.")->action('Open Dealflow Log', route('admin.dealflow.interests.index')),
+            'data_room_granted' => (new MailMessage)->subject('Data room access granted')->line("Data room access for {$investor} at {$company} was granted by Pinpoint.")->action('Open Access Log', route('admin.dealflow.data-rooms.index')),
             'access_revoked' => (new MailMessage)->subject('Data room access revoked')->line("Data room access for {$investor} at {$company} was revoked.")->action('Open Access Log', route('admin.dealflow.data-rooms.index')),
-            'introduction_scheduled' => (new MailMessage)->subject('Founder Call Scheduled')->line("An introductory call between {$investor} and {$company} was scheduled.")->action('Open Dealflow Log', route('admin.dealflow.interests.index')),
+            'introduction_scheduled' => (new MailMessage)->subject('Founder Call Scheduled')->line("An introductory call between {$investor} and {$company} was scheduled by Pinpoint IR.")->action('Open Dealflow Log', route('admin.dealflow.interests.index')),
             'introduction_completed' => (new MailMessage)->subject('Founder Call Completed')->line("The introductory call between {$investor} and {$company} was marked completed.")->action('Open Dealflow Log', route('admin.dealflow.interests.index')),
-            default => (new MailMessage)->subject('Founder reviewed investor interest')->line("{$company} {$this->decision} {$investor}'s investor request.")->action('Open Interest Log', route('admin.dealflow.interests.index')),
+            default => (new MailMessage)->subject('Dealflow status update')->line("{$company} {$this->decision} {$investor}'s investor request.")->action('Open Dealflow Log', route('admin.dealflow.interests.index')),
         };
     }
 

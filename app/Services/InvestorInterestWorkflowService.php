@@ -27,6 +27,7 @@ class InvestorInterestWorkflowService
                 ['investor_id' => $investor->id, 'profile_id' => $profile->id],
                 array_merge($data, [
                     'status' => 'pending',
+                    'founder_decision' => null,
                     'reviewed_at' => null,
                     'reviewed_by_founder' => null,
                     'scheduled_at' => null,
@@ -68,37 +69,25 @@ class InvestorInterestWorkflowService
         });
     }
 
-    public function review(InvestorInterest $interest, Founder $founder, string $status, ?string $ipAddress, ?string $userAgent): InvestorInterest
+    /**
+     * Founder provides authorization or confirmation to Pinpoint Admin.
+     * Crucial: Founder does NOT grant access directly to Investor. Admin must confirm/activate.
+     */
+    public function review(InvestorInterest $interest, Founder $founder, string $decision, ?string $ipAddress, ?string $userAgent): InvestorInterest
     {
-        return DB::transaction(function () use ($interest, $founder, $status, $ipAddress, $userAgent) {
+        return DB::transaction(function () use ($interest, $founder, $decision, $ipAddress, $userAgent) {
+            $normalizedDecision = in_array($decision, ['denied', 'declined']) ? 'declined' : 'approved';
+
             $interest->update([
-                'status' => $status,
+                'founder_decision' => $normalizedDecision,
                 'reviewed_by_founder' => $founder->id,
                 'reviewed_at' => now(),
             ]);
 
-            $grant = null;
-
-            if ($status === 'approved' && $interest->type === 'data_room_access') {
-                $grant = InvestorDataRoomGrant::updateOrCreate(
-                    ['investor_id' => $interest->investor_id, 'profile_id' => $interest->profile_id],
-                    ['granted_by_founder' => $founder->id, 'granted_at' => now(), 'revoked_at' => null],
-                );
-
-                AuditLog::create([
-                    'event' => 'data_room.granted',
-                    'actor_type' => $founder::class,
-                    'actor_id' => $founder->id,
-                    'auditable_type' => $grant::class,
-                    'auditable_id' => $grant->id,
-                    'metadata' => ['interest_id' => $interest->id, 'profile_id' => $interest->profile_id],
-                    'ip_address' => $ipAddress,
-                    'user_agent' => $userAgent,
-                ]);
-            }
+            $event = $normalizedDecision === 'approved' ? 'investor.founder_authorized' : 'investor.founder_declined';
 
             AuditLog::create([
-                'event' => "investor.interest_{$status}",
+                'event' => $event,
                 'actor_type' => $founder::class,
                 'actor_id' => $founder->id,
                 'auditable_type' => $interest::class,
@@ -106,14 +95,14 @@ class InvestorInterestWorkflowService
                 'metadata' => [
                     'profile_id' => $interest->profile_id,
                     'type' => $interest->type,
-                    'data_room_grant_id' => $grant?->id,
+                    'founder_decision' => $normalizedDecision,
                 ],
                 'ip_address' => $ipAddress,
                 'user_agent' => $userAgent,
             ]);
 
             if ($interest->type === 'founder_call') {
-                $introEvent = $status === 'approved' ? 'introduction.approved' : 'introduction.rejected';
+                $introEvent = $normalizedDecision === 'approved' ? 'introduction.founder_confirmed' : 'introduction.founder_declined';
                 AuditLog::create([
                     'event' => $introEvent,
                     'actor_type' => $founder::class,
@@ -126,16 +115,19 @@ class InvestorInterestWorkflowService
                 ]);
             }
 
-            DB::afterCommit(function () use ($interest, $status, $grant) {
+            DB::afterCommit(function () use ($interest, $normalizedDecision) {
                 $interest->loadMissing(['investor.profile', 'profile.founder']);
-                $interest->investor->notify(new InvestorInterestDecisionNotification($interest, $status, $grant !== null));
-                $this->notifyDealflowStaff(new DealflowAdminNotification('interest_decided', $interest, $status));
+                $adminEvent = $normalizedDecision === 'approved' ? 'founder_authorized' : 'founder_declined';
+                $this->notifyDealflowStaff(new DealflowAdminNotification($adminEvent, $interest, $normalizedDecision));
             });
 
             return $interest;
         });
     }
 
+    /**
+     * Admin finalizes decision and activates Data Room clearance or confirms call workflow.
+     */
     public function reviewByAdmin(InvestorInterest $interest, User $admin, string $status, ?string $ipAddress, ?string $userAgent): InvestorInterest
     {
         return DB::transaction(function () use ($interest, $admin, $status, $ipAddress, $userAgent) {
@@ -143,8 +135,7 @@ class InvestorInterestWorkflowService
 
             $interest->update([
                 'status' => $status,
-                'reviewed_by_founder' => $founderId,
-                'reviewed_at' => now(),
+                'reviewed_at' => $interest->reviewed_at ?? now(),
             ]);
 
             $grant = null;
@@ -254,7 +245,7 @@ class InvestorInterestWorkflowService
             DB::afterCommit(function () use ($interest) {
                 $interest->loadMissing(['investor.profile', 'profile.founder']);
 
-                // Notify both investor and founder
+                // Notify both investor and founder with Pinpoint-mediated notification
                 $interest->investor?->notify(new IntroductionScheduledNotification($interest));
                 $interest->profile?->founder?->notify(new IntroductionScheduledNotification($interest));
 

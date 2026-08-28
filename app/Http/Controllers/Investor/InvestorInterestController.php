@@ -37,6 +37,8 @@ class InvestorInterestController extends Controller
                     'type' => $interest->type,
                     'message' => $interest->message,
                     'status' => $interest->status,
+                    'investor_facing_status' => $interest->getInvestorFacingStatus($grant),
+                    'founder_decision' => $interest->founder_decision,
                     'created_at' => $interest->created_at->toISOString(),
                     'scheduled_at' => $interest->scheduled_at?->toISOString(),
                     'completed_at' => $interest->completed_at?->toISOString(),
@@ -67,6 +69,6 @@ class InvestorInterestController extends Controller
         $entry = SpotlightEntry::published()->with('profile')->whereHas('profile', fn ($query) => $query->where('slug', $slug))->firstOrFail();
         $workflow->submit($investor, $entry->profile, $request->validated(), $request->ip(), $request->userAgent());
 
-        return redirect()->route('investor.interests.index')->with('success', 'Your interest has been shared with Pinpoint and the founder.');
+        return redirect()->route('investor.interests.index')->with('success', 'Your interest has been submitted to Pinpoint Investor Relations for review.');
     }
 }

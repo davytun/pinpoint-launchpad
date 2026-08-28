@@ -37,12 +37,12 @@ class InvestorInterestDecisionNotification extends Notification implements Shoul
 
         if ($this->dataRoomGranted) {
             return $message
-                ->line("{$company} approved your data room request.")
+                ->line("Pinpoint has granted you secure Data Room access for {$company}.")
                 ->action('Open secure data room', route('investor.data-rooms.show', $this->interest->profile->slug));
         }
 
         return $message
-            ->line($accepted ? "{$company} accepted your request. Pinpoint Investor Relations will coordinate the next step." : "{$company} did not approve your request at this time.")
+            ->line($accepted ? "Pinpoint Investor Relations has approved your engagement request for {$company} and is coordinating next steps." : "Your engagement request for {$company} could not be approved at this time.")
             ->action('View your interests', route('investor.interests.index'));
     }
 

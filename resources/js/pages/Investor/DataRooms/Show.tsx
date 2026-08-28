@@ -20,11 +20,9 @@ type Document = {
 
 export default function DataRoomShow({ 
     company_name, 
-    slug, 
     documents 
 }: { 
     company_name: string | null; 
-    slug: string; 
     documents: Document[];
 }) {
     return (

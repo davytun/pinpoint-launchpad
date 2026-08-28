@@ -259,7 +259,7 @@ function RejectKycModal({
         }
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [notes]);
+    }, [notes, handleSubmit, onClose]);
 
     return (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
@@ -730,7 +730,7 @@ function KycDrawer({
                         </div>
 
                         {/* Lightbox Canvas */}
-                        <div className="relative rounded-2xl bg-[#F6F8FA] border border-zinc-200/80 p-4 flex items-center justify-center min-h-[380px] max-h-[65vh] overflow-auto">
+                        <div className="relative rounded-2xl bg-[#F6F8FA] border border-zinc-200/80 p-4 flex items-center justify-center min-h-95 max-h-[65vh] overflow-auto">
                             {isPdf ? (
                                 <iframe
                                     src={`/admin/investor-kyc/${submission.id}/preview`}
@@ -778,7 +778,7 @@ export default function InvestorAccountsIndex({
                 setActiveDrawerInvestor(updated);
             }
         }
-    }, [investors]);
+    }, [investors, activeDrawerInvestor]);
 
     const applyFilters = useCallback(
         (overrides: Record<string, string | undefined>) => {
@@ -819,11 +819,11 @@ export default function InvestorAccountsIndex({
         <AdminLayout>
             <Head title="Investor Reviews — Admin" />
 
-            {/* ── Main Container (Refero Design Spec) ─────────────────────────── */}
-            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] overflow-hidden p-6 lg:p-8">
+            {/* ── Main Container ─────────────────────────── */}
+            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col overflow-hidden rounded-3xl bg-white shadow-xs p-6 lg:p-8">
                 {/* ── Header Bar ─────────────────────────────────────────────── */}
                 <div className="flex items-center justify-between shrink-0 mb-6">
-                    <h1 className="text-2xl font-bold tracking-tight text-zinc-950">Investor Reviews</h1>
+                    <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Investor Reviews</h1>
 
                     <div className="flex items-center gap-2.5">
                         <button
@@ -888,45 +888,26 @@ export default function InvestorAccountsIndex({
                     })}
                 </div>
 
-                {/* ── Metrics Strip (Resend Sparkline Style) ──────────────────── */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 shrink-0 py-4 border-y border-zinc-100 mb-6">
-                    <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                            Total Investors
-                        </span>
-                        <p className="mt-1 text-2xl font-semibold text-zinc-950 tabular-nums">{totals?.all ?? 0}</p>
+                {/* ── Minimalist Monochrome Metric Strip ────────── */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 shrink-0 mb-8">
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
+                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">Total Investors</span>
+                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">{totals?.all ?? 0}</span>
                     </div>
 
-                    <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                            KYC Pending
-                        </span>
-                        <p className="mt-1 text-2xl font-semibold text-zinc-950 tabular-nums">{totals?.pending ?? 0}</p>
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
+                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">KYC Pending</span>
+                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">{totals?.pending ?? 0}</span>
                     </div>
 
-                    <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                            Verified Active
-                        </span>
-                        <p className="mt-1 text-2xl font-semibold text-zinc-950 tabular-nums">{totals?.approved ?? 0}</p>
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
+                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">Verified Active</span>
+                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">{totals?.approved ?? 0}</span>
                     </div>
 
-                    <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                            Metrics
-                        </span>
-                        <div className="mt-2 h-7 w-full max-w-35 flex items-end">
-                            <svg className="w-full h-6 overflow-visible" viewBox="0 0 100 24" preserveAspectRatio="none">
-                                <defs>
-                                    <linearGradient id="kycGrad" x1="0" y1="0" x2="1" y2="0">
-                                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.1" />
-                                        <stop offset="100%" stopColor="#10B981" stopOpacity="0.8" />
-                                    </linearGradient>
-                                </defs>
-                                <polygon points="0,24 100,2 100,24" fill="url(#kycGrad)" />
-                                <polyline points="0,24 100,2" fill="none" stroke="#10B981" strokeWidth="1.5" />
-                            </svg>
-                        </div>
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
+                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">Rejected</span>
+                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">{totals?.rejected ?? 0}</span>
                     </div>
                 </div>
 

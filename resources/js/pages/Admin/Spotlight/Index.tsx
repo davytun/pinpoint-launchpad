@@ -204,7 +204,7 @@ function SpotlightDrawer({
         }
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [oneLiner, summary]);
+    }, [oneLiner, summary, onClose, saveCopy]);
 
     const canPublish = profile.is_published || profile.publish_requirements.length === 0;
 
@@ -522,7 +522,7 @@ export default function SpotlightIndex({
                 setActiveDrawerProfile(updated);
             }
         }
-    }, [profiles]);
+    }, [profiles, activeDrawerProfile]);
 
     const applyFilters = useCallback(
         (overrides: Record<string, string | undefined>) => {

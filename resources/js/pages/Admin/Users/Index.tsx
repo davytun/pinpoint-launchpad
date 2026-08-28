@@ -24,9 +24,9 @@ interface PageProps {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const roleBadge: Record<string, string> = {
-    superadmin: 'bg-emerald-50 text-emerald-700 border border-emerald-250',
-    analyst: 'bg-[#3A54A5]/10 text-[#3A54A5] border border-[#3A54A5]/25',
-    support: 'bg-zinc-100 text-zinc-650 border border-zinc-200',
+    superadmin: 'bg-zinc-100 text-zinc-700 border border-zinc-200/80',
+    analyst: 'bg-zinc-100 text-zinc-700 border border-zinc-200/80',
+    support: 'bg-zinc-100 text-zinc-700 border border-zinc-200/80',
 };
 
 const roleLabel: Record<string, string> = {
@@ -47,96 +47,109 @@ export default function AdminUsersIndex({ users }: PageProps) {
 
     return (
         <AdminLayout>
-            <Head title="Team — Admin" />
+            <Head title="Team Management — Admin" />
 
-            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-zinc-955 text-2xl font-extrabold">Team</h1>
-                        <p className="text-zinc-555 mt-1 text-sm font-medium">
-                            {users.length} member{users.length !== 1 ? 's' : ''}
-                        </p>
+            {/* ── Outer Card Container (Mercury Spec) ────────────────────────── */}
+            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] lg:rounded-[22px]">
+                    
+                    {/* ── Top Header & Actions Bar ───────────────────────────────── */}
+                    <div className="flex shrink-0 flex-col justify-between gap-4 border-b border-zinc-100 bg-white px-6 py-4 sm:flex-row sm:items-center">
+                        <div>
+                            <div className="flex items-center gap-2.5">
+                                <h1 className="text-[16.5px] font-bold tracking-tight text-zinc-950">Team</h1>
+                            </div>
+                            <p className="mt-0.5 text-[12px] font-normal text-zinc-500">
+                                {users.length} member{users.length !== 1 ? 's' : ''}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Link
+                                href={route('admin.users.create')}
+                                className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-zinc-800"
+                            >
+                                <Plus className="size-4" />
+                                <span>Add Team Member</span>
+                            </Link>
+                        </div>
                     </div>
-                    <Link
-                        href={route('admin.users.create')}
-                        className="flex items-center gap-2 rounded-xl bg-[#3A54A5] px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-colors hover:bg-[#2D4182] hover:shadow-lg"
-                    >
-                        <Plus className="size-4" />
-                        Add Team Member
-                    </Link>
-                </div>
 
-                {(flash?.success || flash?.error) && (
-                    <div
-                        className={cn(
-                            'mb-4 rounded-xl border px-4 py-3 text-sm font-semibold',
-                            flash.success ? 'border-emerald-500/25 bg-emerald-50 text-emerald-700' : 'border-rose-500/25 bg-rose-50 text-rose-700',
-                        )}
-                    >
-                        {flash.success ?? flash.error}
-                    </div>
-                )}
+                    {/* Flash Messages (Inline) */}
+                    {(flash?.success || flash?.error) && (
+                        <div className="border-b border-zinc-100 bg-white px-6 py-3 text-right">
+                            <span className={cn(
+                                "inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-semibold",
+                                flash.success ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
+                            )}>
+                                {flash.success ?? flash.error}
+                            </span>
+                        </div>
+                    )}
 
-                <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
-                    {users.length === 0 ? (
-                        <div className="py-16 text-center text-sm font-semibold text-zinc-500">No team members yet.</div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[640px] text-sm">
-                                <thead>
-                                    <tr className="border-b border-zinc-200 bg-zinc-50/50">
-                                        {['Name', 'Email', 'Role', 'Assigned Founders', 'Joined', 'Actions'].map((h) => (
+                    {/* ── Table Container (Independently Scrollable) ──────────────── */}
+                    <div className="min-h-0 flex-1 overflow-auto bg-white">
+                        {users.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <h3 className="text-sm font-bold text-zinc-900">No team members yet</h3>
+                            </div>
+                        ) : (
+                            <table className="w-full border-collapse text-left text-xs">
+                                <thead className="sticky top-0 z-10 border-b border-zinc-200/80 bg-zinc-50/95 backdrop-blur-xs">
+                                    <tr>
+                                        {['Name', 'Email', 'Role', 'Assigned Founders', 'Joined', 'Actions'].map((h, i) => (
                                             <th
                                                 key={h}
-                                                className="px-5 py-3.5 text-left text-[10px] font-bold tracking-widest text-zinc-500 uppercase"
+                                                className={cn(
+                                                    "px-6 py-3 text-[11px] font-bold tracking-wider text-zinc-400 uppercase",
+                                                    i === 5 ? "text-right" : ""
+                                                )}
                                             >
                                                 {h}
                                             </th>
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-200/80">
+                                <tbody className="divide-y divide-zinc-100">
                                     {users.map((u) => (
-                                        <tr key={u.id} className="group transition-colors hover:bg-zinc-50/40">
-                                            <td className="px-5 py-4">
+                                        <tr key={u.id} className="group transition-colors duration-150 hover:bg-[#F9F9FB]">
+                                            <td className="px-6 py-4">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-zinc-900">{u.name}</span>
+                                                    <span className="text-[13px] font-semibold text-zinc-950">{u.name}</span>
                                                     {u.is_self && (
-                                                        <span className="rounded-full border border-zinc-300/40 bg-zinc-200 px-2 py-0.5 text-[10px] font-bold text-zinc-600 shadow-xs">
+                                                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-bold text-zinc-500">
                                                             you
                                                         </span>
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="text-zinc-655 px-5 py-4 font-medium">{u.email}</td>
-                                            <td className="px-5 py-4">
+                                            <td className="px-6 py-4 text-[12.5px] font-medium text-zinc-600">{u.email}</td>
+                                            <td className="px-6 py-4">
                                                 <span
                                                     className={cn(
-                                                        'inline-block rounded-full px-2.5 py-0.5 text-xs font-bold whitespace-nowrap shadow-xs',
+                                                        'inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold shadow-xs whitespace-nowrap',
                                                         roleBadge[u.role] ?? '',
                                                     )}
                                                 >
                                                     {roleLabel[u.role] ?? u.role}
                                                 </span>
                                             </td>
-                                            <td className="text-zinc-650 px-5 py-4 font-medium">{u.assigned_founders_count}</td>
-                                            <td className="text-zinc-655 px-5 py-4 font-medium">{u.created_at}</td>
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center gap-3">
+                                            <td className="px-6 py-4 text-[12.5px] font-medium text-zinc-600">{u.assigned_founders_count}</td>
+                                            <td className="px-6 py-4 text-[12.5px] font-medium text-zinc-600">{u.created_at}</td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-1 text-zinc-400">
                                                     <Link
                                                         href={route('admin.users.edit', { user: u.id })}
-                                                        className="text-zinc-555 flex items-center gap-1 text-xs font-bold hover:text-zinc-950"
+                                                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"
+                                                        title="Edit"
                                                     >
-                                                        <UserPen className="size-3.5" />
-                                                        Edit
+                                                        <UserPen className="size-4" />
                                                     </Link>
                                                     {!u.is_self && (
                                                         <button
                                                             onClick={() => destroy(u.id)}
-                                                            className="flex items-center gap-1 text-xs font-bold text-rose-600 hover:text-rose-800"
+                                                            className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-rose-50 hover:text-rose-600"
+                                                            title="Remove"
                                                         >
-                                                            <Trash2 className="size-3.5" />
-                                                            Remove
+                                                            <Trash2 className="size-4" />
                                                         </button>
                                                     )}
                                                 </div>
@@ -145,9 +158,8 @@ export default function AdminUsersIndex({ users }: PageProps) {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
             </div>
         </AdminLayout>
     );

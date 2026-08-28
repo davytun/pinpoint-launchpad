@@ -112,44 +112,44 @@ function StatusBadge({ status }: { status: string }) {
     switch (status) {
         case 'complete':
             return (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
-                    <Icon icon="solar:check-circle-linear" className="size-3 text-emerald-600" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-900" />
                     <span>Complete</span>
                 </span>
             );
         case 'in_progress':
             return (
-                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-900">
-                    <Icon icon="solar:refresh-linear" className="size-3 text-zinc-600" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" />
                     <span>In Progress</span>
                 </span>
             );
         case 'needs_info':
             return (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-                    <Icon icon="solar:danger-circle-linear" className="size-3 text-amber-600" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
                     <span>Needs Info</span>
                 </span>
             );
         case 'on_hold':
             return (
-                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
-                    <Icon icon="solar:pause-circle-linear" className="size-3 text-zinc-500" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
                     <span>On Hold</span>
                 </span>
             );
         case 'pending':
         default:
             return (
-                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
-                    <Icon icon="solar:clock-circle-linear" className="size-3 text-zinc-400" />
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
                     <span>Pending</span>
                 </span>
             );
     }
 }
 
-function ScoreBadge({ score, band }: { score: number | null; band?: string | null }) {
+function ScoreBadge({ score }: { score: number | null }) {
     if (score === null || score === undefined) {
         return <span className="text-zinc-400 font-medium text-xs">—</span>;
     }
@@ -193,7 +193,6 @@ function FounderAuditDrawer({
     onUpdateFounder: (updated: FounderRow) => void;
 }) {
     const isSuperAdmin = userRole === 'superadmin';
-    const [selectedStatus, setSelectedStatus] = useState(founder.audit_status);
     const [selectedAnalystId, setSelectedAnalystId] = useState<string>(
         founder.assigned_analyst ? String(founder.assigned_analyst.id) : '',
     );
@@ -206,7 +205,6 @@ function FounderAuditDrawer({
     const companyName = founder.company_name ?? 'Startup';
 
     function handleStatusChange(newStatus: string) {
-        setSelectedStatus(newStatus);
         setUpdatingStatus(true);
         router.patch(
             route('admin.founders.audit-status', { founder: founder.id }),
@@ -563,7 +561,7 @@ export default function AdminFoundersIndex({
                 setActiveDrawerFounder(updated);
             }
         }
-    }, [founders]);
+    }, [founders, activeDrawerFounder]);
 
     const applyFilters = useCallback(
         (overrides: Record<string, string | undefined>) => {
@@ -593,13 +591,13 @@ export default function AdminFoundersIndex({
         <AdminLayout>
             <Head title="Founders Directory & Audit Hub — Admin" />
 
-            {/* ── Main Full-Height Container (Refero Spec) ─────────────────────── */}
-            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-xs overflow-hidden p-6 lg:p-8">
+            {/* ── Main Full-Height Container ─────────────────────── */}
+            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col overflow-hidden rounded-[24px] bg-white shadow-xs p-6 lg:p-8">
                 {/* ── Top Header Strip ────────────────────────────────────────── */}
                 <div className="flex items-center justify-between shrink-0 mb-6">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-zinc-950">Founders Directory & Audit Hub</h1>
-                        <p className="text-xs text-zinc-500 mt-0.5">
+                        <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Founders Directory & Audit Hub</h1>
+                        <p className="mt-2 text-[15px] font-medium text-zinc-500">
                             Manage diagnostic assessments, PARAGON audit progress, venture tiering, and analyst assignments.
                         </p>
                     </div>
@@ -625,40 +623,40 @@ export default function AdminFoundersIndex({
                     </div>
                 </div>
 
-                {/* ── Minimalist Monochrome Metric Strip (Refero Spec) ────────── */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 mb-6">
-                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                {/* ── Minimalist Monochrome Metric Strip ────────── */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 shrink-0 mb-8">
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
+                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">
                             Total Founders
                         </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
+                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">
                             {totals.total}
                         </span>
                     </div>
 
-                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
+                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">
                             Audit In Progress
                         </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
+                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">
                             {totals.in_progress}
                         </span>
                     </div>
 
-                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
+                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">
                             Audits Complete
                         </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
+                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">
                             {totals.complete}
                         </span>
                     </div>
 
-                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
+                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">
                             Needs Attention
                         </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
+                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">
                             {totals.needs_info + totals.on_hold}
                         </span>
                     </div>

@@ -277,3 +277,22 @@ Last updated: 2026-08-22
 
 **Pattern notes:**
 Unread state is a subtle tinted row plus a compact dot, not a warning treatment. The notification centre preserves each alert until the recipient deliberately reads it or uses the explicit bulk action.
+### Admin Verification Profiles Viewer
+
+File: resources/js/pages/Admin/Profiles/Index.tsx
+Last updated: 2026-08-28
+
+| Property         | Class |
+| ---------------- | ----- |
+| Background       | Admin canvas from `AdminLayout`; `bg-white` data surface |
+| Border           | `border border-zinc-200/90` |
+| Border radius    | `rounded-[22px]` table shell; `rounded-full` status badges |
+| Text — primary   | `text-zinc-950` / `text-zinc-900` |
+| Text — secondary | `text-zinc-500` / `text-zinc-600` |
+| Spacing          | `px-7 py-5` lead cell; `px-5 py-5` supporting cells |
+| Hover state      | `hover:bg-zinc-50/70` rows; accent links deepen to `#2D4182` |
+| Shadow           | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` |
+| Accent usage     | `#3A54A5` for public profile link; emerald only for live state |
+
+**Pattern notes:**
+Admin list pages use a full-width operational surface with a clear title and contextual count above it. The first column carries the strongest identity signal, metadata sits one step quieter, and actions remain inline text links. Keep table headers compact and uppercase, with generous row height for scanability.

@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
-import { Activity, AlertTriangle, CheckCircle2, Clock, DollarSign, List, MessageSquare, Users, Zap } from 'lucide-react';
-import { Bar, BarChart, Cell, Pie, PieChart, XAxis } from 'recharts';
+
+import { Activity, AlertTriangle, DollarSign, MessageSquare, Users, TrendingUp, CreditCard } from 'lucide-react';
+import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, XAxis } from 'recharts';
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import AdminLayout from '@/layouts/admin-layout';
@@ -61,76 +62,88 @@ function fmtCurrency(amount: number) {
 // ─── Metric card ─────────────────────────────────────────────────────────────
 
 function MetricCard({
-    icon: Icon,
     label,
     value,
-    color,
-    iconBg,
+    subValue,
     pulse = false,
     href,
+    icon: Icon,
 }: {
-    icon: React.ElementType;
     label: string;
     value: string | number;
-    color: string;
-    iconBg: string;
+    subValue?: React.ReactNode;
     pulse?: boolean;
     href?: string;
+    icon?: React.ElementType;
 }) {
     const inner = (
         <div
             className={cn(
-                'group rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md transition-all hover:border-zinc-300 hover:bg-white/50 sm:p-5',
-                href && 'cursor-pointer',
+                'group flex h-full flex-col justify-between rounded-[20px] border border-zinc-200/60 bg-linear-to-b from-white to-zinc-50/50 p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)]',
+                href && 'cursor-pointer hover:-translate-y-0.5 hover:border-zinc-300/80',
             )}
         >
-            <div className="mb-3 flex items-center justify-between gap-2">
-                <span className="text-[10px] leading-tight font-bold tracking-widest text-zinc-500 uppercase">{label}</span>
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconBg}`}>
-                    <Icon className={`size-4 ${color}`} />
+            <div className="flex items-start justify-between gap-2">
+                <span className="text-[13px] font-semibold text-zinc-500">{label}</span>
+                <div className="flex items-center gap-2">
+                    {pulse && (
+                        <span className="relative flex h-2 w-2 mr-1">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-60" />
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+                        </span>
+                    )}
+                    {Icon && (
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400 group-hover:text-zinc-600 group-hover:bg-zinc-100 transition-colors">
+                            <Icon className="size-3.5" />
+                        </div>
+                    )}
                 </div>
             </div>
-            <div className="flex items-end gap-2">
-                <span className="text-xl font-extrabold text-zinc-950 sm:text-2xl">{value}</span>
-                {pulse && (
-                    <span className="relative mb-1 flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 opacity-60" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
-                    </span>
-                )}
+            <div className="mt-4 flex flex-col">
+                <span className="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl">{value}</span>
+                {subValue && <span className="mt-1 text-xs font-medium text-zinc-500">{subValue}</span>}
             </div>
         </div>
     );
-    if (href) return <Link href={href}>{inner}</Link>;
+    if (href) return <Link href={href} className="block h-full">{inner}</Link>;
     return inner;
 }
 
 // ─── Revenue sparkline ────────────────────────────────────────────────────────
 
 const revenueChartConfig = {
-    revenue: { label: 'Revenue', color: '#10b981' },
+    revenue: {
+        label: 'Revenue',
+        color: '#18181B',
+    },
 } satisfies ChartConfig;
 
-function RevenueSparkline({ data, thisMonth }: { data: MonthlyRevenue[]; thisMonth: number }) {
-    const max = Math.max(...data.map((d) => d.revenue), 1);
+function RevenueAreaChart({ data, thisMonth }: { data: MonthlyRevenue[]; thisMonth: number }) {
     return (
-        <div className="min-w-0 rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
-            <div className="mb-1 flex items-center justify-between">
-                <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Monthly Revenue</p>
-                <DollarSign className="text-emerald-650 size-4 opacity-50" />
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] h-full flex flex-col">
+            <div className="mb-2 flex items-center justify-between">
+                <p className="text-[13px] font-semibold text-zinc-500">Monthly Revenue</p>
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-500">
+                    <TrendingUp className="size-3.5" />
+                </div>
             </div>
-            <p className="mb-4 text-2xl font-extrabold text-zinc-950">{fmtCurrency(thisMonth)}</p>
-            <ChartContainer config={revenueChartConfig} className="h-[90px] w-full">
-                <BarChart data={data} barCategoryGap="28%">
-                    <XAxis dataKey="month" tick={{ fill: '#64748B', fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtCurrency(Number(v))} hideLabel />} />
-                    <Bar dataKey="revenue" radius={[3, 3, 0, 0]}>
-                        {data.map((entry, i) => (
-                            <Cell key={i} fill={entry.revenue === max ? '#10b981' : 'rgba(16,185,129,0.22)'} />
-                        ))}
-                    </Bar>
-                </BarChart>
-            </ChartContainer>
+            <p className="mb-6 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl">{fmtCurrency(thisMonth)}</p>
+            <div className="flex-1 min-h-40">
+                <ChartContainer config={revenueChartConfig} className="h-full w-full">
+                    <AreaChart data={data} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                        <defs>
+                            <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#18181B" stopOpacity={0.15} />
+                                <stop offset="95%" stopColor="#18181B" stopOpacity={0} />
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E4E4E7" opacity={0.5} />
+                        <XAxis dataKey="month" tick={{ fill: '#A1A1AA', fontSize: 10 }} axisLine={false} tickLine={false} tickMargin={8} />
+                        <ChartTooltip content={<ChartTooltipContent formatter={(v) => fmtCurrency(Number(v))} hideLabel />} />
+                        <Area type="monotone" dataKey="revenue" stroke="#18181B" strokeWidth={2} fillOpacity={1} fill="url(#colorRev)" />
+                    </AreaChart>
+                </ChartContainer>
+            </div>
         </div>
     );
 }
@@ -146,47 +159,50 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
     const chartConfig = buildAuditConfig(data);
 
     return (
-        <div className="min-w-0 rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
-            <p className="mb-4 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Audit Pipeline</p>
-            <div className="flex items-center gap-5">
-                {/* Donut */}
-                <ChartContainer config={chartConfig} className="h-[100px] w-[100px] shrink-0">
-                    <PieChart>
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] h-full">
+            <div className="mb-6 flex items-center justify-between">
+                <p className="text-[13px] font-semibold text-zinc-500">Audit Pipeline</p>
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400">
+                    <Activity className="size-3.5" />
+                </div>
+            </div>
+            <div className="flex flex-col items-center gap-6 xl:flex-row xl:items-start">
+                <div className="h-32 w-32 shrink-0 relative">
+                    <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
+                        <span className="text-2xl font-bold text-zinc-900 leading-none">{total}</span>
+                    </div>
+                    <ChartContainer config={chartConfig} className="h-full w-full">
+                        <PieChart>
                         <Pie
                             data={data}
                             dataKey="value"
                             nameKey="label"
                             cx="50%"
                             cy="50%"
-                            innerRadius={28}
-                            outerRadius={46}
-                            paddingAngle={2}
-                            startAngle={90}
-                            endAngle={-270}
+                            innerRadius={44}
+                            outerRadius={56}
+                            paddingAngle={4}
+                            stroke="none"
                         >
                             {data.map((entry, i) => (
-                                <Cell key={i} fill={entry.color} stroke="transparent" />
+                                <Cell key={i} fill={entry.color} />
                             ))}
                         </Pie>
                         <ChartTooltip content={<ChartTooltipContent nameKey="label" hideLabel />} />
                     </PieChart>
-                </ChartContainer>
+                    </ChartContainer>
+                </div>
 
-                {/* Legend */}
-                <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="min-w-0 flex-1 w-full space-y-2.5 xl:mt-2">
                     {data.map((item) => (
                         <div key={item.label} className="flex items-center justify-between gap-2">
-                            <div className="flex min-w-0 items-center gap-1.5">
+                            <div className="flex min-w-0 items-center gap-2.5">
                                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: item.color }} />
-                                <span className="text-zinc-650 truncate text-xs font-semibold">{item.label}</span>
+                                <span className="text-zinc-600 truncate text-[13px] font-medium">{item.label}</span>
                             </div>
-                            <span className="shrink-0 text-xs font-bold text-zinc-800 tabular-nums">{item.value}</span>
+                            <span className="shrink-0 text-[13px] font-bold text-zinc-900 tabular-nums">{item.value}</span>
                         </div>
                     ))}
-                    <div className="flex items-center justify-between gap-2 border-t border-zinc-200 pt-1.5">
-                        <span className="text-xs font-semibold text-zinc-400">Total</span>
-                        <span className="text-xs font-extrabold text-zinc-950 tabular-nums">{total}</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -195,48 +211,41 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
 
 // ─── Waitlist split ───────────────────────────────────────────────────────────
 
-const waitlistChartConfig = {
-    founders: { label: 'Founders', color: '#3B82F6' },
-    investors: { label: 'Investors', color: '#8B5CF6' },
-} satisfies ChartConfig;
-
-function WaitlistSplit({ founders, investors }: { founders: number; investors: number }) {
+function WaitlistBars({ founders, investors }: { founders: number; investors: number }) {
     const total = founders + investors;
     const founderPct = total ? Math.round((founders / total) * 100) : 0;
     const investorPct = total ? 100 - founderPct : 0;
 
-    const barData = [
-        { name: 'Founders', founders, investors: 0 },
-        { name: 'Investors', founders: 0, investors },
-    ];
-
     return (
-        <div className="min-w-0 rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5">
-            <div className="mb-4 flex items-center justify-between">
-                <p className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Waitlist</p>
-                <span className="text-xs font-extrabold text-zinc-950">{total} total</span>
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+            <div className="mb-6 flex items-center justify-between">
+                <p className="text-[13px] font-semibold text-zinc-500">Waitlist Composition</p>
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400">
+                    <Users className="size-3.5" />
+                </div>
+            </div>
+            
+            <div className="mb-2 flex items-end justify-between">
+                <span className="text-3xl font-bold text-zinc-900 tracking-tight">{total}</span>
+                <span className="text-xs font-medium text-zinc-400 mb-1">Total pending</span>
             </div>
 
-            <ChartContainer config={waitlistChartConfig} className="h-[70px] w-full">
-                <BarChart data={barData} layout="vertical" barCategoryGap="25%" margin={{ left: 0, right: 0 }}>
-                    <XAxis type="number" hide />
-                    <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                    <Bar dataKey="founders" radius={[0, 3, 3, 0]} fill="var(--color-founders)" />
-                    <Bar dataKey="investors" radius={[0, 3, 3, 0]} fill="var(--color-investors)" />
-                </BarChart>
-            </ChartContainer>
+            <div className="mt-5 flex h-2.5 w-full overflow-hidden rounded-full bg-zinc-100">
+                <div className="bg-zinc-900 transition-all duration-500" style={{ width: `${founderPct}%` }} />
+                <div className="bg-zinc-400 transition-all duration-500" style={{ width: `${investorPct}%` }} />
+            </div>
 
-            <div className="mt-3 flex gap-4">
-                <div className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-blue-500" />
-                    <span className="text-zinc-650 text-xs font-semibold">
-                        Founders <span className="font-bold text-zinc-950">{founderPct}%</span>
+            <div className="mt-4 flex gap-5">
+                <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-zinc-900" />
+                    <span className="text-zinc-500 text-xs font-medium">
+                        Founders <span className="font-semibold text-zinc-900 ml-1">{founderPct}%</span>
                     </span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-violet-500" />
-                    <span className="text-zinc-650 text-xs font-semibold">
-                        Investors <span className="font-bold text-zinc-950">{investorPct}%</span>
+                <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-zinc-400" />
+                    <span className="text-zinc-500 text-xs font-medium">
+                        Investors <span className="font-semibold text-zinc-900 ml-1">{investorPct}%</span>
                     </span>
                 </div>
             </div>
@@ -247,9 +256,9 @@ function WaitlistSplit({ founders, investors }: { founders: number; investors: n
 // ─── Activity feed ────────────────────────────────────────────────────────────
 
 const activityDotColor: Record<string, string> = {
-    diagnostic: 'bg-purple-650',
-    payment: 'bg-emerald-650',
-    message: 'bg-[#3A54A5]',
+    diagnostic: 'bg-zinc-600',
+    payment: 'bg-zinc-900',
+    message: 'bg-zinc-400',
 };
 const activityTypeLabel: Record<string, string> = {
     diagnostic: 'Diagnostic',
@@ -267,182 +276,162 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
         <AdminLayout>
             <Head title="Dashboard — Admin" />
 
-            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-                <div className="mb-6 lg:mb-8">
-                    <h1 className="text-zinc-955 text-xl font-extrabold sm:text-2xl">Operational Command</h1>
-                    <p className="text-zinc-550 mt-1 text-sm">
-                        {isSuperAdmin ? 'Full platform overview' : isAnalyst ? 'Your assigned engagements' : 'Support overview'}
-                    </p>
-                </div>
+            <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-xs">
+                <div className="flex-1 overflow-y-auto px-6 py-8 sm:px-10 lg:py-10 no-scrollbar">
+                    <div className="mb-10">
+                        <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Overview</h1>
+                        <p className="mt-2 text-[15px] font-medium text-zinc-500">
+                            {isSuperAdmin ? 'Full platform overview' : isAnalyst ? 'Your assigned engagements' : 'Support overview'}
+                        </p>
+                    </div>
 
-                {/* ── Superadmin ── */}
-                {isSuperAdmin && (
-                    <>
-                        <div className="mb-3 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-                            <MetricCard
-                                icon={Users}
-                                label="Total Founders"
-                                value={metrics.total_founders ?? 0}
-                                color="text-[#3A54A5]"
-                                iconBg="bg-[#3A54A5]/10"
-                                href="/admin/founders"
-                            />
-                            <MetricCard
-                                icon={DollarSign}
-                                label="Total Revenue"
-                                value={fmtCurrency(metrics.total_revenue ?? 0)}
-                                color="text-emerald-650"
-                                iconBg="bg-emerald-50"
-                            />
-                            <MetricCard
-                                icon={Activity}
-                                label="Active Audits"
-                                value={metrics.active_audits ?? 0}
-                                color="text-amber-700"
-                                iconBg="bg-amber-50"
-                            />
-                            <MetricCard
-                                icon={Zap}
-                                label="High Scorers >85"
-                                value={metrics.high_scorers ?? 0}
-                                color="text-purple-650"
-                                iconBg="bg-purple-50"
-                            />
-                        </div>
-                        <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mb-6 lg:grid-cols-4">
-                            <MetricCard icon={Clock} label="Pending" value={metrics.pending_audits ?? 0} color="text-zinc-500" iconBg="bg-zinc-100" />
-                            <MetricCard
-                                icon={AlertTriangle}
-                                label="Needs Info"
-                                value={metrics.needs_info_count ?? 0}
-                                color="text-amber-700"
-                                iconBg="bg-amber-50"
-                                pulse={(metrics.needs_info_count ?? 0) > 0}
-                                href="/admin/founders"
-                            />
-                            <MetricCard
-                                icon={CheckCircle2}
-                                label="Complete"
-                                value={metrics.complete_audits ?? 0}
-                                color="text-emerald-650"
-                                iconBg="bg-emerald-50"
-                            />
-                            <MetricCard
-                                icon={List}
-                                label="Waitlist"
-                                value={(metrics.waitlist_count?.founders ?? 0) + (metrics.waitlist_count?.investors ?? 0)}
-                                color="text-[#3A54A5]"
-                                iconBg="bg-[#3A54A5]/10"
-                                href="/admin/waitlist"
-                            />
-                        </div>
+                    {/* ── Superadmin ── */}
+                    {isSuperAdmin && (
+                        <>
+                            <div className="mb-8 flex items-center gap-4 border-b border-zinc-100 pb-4">
+                                <span className="text-[15px] font-semibold text-zinc-900">Overview</span>
+                            </div>
 
-                        {/* Charts */}
-                        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mb-8 lg:grid-cols-3">
-                            {(metrics.monthly_revenue?.length ?? 0) > 0 && (
-                                <RevenueSparkline data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
-                            )}
-                            {(metrics.audit_breakdown?.length ?? 0) > 0 && <AuditDonut data={metrics.audit_breakdown!} />}
-                            {metrics.waitlist_count && (
-                                <WaitlistSplit founders={metrics.waitlist_count.founders} investors={metrics.waitlist_count.investors} />
-                            )}
-                        </div>
+                            <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                                <MetricCard
+                                    label="Total Founders"
+                                    value={metrics.total_founders ?? 0}
+                                    icon={Users}
+                                    href="/admin/founders"
+                                />
+                                <MetricCard
+                                    label="Total Revenue"
+                                    value={fmtCurrency(metrics.total_revenue ?? 0)}
+                                    icon={DollarSign}
+                                />
+                                <MetricCard
+                                    label="Active Audits"
+                                    value={metrics.active_audits ?? 0}
+                                    icon={Activity}
+                                />
+                                <MetricCard
+                                    label="Needs Info"
+                                    value={metrics.needs_info_count ?? 0}
+                                    icon={AlertTriangle}
+                                    pulse={(metrics.needs_info_count ?? 0) > 0}
+                                    href="/admin/founders"
+                                />
+                            </div>
 
-                        {/* Revenue by tier */}
-                        {metrics.revenue_by_tier && (
-                            <div className="mb-6 lg:mb-8">
-                                <h2 className="mb-3 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Revenue by Tier</h2>
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-                                    {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
-                                        <div
-                                            key={tier}
-                                            className="rounded-xl border border-white/80 bg-white/30 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-5"
-                                        >
-                                            <p className="mb-1 text-[10px] font-bold tracking-widest text-zinc-500 capitalize">{tier}</p>
-                                            <p className="text-xl font-extrabold text-zinc-950">{fmtCurrency(metrics.revenue_by_tier![tier])}</p>
-                                        </div>
-                                    ))}
+                            {/* Charts */}
+                            <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                                <div className="lg:col-span-2">
+                                    {(metrics.monthly_revenue?.length ?? 0) > 0 && (
+                                        <RevenueAreaChart data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
+                                    )}
+                                </div>
+                                <div>
+                                    {(metrics.audit_breakdown?.length ?? 0) > 0 && <AuditDonut data={metrics.audit_breakdown!} />}
                                 </div>
                             </div>
-                        )}
-                    </>
-                )}
 
-                {/* ── Analyst ── */}
-                {isAnalyst && (
-                    <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mb-8 lg:grid-cols-4">
-                        <MetricCard
-                            icon={Users}
-                            label="My Assigned"
-                            value={metrics.my_assigned ?? 0}
-                            color="text-[#3A54A5]"
-                            iconBg="bg-[#3A54A5]/10"
-                            href="/admin/founders"
-                        />
-                        <MetricCard
-                            icon={Activity}
-                            label="Active Audits"
-                            value={metrics.active_audits ?? 0}
-                            color="text-amber-700"
-                            iconBg="bg-amber-50"
-                        />
-                        <MetricCard
-                            icon={AlertTriangle}
-                            label="Needs Info"
-                            value={metrics.needs_info_count ?? 0}
-                            color="text-amber-700"
-                            iconBg="bg-amber-50"
-                            pulse={(metrics.needs_info_count ?? 0) > 0}
-                        />
-                        <MetricCard
-                            icon={MessageSquare}
-                            label="Unread Messages"
-                            value={metrics.my_open_messages ?? 0}
-                            color="text-[#3A54A5]"
-                            iconBg="bg-[#3A54A5]/10"
-                            href="/admin/messages"
-                        />
-                    </div>
-                )}
-
-                {/* ── Support ── */}
-                {user_role === 'support' && (
-                    <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:mb-8">
-                        <MetricCard
-                            icon={MessageSquare}
-                            label="Unread Messages"
-                            value={metrics.my_open_messages ?? 0}
-                            color="text-[#3A54A5]"
-                            iconBg="bg-[#3A54A5]/10"
-                            href="/admin/messages"
-                        />
-                    </div>
-                )}
-
-                {/* ── Recent Activity ── */}
-                <div>
-                    <h2 className="mb-3 text-[10px] font-bold tracking-widest text-zinc-500 uppercase">Recent Activity</h2>
-                    {recent_activity.length === 0 ? (
-                        <div className="rounded-xl border border-white/80 bg-white/30 p-10 text-center text-sm text-zinc-500 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
-                            No recent activity.
-                        </div>
-                    ) : (
-                        <div className="divide-y divide-zinc-200/80 overflow-hidden rounded-xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
-                            {recent_activity.map((item, i) => (
-                                <div key={i} className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-[#3A54A5]/5 sm:px-5 sm:py-4">
-                                    <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${activityDotColor[item.type] ?? 'bg-zinc-400'}`} />
-                                    <div className="min-w-0 flex-1">
-                                        <div className="flex flex-wrap items-center gap-x-2">
-                                            <span className="text-zinc-450 text-[10px] font-bold tracking-wider uppercase">
-                                                {activityTypeLabel[item.type]}
-                                            </span>
-                                            <p className="truncate text-sm font-semibold text-zinc-900">{item.description}</p>
-                                        </div>
-                                        {item.email && <p className="mt-0.5 truncate text-xs text-zinc-500">{item.email}</p>}
+                            {/* Lower Section (Activity & Tiers) */}
+                            <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                                <div className="lg:col-span-2">
+                                    <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-4">
+                                        <span className="text-[15px] font-semibold text-zinc-900">Recent Activity</span>
                                     </div>
-                                    <span className="text-zinc-450 shrink-0 text-xs whitespace-nowrap">{item.time}</span>
+                                    
+                                    {recent_activity.length === 0 ? (
+                                        <div className="rounded-[20px] border border-zinc-200/60 bg-white p-10 text-center text-sm font-medium text-zinc-500 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+                                            No recent activity.
+                                        </div>
+                                    ) : (
+                                        <div className="overflow-hidden rounded-[20px] border border-zinc-200/60 bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+                                            {[...recent_activity].reverse().slice(0, 6).map((item, i) => (
+                                                <div key={i} className="flex items-start gap-4 p-4 sm:p-5 transition-colors hover:bg-zinc-50/50 border-b border-zinc-100 last:border-0">
+                                                    <span className={`mt-1 h-2 w-2 shrink-0 rounded-full shadow-xs ${activityDotColor[item.type] ?? 'bg-zinc-400'}`} />
+                                                    <div className="min-w-0 flex-1">
+                                                        <div className="flex flex-wrap items-center gap-x-2">
+                                                            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                                                                {activityTypeLabel[item.type]}
+                                                            </span>
+                                                            <p className="truncate text-[13.5px] font-semibold text-zinc-900">{item.description}</p>
+                                                        </div>
+                                                        {item.email && <p className="mt-1 truncate text-xs font-medium text-zinc-500">{item.email}</p>}
+                                                    </div>
+                                                    <span className="shrink-0 text-[11px] font-medium text-zinc-400">{item.time}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
-                            ))}
+
+                                <div className="space-y-6">
+                                    {/* Revenue by tier */}
+                                    {metrics.revenue_by_tier && (
+                                        <div>
+                                            <div className="mb-4 flex items-center gap-4 border-b border-zinc-100 pb-4">
+                                                <span className="text-[15px] font-semibold text-zinc-900">Revenue by Tier</span>
+                                            </div>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
+                                                    <div
+                                                        key={tier}
+                                                        className="relative h-20 w-full overflow-hidden rounded-2xl bg-white shadow-xs ring-1 ring-zinc-200/50 p-4"
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <p className="text-[13px] font-semibold text-zinc-500 capitalize">{tier}</p>
+                                                            <CreditCard className="size-3.5 text-zinc-300" />
+                                                        </div>
+                                                        <p className="mt-2 text-xl font-bold tracking-tight text-zinc-900">{fmtCurrency(metrics.revenue_by_tier![tier])}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* Waitlist Split */}
+                                    {metrics.waitlist_count && (
+                                        <WaitlistBars founders={metrics.waitlist_count.founders} investors={metrics.waitlist_count.investors} />
+                                    )}
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* ── Analyst ── */}
+                    {isAnalyst && (
+                        <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                            <MetricCard
+                                label="My Assigned"
+                                value={metrics.my_assigned ?? 0}
+                                icon={Users}
+                                href="/admin/founders"
+                            />
+                            <MetricCard
+                                label="Active Audits"
+                                value={metrics.active_audits ?? 0}
+                                icon={Activity}
+                            />
+                            <MetricCard
+                                label="Needs Info"
+                                value={metrics.needs_info_count ?? 0}
+                                icon={AlertTriangle}
+                                pulse={(metrics.needs_info_count ?? 0) > 0}
+                            />
+                            <MetricCard
+                                label="Unread Messages"
+                                value={metrics.my_open_messages ?? 0}
+                                icon={MessageSquare}
+                                href="/admin/messages"
+                            />
+                        </div>
+                    )}
+
+                    {/* ── Support ── */}
+                    {user_role === 'support' && (
+                        <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                            <MetricCard
+                                label="Unread Messages"
+                                value={metrics.my_open_messages ?? 0}
+                                icon={MessageSquare}
+                                href="/admin/messages"
+                            />
                         </div>
                     )}
                 </div>

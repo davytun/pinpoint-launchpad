@@ -48,13 +48,32 @@ class AdminProfileController extends Controller
             'investorAccessRequests',
         ]);
 
+        $diagnosticSession = null;
+        if ($profile->founder?->email) {
+            $diagnosticSession = \App\Models\DiagnosticSession::byEmail($profile->founder->email)
+                ->latest('completed_at')
+                ->first();
+        }
+
+        $radarData = $profile->radar_data;
+        $overallScore = $profile->overall_score;
+
+        if ($diagnosticSession) {
+            if (empty($radarData) && !empty($diagnosticSession->pillar_scores)) {
+                $radarData = $diagnosticSession->pillar_scores;
+            }
+            if ($overallScore === null) {
+                $overallScore = $diagnosticSession->score;
+            }
+        }
+
         return Inertia::render('Admin/Profiles/Show', [
             'profile' => [
                 'id'              => $profile->id,
                 'slug'            => $profile->slug,
                 'is_public'       => $profile->is_public,
-                'overall_score'   => $profile->overall_score,
-                'radar_data'      => $profile->radar_data,
+                'overall_score'   => $overallScore,
+                'radar_data'      => $radarData,
                 'analyst_summary' => $profile->analyst_summary,
                 'batch'           => $profile->batch,
                 'sector'          => $profile->sector,

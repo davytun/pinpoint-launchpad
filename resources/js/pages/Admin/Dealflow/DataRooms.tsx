@@ -488,7 +488,7 @@ export default function AdminDataRooms({
                 setActiveDrawerGrant(updated);
             }
         }
-    }, [grants]);
+    }, [grants, activeDrawerGrant]);
 
     const applyFilters = useCallback(
         (overrides: Record<string, string | undefined>) => {

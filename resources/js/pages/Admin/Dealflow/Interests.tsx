@@ -564,7 +564,7 @@ export default function AdminInterests({
                 setActiveDrawerInterest(updated);
             }
         }
-    }, [interests]);
+    }, [interests, activeDrawerInterest]);
 
     const applyFilters = useCallback(
         (overrides: Record<string, string | undefined>) => {

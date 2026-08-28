@@ -223,7 +223,7 @@ function RequestInfoModal({
         }
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedIds, note]);
+    }, [selectedIds, note, handleSubmit, onClose]);
 
     return (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">

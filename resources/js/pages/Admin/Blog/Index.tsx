@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { CircleCheck, CircleDot, Edit, Eye, Layers, Plus, Search, Trash2 } from 'lucide-react';
+import {Edit, Eye, Layers, Plus, Search, Trash2, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
@@ -70,142 +70,183 @@ export default function AdminBlogIndex({ posts, filters, totals }: PageProps) {
         <AdminLayout>
             <Head title="Blog Management — Admin" />
 
-            <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-                {/* Header */}
-                <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                    <div>
-                        <h1 className="text-zinc-955 text-2xl font-extrabold">Blog Management</h1>
-                        <p className="text-zinc-555 mt-1 text-sm font-medium">Create, update, and manage your public articles.</p>
+            {/* ── Outer Card Container (Mercury Spec) ────────────────────────── */}
+            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] lg:rounded-[22px]">
+                    
+                    {/* ── Top Header & Actions Bar ───────────────────────────────── */}
+                    <div className="flex shrink-0 flex-col justify-between gap-4 border-b border-zinc-100 bg-white px-6 py-4 sm:flex-row sm:items-center">
+                        <div>
+                            <div className="flex items-center gap-2.5">
+                                <h1 className="text-[16.5px] font-bold tracking-tight text-zinc-950">Blog Management</h1>
+                            </div>
+                            <p className="mt-0.5 text-[12px] font-normal text-zinc-500">
+                                Create, update, and manage your public articles.
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Link
+                                href={route('admin.blog.create')}
+                                className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-zinc-800"
+                            >
+                                <Plus className="size-4" />
+                                <span>Create New Post</span>
+                            </Link>
+                        </div>
                     </div>
-                    <Link
-                        href={route('admin.blog.create')}
-                        className="flex items-center justify-center gap-2 rounded-xl bg-[#3A54A5] px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-[#3A54A5]/20 transition-all hover:bg-[#2D4182] hover:shadow-lg active:scale-[0.98]"
-                    >
-                        <Plus className="size-4" />
-                        Create New Post
-                    </Link>
-                </div>
 
-                {/* Totals & Status Toggles */}
-                <div className="mb-6 grid max-w-xl grid-cols-3 gap-4">
-                    <button
-                        onClick={() => handleStatusChange('')}
-                        className={cn(
-                            'flex flex-col items-start rounded-2xl border p-4 text-left transition-all',
-                            status === ''
-                                ? 'border-[#3A54A5]/30 bg-[#3A54A5]/5 font-bold text-[#3A54A5] shadow-xs'
-                                : 'text-zinc-550 border-zinc-200 bg-white/40 hover:bg-white/60',
-                        )}
-                    >
-                        <Layers className="mb-2 size-4 opacity-80" />
-                        <span className="text-[10px] font-extrabold tracking-wider uppercase opacity-60">All Posts</span>
-                        <span className="text-lg font-black">{totals.all}</span>
-                    </button>
+                    {/* ── Inline Metric Ribbon (Mercury Style) ──────────── */}
+                    <div className="grid shrink-0 grid-cols-3 divide-x divide-zinc-100 border-b border-zinc-100 bg-[#FAFBFD]">
+                        <div className="px-6 py-3">
+                            <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Total Posts</span>
+                            <div className="mt-0.5 flex items-baseline gap-2">
+                                <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{totals.all}</span>
+                            </div>
+                        </div>
 
-                    <button
-                        onClick={() => handleStatusChange('published')}
-                        className={cn(
-                            'flex flex-col items-start rounded-2xl border p-4 text-left transition-all',
-                            status === 'published'
-                                ? 'border-emerald-500/30 bg-emerald-50/50 font-bold text-emerald-700 shadow-xs'
-                                : 'text-zinc-550 border-zinc-200 bg-white/40 hover:bg-white/60',
-                        )}
-                    >
-                        <CircleCheck className="mb-2 size-4 opacity-80" />
-                        <span className="text-[10px] font-extrabold tracking-wider uppercase opacity-60">Published</span>
-                        <span className="text-lg font-black text-emerald-600">{totals.published}</span>
-                    </button>
+                        <div className="px-6 py-3">
+                            <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Published</span>
+                            <div className="mt-0.5 flex items-baseline gap-2">
+                                <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{totals.published}</span>
+                            </div>
+                        </div>
 
-                    <button
-                        onClick={() => handleStatusChange('draft')}
-                        className={cn(
-                            'flex flex-col items-start rounded-2xl border p-4 text-left transition-all',
-                            status === 'draft'
-                                ? 'border-amber-500/30 bg-amber-50/50 font-bold text-amber-700 shadow-xs'
-                                : 'text-zinc-550 border-zinc-200 bg-white/40 hover:bg-white/60',
-                        )}
-                    >
-                        <CircleDot className="mb-2 size-4 opacity-80" />
-                        <span className="text-[10px] font-extrabold tracking-wider uppercase opacity-60">Drafts</span>
-                        <span className="text-lg font-black text-amber-600">{totals.draft}</span>
-                    </button>
-                </div>
-
-                {/* Filter Form */}
-                <form onSubmit={handleSearchSubmit} className="mb-6 flex max-w-md gap-2">
-                    <div className="relative flex-1">
-                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search title, category..."
-                            className="w-full rounded-xl border border-zinc-200 bg-white/50 py-2 pr-4 pl-10 text-sm placeholder:text-zinc-400 focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
-                        />
+                        <div className="px-6 py-3">
+                            <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Drafts</span>
+                            <div className="mt-0.5 flex items-baseline gap-2">
+                                <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{totals.draft}</span>
+                            </div>
+                        </div>
                     </div>
-                    <button
-                        type="submit"
-                        className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-50"
-                    >
-                        Search
-                    </button>
-                </form>
 
-                {/* Flash Messages */}
-                {(flash?.success || flash?.error) && (
-                    <div
-                        className={cn(
-                            'mb-6 rounded-xl border px-4 py-3 text-sm font-semibold',
-                            flash.success ? 'border-emerald-500/25 bg-emerald-50 text-emerald-700' : 'border-rose-500/25 bg-rose-50 text-rose-700',
-                        )}
-                    >
-                        {flash.success ?? flash.error}
+                    {/* ── Toolbar: Segmented Views & Integrated Search ─────────────── */}
+                    <div className="flex shrink-0 flex-col items-center justify-between gap-3 border-b border-zinc-100 bg-white px-6 py-3 sm:flex-row">
+                        {/* Filter Segmented Control */}
+                        <div className="flex items-center gap-1 rounded-xl border border-zinc-200/60 bg-[#F4F4F6] p-1">
+                            {(
+                                [
+                                    { key: '', label: 'All' },
+                                    { key: 'published', label: 'Published' },
+                                    { key: 'draft', label: 'Drafts' },
+                                ] as const
+                            ).map(({ key, label }) => {
+                                const isSelected = status === key;
+                                return (
+                                    <button
+                                        key={label}
+                                        onClick={() => handleStatusChange(key)}
+                                        className={cn(
+                                            'flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-all duration-150',
+                                            isSelected ? 'bg-white font-bold text-zinc-950 shadow-2xs' : 'text-zinc-500 hover:text-zinc-900',
+                                        )}
+                                    >
+                                        <span>{label}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        <div className="flex w-full items-center gap-4 sm:w-auto">
+                            {/* Search Bar */}
+                            <form onSubmit={handleSearchSubmit} className="relative w-full sm:w-76">
+                                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search title, category..."
+                                    className="w-full rounded-xl border border-zinc-200/90 bg-[#F9F9FB] py-1.5 pr-8 pl-9 text-[13px] text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
+                                />
+                                {search && (
+                                    <button
+                                        type="button"
+                                        onClick={() => { setSearch(''); applyFilters('', status); }}
+                                        className="absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                                    >
+                                        <X className="size-3.5" />
+                                    </button>
+                                )}
+                            </form>
+
+                            {/* Flash Messages (Inline) */}
+                            {(flash?.success || flash?.error) && (
+                                <span className={cn(
+                                    "inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-semibold",
+                                    flash.success ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
+                                )}>
+                                    {flash.success ?? flash.error}
+                                </span>
+                            )}
+                        </div>
                     </div>
-                )}
 
-                {/* Table Section */}
-                <div className="overflow-hidden rounded-2xl border border-white/80 bg-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md">
-                    {posts.data.length === 0 ? (
-                        <div className="py-16 text-center text-sm font-semibold text-zinc-500">No blog posts found.</div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[700px] text-sm">
-                                <thead>
-                                    <tr className="border-b border-zinc-200 bg-zinc-50/50">
-                                        {['Title', 'Category', 'Status', 'Date Published', 'Actions'].map((h) => (
-                                            <th
-                                                key={h}
-                                                className="px-5 py-3.5 text-left text-[10px] font-bold tracking-widest text-zinc-500 uppercase"
-                                            >
-                                                {h}
-                                            </th>
-                                        ))}
+                    {/* ── Table Container (Independently Scrollable) ──────────────── */}
+                    <div className="min-h-0 flex-1 overflow-auto bg-white">
+                        {posts.data.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-400">
+                                    <Layers className="size-6" />
+                                </div>
+                                <h3 className="text-sm font-bold text-zinc-900">No blog posts found</h3>
+                                <p className="mt-1 max-w-sm text-xs text-zinc-500">
+                                    {search
+                                        ? `No posts match "${search}". Try clearing your search.`
+                                        : 'Get started by creating your first blog post.'}
+                                </p>
+                            </div>
+                        ) : (
+                            <table className="w-full border-collapse text-left text-xs">
+                                <thead className="sticky top-0 z-10 border-b border-zinc-200/80 bg-zinc-50/95 backdrop-blur-xs">
+                                    <tr>
+                                        <th className="w-[45%] px-6 py-3 text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                                            Title & Excerpt
+                                        </th>
+                                        <th className="w-[15%] px-6 py-3 text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                                            Category
+                                        </th>
+                                        <th className="w-[15%] px-6 py-3 text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                                            Status
+                                        </th>
+                                        <th className="w-[15%] px-6 py-3 text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                                            Published
+                                        </th>
+                                        <th className="w-[10%] px-6 py-3 text-right text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                                            Actions
+                                        </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-200/80">
+                                <tbody className="divide-y divide-zinc-100">
                                     {posts.data.map((post) => (
-                                        <tr key={post.id} className="group transition-colors hover:bg-zinc-50/40">
-                                            <td className="px-5 py-4">
-                                                <div className="line-clamp-1 font-bold text-zinc-950">{post.title}</div>
-                                                <div className="mt-0.5 line-clamp-1 text-xs text-zinc-500">{post.excerpt}</div>
+                                        <tr key={post.id} className="group transition-colors duration-150 hover:bg-[#F9F9FB]">
+                                            <td className="px-6 py-4">
+                                                <div className="min-w-0">
+                                                    <p className="line-clamp-1 text-[13px] font-semibold text-zinc-950">
+                                                        {post.title}
+                                                    </p>
+                                                    <p className="mt-0.5 line-clamp-1 text-[11.5px] font-normal text-zinc-500">
+                                                        {post.excerpt || 'No excerpt provided.'}
+                                                    </p>
+                                                </div>
                                             </td>
-                                            <td className="px-5 py-4 font-semibold text-zinc-600">
-                                                {post.category || <span className="text-zinc-400 italic">Uncategorized</span>}
+                                            <td className="px-6 py-4">
+                                                <span className="text-[12.5px] font-medium text-zinc-700">
+                                                    {post.category || <span className="text-zinc-400 italic">Uncategorized</span>}
+                                                </span>
                                             </td>
-                                            <td className="px-5 py-4">
+                                            <td className="px-6 py-4">
                                                 <button
                                                     onClick={() => togglePublish(post)}
                                                     className={cn(
-                                                        'rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase transition-all hover:scale-105 active:scale-95',
+                                                        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase transition-all hover:scale-105 active:scale-95',
                                                         post.is_published
-                                                            ? 'border-emerald-250 border bg-emerald-50 text-emerald-700'
-                                                            : 'border-amber-250 border bg-amber-50 text-amber-700',
+                                                            ? 'bg-emerald-50 text-emerald-700'
+                                                            : 'bg-amber-50 text-amber-700',
                                                     )}
                                                 >
+                                                    <span className={cn("h-1.5 w-1.5 rounded-full", post.is_published ? "bg-emerald-500" : "bg-amber-500")} />
                                                     {post.is_published ? 'Published' : 'Draft'}
                                                 </button>
                                             </td>
-                                            <td className="px-5 py-4 font-semibold text-zinc-500">
+                                            <td className="px-6 py-4 text-[12.5px] font-medium text-zinc-500">
                                                 {post.published_at ? (
                                                     new Date(post.published_at).toLocaleDateString(undefined, {
                                                         year: 'numeric',
@@ -213,17 +254,17 @@ export default function AdminBlogIndex({ posts, filters, totals }: PageProps) {
                                                         day: 'numeric',
                                                     })
                                                 ) : (
-                                                    <span className="font-normal text-zinc-400 italic">N/A (Draft)</span>
+                                                    <span className="text-zinc-400">—</span>
                                                 )}
                                             </td>
-                                            <td className="px-5 py-4">
-                                                <div className="flex items-center gap-3">
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-1 text-zinc-400">
                                                     {post.is_published && (
                                                         <a
                                                             href={`/blog/${post.slug}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-zinc-650 flex size-8 items-center justify-center rounded-lg border border-zinc-200 bg-white transition-colors hover:border-[#3A54A5]/30 hover:text-[#3A54A5]"
+                                                            className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                                                             title="View Live"
                                                         >
                                                             <Eye className="size-4" />
@@ -231,14 +272,14 @@ export default function AdminBlogIndex({ posts, filters, totals }: PageProps) {
                                                     )}
                                                     <Link
                                                         href={route('admin.blog.edit', { post: post.slug })}
-                                                        className="text-zinc-650 flex size-8 items-center justify-center rounded-lg border border-zinc-200 bg-white transition-colors hover:border-[#3A54A5]/30 hover:text-[#3A54A5]"
+                                                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                                                         title="Edit Post"
                                                     >
                                                         <Edit className="size-4" />
                                                     </Link>
                                                     <button
                                                         onClick={() => destroy(post)}
-                                                        className="text-rose-650 flex size-8 items-center justify-center rounded-lg border border-zinc-200 bg-white transition-colors hover:border-rose-200 hover:bg-rose-50"
+                                                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-rose-50 hover:text-rose-600"
                                                         title="Delete Post"
                                                     >
                                                         <Trash2 className="size-4" />
@@ -249,31 +290,32 @@ export default function AdminBlogIndex({ posts, filters, totals }: PageProps) {
                                     ))}
                                 </tbody>
                             </table>
+                        )}
+                    </div>
+
+                    {/* ── Pagination Footer ───────────────────────────────────────── */}
+                    {posts.last_page > 1 && (
+                        <div className="flex shrink-0 items-center justify-center border-t border-zinc-100 bg-white py-3">
+                            <div className="flex items-center gap-1">
+                                {posts.links.map((link, idx) => {
+                                    if (link.url === null) return null;
+                                    return (
+                                        <Link
+                                            key={idx}
+                                            href={link.url}
+                                            className={cn(
+                                                'flex min-w-8 items-center justify-center rounded-lg px-2 py-1.5 text-[12px] font-semibold transition-colors',
+                                                link.active
+                                                    ? 'bg-zinc-900 text-white'
+                                                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900',
+                                            )}
+                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                        />
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
-                </div>
-
-                {/* Pagination */}
-                {posts.last_page > 1 && (
-                    <div className="mt-6 flex items-center justify-center gap-1.5">
-                        {posts.links.map((link, idx) => {
-                            if (link.url === null) return null;
-                            return (
-                                <Link
-                                    key={idx}
-                                    href={link.url}
-                                    className={cn(
-                                        'rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all',
-                                        link.active
-                                            ? 'border-transparent bg-[#3A54A5] text-white'
-                                            : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50',
-                                    )}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
-                                />
-                            );
-                        })}
-                    </div>
-                )}
             </div>
         </AdminLayout>
     );

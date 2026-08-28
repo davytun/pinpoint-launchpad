@@ -111,7 +111,6 @@ function NavSection({ label, collapsed }: { label: string; collapsed?: boolean }
 
 function SidebarContent({
     user,
-    role,
     isSuperAdmin,
     isAnalyst,
     isSupport,
@@ -126,7 +125,6 @@ function SidebarContent({
     onNav,
 }: {
     user: AdminUser | null;
-    role: string;
     isSuperAdmin: boolean;
     isAnalyst: boolean;
     isSupport: boolean;
@@ -436,7 +434,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             const next = !prev;
             try {
                 localStorage.setItem('admin_sidebar_collapsed', next ? 'true' : 'false');
-            } catch {}
+            } catch {
+                // Ignore localStorage errors
+            }
             return next;
         });
     }

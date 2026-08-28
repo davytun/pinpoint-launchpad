@@ -50,6 +50,11 @@ interface Interest {
     status: 'pending' | 'approved' | 'denied';
     reviewed_by_founder?: string | null;
     reviewed_at?: string | null;
+    scheduled_at?: string | null;
+    completed_at?: string | null;
+    meeting_link?: string | null;
+    admin_notes?: string | null;
+    founder_notes?: string | null;
     created_at: string;
     investor?: InvestorUser | null;
     profile?: FounderProfileData | null;
@@ -64,6 +69,9 @@ interface Totals {
     data_room_requests: number;
     founder_call_requests: number;
     more_details_requests: number;
+    scheduled_calls?: number;
+    completed_calls?: number;
+    pending_introductions?: number;
 }
 
 interface PaginatedData<T> {
@@ -204,6 +212,11 @@ function InterestDrawer({
 }) {
     const [updating, setUpdating] = useState(false);
     const [copiedEmail, setCopiedEmail] = useState(false);
+    const [scheduledAt, setScheduledAt] = useState(interest.scheduled_at ? interest.scheduled_at.slice(0, 16) : '');
+    const [meetingLink, setMeetingLink] = useState(interest.meeting_link ?? '');
+    const [coordinationNotes, setCoordinationNotes] = useState(interest.admin_notes ?? '');
+    const [isScheduling, setIsScheduling] = useState(false);
+    const [isCompleting, setIsCompleting] = useState(false);
 
     const investorName = interest.investor?.profile?.full_name ?? interest.investor?.email ?? 'Investor';
     const investorFirm = interest.investor?.profile?.company_name ?? 'Private Syndicate';
@@ -224,6 +237,53 @@ function InterestDrawer({
                     });
                 },
                 onFinish: () => setUpdating(false),
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function handleScheduleCall(e: React.FormEvent) {
+        e.preventDefault();
+        if (!scheduledAt) return;
+        setIsScheduling(true);
+        router.patch(
+            `/admin/dealflow/interests/${interest.id}/schedule`,
+            {
+                scheduled_at: scheduledAt,
+                meeting_link: meetingLink,
+                notes: coordinationNotes,
+            },
+            {
+                onSuccess: () => {
+                    onUpdateInterest({
+                        ...interest,
+                        status: 'approved',
+                        scheduled_at: new Date(scheduledAt).toISOString(),
+                        meeting_link: meetingLink,
+                        admin_notes: coordinationNotes,
+                    });
+                },
+                onFinish: () => setIsScheduling(false),
+                preserveScroll: true,
+            },
+        );
+    }
+
+    function handleCompleteCall() {
+        setIsCompleting(true);
+        router.patch(
+            `/admin/dealflow/interests/${interest.id}/complete`,
+            {
+                notes: coordinationNotes,
+            },
+            {
+                onSuccess: () => {
+                    onUpdateInterest({
+                        ...interest,
+                        completed_at: new Date().toISOString(),
+                    });
+                },
+                onFinish: () => setIsCompleting(false),
                 preserveScroll: true,
             },
         );
@@ -365,6 +425,103 @@ function InterestDrawer({
                             )}
                         </div>
                     </div>
+
+                    {/* Section 2.5: Introduction & Call Coordination (If Founder Call) */}
+                    {interest.type === 'founder_call' && (
+                        <div className="rounded-2xl border border-indigo-200/80 bg-[#f8faff] p-4.5 space-y-4 shadow-2xs">
+                            <div className="flex items-center justify-between border-b border-indigo-100/80 pb-2.5">
+                                <div className="flex items-center gap-2">
+                                    <Icon icon="solar:phone-calling-bold-duotone" className="size-4 text-indigo-600" />
+                                    <h4 className="text-xs font-bold text-indigo-950 uppercase tracking-wider">
+                                        Founder Introduction Coordination
+                                    </h4>
+                                </div>
+                                <span className="text-[11px] font-bold text-indigo-700">
+                                    {interest.completed_at ? 'Completed' : interest.scheduled_at ? 'Scheduled' : interest.status === 'approved' ? 'Approved — Ready' : 'Pending Request'}
+                                </span>
+                            </div>
+
+                            {interest.completed_at ? (
+                                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-800 space-y-1">
+                                    <div className="flex items-center gap-1.5 font-bold">
+                                        <Icon icon="solar:check-circle-bold" className="size-4 text-emerald-600" />
+                                        <span>Introduction Call Completed</span>
+                                    </div>
+                                    <p className="text-[11.5px] text-emerald-700">
+                                        Concluded on {formatDate(interest.completed_at)}. Diligence and follow-ups can continue via Data Room or direct IR coordination.
+                                    </p>
+                                </div>
+                            ) : interest.status === 'approved' ? (
+                                <form onSubmit={handleScheduleCall} className="space-y-3 text-xs">
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-zinc-700 uppercase tracking-wider mb-1">
+                                            Scheduled Date & Time
+                                        </label>
+                                        <input
+                                            type="datetime-local"
+                                            value={scheduledAt}
+                                            onChange={(e) => setScheduledAt(e.target.value)}
+                                            required
+                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:outline-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-zinc-700 uppercase tracking-wider mb-1">
+                                            Meeting Link / Access Details
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={meetingLink}
+                                            onChange={(e) => setMeetingLink(e.target.value)}
+                                            placeholder="https://meet.google.com/..."
+                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:outline-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[11px] font-bold text-zinc-700 uppercase tracking-wider mb-1">
+                                            Internal IR Coordination Notes
+                                        </label>
+                                        <textarea
+                                            value={coordinationNotes}
+                                            onChange={(e) => setCoordinationNotes(e.target.value)}
+                                            placeholder="Context or preparation notes for the session..."
+                                            rows={2}
+                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:outline-none"
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center gap-2 pt-1">
+                                        <button
+                                            type="submit"
+                                            disabled={isScheduling}
+                                            className="flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-3.5 py-1.5 text-xs font-semibold text-white transition shadow-2xs disabled:opacity-50"
+                                        >
+                                            <Icon icon="solar:calendar-linear" className="size-3.5" />
+                                            <span>{interest.scheduled_at ? 'Update Schedule' : 'Schedule Call'}</span>
+                                        </button>
+
+                                        {interest.scheduled_at && (
+                                            <button
+                                                type="button"
+                                                onClick={handleCompleteCall}
+                                                disabled={isCompleting}
+                                                className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-semibold text-white transition shadow-2xs disabled:opacity-50"
+                                            >
+                                                <Icon icon="solar:check-circle-linear" className="size-3.5" />
+                                                <span>Mark Call Completed</span>
+                                            </button>
+                                        )}
+                                    </div>
+                                </form>
+                            ) : (
+                                <p className="text-[11.5px] text-indigo-700">
+                                    Approve this request to enable date/time scheduling and coordination with the founder and investor.
+                                </p>
+                            )}
+                        </div>
+                    )}
 
                     {/* Section 3: Target Startup Dossier */}
                     <div className="space-y-3">

@@ -105,21 +105,43 @@ class FounderDashboardController extends Controller
         $auditStatus = $founder->payment?->audit_status ?? 'pending';
         $tier = $founder->tier;
 
+        $dataRoomGrants = $founder->profile
+            ? $founder->profile->investorDataRoomGrants()
+                ->whereNull('revoked_at')
+                ->get()
+                ->keyBy('investor_id')
+            : collect();
+
         $accessRequests = $founder->profile
             ? $founder->profile->investorInterests()
                 ->with('investor.profile')
                 ->orderBy('created_at', 'desc')
                 ->get()
-                ->map(fn ($interest) => [
-                    'id' => $interest->id,
-                    'investor_name' => $interest->investor->profile->full_name ?? 'Anonymous Investor',
-                    'investor_email' => $interest->investor->email,
-                    'firm_name' => $interest->investor->profile->company_name,
-                    'type' => $interest->type,
-                    'message' => $interest->message,
-                    'status' => $interest->status,
-                    'created_at' => $interest->created_at->toISOString(),
-                ])
+                ->map(function ($interest) use ($dataRoomGrants) {
+                    $grant = $dataRoomGrants->get($interest->investor_id);
+                    $latestActivity = $interest->completed_at
+                        ?? $interest->scheduled_at
+                        ?? $interest->reviewed_at
+                        ?? $interest->created_at;
+
+                    return [
+                        'id' => $interest->id,
+                        'investor_name' => $interest->investor?->profile?->full_name ?? 'Anonymous Investor',
+                        'investor_type' => $interest->investor?->profile?->investor_type ?? 'individual',
+                        'firm_name' => $interest->investor?->profile?->company_name,
+                        'type' => $interest->type,
+                        'message' => $interest->message,
+                        'status' => $interest->status,
+                        'stage' => $interest->getEngagementStage($grant),
+                        'introduction_status' => $interest->getIntroductionStatus(),
+                        'data_room_granted' => $grant !== null,
+                        'scheduled_at' => $interest->scheduled_at?->toISOString(),
+                        'completed_at' => $interest->completed_at?->toISOString(),
+                        'meeting_link' => $interest->meeting_link,
+                        'latest_activity_at' => $latestActivity?->toISOString(),
+                        'created_at' => $interest->created_at->toISOString(),
+                    ];
+                })
                 ->toArray()
             : [];
 

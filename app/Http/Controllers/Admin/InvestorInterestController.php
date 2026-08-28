@@ -19,6 +19,7 @@ class InvestorInterestController extends Controller
         $type = $request->query('type', 'all');
         $search = trim((string) $request->query('search', ''));
         $sector = $request->query('sector', 'all');
+        $callStatus = $request->query('call_status', 'all');
 
         $query = InvestorInterest::query()
             ->with([
@@ -38,6 +39,14 @@ class InvestorInterestController extends Controller
 
         if ($sector && $sector !== 'all') {
             $query->whereHas('profile', fn ($q) => $q->where('sector', $sector));
+        }
+
+        if ($callStatus === 'scheduled') {
+            $query->where('type', 'founder_call')->whereNotNull('scheduled_at')->whereNull('completed_at');
+        } elseif ($callStatus === 'completed') {
+            $query->where('type', 'founder_call')->whereNotNull('completed_at');
+        } elseif ($callStatus === 'pending') {
+            $query->where('type', 'founder_call')->where('status', 'pending');
         }
 
         if ($search !== '') {
@@ -60,6 +69,9 @@ class InvestorInterestController extends Controller
             'data_room_requests' => $allInterests->where('type', 'data_room_access')->count(),
             'founder_call_requests' => $allInterests->where('type', 'founder_call')->count(),
             'more_details_requests' => $allInterests->where('type', 'more_details')->count(),
+            'scheduled_calls' => $allInterests->where('type', 'founder_call')->whereNotNull('scheduled_at')->whereNull('completed_at')->count(),
+            'completed_calls' => $allInterests->where('type', 'founder_call')->whereNotNull('completed_at')->count(),
+            'pending_introductions' => $allInterests->where('type', 'founder_call')->where('status', 'pending')->count(),
         ];
 
         $sectors = FounderProfile::query()
@@ -74,6 +86,7 @@ class InvestorInterestController extends Controller
             'activeStatus' => $status,
             'activeType' => $type,
             'activeSector' => $sector,
+            'activeCallStatus' => $callStatus,
             'search' => $search,
             'sectors' => $sectors,
             'totals' => $totals,
@@ -97,6 +110,8 @@ class InvestorInterestController extends Controller
                 'status' => 'pending',
                 'reviewed_at' => null,
                 'reviewed_by_founder' => null,
+                'scheduled_at' => null,
+                'completed_at' => null,
             ]);
             return back()->with('success', 'Interest request reset to pending.');
         }
@@ -110,5 +125,49 @@ class InvestorInterestController extends Controller
         );
 
         return back()->with('success', "Interest request marked as {$status}.");
+    }
+
+    public function schedule(
+        Request $request,
+        InvestorInterest $interest,
+        InvestorInterestWorkflowService $workflow
+    ): RedirectResponse {
+        $validated = $request->validate([
+            'scheduled_at' => ['required', 'date'],
+            'meeting_link' => ['nullable', 'string', 'max:500'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $workflow->scheduleIntroduction(
+            $interest,
+            $request->user(),
+            $validated['scheduled_at'],
+            $validated['meeting_link'] ?? null,
+            $validated['notes'] ?? null,
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        return back()->with('success', 'Introduction call scheduled successfully.');
+    }
+
+    public function complete(
+        Request $request,
+        InvestorInterest $interest,
+        InvestorInterestWorkflowService $workflow
+    ): RedirectResponse {
+        $validated = $request->validate([
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $workflow->completeIntroduction(
+            $interest,
+            $request->user(),
+            $validated['notes'] ?? null,
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        return back()->with('success', 'Introduction call marked as completed.');
     }
 }

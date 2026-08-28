@@ -68,6 +68,11 @@ class FounderProfile extends Model
         return $this->hasMany(InvestorDataRoomGrant::class, 'profile_id');
     }
 
+    public function investorDataRoomGrants(): HasMany
+    {
+        return $this->dataRoomGrants();
+    }
+
     public function isLive(): bool
     {
         return $this->is_public

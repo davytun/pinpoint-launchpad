@@ -148,7 +148,7 @@ class AdminDashboardController extends Controller
             }
         }
 
-        // 3. Dealflow Requests (Superadmin & Investor Relations)
+        // 3. Dealflow & Introductions (Superadmin & Investor Relations)
         if ($user->isSuperAdmin() || $user->isInvestorRelations()) {
             $pendingInterestsCount = InvestorInterest::where('status', 'pending')->count();
             if ($pendingInterestsCount > 0) {
@@ -160,6 +160,23 @@ class AdminDashboardController extends Controller
                     'action_url' => '/admin/dealflow/interests?status=pending',
                     'icon' => 'solar:folder-with-files-bold-duotone',
                     'color' => 'blue',
+                ];
+            }
+
+            $scheduledCallsCount = InvestorInterest::where('type', 'founder_call')
+                ->whereNotNull('scheduled_at')
+                ->whereNull('completed_at')
+                ->count();
+
+            if ($scheduledCallsCount > 0) {
+                $needsAttention[] = [
+                    'id' => 'scheduled_founder_calls',
+                    'title' => 'Scheduled Founder Calls',
+                    'description' => 'Upcoming coordinated investor-founder calls.',
+                    'count' => $scheduledCallsCount,
+                    'action_url' => '/admin/dealflow/interests?call_status=scheduled',
+                    'icon' => 'solar:phone-calling-bold-duotone',
+                    'color' => 'emerald',
                 ];
             }
         }

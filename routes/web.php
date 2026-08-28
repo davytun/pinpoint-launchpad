@@ -114,6 +114,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/spotlight/{profile}', [AdminSpotlightController::class, 'update'])->name('spotlight.update');
         Route::get('/dealflow/interests', [App\Http\Controllers\Admin\InvestorInterestController::class, 'index'])->name('dealflow.interests.index');
         Route::patch('/dealflow/interests/{interest}', [App\Http\Controllers\Admin\InvestorInterestController::class, 'update'])->name('dealflow.interests.update');
+        Route::patch('/dealflow/interests/{interest}/schedule', [App\Http\Controllers\Admin\InvestorInterestController::class, 'schedule'])->name('dealflow.interests.schedule');
+        Route::patch('/dealflow/interests/{interest}/complete', [App\Http\Controllers\Admin\InvestorInterestController::class, 'complete'])->name('dealflow.interests.complete');
         Route::get('/dealflow/data-rooms', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'index'])->name('dealflow.data-rooms.index');
         Route::patch('/dealflow/data-rooms/{grant}/revoke', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'revoke'])->name('dealflow.data-rooms.revoke');
         Route::patch('/dealflow/data-rooms/{grant}/reinstate', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'reinstate'])->name('dealflow.data-rooms.reinstate');

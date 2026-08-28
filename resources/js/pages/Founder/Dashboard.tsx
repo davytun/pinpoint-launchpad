@@ -49,11 +49,18 @@ interface Founder {
 interface InvestorAccessRequest {
     id: number;
     investor_name: string;
-    investor_email: string;
+    investor_type?: string;
     firm_name: string | null;
     message: string | null;
     type: 'more_details' | 'founder_call' | 'data_room_access';
     status: 'pending' | 'approved' | 'denied';
+    stage: 'new_interest' | 'reviewing' | 'data_room' | 'introduction' | 'active_discussion' | 'declined';
+    introduction_status: 'not_requested' | 'requested' | 'approved' | 'scheduled' | 'completed' | 'denied';
+    data_room_granted: boolean;
+    scheduled_at?: string | null;
+    completed_at?: string | null;
+    meeting_link?: string | null;
+    latest_activity_at?: string | null;
     created_at: string;
 }
 
@@ -574,93 +581,156 @@ export default function FounderDashboard({
                     </div>
                 </FadeUp>
 
-                {/* ── Section 5.5 — Investor Access Requests ── */}
+                {/* ── Section 5.5 — Investor Engagement & Deal Pipeline ── */}
                 <FadeUp delay={0.32}>
                     <ProCard className="p-6 sm:p-8">
                         <div className="mb-6 flex flex-col gap-3 border-b border-zinc-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#3A54A5]/10 text-[#3A54A5]">
-                                    <Lock className="size-4.5" />
+                                    <TrendingUp className="size-4.5" />
                                 </div>
-                                <h2 className="text-[16px] font-bold text-zinc-800">Investor Interest Requests</h2>
+                                <div>
+                                    <h2 className="text-[16px] font-bold text-zinc-800">Investor Engagement Pipeline</h2>
+                                    <p className="text-xs text-zinc-500">Track investor discovery, diligence clearances, and scheduled founder calls.</p>
+                                </div>
                             </div>
                             <span className="text-zinc-555 text-[13px] font-semibold">
-                                {access_requests.length} total request{access_requests.length !== 1 ? 's' : ''}
+                                {access_requests.length} investor engagement{access_requests.length !== 1 ? 's' : ''}
                             </span>
                         </div>
 
                         {access_requests.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-8 text-center">
-                                <p className="text-zinc-450 text-sm font-medium">No investor interest requests yet.</p>
+                                <p className="text-zinc-450 text-sm font-medium">No investor engagements yet.</p>
                                 <p className="mt-1 text-xs text-zinc-400">
-                                    Requests for information, a founder call, or data-room access will appear here for your decision.
+                                    When KYC-approved investors discover your startup and request information, a founder call, or data room access, they will appear here.
                                 </p>
                             </div>
                         ) : (
                             <div className="divide-y divide-zinc-200/80">
-                                {access_requests.map((req) => (
-                                    <div key={req.id} className="py-4 first:pt-0 last:pb-0">
-                                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                            <div className="space-y-1">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="text-sm font-semibold text-zinc-900">{req.investor_name}</span>
-                                                    {req.firm_name && (
-                                                        <span className="text-zinc-650 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10.5px] font-bold">
-                                                            {req.firm_name}
+                                {access_requests.map((req) => {
+                                    const stageColors: Record<string, string> = {
+                                        new_interest: 'bg-amber-50 text-amber-700 border-amber-200',
+                                        reviewing: 'bg-blue-50 text-blue-700 border-blue-200',
+                                        data_room: 'bg-purple-50 text-purple-700 border-purple-200',
+                                        introduction: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                                        active_discussion: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                                        declined: 'bg-zinc-100 text-zinc-600 border-zinc-200',
+                                    };
+
+                                    const stageLabels: Record<string, string> = {
+                                        new_interest: 'New Interest',
+                                        reviewing: 'Reviewing',
+                                        data_room: 'Data Room Active',
+                                        introduction: req.scheduled_at ? 'Intro Scheduled' : 'Intro Coordination',
+                                        active_discussion: 'Active Discussion',
+                                        declined: 'Declined',
+                                    };
+
+                                    return (
+                                        <div key={req.id} className="py-4.5 first:pt-0 last:pb-0">
+                                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                                <div className="space-y-2">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <span className="text-sm font-bold text-zinc-900">{req.investor_name}</span>
+                                                        {req.firm_name && (
+                                                            <span className="text-zinc-650 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10.5px] font-bold">
+                                                                {req.firm_name}
+                                                            </span>
+                                                        )}
+                                                        {req.investor_type && (
+                                                            <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10.5px] font-medium text-zinc-600 capitalize">
+                                                                {req.investor_type.replace('_', ' ')}
+                                                            </span>
+                                                        )}
+                                                        <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${stageColors[req.stage] ?? 'bg-zinc-100 text-zinc-700'}`}>
+                                                            {stageLabels[req.stage] ?? req.stage}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="text-zinc-555 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold">
+                                                        <span>Type: <strong className="text-zinc-800">{req.type.replaceAll('_', ' ')}</strong></span>
+                                                        <span className="opacity-40">•</span>
+                                                        <span>Interest Date: {fmtDateTime(req.created_at)}</span>
+                                                        {req.data_room_granted && (
+                                                            <>
+                                                                <span className="opacity-40">•</span>
+                                                                <span className="inline-flex items-center gap-1 font-bold text-purple-700">
+                                                                    <Lock className="size-3" /> Data Room Granted
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </div>
+
+                                                    {req.message && (
+                                                        <div className="mt-2 max-w-2xl rounded-lg border-l-2 border-[#3A54A5] bg-zinc-50/80 p-3 text-xs leading-relaxed font-medium text-zinc-600 italic">
+                                                            &ldquo;{req.message}&rdquo;
+                                                        </div>
+                                                    )}
+
+                                                    {/* Scheduled Call Info Box */}
+                                                    {req.scheduled_at && (
+                                                        <div className="mt-2.5 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs text-emerald-900">
+                                                            <CheckCircle2 className="size-4 shrink-0 text-emerald-600 mt-0.5" />
+                                                            <div>
+                                                                <p className="font-bold">Introduction Call Scheduled</p>
+                                                                <p className="mt-0.5 text-emerald-800">
+                                                                    Date & Time: {fmtDateTime(req.scheduled_at)}
+                                                                </p>
+                                                                {req.meeting_link && (
+                                                                    <p className="mt-0.5 text-emerald-700">
+                                                                        Details: <span className="font-mono">{req.meeting_link}</span>
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {req.completed_at && (
+                                                        <div className="mt-2.5 flex items-center gap-2 text-xs font-bold text-emerald-700">
+                                                            <CheckCircle2 className="size-3.5" />
+                                                            <span>Introduction Completed on {fmtDate(req.completed_at)}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="flex shrink-0 items-center gap-2 sm:mt-1">
+                                                    {req.status === 'pending' ? (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleRequestStatus(req.id, 'approved')}
+                                                                disabled={updatingStatusId !== null}
+                                                                className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50 transition"
+                                                            >
+                                                                Approve
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleRequestStatus(req.id, 'denied')}
+                                                                disabled={updatingStatusId !== null}
+                                                                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 transition"
+                                                            >
+                                                                Deny
+                                                            </button>
+                                                        </>
+                                                    ) : req.status === 'approved' ? (
+                                                        <span className="border-emerald-250 animate-fade-in inline-flex items-center gap-1 rounded-full border bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs">
+                                                            <CheckCircle2 className="size-3.5 text-emerald-600" />
+                                                            {req.type === 'data_room_access'
+                                                                ? 'Data room granted'
+                                                                : req.type === 'founder_call'
+                                                                ? (req.scheduled_at ? 'Call scheduled' : 'Intro approved (IR coordinating)')
+                                                                : 'Approved for follow-up'}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-bold text-zinc-500">
+                                                            Denied
                                                         </span>
                                                     )}
-                                                    <span className="rounded-md border border-[#3A54A5]/25 bg-[#3A54A5]/5 px-2 py-0.5 text-[10.5px] font-bold text-[#3A54A5]">
-                                                        {req.type.replaceAll('_', ' ')}
-                                                    </span>
                                                 </div>
-                                                <div className="text-zinc-555 text-xs font-semibold">
-                                                    Email:{' '}
-                                                    <a href={`mailto:${req.investor_email}`} className="font-bold text-[#3A54A5] hover:underline">
-                                                        {req.investor_email}
-                                                    </a>
-                                                    <span className="mx-2 opacity-50">•</span>
-                                                    Requested: {fmtDateTime(req.created_at)}
-                                                </div>
-
-                                                {req.message && (
-                                                    <div className="mt-2.5 max-w-2xl border-l-2 border-zinc-200 pl-3.5 text-xs leading-relaxed font-semibold text-zinc-500 italic">
-                                                        {req.message}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="flex shrink-0 items-center gap-2 sm:mt-1">
-                                                {req.status === 'pending' ? (
-                                                    <>
-                                                        <button
-                                                            onClick={() => handleRequestStatus(req.id, 'approved')}
-                                                            disabled={updatingStatusId !== null}
-                                                            className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50"
-                                                        >
-                                                            Approve
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleRequestStatus(req.id, 'denied')}
-                                                            disabled={updatingStatusId !== null}
-                                                            className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
-                                                        >
-                                                            Deny
-                                                        </button>
-                                                    </>
-                                                ) : req.status === 'approved' ? (
-                                                    <span className="border-emerald-250 animate-fade-in inline-flex items-center gap-1 rounded-full border bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs">
-                                                        <CheckCircle2 className="size-3.5 text-emerald-600" />
-                                                        {req.type === 'data_room_access' ? 'Data room granted' : 'Approved for IR follow-up'}
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-bold text-zinc-500">
-                                                        Denied
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </ProCard>

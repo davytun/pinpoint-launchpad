@@ -10,9 +10,12 @@ use App\Models\InvestorDataRoomGrant;
 use App\Models\InvestorInterest;
 use App\Models\User;
 use App\Notifications\DealflowAdminNotification;
+use App\Notifications\IntroductionCompletedNotification;
+use App\Notifications\IntroductionScheduledNotification;
 use App\Notifications\InvestorDataRoomRevokedNotification;
 use App\Notifications\InvestorInterestDecisionNotification;
 use App\Notifications\InvestorInterestReceivedNotification;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class InvestorInterestWorkflowService
@@ -22,7 +25,13 @@ class InvestorInterestWorkflowService
         return DB::transaction(function () use ($investor, $profile, $data, $ipAddress, $userAgent) {
             $interest = InvestorInterest::updateOrCreate(
                 ['investor_id' => $investor->id, 'profile_id' => $profile->id],
-                array_merge($data, ['status' => 'pending', 'reviewed_at' => null, 'reviewed_by_founder' => null]),
+                array_merge($data, [
+                    'status' => 'pending',
+                    'reviewed_at' => null,
+                    'reviewed_by_founder' => null,
+                    'scheduled_at' => null,
+                    'completed_at' => null,
+                ]),
             );
 
             AuditLog::create([
@@ -35,6 +44,19 @@ class InvestorInterestWorkflowService
                 'ip_address' => $ipAddress,
                 'user_agent' => $userAgent,
             ]);
+
+            if ($interest->type === 'founder_call') {
+                AuditLog::create([
+                    'event' => 'introduction.requested',
+                    'actor_type' => $investor::class,
+                    'actor_id' => $investor->id,
+                    'auditable_type' => $interest::class,
+                    'auditable_id' => $interest->id,
+                    'metadata' => ['profile_id' => $profile->id],
+                    'ip_address' => $ipAddress,
+                    'user_agent' => $userAgent,
+                ]);
+            }
 
             DB::afterCommit(function () use ($interest) {
                 $interest->loadMissing(['investor.profile', 'profile.founder']);
@@ -89,6 +111,20 @@ class InvestorInterestWorkflowService
                 'ip_address' => $ipAddress,
                 'user_agent' => $userAgent,
             ]);
+
+            if ($interest->type === 'founder_call') {
+                $introEvent = $status === 'approved' ? 'introduction.approved' : 'introduction.rejected';
+                AuditLog::create([
+                    'event' => $introEvent,
+                    'actor_type' => $founder::class,
+                    'actor_id' => $founder->id,
+                    'auditable_type' => $interest::class,
+                    'auditable_id' => $interest->id,
+                    'metadata' => ['profile_id' => $interest->profile_id],
+                    'ip_address' => $ipAddress,
+                    'user_agent' => $userAgent,
+                ]);
+            }
 
             DB::afterCommit(function () use ($interest, $status, $grant) {
                 $interest->loadMissing(['investor.profile', 'profile.founder']);
@@ -146,10 +182,131 @@ class InvestorInterestWorkflowService
                 'user_agent' => $userAgent,
             ]);
 
+            if ($interest->type === 'founder_call') {
+                $introEvent = $status === 'approved' ? 'introduction.approved' : 'introduction.rejected';
+                AuditLog::create([
+                    'event' => $introEvent,
+                    'actor_type' => $admin::class,
+                    'actor_id' => $admin->id,
+                    'auditable_type' => $interest::class,
+                    'auditable_id' => $interest->id,
+                    'metadata' => ['profile_id' => $interest->profile_id, 'decided_by' => 'admin'],
+                    'ip_address' => $ipAddress,
+                    'user_agent' => $userAgent,
+                ]);
+            }
+
             DB::afterCommit(function () use ($interest, $status, $grant) {
                 $interest->loadMissing(['investor.profile', 'profile.founder']);
                 $interest->investor?->notify(new InvestorInterestDecisionNotification($interest, $status, $grant !== null));
                 $this->notifyDealflowStaff(new DealflowAdminNotification('interest_decided', $interest, $status));
+            });
+
+            return $interest;
+        });
+    }
+
+    public function scheduleIntroduction(
+        InvestorInterest $interest,
+        User|Founder $actor,
+        Carbon|string $scheduledAt,
+        ?string $meetingLink = null,
+        ?string $notes = null,
+        ?string $ipAddress = null,
+        ?string $userAgent = null
+    ): InvestorInterest {
+        return DB::transaction(function () use ($interest, $actor, $scheduledAt, $meetingLink, $notes, $ipAddress, $userAgent) {
+            $parsedDate = is_string($scheduledAt) ? Carbon::parse($scheduledAt) : $scheduledAt;
+
+            $updateData = [
+                'scheduled_at' => $parsedDate,
+                'meeting_link' => $meetingLink,
+                'status' => 'approved',
+            ];
+
+            if ($actor instanceof User) {
+                if ($notes) {
+                    $updateData['admin_notes'] = $notes;
+                }
+            } else {
+                if ($notes) {
+                    $updateData['founder_notes'] = $notes;
+                }
+            }
+
+            $interest->update($updateData);
+
+            AuditLog::create([
+                'event' => 'introduction.scheduled',
+                'actor_type' => $actor::class,
+                'actor_id' => $actor->id,
+                'auditable_type' => $interest::class,
+                'auditable_id' => $interest->id,
+                'metadata' => [
+                    'profile_id' => $interest->profile_id,
+                    'scheduled_at' => $parsedDate->toISOString(),
+                    'meeting_link' => $meetingLink,
+                ],
+                'ip_address' => $ipAddress,
+                'user_agent' => $userAgent,
+            ]);
+
+            DB::afterCommit(function () use ($interest) {
+                $interest->loadMissing(['investor.profile', 'profile.founder']);
+
+                // Notify both investor and founder
+                $interest->investor?->notify(new IntroductionScheduledNotification($interest));
+                $interest->profile?->founder?->notify(new IntroductionScheduledNotification($interest));
+
+                // Notify staff
+                $this->notifyDealflowStaff(new DealflowAdminNotification('introduction_scheduled', $interest));
+            });
+
+            return $interest;
+        });
+    }
+
+    public function completeIntroduction(
+        InvestorInterest $interest,
+        User|Founder $actor,
+        ?string $notes = null,
+        ?string $ipAddress = null,
+        ?string $userAgent = null
+    ): InvestorInterest {
+        return DB::transaction(function () use ($interest, $actor, $notes, $ipAddress, $userAgent) {
+            $updateData = [
+                'completed_at' => now(),
+            ];
+
+            if ($actor instanceof User && $notes) {
+                $updateData['admin_notes'] = $notes;
+            } elseif ($actor instanceof Founder && $notes) {
+                $updateData['founder_notes'] = $notes;
+            }
+
+            $interest->update($updateData);
+
+            AuditLog::create([
+                'event' => 'introduction.completed',
+                'actor_type' => $actor::class,
+                'actor_id' => $actor->id,
+                'auditable_type' => $interest::class,
+                'auditable_id' => $interest->id,
+                'metadata' => [
+                    'profile_id' => $interest->profile_id,
+                    'completed_at' => now()->toISOString(),
+                ],
+                'ip_address' => $ipAddress,
+                'user_agent' => $userAgent,
+            ]);
+
+            DB::afterCommit(function () use ($interest) {
+                $interest->loadMissing(['investor.profile', 'profile.founder']);
+
+                $interest->investor?->notify(new IntroductionCompletedNotification($interest));
+                $interest->profile?->founder?->notify(new IntroductionCompletedNotification($interest));
+
+                $this->notifyDealflowStaff(new DealflowAdminNotification('introduction_completed', $interest));
             });
 
             return $interest;

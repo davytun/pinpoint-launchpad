@@ -663,7 +663,7 @@ function KycDrawer({
                         onClick={() => setLightboxOpen(false)}
                     />
 
-                    <div className="animate-in zoom-in-95 relative z-10 flex w-full max-w-3xl flex-col space-y-4 rounded-[24px] border border-zinc-200/90 bg-white p-6 shadow-2xl duration-150">
+                    <div className="animate-in zoom-in-95 relative z-10 flex w-full max-w-3xl flex-col space-y-4 rounded-3xl border border-zinc-200/90 bg-white p-6 shadow-2xl duration-150">
                         {/* Lightbox Header */}
                         <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 pb-3">
                             <div className="flex items-center gap-2.5">

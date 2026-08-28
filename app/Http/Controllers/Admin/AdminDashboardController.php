@@ -20,17 +20,26 @@ class AdminDashboardController extends Controller
     {
         $user = Auth::user();
         $metrics = [];
+        
+        $dateRange = request('date_range', 'all');
+        $startDate = match ($dateRange) {
+            '7d' => now()->subDays(7),
+            '30d' => now()->subDays(30),
+            'ytd' => now()->startOfYear(),
+            '12m' => now()->subMonths(12),
+            default => null,
+        };
 
         // All roles
         $metrics['my_open_messages'] = MessageThread::where('admin_unread_count', '>', 0)->count();
 
         if ($user->canManageAudit()) {
             if ($user->isSuperAdmin()) {
-                $metrics['total_founders']   = Founder::count();
+                $metrics['total_founders']   = Founder::when($startDate, fn($q) => $q->where('created_at', '>=', $startDate))->count();
                 $metrics['active_audits']    = Payment::where('audit_status', 'in_progress')->count();
                 $metrics['pending_audits']   = Payment::where('audit_status', 'pending')->count();
                 $metrics['complete_audits']  = Payment::where('audit_status', 'complete')->count();
-                $metrics['high_scorers']     = DiagnosticSession::where('score', '>', 85)->count();
+                $metrics['high_scorers']     = DiagnosticSession::where('score', '>', 85)->when($startDate, fn($q) => $q->where('completed_at', '>=', $startDate))->count();
                 $metrics['needs_info_count'] = Payment::where('audit_status', 'needs_info')->count();
             } else {
                 $assignedFounderIds = AuditAssignment::where('analyst_id', $user->id)->pluck('founder_id');
@@ -41,15 +50,15 @@ class AdminDashboardController extends Controller
         }
 
         if ($user->canAccessFinancials()) {
-            $metrics['total_revenue']        = Payment::where('status', 'paid')->sum('total_amount');
+            $metrics['total_revenue']        = Payment::where('status', 'paid')->when($startDate, fn($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount');
             $metrics['revenue_this_month']   = Payment::where('status', 'paid')
                 ->whereMonth('paid_at', now()->month)
                 ->whereYear('paid_at', now()->year)
                 ->sum('total_amount');
             $metrics['revenue_by_tier'] = [
-                'foundation'   => Payment::where('status', 'paid')->where('tier', 'foundation')->sum('total_amount'),
-                'growth'       => Payment::where('status', 'paid')->where('tier', 'growth')->sum('total_amount'),
-                'institutional'=> Payment::where('status', 'paid')->where('tier', 'institutional')->sum('total_amount'),
+                'foundation'   => Payment::where('status', 'paid')->where('tier', 'foundation')->when($startDate, fn($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount'),
+                'growth'       => Payment::where('status', 'paid')->where('tier', 'growth')->when($startDate, fn($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount'),
+                'institutional'=> Payment::where('status', 'paid')->where('tier', 'institutional')->when($startDate, fn($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount'),
             ];
             $metrics['waitlist_count'] = [
                 'founders'  => WaitlistEntry::where('type', 'founder')->count(),
@@ -81,12 +90,62 @@ class AdminDashboardController extends Controller
             ];
         }
 
+        $needsAttention = [];
+
+        // 1. Unread Messages (Everyone)
+        $unreadMessagesCount = MessageThread::where('admin_unread_count', '>', 0)->count();
+        if ($unreadMessagesCount > 0) {
+            $needsAttention[] = [
+                'id' => 'unread_messages',
+                'title' => 'Unread Messages',
+                'description' => "Founders are waiting for a response.",
+                'count' => $unreadMessagesCount,
+                'action_url' => '/admin/messages',
+                'icon' => 'solar:letter-unread-bold-duotone',
+                'color' => 'blue',
+            ];
+        }
+
+        if ($user->canManageAudit() && $user->isSuperAdmin()) {
+            // 2. Pending KYC
+            if (class_exists(\App\Models\Investor::class)) {
+                $pendingKycCount = \App\Models\Investor::where('kyc_status', 'pending')->count();
+                if ($pendingKycCount > 0) {
+                    $needsAttention[] = [
+                        'id' => 'pending_kyc',
+                        'title' => 'Pending KYC Reviews',
+                        'description' => "Investor accounts waiting for KYC approval.",
+                        'count' => $pendingKycCount,
+                        'action_url' => '/admin/investor-accounts?kyc_status=pending',
+                        'icon' => 'solar:shield-warning-bold-duotone',
+                        'color' => 'amber',
+                    ];
+                }
+            }
+
+            // 3. Pending Audits
+            $pendingAuditsCount = Payment::where('audit_status', 'pending')->count();
+            if ($pendingAuditsCount > 0) {
+                $needsAttention[] = [
+                    'id' => 'pending_audits',
+                    'title' => 'Pending Audits',
+                    'description' => "New audits that haven't been started.",
+                    'count' => $pendingAuditsCount,
+                    'action_url' => '/admin/revenue', // Since we don't have a dedicated audits page yet, just revenue or dashboard
+                    'icon' => 'solar:document-add-bold-duotone',
+                    'color' => 'emerald',
+                ];
+            }
+        }
+
         $recentActivity = $this->getRecentActivity($user);
 
         return Inertia::render('Admin/Dashboard', [
             'metrics'         => $metrics,
             'recent_activity' => $recentActivity,
+            'needs_attention' => $needsAttention,
             'user_role'       => $user->role,
+            'date_range'      => $dateRange,
         ]);
     }
 

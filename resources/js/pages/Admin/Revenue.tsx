@@ -147,7 +147,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                             <div className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-xs">
                                 <h2 className="text-[13px] font-bold text-zinc-900">6-Month Trend</h2>
                                 <p className="mt-0.5 mb-5 text-[11px] font-medium text-zinc-500">Revenue over the last 6 months</p>
-                                <ChartContainer config={trendChartConfig} className="h-[160px] w-full">
+                                <ChartContainer config={trendChartConfig} className="h-40 w-full">
                                     <BarChart data={monthly} barCategoryGap="32%">
                                         <CartesianGrid vertical={false} stroke="#F4F4F5" />
                                         <XAxis dataKey="month" tick={{ fill: '#71717A', fontSize: 10 }} axisLine={false} tickLine={false} />
@@ -170,7 +170,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                         <div className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-xs">
                             <h2 className="text-[13px] font-bold text-zinc-900">Revenue by Tier</h2>
                             <p className="mt-0.5 mb-5 text-[11px] font-medium text-zinc-500">Breakdown across all pricing tiers</p>
-                            <ChartContainer config={tierChartConfig} className="h-[160px] w-full">
+                            <ChartContainer config={tierChartConfig} className="h-40 w-full">
                                 <BarChart data={tierData} barCategoryGap="40%">
                                     <CartesianGrid vertical={false} stroke="#F4F4F5" />
                                     <XAxis dataKey="tier" tick={{ fill: '#71717A', fontSize: 10 }} axisLine={false} tickLine={false} />
@@ -218,7 +218,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                                         <tbody className="divide-y divide-zinc-100">
                                             {metrics.recent_payments.map((p) => (
                                                 <tr key={p.id} className="group transition-colors duration-150 hover:bg-[#F9F9FB]">
-                                                    <td className="max-w-[180px] truncate px-5 py-3.5 font-semibold text-zinc-950">
+                                                    <td className="max-w-45 truncate px-5 py-3.5 font-semibold text-zinc-950">
                                                         {p.customer_email}
                                                     </td>
                                                     <td className="px-5 py-3.5 font-medium text-zinc-600 capitalize">{p.tier}</td>

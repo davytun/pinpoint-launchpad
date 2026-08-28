@@ -901,3 +901,12 @@ select::placeholder,
     scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
 }
 
+/* ─── NProgress Loader Overrides ────────────────────────────────────────────── */
+#nprogress .bar {
+    height: 3px !important;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: #3a54a5 !important;
+    border-left-color: #3a54a5 !important;
+}

@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import GlobalLoader from '@/components/GlobalLoader';
 import { cn } from '@/lib/utils';
 
 interface AdminUser {
@@ -497,6 +498,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <div className="h-screen max-h-screen overflow-hidden bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white flex flex-col lg:flex-row p-3 lg:p-3.5 gap-3.5">
+            <GlobalLoader />
             {/* ── Desktop Sidebar (Strictly bounded height, no scrollbar visible) ── */}
             <aside
                 className={cn(

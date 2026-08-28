@@ -427,7 +427,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                         onClick={() => setLightboxDoc(null)}
                     />
 
-                    <div className="relative z-10 w-full max-w-3xl rounded-[24px] bg-white border border-zinc-200/90 p-6 shadow-2xl animate-in zoom-in-95 duration-150 flex flex-col space-y-4">
+                    <div className="relative z-10 w-full max-w-3xl rounded-3xl bg-white border border-zinc-200/90 p-6 shadow-2xl animate-in zoom-in-95 duration-150 flex flex-col space-y-4">
                         <div className="flex items-center justify-between pb-3 border-b border-zinc-100 shrink-0">
                             <div className="flex items-center gap-2.5">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700">
@@ -459,7 +459,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                             </div>
                         </div>
 
-                        <div className="relative rounded-2xl bg-[#F6F8FA] border border-zinc-200/80 p-4 flex items-center justify-center min-h-[380px] max-h-[65vh] overflow-auto">
+                        <div className="relative rounded-2xl bg-[#F6F8FA] border border-zinc-200/80 p-4 flex items-center justify-center min-h-95 max-h-[65vh] overflow-auto">
                             {lightboxDoc.mime_type === 'application/pdf' || lightboxDoc.original_name.endsWith('.pdf') ? (
                                 <iframe
                                     src={`/admin/investor-kyc/${lightboxDoc.id}/preview`}

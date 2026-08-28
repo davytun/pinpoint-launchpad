@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 import { Activity, AlertTriangle, DollarSign, MessageSquare, Users, TrendingUp, CreditCard } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, XAxis } from 'recharts';
@@ -6,8 +6,19 @@ import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, XAxis } from 'rech
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
+import { Icon } from '@iconify/react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+interface NeedsAttentionItem {
+    id: string;
+    title: string;
+    description: string;
+    count: number;
+    action_url: string;
+    icon: string;
+    color: string;
+}
 
 interface MonthlyRevenue {
     month: string;
@@ -46,7 +57,9 @@ interface ActivityItem {
 interface PageProps {
     metrics: Metrics;
     recent_activity: ActivityItem[];
+    needs_attention?: NeedsAttentionItem[];
     user_role: 'superadmin' | 'analyst' | 'support';
+    date_range?: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -67,7 +80,8 @@ function MetricCard({
     subValue,
     pulse = false,
     href,
-    icon: Icon,
+    icon: IconComponent,
+    variant = 'gray',
 }: {
     label: string;
     value: string | number;
@@ -75,16 +89,19 @@ function MetricCard({
     pulse?: boolean;
     href?: string;
     icon?: React.ElementType;
+    variant?: 'blue' | 'emerald' | 'amber' | 'purple' | 'gray';
 }) {
+    const defaultColors = { bg: 'bg-[#f4f4f5]', text: 'text-zinc-600' };
+    const colors = colorMap[variant] || defaultColors;
+
     const inner = (
         <div
             className={cn(
-                'group flex h-full flex-col justify-between rounded-[20px] border border-zinc-200/60 bg-linear-to-b from-white to-zinc-50/50 p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)]',
-                href && 'cursor-pointer hover:-translate-y-0.5 hover:border-zinc-300/80',
+                'group relative flex h-full flex-col justify-between p-4 sm:p-5 bg-white border border-zinc-100 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5',
             )}
         >
             <div className="flex items-start justify-between gap-2">
-                <span className="text-[13px] font-semibold text-zinc-500">{label}</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">{label}</span>
                 <div className="flex items-center gap-2">
                     {pulse && (
                         <span className="relative flex h-2 w-2 mr-1">
@@ -92,16 +109,18 @@ function MetricCard({
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
                         </span>
                     )}
-                    {Icon && (
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400 group-hover:text-zinc-600 group-hover:bg-zinc-100 transition-colors">
-                            <Icon className="size-3.5" />
+                    {IconComponent && (
+                        <div className={cn("flex h-7 w-7 items-center justify-center rounded-lg", colors.bg, colors.text)}>
+                            <IconComponent className="size-3.5" />
                         </div>
                     )}
                 </div>
             </div>
-            <div className="mt-4 flex flex-col">
-                <span className="text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl">{value}</span>
-                {subValue && <span className="mt-1 text-xs font-medium text-zinc-500">{subValue}</span>}
+            <div className="mt-3 flex items-end justify-between">
+                <div className="flex flex-col">
+                    <span className="text-[26px] font-bold tracking-tight text-zinc-900 leading-none">{value}</span>
+                    {subValue && <span className="mt-1 text-[11px] font-medium text-zinc-500">{subValue}</span>}
+                </div>
             </div>
         </div>
     );
@@ -268,7 +287,15 @@ const activityTypeLabel: Record<string, string> = {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function AdminDashboard({ metrics, recent_activity, user_role }: PageProps) {
+const colorMap: Record<string, { bg: string; text: string }> = {
+    amber: { bg: 'bg-amber-100/50', text: 'text-amber-600' },
+    blue: { bg: 'bg-blue-100/50', text: 'text-blue-600' },
+    emerald: { bg: 'bg-emerald-100/50', text: 'text-emerald-600' },
+    purple: { bg: 'bg-purple-100/50', text: 'text-purple-600' },
+    gray: { bg: 'bg-zinc-100/80', text: 'text-zinc-600' },
+};
+
+export default function AdminDashboard({ metrics, recent_activity, needs_attention = [], user_role, date_range = 'all' }: PageProps) {
     const isSuperAdmin = user_role === 'superadmin';
     const isAnalyst = user_role === 'analyst';
 
@@ -278,36 +305,104 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
 
             <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-xs">
                 <div className="flex-1 overflow-y-auto px-6 py-8 sm:px-10 lg:py-10 no-scrollbar">
-                    <div className="mb-10">
-                        <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Overview</h1>
-                        <p className="mt-2 text-[15px] font-medium text-zinc-500">
-                            {isSuperAdmin ? 'Full platform overview' : isAnalyst ? 'Your assigned engagements' : 'Support overview'}
-                        </p>
+                    <div className="mb-10 flex items-start justify-between">
+                        <div>
+                            <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Overview</h1>
+                            <p className="mt-2 text-[15px] font-medium text-zinc-500">
+                                {isSuperAdmin ? 'Full platform overview' : isAnalyst ? 'Your assigned engagements' : 'Support overview'}
+                            </p>
+                        </div>
+                        {isSuperAdmin && (
+                            <div className="flex shrink-0 items-center gap-1 overflow-x-auto rounded-xl border border-zinc-200/80 bg-white p-1 shadow-2xs">
+                                {(
+                                    [
+                                        { key: 'all', label: 'All Time' },
+                                        { key: '7d', label: '7 Days' },
+                                        { key: '30d', label: '30 Days' },
+                                        { key: 'ytd', label: 'YTD' },
+                                        { key: '12m', label: '12 Months' },
+                                    ] as const
+                                ).map(({ key, label }) => {
+                                    const isSelected = date_range === key;
+                                    return (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            onClick={() => router.get('/admin', { date_range: key }, { preserveState: true, preserveScroll: true })}
+                                            className={cn(
+                                                'shrink-0 rounded-lg px-3 py-1.5 text-[12.5px] font-medium transition-all duration-150',
+                                                isSelected
+                                                    ? 'bg-zinc-100/80 font-semibold text-zinc-950 shadow-xs'
+                                                    : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
+                                            )}
+                                        >
+                                            {label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
+
+                    {/* ── Needs Attention Workflow ───────────────────────────────────────── */}
+                    {needs_attention.length > 0 && (
+                        <div className="mb-10">
+                            <div className="mb-4 flex items-center gap-2">
+                                <h2 className="text-[13px] font-bold text-zinc-900 tracking-wider uppercase">Action Required</h2>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {needs_attention.map((item) => {
+                                    const colors = colorMap[item.color] || colorMap.amber;
+                                    return (
+                                        <Link 
+                                            key={item.id} 
+                                            href={item.action_url} 
+                                            className="group relative flex flex-col justify-between p-4 sm:p-5 bg-white border border-zinc-100 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                                        >
+                                            <div className="flex items-start justify-between gap-2">
+                                                <h3 className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 line-clamp-1">{item.title}</h3>
+                                                <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-lg", colors.bg, colors.text)}>
+                                                    <Icon icon={item.icon} className="size-3.5" />
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="mt-3 flex items-end justify-between">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[26px] font-bold tracking-tight text-zinc-900 leading-none">{item.count}</span>
+                                                    <span className="text-[11px] font-medium text-zinc-500 mt-1">Pending</span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
 
                     {/* ── Superadmin ── */}
                     {isSuperAdmin && (
                         <>
-                            <div className="mb-8 flex items-center gap-4 border-b border-zinc-100 pb-4">
-                                <span className="text-[15px] font-semibold text-zinc-900">Overview</span>
-                            </div>
 
                             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
                                 <MetricCard
-                                    label="Total Founders"
+                                    label={date_range === 'all' ? 'Total Founders' : 'New Founders'}
                                     value={metrics.total_founders ?? 0}
                                     icon={Users}
                                     href="/admin/founders"
+                                    variant="blue"
                                 />
                                 <MetricCard
                                     label="Total Revenue"
                                     value={fmtCurrency(metrics.total_revenue ?? 0)}
                                     icon={DollarSign}
+                                    variant="emerald"
                                 />
                                 <MetricCard
                                     label="Active Audits"
                                     value={metrics.active_audits ?? 0}
                                     icon={Activity}
+                                    variant="amber"
                                 />
                                 <MetricCard
                                     label="Needs Info"
@@ -315,6 +410,7 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                                     icon={AlertTriangle}
                                     pulse={(metrics.needs_info_count ?? 0) > 0}
                                     href="/admin/founders"
+                                    variant="purple"
                                 />
                             </div>
 
@@ -393,7 +489,6 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                             </div>
                         </>
                     )}
-
                     {/* ── Analyst ── */}
                     {isAnalyst && (
                         <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -402,23 +497,27 @@ export default function AdminDashboard({ metrics, recent_activity, user_role }: 
                                 value={metrics.my_assigned ?? 0}
                                 icon={Users}
                                 href="/admin/founders"
+                                variant="blue"
                             />
                             <MetricCard
                                 label="Active Audits"
                                 value={metrics.active_audits ?? 0}
                                 icon={Activity}
+                                variant="emerald"
                             />
                             <MetricCard
                                 label="Needs Info"
                                 value={metrics.needs_info_count ?? 0}
                                 icon={AlertTriangle}
                                 pulse={(metrics.needs_info_count ?? 0) > 0}
+                                variant="amber"
                             />
                             <MetricCard
                                 label="Unread Messages"
                                 value={metrics.my_open_messages ?? 0}
                                 icon={MessageSquare}
                                 href="/admin/messages"
+                                variant="purple"
                             />
                         </div>
                     )}

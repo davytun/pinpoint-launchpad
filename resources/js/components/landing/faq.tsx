@@ -15,7 +15,7 @@ const FAQS_DATA = [
     },
     {
         q: 'How do investors access my verification page?',
-        a: 'Your verification profile is live on a custom secure URL. Key metrics and badges are visible to verified network investors, but detailed diligence assets (e.g., contracts, models) remain locked. Investors must submit an access request, which you approve or reject from your dashboard.',
+        a: 'Approved investors can discover your Spotlight profile. Detailed diligence assets remain in startup-specific Data Rooms, and Pinpoint coordinates all investor interest and founder authorization.',
     },
     {
         q: 'What is the success guarantee on Seed+ / Growth?',

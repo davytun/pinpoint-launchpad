@@ -94,7 +94,7 @@ export default function BlogShow({ post, related }: PageProps) {
                                 <h1 className="font-display text-3xl leading-tight font-extrabold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl lg:text-6xl">
                                     {post.title}
                                 </h1>
-                                <p className="text-zinc-600 text-lg leading-relaxed font-medium md:text-xl">{post.excerpt}</p>
+                                <p className="text-lg leading-relaxed font-medium text-zinc-600 md:text-xl">{post.excerpt}</p>
 
                                 <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-zinc-200/80 py-4 text-sm font-bold text-zinc-500 md:text-base">
                                     <div className="flex flex-wrap items-center gap-6">

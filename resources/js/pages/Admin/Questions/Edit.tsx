@@ -1,7 +1,7 @@
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ArrowLeft } from 'lucide-react';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 

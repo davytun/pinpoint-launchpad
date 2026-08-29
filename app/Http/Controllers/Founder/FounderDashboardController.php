@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Founder;
 
 use App\Http\Controllers\Controller;
-use App\Models\Founder;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use App\Models\InvestorInterest;
 use App\Http\Requests\Founder\ReviewInvestorInterestRequest;
+use App\Models\Founder;
+use App\Models\InvestorInterest;
 use App\Services\InvestorInterestWorkflowService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -112,7 +112,7 @@ class FounderDashboardController extends Controller
                 ->keyBy('investor_id')
             : collect();
 
-        $accessRequests = $founder->profile
+        $investorInterests = $founder->profile
             ? $founder->profile->investorInterests()
                 ->with('investor.profile')
                 ->orderBy('created_at', 'desc')
@@ -179,23 +179,23 @@ class FounderDashboardController extends Controller
                 'signed_at' => $founder->signature->signed_at?->toISOString(),
             ] : null,
             'spotlight_featured' => $founder->profile?->is_featured_in_spotlight ?? false,
-            'access_requests' => $accessRequests,
+            'investor_interests' => $investorInterests,
             'pending_diligence_count' => $pendingDiligenceCount,
         ]);
     }
 
-    public function updateRequestStatus(ReviewInvestorInterestRequest $request, InvestorInterest $accessRequest, InvestorInterestWorkflowService $workflow): RedirectResponse
+    public function updateInterestAuthorization(ReviewInvestorInterestRequest $request, InvestorInterest $interest, InvestorInterestWorkflowService $workflow): RedirectResponse
     {
-        $profile = $accessRequest->profile;
+        $profile = $interest->profile;
         if (! $profile || $profile->founder_id !== Auth::guard('founder')->id()) {
             abort(403, 'Unauthorized action.');
         }
 
-        $workflow->review($accessRequest, Auth::guard('founder')->user(), $request->validated('status'), $request->ip(), $request->userAgent());
+        $workflow->review($interest, Auth::guard('founder')->user(), $request->validated('status'), $request->ip(), $request->userAgent());
 
         $msg = $request->validated('status') === 'approved'
-            ? ($accessRequest->type === 'data_room_access' 
-                ? 'Authorization provided to Pinpoint. Investor Relations will activate secure access.' 
+            ? ($interest->type === 'data_room_access'
+                ? 'Authorization provided to Pinpoint. Investor Relations will activate secure access.'
                 : 'Interest confirmed. Pinpoint Investor Relations will coordinate scheduling.')
             : 'Request declined to Pinpoint Investor Relations.';
 

@@ -109,14 +109,14 @@ test('3. Founder sees introduction request for their startup in sanitized pipeli
     $response->assertOk();
     $response->assertInertia(fn (Assert $page) => $page
         ->component('Founder/Dashboard')
-        ->has('access_requests', 1)
-        ->where('access_requests.0.investor_name', 'Sarah Venture')
-        ->where('access_requests.0.firm_name', 'Benchmark Partners')
-        ->where('access_requests.0.type', 'founder_call')
-        ->where('access_requests.0.status', 'pending')
-        ->where('access_requests.0.stage', 'new_interest')
-        ->where('access_requests.0.introduction_status', 'requested')
-        ->where('access_requests.0.data_room_granted', false)
+        ->has('investor_interests', 1)
+        ->where('investor_interests.0.investor_name', 'Sarah Venture')
+        ->where('investor_interests.0.firm_name', 'Benchmark Partners')
+        ->where('investor_interests.0.type', 'founder_call')
+        ->where('investor_interests.0.status', 'pending')
+        ->where('investor_interests.0.stage', 'new_interest')
+        ->where('investor_interests.0.introduction_status', 'requested')
+        ->where('investor_interests.0.data_room_granted', false)
     );
 });
 
@@ -138,7 +138,7 @@ test('4. Different Founder cannot see another startup introduction request', fun
     $response->assertOk();
     $response->assertInertia(fn (Assert $page) => $page
         ->component('Founder/Dashboard')
-        ->has('access_requests', 0)
+        ->has('investor_interests', 0)
     );
 });
 
@@ -271,7 +271,7 @@ test('7. Founder authorizes introduction request for Admin coordination', functi
     ]);
 
     $this->actingAs($founder, 'founder')
-        ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
+        ->patch(route('founder.interests.authorize', $interest), ['status' => 'approved'])
         ->assertRedirect();
 
     $interest->refresh();
@@ -331,9 +331,9 @@ test('9. Founder receives correct state when call is scheduled and completed', f
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Founder/Dashboard')
-            ->where('access_requests.0.introduction_status', 'scheduled')
-            ->where('access_requests.0.stage', 'introduction')
-            ->where('access_requests.0.meeting_link', 'https://meet.google.com/founder-call')
+            ->where('investor_interests.0.introduction_status', 'scheduled')
+            ->where('investor_interests.0.stage', 'introduction')
+            ->where('investor_interests.0.meeting_link', 'https://meet.google.com/founder-call')
         );
 
     $interest->update(['completed_at' => now()]);
@@ -343,8 +343,8 @@ test('9. Founder receives correct state when call is scheduled and completed', f
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Founder/Dashboard')
-            ->where('access_requests.0.introduction_status', 'completed')
-            ->where('access_requests.0.stage', 'active_discussion')
+            ->where('investor_interests.0.introduction_status', 'completed')
+            ->where('investor_interests.0.stage', 'active_discussion')
         );
 });
 
@@ -362,7 +362,7 @@ test('10. Rejection works cleanly for Founder and Admin', function () {
     ]);
 
     $this->actingAs($founder, 'founder')
-        ->patch(route('founder.access-requests.status', $interest), ['status' => 'denied'])
+        ->patch(route('founder.interests.authorize', $interest), ['status' => 'denied'])
         ->assertRedirect();
 
     $interest->refresh();
@@ -482,7 +482,7 @@ test('14. Introduction decision does not automatically grant Data Room access', 
     ]);
 
     $this->actingAs($founder, 'founder')
-        ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
+        ->patch(route('founder.interests.authorize', $interest), ['status' => 'approved'])
         ->assertRedirect();
 
     expect($interest->fresh()->founder_decision)->toBe('approved')
@@ -504,7 +504,7 @@ test('15. Cross-startup isolation remains strictly intact', function () {
 
     // Founder B cannot modify or approve Founder A's interest
     $this->actingAs($founderB, 'founder')
-        ->patch(route('founder.access-requests.status', $interestA), ['status' => 'approved'])
+        ->patch(route('founder.interests.authorize', $interestA), ['status' => 'approved'])
         ->assertForbidden();
 
     expect($interestA->fresh()->status)->toBe('pending');

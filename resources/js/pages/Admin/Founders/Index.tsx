@@ -112,28 +112,28 @@ function StatusBadge({ status }: { status: string }) {
     switch (status) {
         case 'complete':
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700">
                     <span className="h-1.5 w-1.5 rounded-full bg-zinc-900" />
                     <span>Complete</span>
                 </span>
             );
         case 'in_progress':
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700">
                     <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" />
                     <span>In Progress</span>
                 </span>
             );
         case 'needs_info':
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700">
                     <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
                     <span>Needs Info</span>
                 </span>
             );
         case 'on_hold':
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700">
                     <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
                     <span>On Hold</span>
                 </span>
@@ -141,7 +141,7 @@ function StatusBadge({ status }: { status: string }) {
         case 'pending':
         default:
             return (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 border border-zinc-200/80 px-2 py-0.5 text-xs font-medium text-zinc-700">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700">
                     <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
                     <span>Pending</span>
                 </span>
@@ -151,7 +151,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function ScoreBadge({ score }: { score: number | null }) {
     if (score === null || score === undefined) {
-        return <span className="text-zinc-400 font-medium text-xs">—</span>;
+        return <span className="text-xs font-medium text-zinc-400">—</span>;
     }
 
     const isHigh = score >= 85;
@@ -159,15 +159,10 @@ function ScoreBadge({ score }: { score: number | null }) {
 
     return (
         <div className="flex items-center gap-1.5">
-            <span
-                className={cn(
-                    'font-mono text-xs font-bold tabular-nums',
-                    isHigh ? 'text-zinc-950' : isMid ? 'text-zinc-800' : 'text-zinc-600',
-                )}
-            >
+            <span className={cn('font-mono text-xs font-bold tabular-nums', isHigh ? 'text-zinc-950' : isMid ? 'text-zinc-800' : 'text-zinc-600')}>
                 {score}
             </span>
-            <span className="text-[10px] text-zinc-400 font-mono">/100</span>
+            <span className="font-mono text-[10px] text-zinc-400">/100</span>
             {isHigh && (
                 <span title="High Velocity">
                     <Icon icon="solar:bolt-linear" className="size-3 text-amber-500" />
@@ -193,9 +188,7 @@ function FounderAuditDrawer({
     onUpdateFounder: (updated: FounderRow) => void;
 }) {
     const isSuperAdmin = userRole === 'superadmin';
-    const [selectedAnalystId, setSelectedAnalystId] = useState<string>(
-        founder.assigned_analyst ? String(founder.assigned_analyst.id) : '',
-    );
+    const [selectedAnalystId, setSelectedAnalystId] = useState<string>(founder.assigned_analyst ? String(founder.assigned_analyst.id) : '');
     const [notes, setNotes] = useState(founder.audit_notes ?? '');
     const [updatingStatus, setUpdatingStatus] = useState(false);
     const [updatingAnalyst, setUpdatingAnalyst] = useState(false);
@@ -264,17 +257,14 @@ function FounderAuditDrawer({
     return (
         <div className="fixed inset-0 z-50 flex justify-end">
             {/* Backdrop */}
-            <div
-                className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200"
-                onClick={onClose}
-            />
+            <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200" onClick={onClose} />
 
             {/* Slide-over Content Canvas */}
-            <div className="relative z-10 w-full max-w-xl bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden border-l border-zinc-200 animate-in slide-in-from-right duration-200">
+            <div className="animate-in slide-in-from-right relative z-10 flex h-full w-full max-w-xl flex-col justify-between overflow-hidden border-l border-zinc-200 bg-white shadow-2xl duration-200">
                 {/* ── Drawer Header ────────────────────────────────────────── */}
-                <div className="flex items-center justify-between px-6 py-4.5 border-b border-zinc-100 shrink-0 bg-white">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-white text-xs font-bold shadow-xs">
+                <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 bg-white px-6 py-4.5">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-xs font-bold text-white shadow-xs">
                             {getInitials(founderName)}
                         </div>
                         <div className="min-w-0">
@@ -291,18 +281,16 @@ function FounderAuditDrawer({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors shrink-0"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                     >
                         <Icon icon="solar:close-circle-linear" className="size-5" />
                     </button>
                 </div>
 
                 {/* ── Fast Action Toolbar ───────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-3 px-6 py-3 bg-[#FAFBFD] border-b border-zinc-100 shrink-0">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 bg-[#FAFBFD] px-6 py-3">
                     <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                            Audit Status:
-                        </span>
+                        <span className="text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Audit Status:</span>
                         <div className="flex items-center gap-1">
                             {['pending', 'in_progress', 'needs_info', 'complete'].map((st) => (
                                 <button
@@ -311,10 +299,10 @@ function FounderAuditDrawer({
                                     onClick={() => handleStatusChange(st)}
                                     disabled={updatingStatus || founder.audit_status === st}
                                     className={cn(
-                                        'px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all capitalize',
+                                        'rounded-lg px-2.5 py-1 text-[11px] font-semibold capitalize transition-all',
                                         founder.audit_status === st
                                             ? 'bg-zinc-950 text-white shadow-2xs'
-                                            : 'bg-white border border-zinc-200/80 text-zinc-600 hover:bg-zinc-50',
+                                            : 'border border-zinc-200/80 bg-white text-zinc-600 hover:bg-zinc-50',
                                     )}
                                 >
                                     {st.replace('_', ' ')}
@@ -323,48 +311,40 @@ function FounderAuditDrawer({
                         </div>
                     </div>
 
-                    {updatingStatus && (
-                        <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin text-zinc-400" />
-                    )}
+                    {updatingStatus && <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin text-zinc-400" />}
                 </div>
 
                 {/* ── Drawer Body (Scrollable, No scrollbars) ───────────────── */}
-                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
+                <div className="no-scrollbar min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
                     {/* Section 1: PARAGON Diagnostic Scores Card */}
-                    <div className="rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4.5 space-y-3.5 shadow-2xs">
+                    <div className="space-y-3.5 rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4.5 shadow-2xs">
                         <div className="flex items-center justify-between">
                             <div>
-                                <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block">
-                                    PARAGON Diagnostic Score
-                                </span>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-2xl font-bold text-zinc-950 font-mono">
-                                        {founder.score ?? '—'}
-                                    </span>
-                                    <span className="text-xs text-zinc-400 font-mono">/ 100</span>
+                                <span className="block text-[11px] font-bold tracking-wider text-zinc-400 uppercase">PARAGON Diagnostic Score</span>
+                                <div className="mt-0.5 flex items-center gap-2">
+                                    <span className="font-mono text-2xl font-bold text-zinc-950">{founder.score ?? '—'}</span>
+                                    <span className="font-mono text-xs text-zinc-400">/ 100</span>
                                 </div>
                             </div>
 
                             <div className="text-right">
-                                <span className="text-[11px] font-medium text-zinc-400 block">Venture Tier</span>
-                                <span className="text-xs font-semibold text-zinc-900 capitalize">
-                                    {founder.tier_label}
-                                </span>
+                                <span className="block text-[11px] font-medium text-zinc-400">Venture Tier</span>
+                                <span className="text-xs font-semibold text-zinc-900 capitalize">{founder.tier_label}</span>
                             </div>
                         </div>
 
                         {/* Pillar Progress Bars */}
                         {founder.pillar_scores && (
-                            <div className="space-y-2 pt-2 border-t border-zinc-100">
+                            <div className="space-y-2 border-t border-zinc-100 pt-2">
                                 {Object.entries(founder.pillar_scores).map(([pillar, val]) => (
                                     <div key={pillar} className="space-y-1">
                                         <div className="flex items-center justify-between text-[11px]">
                                             <span className="font-medium text-zinc-600 capitalize">{pillar}</span>
-                                            <span className="font-bold text-zinc-900 font-mono">{val}%</span>
+                                            <span className="font-mono font-bold text-zinc-900">{val}%</span>
                                         </div>
-                                        <div className="h-1.5 w-full rounded-full bg-zinc-200/60 overflow-hidden">
+                                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200/60">
                                             <div
-                                                className="h-full bg-zinc-900 rounded-full transition-all duration-300"
+                                                className="h-full rounded-full bg-zinc-900 transition-all duration-300"
                                                 style={{ width: `${Math.min(100, Math.max(0, val))}%` }}
                                             />
                                         </div>
@@ -377,24 +357,18 @@ function FounderAuditDrawer({
                     {/* Section 2: Analyst Assignment & Internal Notes */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                                Assigned Analyst & Review Notes
-                            </h4>
-                            <span className="text-[11px] text-zinc-400">
-                                {founder.assigned_analyst ? 'Lead Assigned' : 'Unassigned'}
-                            </span>
+                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Assigned Analyst & Review Notes</h4>
+                            <span className="text-[11px] text-zinc-400">{founder.assigned_analyst ? 'Lead Assigned' : 'Unassigned'}</span>
                         </div>
 
-                        <form onSubmit={handleAssignAnalyst} className="rounded-2xl border border-zinc-200/80 bg-white p-4 space-y-3 shadow-2xs">
+                        <form onSubmit={handleAssignAnalyst} className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-2xs">
                             <div>
-                                <label className="block text-[11px] font-semibold text-zinc-500 mb-1">
-                                    Assigned Audit Lead
-                                </label>
+                                <label className="mb-1 block text-[11px] font-semibold text-zinc-500">Assigned Audit Lead</label>
                                 {isSuperAdmin ? (
                                     <select
                                         value={selectedAnalystId}
                                         onChange={(e) => setSelectedAnalystId(e.target.value)}
-                                        className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-zinc-400 focus:outline-none shadow-2xs"
+                                        className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 shadow-2xs focus:border-zinc-400 focus:outline-none"
                                     >
                                         <option value="">No Analyst Assigned (Unassigned)</option>
                                         {analysts.map((a) => (
@@ -411,7 +385,7 @@ function FounderAuditDrawer({
                             </div>
 
                             <div>
-                                <label className="block text-[11px] font-semibold text-zinc-500 mb-1">
+                                <label className="mb-1 block text-[11px] font-semibold text-zinc-500">
                                     Internal Analyst Notes & Audit Directives
                                 </label>
                                 <textarea
@@ -419,7 +393,7 @@ function FounderAuditDrawer({
                                     onChange={(e) => setNotes(e.target.value)}
                                     rows={2}
                                     placeholder="Internal verification notes, requested documents, or cap table observations..."
-                                    className="w-full rounded-xl border border-zinc-200 bg-white p-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none shadow-2xs resize-none"
+                                    className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-2.5 text-xs text-zinc-900 shadow-2xs placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                                 />
                             </div>
 
@@ -427,7 +401,7 @@ function FounderAuditDrawer({
                                 <button
                                     type="submit"
                                     disabled={updatingAnalyst}
-                                    className="flex items-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs disabled:opacity-50"
+                                    className="flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800 disabled:opacity-50"
                                 >
                                     {updatingAnalyst ? (
                                         <Icon icon="solar:refresh-linear" className="size-3 animate-spin" />
@@ -443,48 +417,35 @@ function FounderAuditDrawer({
                     {/* Section 3: Founder & Venture Record */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                                Founder Dossier & Contact
-                            </h4>
+                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Founder Dossier & Contact</h4>
                             <span className="text-[11px] text-zinc-400">KYC Profile</span>
                         </div>
 
-                        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 space-y-2.5 shadow-2xs text-xs">
-                            <div className="flex items-center justify-between py-1.5 border-b border-zinc-100">
+                        <div className="space-y-2.5 rounded-2xl border border-zinc-200/80 bg-white p-4 text-xs shadow-2xs">
+                            <div className="flex items-center justify-between border-b border-zinc-100 py-1.5">
                                 <span className="text-zinc-400">Full Legal Name</span>
                                 <span className="font-semibold text-zinc-950">{founderName}</span>
                             </div>
 
-                            <div className="flex items-center justify-between py-1.5 border-b border-zinc-100">
+                            <div className="flex items-center justify-between border-b border-zinc-100 py-1.5">
                                 <span className="text-zinc-400">Company Name</span>
                                 <span className="font-medium text-zinc-900">{companyName}</span>
                             </div>
 
-                            <div className="flex items-center justify-between py-1.5 border-b border-zinc-100">
+                            <div className="flex items-center justify-between border-b border-zinc-100 py-1.5">
                                 <span className="text-zinc-400">Official Email</span>
                                 <div className="flex items-center gap-2">
-                                    <span className="font-medium text-zinc-900 font-mono text-[11px]">
-                                        {founder.email}
-                                    </span>
-                                    <button
-                                        onClick={copyEmail}
-                                        className="text-zinc-400 hover:text-zinc-800 transition-colors"
-                                        title="Copy Email"
-                                    >
-                                        <Icon
-                                            icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'}
-                                            className="size-3.5"
-                                        />
+                                    <span className="font-mono text-[11px] font-medium text-zinc-900">{founder.email}</span>
+                                    <button onClick={copyEmail} className="text-zinc-400 transition-colors hover:text-zinc-800" title="Copy Email">
+                                        <Icon icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'} className="size-3.5" />
                                     </button>
                                 </div>
                             </div>
 
                             {founder.phone && (
-                                <div className="flex items-center justify-between py-1.5 border-b border-zinc-100">
+                                <div className="flex items-center justify-between border-b border-zinc-100 py-1.5">
                                     <span className="text-zinc-400">Direct Phone</span>
-                                    <span className="font-medium text-zinc-900 font-mono text-[11px]">
-                                        {founder.phone}
-                                    </span>
+                                    <span className="font-mono text-[11px] font-medium text-zinc-900">{founder.phone}</span>
                                 </div>
                             )}
 
@@ -497,11 +458,11 @@ function FounderAuditDrawer({
                 </div>
 
                 {/* ── Sticky Action Footer ─────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-3 px-6 py-3.5 border-t border-zinc-100 bg-[#FAFBFD] shrink-0">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-t border-zinc-100 bg-[#FAFBFD] px-6 py-3.5">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
+                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                     >
                         Close
                     </button>
@@ -510,7 +471,7 @@ function FounderAuditDrawer({
                         <button
                             type="button"
                             onClick={() => router.get('/admin/messages')}
-                            className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                            className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:chat-round-dots-linear" className="size-3.5 text-zinc-500" />
                             <span>Message Founder</span>
@@ -519,7 +480,7 @@ function FounderAuditDrawer({
                         <button
                             type="button"
                             onClick={() => router.get(route('admin.founders.show', { founder: founder.id }))}
-                            className="flex items-center gap-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 px-4 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs"
+                            className="flex items-center gap-1.5 rounded-full bg-zinc-950 px-4 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800"
                         >
                             <span>Open Full Dossier</span>
                             <Icon icon="solar:arrow-right-linear" className="size-3.5" />
@@ -592,9 +553,9 @@ export default function AdminFoundersIndex({
             <Head title="Founders Directory & Audit Hub — Admin" />
 
             {/* ── Main Full-Height Container ─────────────────────── */}
-            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col overflow-hidden rounded-[24px] bg-white shadow-xs p-6 lg:p-8">
+            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-white p-6 shadow-xs lg:p-8">
                 {/* ── Top Header Strip ────────────────────────────────────────── */}
-                <div className="flex items-center justify-between shrink-0 mb-6">
+                <div className="mb-6 flex shrink-0 items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Founders Directory & Audit Hub</h1>
                         <p className="mt-2 text-[15px] font-medium text-zinc-500">
@@ -606,7 +567,7 @@ export default function AdminFoundersIndex({
                         <button
                             type="button"
                             onClick={() => router.get('/admin/messages')}
-                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:chat-round-dots-linear" className="size-3.5 text-zinc-500" />
                             <span>Founder Messages</span>
@@ -615,7 +576,7 @@ export default function AdminFoundersIndex({
                         <button
                             type="button"
                             onClick={() => router.get('/admin/spotlight')}
-                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:crown-linear" className="size-3.5 text-zinc-500" />
                             <span>Spotlight Startups</span>
@@ -624,46 +585,32 @@ export default function AdminFoundersIndex({
                 </div>
 
                 {/* ── Minimalist Monochrome Metric Strip ────────── */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 shrink-0 mb-8">
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
-                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">
-                            Total Founders
-                        </span>
-                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">
-                            {totals.total}
-                        </span>
+                <div className="mb-8 grid shrink-0 grid-cols-2 gap-4 sm:grid-cols-4">
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
+                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Total Founders</span>
+                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals.total}</span>
                     </div>
 
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
-                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">
-                            Audit In Progress
-                        </span>
-                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">
-                            {totals.in_progress}
-                        </span>
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
+                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Audit In Progress</span>
+                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals.in_progress}</span>
                     </div>
 
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
-                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">
-                            Audits Complete
-                        </span>
-                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">
-                            {totals.complete}
-                        </span>
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
+                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Audits Complete</span>
+                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals.complete}</span>
                     </div>
 
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 sm:p-6 transition-colors">
-                        <span className="text-[13px] font-medium text-zinc-500 block mb-4">
-                            Needs Attention
-                        </span>
-                        <span className="text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl block">
+                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
+                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Needs Attention</span>
+                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
                             {totals.needs_info + totals.on_hold}
                         </span>
                     </div>
                 </div>
 
                 {/* ── Status Tab Navigation ────────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-4 shrink-0 pb-3 border-b border-zinc-100 mb-4">
+                <div className="mb-4 flex shrink-0 items-center justify-between gap-4 border-b border-zinc-100 pb-3">
                     <div className="flex items-center gap-1.5 overflow-x-auto">
                         {[
                             { id: 'all', label: 'All Founders', count: totals.total },
@@ -678,16 +625,16 @@ export default function AdminFoundersIndex({
                                 type="button"
                                 onClick={() => applyFilters({ status: tab.id === 'all' ? '' : tab.id })}
                                 className={cn(
-                                    'shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                                    'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
                                     (tab.id === 'all' && activeStatus === 'all') || activeStatus === tab.id
-                                        ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
-                                        : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                        ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
+                                        : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
                                 )}
                             >
                                 <span>{tab.label}</span>
                                 <span
                                     className={cn(
-                                        'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
+                                        'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
                                         (tab.id === 'all' && activeStatus === 'all') || activeStatus === tab.id
                                             ? 'bg-zinc-950 text-white'
                                             : 'bg-zinc-200/70 text-zinc-600',
@@ -700,11 +647,11 @@ export default function AdminFoundersIndex({
                     </div>
 
                     {/* Analyst Lead Filter */}
-                    <div className="shrink-0 flex items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                         <select
                             value={activeAnalyst}
                             onChange={(e) => applyFilters({ analyst_id: e.target.value === 'all' ? '' : e.target.value })}
-                            className="rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs text-zinc-700 focus:border-zinc-400 focus:outline-none shadow-2xs"
+                            className="rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs text-zinc-700 shadow-2xs focus:border-zinc-400 focus:outline-none"
                         >
                             <option value="all">All Audit Leads</option>
                             <option value="unassigned">Unassigned Only ({totals.unassigned})</option>
@@ -718,23 +665,23 @@ export default function AdminFoundersIndex({
                 </div>
 
                 {/* ── Search Bar Strip ────────────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-3 shrink-0 mb-3">
+                <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
                     <div className="relative w-full max-w-md">
                         <Icon
                             icon="solar:minimalistic-magnifer-linear"
-                            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none"
+                            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
                         />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search founder name, company, or email..."
-                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none shadow-2xs transition-colors"
+                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                         />
                         {search && (
                             <button
                                 onClick={() => setSearch('')}
-                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                                className="absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
                             >
                                 <Icon icon="solar:close-circle-linear" className="size-3.5" />
                             </button>
@@ -743,9 +690,9 @@ export default function AdminFoundersIndex({
                 </div>
 
                 {/* ── Data Table (Fixed Header + No-Scrollbar Rows) ────────────── */}
-                <div className="flex-1 min-h-0 flex flex-col justify-between overflow-hidden">
+                <div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden">
                     {/* Fixed Table Header */}
-                    <div className="flex items-center gap-4 px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 select-none shrink-0">
+                    <div className="flex shrink-0 items-center gap-4 border-b border-zinc-100 px-4 py-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase select-none">
                         <div className="w-56 shrink-0">Founder / Contact</div>
                         <div className="w-48 shrink-0">Company</div>
                         <div className="w-28 shrink-0">PARAGON Score</div>
@@ -756,10 +703,10 @@ export default function AdminFoundersIndex({
                     </div>
 
                     {/* Scrollable Table Rows (No scrollbar) */}
-                    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar divide-y divide-zinc-100">
+                    <div className="no-scrollbar min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
                         {founders.data.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <Icon icon="solar:user-speak-linear" className="size-8 text-zinc-300 mb-2" />
+                                <Icon icon="solar:user-speak-linear" className="mb-2 size-8 text-zinc-300" />
                                 <p className="text-xs text-zinc-400">No founders found matching this filter.</p>
                             </div>
                         ) : (
@@ -771,31 +718,25 @@ export default function AdminFoundersIndex({
                                     <div
                                         key={f.id}
                                         onClick={() => setActiveDrawerFounder(f)}
-                                        className="group flex items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80 cursor-pointer"
+                                        className="group flex cursor-pointer items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80"
                                     >
                                         {/* Founder Column */}
-                                        <div className="w-56 shrink-0 flex items-center gap-2.5 min-w-0">
-                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-100 border border-zinc-200 text-[11px] font-bold text-zinc-700">
+                                        <div className="flex w-56 min-w-0 shrink-0 items-center gap-2.5">
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-[11px] font-bold text-zinc-700">
                                                 {getInitials(founderName)}
                                             </div>
                                             <div className="min-w-0 pr-1">
-                                                <span className="font-semibold text-zinc-950 group-hover:underline text-[12.5px] block truncate">
+                                                <span className="block truncate text-[12.5px] font-semibold text-zinc-950 group-hover:underline">
                                                     {founderName}
                                                 </span>
-                                                <span className="text-zinc-400 text-[11px] truncate block font-mono">
-                                                    {f.email}
-                                                </span>
+                                                <span className="block truncate font-mono text-[11px] text-zinc-400">{f.email}</span>
                                             </div>
                                         </div>
 
                                         {/* Company Column */}
-                                        <div className="w-48 shrink-0 min-w-0">
-                                            <span className="font-medium text-zinc-900 truncate block text-[12px]">
-                                                {companyName}
-                                            </span>
-                                            <span className="text-[11px] text-zinc-400 truncate block">
-                                                {f.profile?.sector ?? 'General Tech'}
-                                            </span>
+                                        <div className="w-48 min-w-0 shrink-0">
+                                            <span className="block truncate text-[12px] font-medium text-zinc-900">{companyName}</span>
+                                            <span className="block truncate text-[11px] text-zinc-400">{f.profile?.sector ?? 'General Tech'}</span>
                                         </div>
 
                                         {/* PARAGON Score */}
@@ -805,9 +746,7 @@ export default function AdminFoundersIndex({
 
                                         {/* Venture Tier */}
                                         <div className="w-36 shrink-0">
-                                            <span className="text-zinc-700 font-medium text-[11.5px]">
-                                                {f.tier_label}
-                                            </span>
+                                            <span className="text-[11.5px] font-medium text-zinc-700">{f.tier_label}</span>
                                         </div>
 
                                         {/* Audit Status */}
@@ -818,14 +757,14 @@ export default function AdminFoundersIndex({
                                         {/* Assigned Analyst */}
                                         <div className="min-w-0 flex-1 truncate">
                                             {f.assigned_analyst ? (
-                                                <div className="flex items-center gap-1.5 text-zinc-800 font-medium text-[11.5px]">
+                                                <div className="flex items-center gap-1.5 text-[11.5px] font-medium text-zinc-800">
                                                     <div className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-900 text-[9px] font-bold text-white">
                                                         {getInitials(f.assigned_analyst.name)}
                                                     </div>
                                                     <span className="truncate">{f.assigned_analyst.name}</span>
                                                 </div>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50/80 border border-amber-200/60 px-2 py-0.2 text-[10.5px] font-medium text-amber-700">
+                                                <span className="py-0.2 inline-flex items-center gap-1 rounded-full border border-amber-200/60 bg-amber-50/80 px-2 text-[10.5px] font-medium text-amber-700">
                                                     Unassigned
                                                 </span>
                                             )}
@@ -839,7 +778,7 @@ export default function AdminFoundersIndex({
                                                     e.stopPropagation();
                                                     setActiveDrawerFounder(f);
                                                 }}
-                                                className="whitespace-nowrap rounded-lg border border-zinc-200/80 bg-white px-3 py-1 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                                className="rounded-lg border border-zinc-200/80 bg-white px-3 py-1 text-xs font-semibold whitespace-nowrap text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                                             >
                                                 Inspect & Act
                                             </button>
@@ -851,7 +790,7 @@ export default function AdminFoundersIndex({
                     </div>
 
                     {/* Table Footer & Pagination */}
-                    <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-xs text-zinc-400 shrink-0">
+                    <div className="flex shrink-0 items-center justify-between border-t border-zinc-100 pt-3 text-xs text-zinc-400">
                         <p>
                             Showing {founders.from ?? 0} to {founders.to ?? 0} of {founders.total} founders
                         </p>
@@ -864,12 +803,12 @@ export default function AdminFoundersIndex({
                                         onClick={() => link.url && router.get(link.url, {}, { preserveScroll: true })}
                                         disabled={!link.url}
                                         className={cn(
-                                            'px-2 py-1 rounded-md text-xs font-medium',
+                                            'rounded-md px-2 py-1 text-xs font-medium',
                                             link.active
-                                                ? 'bg-zinc-950 text-white font-bold'
+                                                ? 'bg-zinc-950 font-bold text-white'
                                                 : link.url
-                                                ? 'text-zinc-600 hover:bg-zinc-100'
-                                                : 'text-zinc-300 cursor-not-allowed',
+                                                  ? 'text-zinc-600 hover:bg-zinc-100'
+                                                  : 'cursor-not-allowed text-zinc-300',
                                         )}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />

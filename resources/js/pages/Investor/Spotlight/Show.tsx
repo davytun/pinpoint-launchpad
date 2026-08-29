@@ -44,7 +44,10 @@ const PILLARS = [
 export default function SpotlightShow({ entry }: { entry: Entry }) {
     const radarItems = PILLARS.map(([key, subject]) => ({ subject, value: entry.radar_data?.[key] ?? 0 }));
     const hasRadarData = radarItems.some((item) => item.value > 0);
-    const interestForm = useForm<{ type: 'more_details' | 'founder_call' | 'data_room_access'; message: string }>({ type: 'more_details', message: '' });
+    const interestForm = useForm<{ type: 'more_details' | 'founder_call' | 'data_room_access'; message: string }>({
+        type: 'more_details',
+        message: '',
+    });
 
     function submitInterest(event: React.FormEvent) {
         event.preventDefault();
@@ -83,7 +86,7 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
 
                     <div className="mt-9 border-t border-zinc-100 pt-8">
                         <h2 className="text-xl font-extrabold">Company overview</h2>
-                        <p className="mt-4 max-w-3xl whitespace-pre-line leading-7 text-zinc-600">{entry.summary}</p>
+                        <p className="mt-4 max-w-3xl leading-7 whitespace-pre-line text-zinc-600">{entry.summary}</p>
                     </div>
 
                     <div className="mt-9 grid gap-8 border-t border-zinc-100 pt-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(16rem,0.9fr)]">
@@ -92,7 +95,10 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                             {entry.badges.length > 0 ? (
                                 <div className="mt-4 flex flex-wrap gap-2">
                                     {entry.badges.map((badge) => (
-                                        <span key={badge.id} className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-700">
+                                        <span
+                                            key={badge.id}
+                                            className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-bold text-zinc-700"
+                                        >
                                             <BadgeCheck className="size-3.5 text-[#3A54A5]" />
                                             {badge.label}
                                         </span>
@@ -138,10 +144,12 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                             {entry.can_view_pitch_deck ? <FileText className="size-5" /> : <LockKeyhole className="size-5" />}
                         </div>
                         <div className="min-w-0 flex-1">
-                            <h2 id="pitch-deck-heading" className="font-extrabold">Pitch deck</h2>
+                            <h2 id="pitch-deck-heading" className="font-extrabold">
+                                Pitch deck
+                            </h2>
                             {entry.pitch_deck ? (
                                 <>
-                                    <p className="mt-1 break-words text-sm text-zinc-600">
+                                    <p className="mt-1 text-sm break-words text-zinc-600">
                                         {entry.can_view_pitch_deck
                                             ? entry.pitch_deck.original_filename
                                             : 'Complete KYC approval to access this reviewed pitch deck.'}
@@ -154,7 +162,11 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                                         />
                                     )}
                                     {entry.can_view_pitch_deck && entry.pitch_deck.download_url && (
-                                        <Button asChild variant={entry.pitch_deck.can_preview ? 'outline' : 'default'} className="mt-4 rounded-xl border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50">
+                                        <Button
+                                            asChild
+                                            variant={entry.pitch_deck.can_preview ? 'outline' : 'default'}
+                                            className="mt-4 rounded-xl border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50"
+                                        >
                                             <a href={entry.pitch_deck.download_url}>
                                                 <FileDown data-icon="inline-start" />
                                                 Download pitch deck
@@ -162,7 +174,9 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                                         </Button>
                                     )}
                                     {entry.can_view_pitch_deck && !entry.pitch_deck.can_preview && (
-                                        <p className="mt-3 text-xs leading-5 text-zinc-600">This format can be downloaded securely, but cannot be previewed in the portal.</p>
+                                        <p className="mt-3 text-xs leading-5 text-zinc-600">
+                                            This format can be downloaded securely, but cannot be previewed in the portal.
+                                        </p>
                                     )}
                                 </>
                             ) : (
@@ -171,32 +185,84 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                         </div>
                     </div>
                 </section>
-                <section className="mt-7 rounded-2xl border border-white/80 bg-white p-6 shadow-[0_16px_36px_rgba(33,56,120,0.06)] sm:p-8" aria-labelledby="interest-heading">
+                <section
+                    className="mt-7 rounded-2xl border border-white/80 bg-white p-6 shadow-[0_16px_36px_rgba(33,56,120,0.06)] sm:p-8"
+                    aria-labelledby="interest-heading"
+                >
                     <p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Pinpoint-mediated</p>
-                    <h2 id="interest-heading" className="mt-2 text-xl font-extrabold text-zinc-950">Express interest</h2>
-                    <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">Choose a next step. Founder contact details remain private and Pinpoint stays in the loop.</p>
+                    <h2 id="interest-heading" className="mt-2 text-xl font-extrabold text-zinc-950">
+                        Express interest
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
+                        Choose a next step. Founder contact details remain private and Pinpoint stays in the loop.
+                    </p>
                     {entry.can_submit_interest ? (
                         <form onSubmit={submitInterest} className="mt-6 flex max-w-3xl flex-col gap-5">
                             <fieldset>
                                 <legend className="text-sm font-bold text-zinc-900">What would you like to do?</legend>
-                                <ToggleGroup type="single" variant="outline" value={interestForm.data.type} onValueChange={(value) => value && interestForm.setData('type', value as typeof interestForm.data.type)} className="mt-3 grid justify-start gap-2 sm:grid-cols-3">
-                                    <ToggleGroupItem value="more_details" className="h-auto justify-start whitespace-normal px-4 py-3 text-left text-sm">Share more details</ToggleGroupItem>
-                                    <ToggleGroupItem value="founder_call" className="h-auto justify-start whitespace-normal px-4 py-3 text-left text-sm">Arrange a founder call</ToggleGroupItem>
-                                    <ToggleGroupItem value="data_room_access" className="h-auto justify-start whitespace-normal px-4 py-3 text-left text-sm">Request data-room access</ToggleGroupItem>
+                                <ToggleGroup
+                                    type="single"
+                                    variant="outline"
+                                    value={interestForm.data.type}
+                                    onValueChange={(value) => value && interestForm.setData('type', value as typeof interestForm.data.type)}
+                                    className="mt-3 grid justify-start gap-2 sm:grid-cols-3"
+                                >
+                                    <ToggleGroupItem
+                                        value="more_details"
+                                        className="h-auto justify-start px-4 py-3 text-left text-sm whitespace-normal"
+                                    >
+                                        Share more details
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem
+                                        value="founder_call"
+                                        className="h-auto justify-start px-4 py-3 text-left text-sm whitespace-normal"
+                                    >
+                                        Arrange a founder call
+                                    </ToggleGroupItem>
+                                    <ToggleGroupItem
+                                        value="data_room_access"
+                                        className="h-auto justify-start px-4 py-3 text-left text-sm whitespace-normal"
+                                    >
+                                        Request data-room access
+                                    </ToggleGroupItem>
                                 </ToggleGroup>
                             </fieldset>
                             <div>
-                                <label htmlFor="interest-message" className="text-sm font-bold text-zinc-900">Short message <span className="font-medium text-zinc-500">(optional)</span></label>
-                                <Textarea id="interest-message" value={interestForm.data.message} onChange={(event) => interestForm.setData('message', event.target.value)} aria-invalid={Boolean(interestForm.errors.message)} aria-describedby={interestForm.errors.message ? 'interest-message-error' : undefined} maxLength={500} placeholder="Add context for Pinpoint and the founder." className="mt-2 border-zinc-200 bg-white text-zinc-950" />
-                                {interestForm.errors.message && <p id="interest-message-error" className="mt-2 text-sm font-medium text-rose-700">{interestForm.errors.message}</p>}
+                                <label htmlFor="interest-message" className="text-sm font-bold text-zinc-900">
+                                    Short message <span className="font-medium text-zinc-500">(optional)</span>
+                                </label>
+                                <Textarea
+                                    id="interest-message"
+                                    value={interestForm.data.message}
+                                    onChange={(event) => interestForm.setData('message', event.target.value)}
+                                    aria-invalid={Boolean(interestForm.errors.message)}
+                                    aria-describedby={interestForm.errors.message ? 'interest-message-error' : undefined}
+                                    maxLength={500}
+                                    placeholder="Add context for Pinpoint and the founder."
+                                    className="mt-2 border-zinc-200 bg-white text-zinc-950"
+                                />
+                                {interestForm.errors.message && (
+                                    <p id="interest-message-error" className="mt-2 text-sm font-medium text-rose-700">
+                                        {interestForm.errors.message}
+                                    </p>
+                                )}
                             </div>
                             <div className="flex flex-wrap items-center gap-4">
-                                <Button type="submit" disabled={interestForm.processing} className="rounded-xl bg-[#3A54A5] hover:bg-[#2D4182]">{interestForm.processing ? 'Submitting…' : 'Submit interest'}</Button>
-                                <p className="text-xs leading-5 text-zinc-500">Only an approved data-room request grants access to detailed documents.</p>
+                                <Button type="submit" disabled={interestForm.processing} className="rounded-xl bg-[#3A54A5] hover:bg-[#2D4182]">
+                                    {interestForm.processing ? 'Submitting…' : 'Submit interest'}
+                                </Button>
+                                <p className="text-xs leading-5 text-zinc-500">
+                                    Only an approved data-room request grants access to detailed documents.
+                                </p>
                             </div>
                         </form>
                     ) : (
-                        <div className="mt-6 rounded-xl border border-[#3A54A5]/12 bg-[#eef2ff] p-4 text-sm leading-6 text-zinc-700">Complete KYC approval to submit an interest or request access. <Link href={route('investor.kyc.create')} className="font-bold text-[#3A54A5] hover:underline">Complete KYC</Link></div>
+                        <div className="mt-6 rounded-xl border border-[#3A54A5]/12 bg-[#eef2ff] p-4 text-sm leading-6 text-zinc-700">
+                            Complete KYC approval to submit an interest or request access.{' '}
+                            <Link href={route('investor.kyc.create')} className="font-bold text-[#3A54A5] hover:underline">
+                                Complete KYC
+                            </Link>
+                        </div>
                     )}
                 </section>
             </section>

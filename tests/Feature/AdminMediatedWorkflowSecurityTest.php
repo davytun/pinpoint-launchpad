@@ -127,11 +127,11 @@ test('Security 4: Founder cannot obtain confidential Investor/KYC information (d
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Founder/Dashboard')
-            ->where('access_requests.0.investor_name', 'John Diligence')
-            ->where('access_requests.0.firm_name', 'Sequoia Capital Partners')
-            ->missing('access_requests.0.investor_email')
-            ->missing('access_requests.0.investor_phone')
-            ->missing('access_requests.0.investor_address')
+            ->where('investor_interests.0.investor_name', 'John Diligence')
+            ->where('investor_interests.0.firm_name', 'Sequoia Capital Partners')
+            ->missing('investor_interests.0.investor_email')
+            ->missing('investor_interests.0.investor_phone')
+            ->missing('investor_interests.0.investor_address')
         );
 });
 
@@ -173,7 +173,7 @@ test('Security 6: Founder authorization is recorded and visible to Admin', funct
 
     // Founder authorizes Pinpoint to coordinate
     $this->actingAs($founder, 'founder')
-        ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
+        ->patch(route('founder.interests.authorize', $interest), ['status' => 'approved'])
         ->assertRedirect();
 
     $interest->refresh();
@@ -206,7 +206,7 @@ test('Security 7: Founder authorization alone does NOT create Data Room grant wi
 
     // Founder authorizes
     $this->actingAs($founder, 'founder')
-        ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
+        ->patch(route('founder.interests.authorize', $interest), ['status' => 'approved'])
         ->assertRedirect();
 
     // Verify NO data room grant was created
@@ -346,7 +346,7 @@ test('Security 12: Investor and Founder UI payloads exclude internal Admin notes
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Founder/Dashboard')
-            ->missing('access_requests.0.admin_notes')
+            ->missing('investor_interests.0.admin_notes')
         );
 
     // Investor Interests payload

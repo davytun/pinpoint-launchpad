@@ -218,9 +218,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                                         <tbody className="divide-y divide-zinc-100">
                                             {metrics.recent_payments.map((p) => (
                                                 <tr key={p.id} className="group transition-colors duration-150 hover:bg-[#F9F9FB]">
-                                                    <td className="max-w-45 truncate px-5 py-3.5 font-semibold text-zinc-950">
-                                                        {p.customer_email}
-                                                    </td>
+                                                    <td className="max-w-45 truncate px-5 py-3.5 font-semibold text-zinc-950">{p.customer_email}</td>
                                                     <td className="px-5 py-3.5 font-medium text-zinc-600 capitalize">{p.tier}</td>
                                                     <td className="px-5 py-3.5 font-mono font-bold text-emerald-600">
                                                         {fmt(p.total_amount, p.currency)}

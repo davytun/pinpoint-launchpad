@@ -294,7 +294,7 @@
             <strong>Testing URL:</strong> https://app.pinpointlaunchpad.com<br>
             <strong>Report Issues To:</strong> davidakintunde433@gmail.com<br>
             <strong>Suggested Review Window:</strong> Complete review within 5 business days<br>
-            <strong>Primary Focus:</strong> Founder journey, payments, onboarding, dashboard, and public verification page
+            <strong>Primary Focus:</strong> Founder journey, payments, onboarding, dashboard, and approved-investor Spotlight
         </div>
     </div>
 
@@ -452,21 +452,21 @@
 
     <div class="section">
         <span class="section-number">7</span>
-        <span class="section-title">Public Verification Page</span>
+        <span class="section-title">Investor Spotlight</span>
         <div class="section-body">
-            <p>The public verification page is the outward-facing proof layer for reviewed founders.</p>
+            <p>Spotlight is the approved-investor view of reviewed founders. It is not a public startup profile.</p>
 
             <div class="steps">
-                <div class="step">Open the sample page at <strong>/verify/sample-unicorn</strong></div>
-                <div class="step">Review the summary, score, badges, and diligence assets table</div>
-                <div class="step">Test the access request flow</div>
+                <div class="step">Log in as an approved Investor and open Spotlight</div>
+                <div class="step">Review the summary, verification signals, and permitted information</div>
+                <div class="step">Submit an interest and confirm Pinpoint coordinates the next step</div>
             </div>
 
             <p style="margin-top:10px;"><strong>What to review:</strong></p>
             <div class="checklist">
-                <div class="check-item">The page feels premium and investor-ready</div>
-                <div class="check-item">Score, summary, and diligence assets are clearly presented</div>
-                <div class="check-item">The call to request access is obvious and credible</div>
+                <div class="check-item">The Spotlight profile feels clear and investor-ready</div>
+                <div class="check-item">Verification signals and permitted information are clearly presented</div>
+                <div class="check-item">The interest action makes Pinpoint mediation clear</div>
                 <div class="check-item">The page works well on mobile</div>
             </div>
         </div>
@@ -551,7 +551,7 @@
                 <div class="check-item">Checkout and onboarding flow approved</div>
                 <div class="check-item">Founder dashboard experience approved</div>
                 <div class="check-item">Emails and transactional messages approved</div>
-                <div class="check-item">Public verification page approved</div>
+                <div class="check-item">Approved-investor Spotlight approved</div>
                 <div class="check-item">No unresolved high-priority issues remain</div>
             </div>
         </div>

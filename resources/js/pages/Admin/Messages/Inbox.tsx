@@ -67,12 +67,7 @@ function getInitials(name?: string | null): string {
         .toUpperCase();
 }
 
-export default function AdminMessagesInbox({
-    threads,
-    active_thread,
-    messages,
-    founder,
-}: PageProps) {
+export default function AdminMessagesInbox({ threads, active_thread, messages, founder }: PageProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterTab, setFilterTab] = useState<'all' | 'unread'>('all');
     const [attachment, setAttachment] = useState<File | null>(null);
@@ -157,20 +152,18 @@ export default function AdminMessagesInbox({
             <Head title={active_thread ? `${active_thread.founder_name} — Inbox` : 'Message Inbox — Admin'} />
 
             {/* ── Fixed Viewport Multi-Container (Zero Window Scrolling) ───────── */}
-            <div className="flex flex-1 min-w-0 gap-3.5 h-full max-h-full overflow-hidden">
+            <div className="flex h-full max-h-full min-w-0 flex-1 gap-3.5 overflow-hidden">
                 {/* ── Container 1: Master Thread List Card (Left) ─────────────── */}
-                <section className="flex w-full md:w-80 lg:w-84 shrink-0 flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] h-full max-h-full overflow-hidden">
+                <section className="flex h-full max-h-full w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] md:w-80 lg:w-84 lg:rounded-[22px]">
                     {/* Header */}
-                    <div className="p-4 pb-3 border-b border-zinc-100 shrink-0">
-                        <div className="flex items-center justify-between mb-3">
+                    <div className="shrink-0 border-b border-zinc-100 p-4 pb-3">
+                        <div className="mb-3 flex items-center justify-between">
                             <h1 className="text-[16px] font-bold tracking-tight text-zinc-950">Inbox</h1>
                             <button
                                 onClick={() => setFilterTab(filterTab === 'all' ? 'unread' : 'all')}
                                 className={cn(
                                     'flex h-7 items-center gap-1 rounded-lg px-2 text-[12px] font-semibold transition-colors',
-                                    filterTab === 'unread'
-                                        ? 'bg-zinc-900 text-white'
-                                        : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900',
+                                    filterTab === 'unread' ? 'bg-zinc-900 text-white' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900',
                                 )}
                             >
                                 <Icon icon="solar:filter-linear" className="size-3.5" />
@@ -180,22 +173,16 @@ export default function AdminMessagesInbox({
 
                         {/* Search Input */}
                         <div className="relative flex items-center">
-                            <Icon
-                                icon="solar:minimalistic-magnifer-linear"
-                                className="absolute left-3 size-4 text-zinc-400 pointer-events-none"
-                            />
+                            <Icon icon="solar:minimalistic-magnifer-linear" className="pointer-events-none absolute left-3 size-4 text-zinc-400" />
                             <input
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search founders or messages..."
-                                className="w-full rounded-xl border border-zinc-200/90 bg-[#F9F9FB] py-1.5 pr-8 pl-9 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none transition-colors"
+                                className="w-full rounded-xl border border-zinc-200/90 bg-[#F9F9FB] py-1.5 pr-8 pl-9 text-[13px] text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
                             />
                             {searchQuery && (
-                                <button
-                                    onClick={() => setSearchQuery('')}
-                                    className="absolute right-2.5 text-zinc-400 hover:text-zinc-700"
-                                >
+                                <button onClick={() => setSearchQuery('')} className="absolute right-2.5 text-zinc-400 hover:text-zinc-700">
                                     <Icon icon="solar:close-circle-linear" className="size-3.5" />
                                 </button>
                             )}
@@ -203,12 +190,12 @@ export default function AdminMessagesInbox({
                     </div>
 
                     {/* Thread Items List (Independently Scrollable) */}
-                    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-2 space-y-1">
+                    <div className="no-scrollbar min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
                         {filteredThreads.length === 0 ? (
                             <div className="p-8 text-center">
-                                <Icon icon="solar:inbox-line-linear" className="mx-auto size-8 text-zinc-300 mb-2" />
+                                <Icon icon="solar:inbox-line-linear" className="mx-auto mb-2 size-8 text-zinc-300" />
                                 <p className="text-xs font-bold text-zinc-700">No conversations</p>
-                                <p className="text-[11px] text-zinc-400 mt-0.5">
+                                <p className="mt-0.5 text-[11px] text-zinc-400">
                                     {searchQuery ? 'No matching threads.' : 'Messages will appear here.'}
                                 </p>
                             </div>
@@ -225,13 +212,11 @@ export default function AdminMessagesInbox({
                                         preserveScroll
                                         className={cn(
                                             'group relative flex flex-col gap-1 rounded-xl p-3 text-left transition-all duration-150',
-                                            isSelected
-                                                ? 'bg-[#EAEAEC] text-zinc-950 shadow-2xs font-medium'
-                                                : 'hover:bg-zinc-100/70 text-zinc-700',
+                                            isSelected ? 'bg-[#EAEAEC] font-medium text-zinc-950 shadow-2xs' : 'text-zinc-700 hover:bg-zinc-100/70',
                                         )}
                                     >
                                         <div className="flex items-center justify-between gap-2">
-                                            <div className="flex items-center gap-2.5 min-w-0">
+                                            <div className="flex min-w-0 items-center gap-2.5">
                                                 {/* Unified Elegant Monochrome Avatar */}
                                                 <div className="flex h-6.5 w-6.5 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-[10.5px] font-bold text-white shadow-2xs">
                                                     {getInitials(t.founder_name)}
@@ -242,27 +227,23 @@ export default function AdminMessagesInbox({
                                                         isSelected
                                                             ? 'font-bold text-zinc-950'
                                                             : hasUnread
-                                                            ? 'font-bold text-zinc-900'
-                                                            : 'font-semibold text-zinc-800',
+                                                              ? 'font-bold text-zinc-900'
+                                                              : 'font-semibold text-zinc-800',
                                                     )}
                                                 >
                                                     {t.founder_name ?? 'Unknown'}
                                                 </p>
                                             </div>
                                             {t.last_message_at && (
-                                                <span className="shrink-0 text-[11px] text-zinc-400 tabular-nums font-normal">
+                                                <span className="shrink-0 text-[11px] font-normal text-zinc-400 tabular-nums">
                                                     {t.last_message_at}
                                                 </span>
                                             )}
                                         </div>
 
-                                        <p className="line-clamp-1 text-[12px] text-zinc-500 pl-9 mt-0.5 font-normal">
-                                            {t.last_message_preview}
-                                        </p>
+                                        <p className="mt-0.5 line-clamp-1 pl-9 text-[12px] font-normal text-zinc-500">{t.last_message_preview}</p>
 
-                                        {hasUnread && (
-                                            <div className="absolute top-3.5 right-3 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-white" />
-                                        )}
+                                        {hasUnread && <div className="absolute top-3.5 right-3 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-white" />}
                                     </Link>
                                 );
                             })
@@ -271,14 +252,14 @@ export default function AdminMessagesInbox({
                 </section>
 
                 {/* ── Container 2: Active Conversation & Context Inspector Card ─── */}
-                <section className="flex flex-1 min-w-0 bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] h-full max-h-full overflow-hidden">
+                <section className="flex h-full max-h-full min-w-0 flex-1 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] lg:rounded-[22px]">
                     {active_thread ? (
                         <>
                             {/* Left Sub-Pane: Conversation Canvas */}
-                            <div className="flex flex-1 flex-col min-w-0 h-full max-h-full overflow-hidden">
+                            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden">
                                 {/* Fixed Top Header */}
-                                <div className="flex h-14 items-center justify-between border-b border-zinc-100 px-6 shrink-0 bg-white">
-                                    <div className="flex items-center gap-3 min-w-0">
+                                <div className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-100 bg-white px-6">
+                                    <div className="flex min-w-0 items-center gap-3">
                                         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-xs font-bold text-white shadow-2xs">
                                             {getInitials(active_thread.founder_name)}
                                         </div>
@@ -296,7 +277,7 @@ export default function AdminMessagesInbox({
                                         {founder?.id && (
                                             <Link
                                                 href={`/admin/founders/${founder.id}`}
-                                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 hover:text-zinc-950 transition-colors"
+                                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                                             >
                                                 <span>Profile</span>
                                                 <Icon icon="solar:arrow-right-up-linear" className="size-3 text-zinc-400" />
@@ -306,7 +287,7 @@ export default function AdminMessagesInbox({
                                 </div>
 
                                 {/* Message Timeline (Independently Scrollable Stream) */}
-                                <div ref={threadRef} className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
+                                <div ref={threadRef} className="no-scrollbar min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
                                     {messages.map((msg, idx) => {
                                         const isFounder = msg.is_from_founder;
 
@@ -321,29 +302,27 @@ export default function AdminMessagesInbox({
                                                                 : 'Pinpoint Analyst Team'}
                                                         </span>
                                                         {!isFounder && (
-                                                            <span className="rounded-md bg-zinc-100 px-1.5 py-0.2 text-[9.5px] font-bold uppercase tracking-wider text-zinc-600">
+                                                            <span className="py-0.2 rounded-md bg-zinc-100 px-1.5 text-[9.5px] font-bold tracking-wider text-zinc-600 uppercase">
                                                                 Analyst
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <span className="text-[11px] text-zinc-400 tabular-nums">
-                                                        {msg.created_at}
-                                                    </span>
+                                                    <span className="text-[11px] text-zinc-400 tabular-nums">{msg.created_at}</span>
                                                 </div>
 
                                                 {/* Message Body */}
                                                 {msg.body && (
-                                                    <p className="text-[13.5px] leading-relaxed text-zinc-800 whitespace-pre-wrap font-normal">
+                                                    <p className="text-[13.5px] leading-relaxed font-normal whitespace-pre-wrap text-zinc-800">
                                                         {msg.body}
                                                     </p>
                                                 )}
 
                                                 {/* Structured Attachment Card */}
                                                 {msg.has_attachment && (
-                                                    <div className="mt-3 rounded-2xl border border-zinc-200/80 bg-[#F9F9FB] p-3.5 max-w-md">
+                                                    <div className="mt-3 max-w-md rounded-2xl border border-zinc-200/80 bg-[#F9F9FB] p-3.5">
                                                         <div className="flex items-center justify-between gap-3">
-                                                            <div className="flex items-center gap-2.5 min-w-0">
-                                                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white border border-zinc-200 shadow-2xs text-zinc-700">
+                                                            <div className="flex min-w-0 items-center gap-2.5">
+                                                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 shadow-2xs">
                                                                     <Icon icon="solar:document-text-linear" className="size-4" />
                                                                 </div>
                                                                 <div className="min-w-0">
@@ -351,9 +330,7 @@ export default function AdminMessagesInbox({
                                                                         {msg.attachment_filename ?? 'Attachment'}
                                                                     </p>
                                                                     {msg.attachment_size && (
-                                                                        <p className="text-[11px] text-zinc-400">
-                                                                            {msg.attachment_size}
-                                                                        </p>
+                                                                        <p className="text-[11px] text-zinc-400">{msg.attachment_size}</p>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -361,7 +338,7 @@ export default function AdminMessagesInbox({
                                                                 href={route('admin.messages.attachment.download', { message: msg.id })}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs hover:bg-zinc-50 transition-colors"
+                                                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                                                             >
                                                                 <span>Download</span>
                                                                 <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-400" />
@@ -370,31 +347,25 @@ export default function AdminMessagesInbox({
                                                     </div>
                                                 )}
 
-                                                {idx < messages.length - 1 && (
-                                                    <hr className="border-zinc-100 pt-4" />
-                                                )}
+                                                {idx < messages.length - 1 && <hr className="border-zinc-100 pt-4" />}
                                             </div>
                                         );
                                     })}
                                 </div>
 
                                 {/* Fixed Bottom Command Composer (Always in Viewport!) */}
-                                <div className="border-t border-zinc-100 p-3.5 bg-white shrink-0">
+                                <div className="shrink-0 border-t border-zinc-100 bg-white p-3.5">
                                     {attachment && (
-                                        <div className="mb-2 flex items-center gap-2 rounded-xl bg-zinc-100 px-3 py-1.5 text-xs text-zinc-800 w-fit">
+                                        <div className="mb-2 flex w-fit items-center gap-2 rounded-xl bg-zinc-100 px-3 py-1.5 text-xs text-zinc-800">
                                             <Icon icon="solar:paperclip-linear" className="size-3.5 text-zinc-500" />
-                                            <span className="font-semibold max-w-50 truncate">{attachment.name}</span>
-                                            <button
-                                                type="button"
-                                                onClick={removeAttachment}
-                                                className="text-zinc-400 hover:text-zinc-700 ml-1"
-                                            >
+                                            <span className="max-w-50 truncate font-semibold">{attachment.name}</span>
+                                            <button type="button" onClick={removeAttachment} className="ml-1 text-zinc-400 hover:text-zinc-700">
                                                 <Icon icon="solar:close-circle-linear" className="size-3.5" />
                                             </button>
                                         </div>
                                     )}
 
-                                    <div className="rounded-2xl border border-zinc-200/90 bg-[#F9F9FB] p-3 shadow-2xs focus-within:border-zinc-400 focus-within:bg-white transition-all">
+                                    <div className="rounded-2xl border border-zinc-200/90 bg-[#F9F9FB] p-3 shadow-2xs transition-all focus-within:border-zinc-400 focus-within:bg-white">
                                         <textarea
                                             value={data.body}
                                             onChange={(e) => setData('body', e.target.value)}
@@ -404,19 +375,14 @@ export default function AdminMessagesInbox({
                                             className="w-full resize-none border-0 bg-transparent text-[13.5px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
                                         />
 
-                                        <div className="flex items-center justify-between pt-2 border-t border-zinc-200/60">
+                                        <div className="flex items-center justify-between border-t border-zinc-200/60 pt-2">
                                             <div className="flex items-center gap-2">
-                                                <input
-                                                    ref={fileInputRef}
-                                                    type="file"
-                                                    onChange={handleFileChange}
-                                                    className="hidden"
-                                                />
+                                                <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" />
                                                 <button
                                                     type="button"
                                                     onClick={() => fileInputRef.current?.click()}
                                                     title="Attach file"
-                                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-200/70 hover:text-zinc-900 transition-colors"
+                                                    className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-200/70 hover:text-zinc-900"
                                                 >
                                                     <Icon icon="solar:paperclip-linear" className="size-4" />
                                                 </button>
@@ -427,10 +393,10 @@ export default function AdminMessagesInbox({
                                                 disabled={!canSend}
                                                 onClick={handleSubmit}
                                                 className={cn(
-                                                    'flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-xs font-bold transition-all shadow-2xs',
+                                                    'flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-xs font-bold shadow-2xs transition-all',
                                                     canSend
                                                         ? 'bg-zinc-950 text-white hover:bg-zinc-800'
-                                                        : 'bg-zinc-200 text-zinc-400 cursor-not-allowed',
+                                                        : 'cursor-not-allowed bg-zinc-200 text-zinc-400',
                                                 )}
                                             >
                                                 <span>Send</span>
@@ -443,7 +409,7 @@ export default function AdminMessagesInbox({
 
                             {/* Right Sub-Pane: Clean Structured Inspector */}
                             {founder && (
-                                <aside className="hidden w-84 shrink-0 border-l border-zinc-100 bg-[#FAFBFD] p-5 h-full max-h-full overflow-y-auto no-scrollbar xl:flex xl:flex-col justify-between">
+                                <aside className="no-scrollbar hidden h-full max-h-full w-84 shrink-0 justify-between overflow-y-auto border-l border-zinc-100 bg-[#FAFBFD] p-5 xl:flex xl:flex-col">
                                     <div className="space-y-5">
                                         {/* Top Profile Summary Card */}
                                         <div className="flex items-start gap-3.5">
@@ -451,18 +417,18 @@ export default function AdminMessagesInbox({
                                                 {getInitials(founder.full_name)}
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <h3 className="truncate text-[15px] font-bold text-zinc-950 leading-tight">
+                                                <h3 className="truncate text-[15px] leading-tight font-bold text-zinc-950">
                                                     {founder.full_name ?? '—'}
                                                 </h3>
-                                                <p className="truncate text-[12.5px] font-medium text-zinc-500 mt-0.5">
+                                                <p className="mt-0.5 truncate text-[12.5px] font-medium text-zinc-500">
                                                     {founder.company_name !== 'N/A' ? founder.company_name : 'No Company'}
                                                 </p>
-                                                <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                                                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10.5px] font-bold text-emerald-700">
+                                                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                                    <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10.5px] font-bold text-emerald-700">
                                                         <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                                                         Active
                                                     </span>
-                                                    <span className="inline-flex items-center rounded-md bg-zinc-100 border border-zinc-200/60 px-2 py-0.5 text-[10.5px] font-bold text-zinc-700 uppercase tracking-wide">
+                                                    <span className="inline-flex items-center rounded-md border border-zinc-200/60 bg-zinc-100 px-2 py-0.5 text-[10.5px] font-bold tracking-wide text-zinc-700 uppercase">
                                                         {founder.tier ?? 'Foundation'}
                                                     </span>
                                                 </div>
@@ -470,17 +436,15 @@ export default function AdminMessagesInbox({
                                         </div>
 
                                         {/* Section: Properties Table (Bordered Panel) */}
-                                        <div className="rounded-2xl border border-zinc-200/80 bg-white overflow-hidden divide-y divide-zinc-100/90 shadow-2xs">
+                                        <div className="divide-y divide-zinc-100/90 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-2xs">
                                             <div className="flex items-center justify-between p-3 text-xs">
                                                 <span className="font-medium text-zinc-400">Email</span>
-                                                <div className="flex items-center gap-1.5 min-w-0">
-                                                    <span className="font-mono text-[12px] text-zinc-800 truncate max-w-35">
-                                                        {founder.email}
-                                                    </span>
+                                                <div className="flex min-w-0 items-center gap-1.5">
+                                                    <span className="max-w-35 truncate font-mono text-[12px] text-zinc-800">{founder.email}</span>
                                                     <button
                                                         onClick={copyEmail}
                                                         title="Copy email"
-                                                        className="text-zinc-400 hover:text-zinc-800 transition-colors"
+                                                        className="text-zinc-400 transition-colors hover:text-zinc-800"
                                                     >
                                                         <Icon
                                                             icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'}
@@ -493,9 +457,7 @@ export default function AdminMessagesInbox({
                                             {founder.phone && (
                                                 <div className="flex items-center justify-between p-3 text-xs">
                                                     <span className="font-medium text-zinc-400">Phone</span>
-                                                    <span className="font-mono text-[12px] text-zinc-800">
-                                                        {founder.phone}
-                                                    </span>
+                                                    <span className="font-mono text-[12px] text-zinc-800">{founder.phone}</span>
                                                 </div>
                                             )}
 
@@ -520,41 +482,49 @@ export default function AdminMessagesInbox({
                                         </div>
 
                                         {/* Section: Thread Context Card */}
-                                        <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-3.5 space-y-1">
-                                            <p className="text-[10.5px] font-bold uppercase tracking-wider text-zinc-400">
-                                                Thread Context
-                                            </p>
-                                            <p className="text-xs font-bold text-zinc-900">
-                                                Diligence & Matching
-                                            </p>
-                                            <p className="text-[11.5px] text-zinc-500 leading-relaxed font-normal">
+                                        <div className="space-y-1 rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-3.5">
+                                            <p className="text-[10.5px] font-bold tracking-wider text-zinc-400 uppercase">Thread Context</p>
+                                            <p className="text-xs font-bold text-zinc-900">Diligence & Matching</p>
+                                            <p className="text-[11.5px] leading-relaxed font-normal text-zinc-500">
                                                 Founder uploaded updated metrics and presentation deck for review.
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* Action Links */}
-                                    <div className="pt-4 space-y-2 border-t border-zinc-200/70 mt-6">
+                                    <div className="mt-6 space-y-2 border-t border-zinc-200/70 pt-4">
                                         <Link
                                             href={`/admin/founders/${founder.id}`}
-                                            className="group flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white p-3 text-[12.5px] font-semibold text-zinc-800 shadow-2xs hover:bg-zinc-50 hover:border-zinc-300 transition-all"
+                                            className="group flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white p-3 text-[12.5px] font-semibold text-zinc-800 shadow-2xs transition-all hover:border-zinc-300 hover:bg-zinc-50"
                                         >
                                             <div className="flex items-center gap-2.5">
-                                                <Icon icon="solar:user-circle-linear" className="size-4 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
+                                                <Icon
+                                                    icon="solar:user-circle-linear"
+                                                    className="size-4 text-zinc-400 transition-colors group-hover:text-zinc-900"
+                                                />
                                                 <span>Founder Overview</span>
                                             </div>
-                                            <Icon icon="solar:alt-arrow-right-linear" className="size-3.5 text-zinc-400 group-hover:text-zinc-700 transition-transform group-hover:translate-x-0.5" />
+                                            <Icon
+                                                icon="solar:alt-arrow-right-linear"
+                                                className="size-3.5 text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-zinc-700"
+                                            />
                                         </Link>
 
                                         <Link
                                             href={`/admin/profiles/${founder.id}`}
-                                            className="group flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white p-3 text-[12.5px] font-semibold text-zinc-800 shadow-2xs hover:bg-zinc-50 hover:border-zinc-300 transition-all"
+                                            className="group flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white p-3 text-[12.5px] font-semibold text-zinc-800 shadow-2xs transition-all hover:border-zinc-300 hover:bg-zinc-50"
                                         >
                                             <div className="flex items-center gap-2.5">
-                                                <Icon icon="solar:chart-square-linear" className="size-4 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
+                                                <Icon
+                                                    icon="solar:chart-square-linear"
+                                                    className="size-4 text-zinc-400 transition-colors group-hover:text-zinc-900"
+                                                />
                                                 <span>Diagnostic Audit</span>
                                             </div>
-                                            <Icon icon="solar:alt-arrow-right-linear" className="size-3.5 text-zinc-400 group-hover:text-zinc-700 transition-transform group-hover:translate-x-0.5" />
+                                            <Icon
+                                                icon="solar:alt-arrow-right-linear"
+                                                className="size-3.5 text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-zinc-700"
+                                            />
                                         </Link>
                                     </div>
                                 </aside>
@@ -562,9 +532,9 @@ export default function AdminMessagesInbox({
                         </>
                     ) : (
                         <div className="flex flex-1 flex-col items-center justify-center p-12 text-center">
-                            <Icon icon="solar:inbox-line-linear" className="size-12 text-zinc-300 mb-3" />
+                            <Icon icon="solar:inbox-line-linear" className="mb-3 size-12 text-zinc-300" />
                             <h3 className="text-sm font-bold text-zinc-900">Select a conversation</h3>
-                            <p className="text-xs text-zinc-500 mt-1 max-w-sm">
+                            <p className="mt-1 max-w-sm text-xs text-zinc-500">
                                 Choose a thread from the list on the left to start viewing and replying to messages.
                             </p>
                         </div>

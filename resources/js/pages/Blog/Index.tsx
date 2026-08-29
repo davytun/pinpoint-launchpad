@@ -90,7 +90,9 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                         {/* Section Header */}
                         <div className="mx-auto mb-12 max-w-3xl pt-8 text-center">
                             <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase md:text-sm">Insights & Analysis</span>
-                            <h1 className="font-display mt-3 text-4xl font-extrabold tracking-tight text-zinc-950 sm:text-5xl md:text-6xl">The Pinpoint Blog</h1>
+                            <h1 className="font-display mt-3 text-4xl font-extrabold tracking-tight text-zinc-950 sm:text-5xl md:text-6xl">
+                                The Pinpoint Blog
+                            </h1>
                             <p className="mt-4 text-base leading-relaxed text-zinc-500 md:text-lg lg:text-xl">
                                 Investment readiness advice, institutional vetting guides, and fundraising playbooks for early-stage founders.
                             </p>

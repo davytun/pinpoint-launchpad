@@ -146,14 +146,10 @@ function humanizeType(type: string): string {
 
 function TypeBadge({ type }: { type: Interest['type'] }) {
     const icon =
-        type === 'data_room_access'
-            ? 'solar:key-linear'
-            : type === 'founder_call'
-            ? 'solar:phone-calling-linear'
-            : 'solar:info-circle-linear';
+        type === 'data_room_access' ? 'solar:key-linear' : type === 'founder_call' ? 'solar:phone-calling-linear' : 'solar:info-circle-linear';
 
     return (
-        <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-100 border border-zinc-200/80 px-2.5 py-1 text-xs font-medium text-zinc-800">
+        <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-800">
             <Icon icon={icon} className="size-3.5 text-zinc-500" />
             <span>{humanizeType(type)}</span>
         </span>
@@ -164,14 +160,14 @@ function StatusBadge({ status }: { status: Interest['status'] }) {
     switch (status) {
         case 'approved':
             return (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
                     <Icon icon="solar:check-circle-linear" className="size-3 text-emerald-600" />
                     <span>Approved</span>
                 </span>
             );
         case 'denied':
             return (
-                <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 border border-rose-200/80 px-2.5 py-0.5 text-xs font-medium text-rose-700">
+                <span className="inline-flex items-center gap-1 rounded-full border border-rose-200/80 bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-700">
                     <Icon icon="solar:close-circle-linear" className="size-3 text-rose-600" />
                     <span>Declined</span>
                 </span>
@@ -179,7 +175,7 @@ function StatusBadge({ status }: { status: Interest['status'] }) {
         case 'pending':
         default:
             return (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-200/80 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
                     <Icon icon="solar:clock-circle-linear" className="size-3 text-amber-600" />
                     <span>Pending</span>
                 </span>
@@ -308,17 +304,14 @@ function InterestDrawer({
     return (
         <div className="fixed inset-0 z-50 flex justify-end">
             {/* Backdrop */}
-            <div
-                className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200"
-                onClick={onClose}
-            />
+            <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200" onClick={onClose} />
 
             {/* Slide Panel */}
-            <div className="relative z-10 w-full max-w-xl bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden border-l border-zinc-200 animate-in slide-in-from-right duration-200">
+            <div className="animate-in slide-in-from-right relative z-10 flex h-full w-full max-w-xl flex-col justify-between overflow-hidden border-l border-zinc-200 bg-white shadow-2xl duration-200">
                 {/* ── Drawer Header ────────────────────────────────────────── */}
-                <div className="flex items-center justify-between px-6 py-4.5 border-b border-zinc-100 shrink-0 bg-white">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-white text-xs font-bold shadow-xs">
+                <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 bg-white px-6 py-4.5">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-xs font-bold text-white shadow-xs">
                             {getInitials(investorName)}
                         </div>
                         <div className="min-w-0">
@@ -335,7 +328,7 @@ function InterestDrawer({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors shrink-0"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                     >
                         <Icon icon="solar:close-circle-linear" className="size-5" />
                     </button>
@@ -343,13 +336,13 @@ function InterestDrawer({
 
                 {/* ── Quick Action Strip (When Pending) ──────────────────────── */}
                 {interest.status === 'pending' && (
-                    <div className="flex items-center justify-between gap-3 px-6 py-3 bg-[#FAFBFD] border-b border-zinc-100 shrink-0">
+                    <div className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 bg-[#FAFBFD] px-6 py-3">
                         <div className="flex items-center gap-2">
                             <button
                                 type="button"
                                 onClick={() => setStatus('approved')}
                                 disabled={updating}
-                                className="flex items-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs disabled:opacity-50"
+                                className="flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800 disabled:opacity-50"
                             >
                                 {updating ? (
                                     <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
@@ -363,7 +356,7 @@ function InterestDrawer({
                                 type="button"
                                 onClick={() => setStatus('denied')}
                                 disabled={updating}
-                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white hover:bg-zinc-50 px-3.5 py-1.5 text-xs font-semibold text-zinc-700 transition-all shadow-2xs disabled:opacity-50"
+                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-all hover:bg-zinc-50 disabled:opacity-50"
                             >
                                 <Icon icon="solar:close-circle-linear" className="size-3.5 text-zinc-500" />
                                 <span>Decline</span>
@@ -375,30 +368,28 @@ function InterestDrawer({
                 )}
 
                 {/* ── Drawer Body ───────────────────────────────────────────── */}
-                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
+                <div className="no-scrollbar min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
                     {/* Section 1: Request Specification Card */}
-                    <div className="rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4.5 space-y-3 shadow-2xs">
+                    <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4.5 shadow-2xs">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-                                Engagement Type
-                            </span>
+                            <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Engagement Type</span>
                             <TypeBadge type={interest.type} />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-100 text-xs">
+                        <div className="grid grid-cols-2 gap-3 border-t border-zinc-100 pt-2 text-xs">
                             <div>
-                                <span className="text-zinc-400 block text-[11px]">Submitted</span>
+                                <span className="block text-[11px] text-zinc-400">Submitted</span>
                                 <span className="font-medium text-zinc-800">{formatDate(interest.created_at)}</span>
                             </div>
                             <div>
-                                <span className="text-zinc-400 block text-[11px]">Status</span>
+                                <span className="block text-[11px] text-zinc-400">Status</span>
                                 <span className="font-medium text-zinc-950 capitalize">{interest.status}</span>
                             </div>
                         </div>
 
                         {interest.type === 'data_room_access' && (
-                            <div className="rounded-xl border border-zinc-200/70 bg-white p-3 text-xs text-zinc-700 flex items-start gap-2">
-                                <Icon icon="solar:shield-keyhole-linear" className="size-4 shrink-0 text-zinc-600 mt-0.5" />
+                            <div className="flex items-start gap-2 rounded-xl border border-zinc-200/70 bg-white p-3 text-xs text-zinc-700">
+                                <Icon icon="solar:shield-keyhole-linear" className="mt-0.5 size-4 shrink-0 text-zinc-600" />
                                 <div className="space-y-0.5">
                                     <p className="font-semibold text-zinc-900">Data Room Clearance</p>
                                     <p className="text-[11px] text-zinc-500">
@@ -410,23 +401,21 @@ function InterestDrawer({
                     </div>
 
                     {/* Section 1.5: Founder Authorization Status (Pinpoint Mediation) */}
-                    <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 text-xs space-y-2 shadow-2xs">
+                    <div className="space-y-2 rounded-2xl border border-zinc-200/80 bg-white p-4 text-xs shadow-2xs">
                         <div className="flex items-center justify-between">
-                            <span className="font-bold text-zinc-950 uppercase tracking-wider text-[11px]">
-                                Founder Authorization
-                            </span>
+                            <span className="text-[11px] font-bold tracking-wider text-zinc-950 uppercase">Founder Authorization</span>
                             {interest.founder_decision === 'approved' ? (
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
                                     <Icon icon="solar:check-circle-bold" className="size-3.5 text-emerald-600" />
                                     <span>Authorized by Founder</span>
                                 </span>
                             ) : interest.founder_decision === 'declined' ? (
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-[11px] font-bold text-rose-700">
                                     <Icon icon="solar:close-circle-bold" className="size-3.5 text-rose-600" />
                                     <span>Declined by Founder</span>
                                 </span>
                             ) : (
-                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700">
                                     <Icon icon="solar:clock-circle-bold" className="size-3.5 text-amber-600" />
                                     <span>Awaiting Founder Response</span>
                                 </span>
@@ -436,23 +425,21 @@ function InterestDrawer({
                             {interest.founder_decision === 'approved'
                                 ? 'The founder has authorized Pinpoint to finalize and execute this engagement.'
                                 : interest.founder_decision === 'declined'
-                                ? 'The founder declined willingness to proceed with this request.'
-                                : 'Pinpoint has requested authorization from the founder via the Founder Portal.'}
+                                  ? 'The founder declined willingness to proceed with this request.'
+                                  : 'Pinpoint has requested authorization from the founder via the Founder Portal.'}
                         </p>
                     </div>
 
                     {/* Section 2: Investor Message / Note */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                                Investor Note / Inquiry
-                            </h4>
+                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Investor Note / Inquiry</h4>
                             <span className="text-[11px] text-zinc-400">Attached note</span>
                         </div>
 
-                        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 text-xs text-zinc-800 shadow-2xs leading-relaxed">
+                        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 text-xs leading-relaxed text-zinc-800 shadow-2xs">
                             {interest.message ? (
-                                <p className="italic text-zinc-700">&ldquo;{interest.message}&rdquo;</p>
+                                <p className="text-zinc-700 italic">&ldquo;{interest.message}&rdquo;</p>
                             ) : (
                                 <p className="text-zinc-400 italic">No custom message attached.</p>
                             )}
@@ -461,33 +448,38 @@ function InterestDrawer({
 
                     {/* Section 2.5: Introduction & Call Coordination (If Founder Call) */}
                     {interest.type === 'founder_call' && (
-                        <div className="rounded-2xl border border-indigo-200/80 bg-[#f8faff] p-4.5 space-y-4 shadow-2xs">
+                        <div className="space-y-4 rounded-2xl border border-indigo-200/80 bg-[#f8faff] p-4.5 shadow-2xs">
                             <div className="flex items-center justify-between border-b border-indigo-100/80 pb-2.5">
                                 <div className="flex items-center gap-2">
                                     <Icon icon="solar:phone-calling-bold-duotone" className="size-4 text-indigo-600" />
-                                    <h4 className="text-xs font-bold text-indigo-950 uppercase tracking-wider">
-                                        Founder Introduction Coordination
-                                    </h4>
+                                    <h4 className="text-xs font-bold tracking-wider text-indigo-950 uppercase">Founder Introduction Coordination</h4>
                                 </div>
                                 <span className="text-[11px] font-bold text-indigo-700">
-                                    {interest.completed_at ? 'Completed' : interest.scheduled_at ? 'Scheduled' : interest.status === 'approved' ? 'Approved — Ready' : 'Pending Request'}
+                                    {interest.completed_at
+                                        ? 'Completed'
+                                        : interest.scheduled_at
+                                          ? 'Scheduled'
+                                          : interest.status === 'approved'
+                                            ? 'Approved — Ready'
+                                            : 'Pending Request'}
                                 </span>
                             </div>
 
                             {interest.completed_at ? (
-                                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-800 space-y-1">
+                                <div className="space-y-1 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800">
                                     <div className="flex items-center gap-1.5 font-bold">
                                         <Icon icon="solar:check-circle-bold" className="size-4 text-emerald-600" />
                                         <span>Introduction Call Completed</span>
                                     </div>
                                     <p className="text-[11.5px] text-emerald-700">
-                                        Concluded on {formatDate(interest.completed_at)}. Diligence and follow-ups can continue via Data Room or direct IR coordination.
+                                        Concluded on {formatDate(interest.completed_at)}. Diligence and follow-ups can continue via Data Room or
+                                        direct IR coordination.
                                     </p>
                                 </div>
                             ) : interest.status === 'approved' ? (
                                 <form onSubmit={handleScheduleCall} className="space-y-3 text-xs">
                                     <div>
-                                        <label className="block text-[11px] font-bold text-zinc-700 uppercase tracking-wider mb-1">
+                                        <label className="mb-1 block text-[11px] font-bold tracking-wider text-zinc-700 uppercase">
                                             Scheduled Date & Time
                                         </label>
                                         <input
@@ -500,7 +492,7 @@ function InterestDrawer({
                                     </div>
 
                                     <div>
-                                        <label className="block text-[11px] font-bold text-zinc-700 uppercase tracking-wider mb-1">
+                                        <label className="mb-1 block text-[11px] font-bold tracking-wider text-zinc-700 uppercase">
                                             Meeting Link / Access Details
                                         </label>
                                         <input
@@ -513,7 +505,7 @@ function InterestDrawer({
                                     </div>
 
                                     <div>
-                                        <label className="block text-[11px] font-bold text-zinc-700 uppercase tracking-wider mb-1">
+                                        <label className="mb-1 block text-[11px] font-bold tracking-wider text-zinc-700 uppercase">
                                             Internal IR Coordination Notes
                                         </label>
                                         <textarea
@@ -529,7 +521,7 @@ function InterestDrawer({
                                         <button
                                             type="submit"
                                             disabled={isScheduling}
-                                            className="flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 px-3.5 py-1.5 text-xs font-semibold text-white transition shadow-2xs disabled:opacity-50"
+                                            className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-indigo-700 disabled:opacity-50"
                                         >
                                             <Icon icon="solar:calendar-linear" className="size-3.5" />
                                             <span>{interest.scheduled_at ? 'Update Schedule' : 'Schedule Call'}</span>
@@ -540,7 +532,7 @@ function InterestDrawer({
                                                 type="button"
                                                 onClick={handleCompleteCall}
                                                 disabled={isCompleting}
-                                                className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 text-xs font-semibold text-white transition shadow-2xs disabled:opacity-50"
+                                                className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-emerald-700 disabled:opacity-50"
                                             >
                                                 <Icon icon="solar:check-circle-linear" className="size-3.5" />
                                                 <span>Mark Call Completed</span>
@@ -559,18 +551,14 @@ function InterestDrawer({
                     {/* Section 3: Target Startup Dossier */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                                Target Startup Profile
-                            </h4>
-                            <span className="text-[11px] font-semibold text-zinc-600">
-                                Score: {interest.profile?.overall_score ?? '—'}/100
-                            </span>
+                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Target Startup Profile</h4>
+                            <span className="text-[11px] font-semibold text-zinc-600">Score: {interest.profile?.overall_score ?? '—'}/100</span>
                         </div>
 
-                        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 space-y-3 shadow-2xs">
+                        <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-2xs">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-100 border border-zinc-200 text-xs font-bold text-zinc-700">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-xs font-bold text-zinc-700">
                                         {getInitials(startupName)}
                                     </div>
                                     <div>
@@ -580,7 +568,7 @@ function InterestDrawer({
                                 </div>
 
                                 {interest.profile?.is_featured_in_spotlight && (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200/80 px-2 py-0.5 text-[10.5px] font-medium text-zinc-700">
+                                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200/80 bg-zinc-100 px-2 py-0.5 text-[10.5px] font-medium text-zinc-700">
                                         <Icon icon="solar:crown-linear" className="size-3 text-zinc-600" />
                                         <span>Spotlight</span>
                                     </span>
@@ -594,9 +582,7 @@ function InterestDrawer({
                                 </div>
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-zinc-400">Founder Email</span>
-                                    <span className="font-medium text-zinc-900 font-mono text-[11px]">
-                                        {interest.profile?.founder?.email ?? '—'}
-                                    </span>
+                                    <span className="font-mono text-[11px] font-medium text-zinc-900">{interest.profile?.founder?.email ?? '—'}</span>
                                 </div>
                                 {interest.profile?.batch && (
                                     <div className="flex items-center justify-between py-2">
@@ -611,13 +597,11 @@ function InterestDrawer({
                     {/* Section 4: Investor Dossier & Verification */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                                Investor Dossier
-                            </h4>
+                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Investor Dossier</h4>
                             <span className="text-[11px] text-zinc-400">Identity Record</span>
                         </div>
 
-                        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 space-y-3 shadow-2xs">
+                        <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-2xs">
                             <div className="divide-y divide-zinc-100 text-xs">
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-zinc-400">Full Legal Name</span>
@@ -630,24 +614,19 @@ function InterestDrawer({
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-zinc-400">Direct Email</span>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-medium text-zinc-900 font-mono text-[11px]">
-                                            {interest.investor?.email ?? '—'}
-                                        </span>
+                                        <span className="font-mono text-[11px] font-medium text-zinc-900">{interest.investor?.email ?? '—'}</span>
                                         <button
                                             onClick={copyEmail}
-                                            className="text-zinc-400 hover:text-zinc-800 transition-colors"
+                                            className="text-zinc-400 transition-colors hover:text-zinc-800"
                                             title="Copy Email"
                                         >
-                                            <Icon
-                                                icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'}
-                                                className="size-3.5"
-                                            />
+                                            <Icon icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'} className="size-3.5" />
                                         </button>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-zinc-400">KYC Status</span>
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-800 bg-zinc-100 border border-zinc-200/80 rounded-full px-2 py-0.2">
+                                    <span className="py-0.2 inline-flex items-center gap-1 rounded-full border border-zinc-200/80 bg-zinc-100 px-2 text-[11px] font-medium text-zinc-800">
                                         <Icon icon="solar:verified-check-linear" className="size-3 text-zinc-600" />
                                         <span>{interest.investor?.kyc_status ?? 'Approved'}</span>
                                     </span>
@@ -658,28 +637,25 @@ function InterestDrawer({
 
                     {/* Section 5: Review & Audit Information */}
                     {interest.reviewed_at && (
-                        <div className="rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4 text-xs space-y-2">
+                        <div className="space-y-2 rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4 text-xs">
                             <div className="flex items-center justify-between text-zinc-500">
                                 <span className="font-semibold text-zinc-800">Decision Audit Log</span>
                                 <span>{formatDate(interest.reviewed_at)}</span>
                             </div>
                             <p className="text-[11.5px] text-zinc-500">
                                 Action was recorded on {new Date(interest.reviewed_at).toLocaleTimeString()} by{' '}
-                                <span className="font-medium text-zinc-800">
-                                    {interest.reviewer?.full_name ?? 'Admin'}
-                                </span>
-                                .
+                                <span className="font-medium text-zinc-800">{interest.reviewer?.full_name ?? 'Admin'}</span>.
                             </p>
                         </div>
                     )}
                 </div>
 
                 {/* ── Sticky Action Footer ─────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-3 px-6 py-3.5 border-t border-zinc-100 bg-[#FAFBFD] shrink-0">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-t border-zinc-100 bg-[#FAFBFD] px-6 py-3.5">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
+                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                     >
                         Close
                     </button>
@@ -690,7 +666,7 @@ function InterestDrawer({
                                 type="button"
                                 onClick={() => setStatus('pending')}
                                 disabled={updating}
-                                className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-medium text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                             >
                                 <Icon icon="solar:restart-linear" className="size-3.5 text-zinc-400" />
                                 <span>Reset to Pending</span>
@@ -702,7 +678,7 @@ function InterestDrawer({
                                 type="button"
                                 onClick={() => setStatus('approved')}
                                 disabled={updating}
-                                className="flex items-center gap-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 px-4 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs"
+                                className="flex items-center gap-1.5 rounded-full bg-zinc-950 px-4 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800"
                             >
                                 {updating ? (
                                     <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
@@ -797,12 +773,12 @@ export default function AdminInterests({
             <Head title="Investor Interests & Dealflow — Admin" />
 
             {/* ── Main Full-Height Container ───────────────────────────────────── */}
-            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-xs overflow-hidden p-6 lg:p-8">
+            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs lg:rounded-[22px] lg:p-8">
                 {/* ── Top Bar ─────────────────────────────────────────────────── */}
-                <div className="flex items-center justify-between shrink-0 mb-6">
+                <div className="mb-6 flex shrink-0 items-center justify-between">
                     <div>
                         <h1 className="text-xl font-bold tracking-tight text-zinc-950">Investor Interests & Dealflow</h1>
-                        <p className="text-xs text-zinc-500 mt-0.5">
+                        <p className="mt-0.5 text-xs text-zinc-500">
                             Monitor, audit, and approve investor engagement, data room clearances, and founder introductions.
                         </p>
                     </div>
@@ -811,7 +787,7 @@ export default function AdminInterests({
                         <button
                             type="button"
                             onClick={() => router.get('/admin/dealflow/diligence')}
-                            className="flex items-center gap-1.5 rounded-xl border border-indigo-200/90 bg-indigo-50/70 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-2xs hover:bg-indigo-100 transition-colors"
+                            className="flex items-center gap-1.5 rounded-xl border border-indigo-200/90 bg-indigo-50/70 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-2xs transition-colors hover:bg-indigo-100"
                         >
                             <Icon icon="solar:folder-with-files-bold" className="size-3.5 text-indigo-600" />
                             <span>Post-Intro Diligence</span>
@@ -820,7 +796,7 @@ export default function AdminInterests({
                         <button
                             type="button"
                             onClick={() => router.get('/admin/dealflow/data-rooms')}
-                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:key-linear" className="size-3.5 text-zinc-500" />
                             <span>Data Room Grants</span>
@@ -829,7 +805,7 @@ export default function AdminInterests({
                         <button
                             type="button"
                             onClick={() => router.get('/admin/spotlight')}
-                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:crown-linear" className="size-3.5 text-zinc-500" />
                             <span>Spotlight Startups</span>
@@ -838,46 +814,30 @@ export default function AdminInterests({
                 </div>
 
                 {/* ── Minimal Monochrome Stats Strip (Refero Clean Look) ───────── */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 mb-6">
+                <div className="mb-6 grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-4">
                     <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                            Total Inquiries
-                        </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
-                            {totals.all}
-                        </span>
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Total Inquiries</span>
+                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.all}</span>
                     </div>
 
                     <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                            Pending Decision
-                        </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
-                            {totals.pending}
-                        </span>
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Pending Decision</span>
+                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.pending}</span>
                     </div>
 
                     <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                            Data Room Granted
-                        </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
-                            {totals.data_room_requests}
-                        </span>
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Data Room Granted</span>
+                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.data_room_requests}</span>
                     </div>
 
                     <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                            Founder Calls
-                        </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
-                            {totals.founder_call_requests}
-                        </span>
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Founder Calls</span>
+                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.founder_call_requests}</span>
                     </div>
                 </div>
 
                 {/* ── Navigation Tabs ─────────────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-4 shrink-0 pb-3 border-b border-zinc-100 mb-4">
+                <div className="mb-4 flex shrink-0 items-center justify-between gap-4 border-b border-zinc-100 pb-3">
                     <div className="flex items-center gap-1.5 overflow-x-auto">
                         {(
                             [
@@ -892,10 +852,10 @@ export default function AdminInterests({
                                 key === 'all'
                                     ? totals.all
                                     : key === 'pending'
-                                    ? totals.pending
-                                    : key === 'approved'
-                                    ? totals.approved
-                                    : totals.denied;
+                                      ? totals.pending
+                                      : key === 'approved'
+                                        ? totals.approved
+                                        : totals.denied;
 
                             return (
                                 <button
@@ -903,17 +863,17 @@ export default function AdminInterests({
                                     type="button"
                                     onClick={() => applyFilters({ status: key === 'all' ? '' : key })}
                                     className={cn(
-                                        'shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                                        'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
                                         isSelected
-                                            ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
-                                            : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                            ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
+                                            : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
                                     )}
                                 >
                                     <span>{label}</span>
                                     {count !== undefined && count > 0 && (
                                         <span
                                             className={cn(
-                                                'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
+                                                'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
                                                 isSelected ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
                                             )}
                                         >
@@ -927,24 +887,24 @@ export default function AdminInterests({
                 </div>
 
                 {/* ── Search & Multi-Filters Strip ────────────────────────────── */}
-                <div className="flex items-center justify-between gap-3 shrink-0 mb-3">
+                <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
                     {/* Live Search */}
                     <div className="relative w-full max-w-md">
                         <Icon
                             icon="solar:minimalistic-magnifer-linear"
-                            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none"
+                            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
                         />
                         <input
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search investor, startup, or message text..."
-                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none shadow-2xs transition-colors"
+                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                         />
                         {search && (
                             <button
                                 onClick={() => setSearch('')}
-                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                                className="absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
                             >
                                 <Icon icon="solar:close-circle-linear" className="size-3.5" />
                             </button>
@@ -958,14 +918,14 @@ export default function AdminInterests({
                             <button
                                 type="button"
                                 onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-                                className="flex h-8 items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3 text-xs font-medium text-zinc-800 shadow-2xs hover:bg-zinc-50 transition-colors"
+                                className="flex h-8 items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3 text-xs font-medium text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                             >
                                 <span>{typeLabels[activeType] ?? 'All request types'}</span>
                                 <Icon icon="solar:alt-arrow-down-linear" className="size-3 text-zinc-400" />
                             </button>
 
                             {isTypeDropdownOpen && (
-                                <div className="absolute right-0 top-full z-30 mt-1.5 w-52 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 duration-150">
+                                <div className="animate-in fade-in-0 zoom-in-95 absolute top-full right-0 z-30 mt-1.5 w-52 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl duration-150">
                                     {(['all', 'data_room_access', 'founder_call', 'more_details'] as const).map((t) => (
                                         <button
                                             key={t}
@@ -976,15 +936,11 @@ export default function AdminInterests({
                                             }}
                                             className={cn(
                                                 'flex w-full items-center justify-between rounded-xl px-3 py-1.5 text-left text-xs transition-colors',
-                                                activeType === t
-                                                    ? 'bg-zinc-100 font-semibold text-zinc-950'
-                                                    : 'text-zinc-700 hover:bg-zinc-50',
+                                                activeType === t ? 'bg-zinc-100 font-semibold text-zinc-950' : 'text-zinc-700 hover:bg-zinc-50',
                                             )}
                                         >
                                             <span>{typeLabels[t]}</span>
-                                            {activeType === t && (
-                                                <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />
-                                            )}
+                                            {activeType === t && <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />}
                                         </button>
                                     ))}
                                 </div>
@@ -997,14 +953,14 @@ export default function AdminInterests({
                                 <button
                                     type="button"
                                     onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)}
-                                    className="flex h-8 items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3 text-xs font-medium text-zinc-800 shadow-2xs hover:bg-zinc-50 transition-colors"
+                                    className="flex h-8 items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3 text-xs font-medium text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                                 >
                                     <span>{activeSector === 'all' ? 'All sectors' : activeSector}</span>
                                     <Icon icon="solar:alt-arrow-down-linear" className="size-3 text-zinc-400" />
                                 </button>
 
                                 {isSectorDropdownOpen && (
-                                    <div className="absolute right-0 top-full z-30 mt-1.5 w-48 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl animate-in fade-in-0 zoom-in-95 duration-150">
+                                    <div className="animate-in fade-in-0 zoom-in-95 absolute top-full right-0 z-30 mt-1.5 w-48 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl duration-150">
                                         <button
                                             type="button"
                                             onClick={() => {
@@ -1013,15 +969,11 @@ export default function AdminInterests({
                                             }}
                                             className={cn(
                                                 'flex w-full items-center justify-between rounded-xl px-3 py-1.5 text-left text-xs transition-colors',
-                                                activeSector === 'all'
-                                                    ? 'bg-zinc-100 font-semibold text-zinc-950'
-                                                    : 'text-zinc-700 hover:bg-zinc-50',
+                                                activeSector === 'all' ? 'bg-zinc-100 font-semibold text-zinc-950' : 'text-zinc-700 hover:bg-zinc-50',
                                             )}
                                         >
                                             <span>All sectors</span>
-                                            {activeSector === 'all' && (
-                                                <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />
-                                            )}
+                                            {activeSector === 'all' && <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />}
                                         </button>
 
                                         {sectors.map((s) => (
@@ -1034,15 +986,11 @@ export default function AdminInterests({
                                                 }}
                                                 className={cn(
                                                     'flex w-full items-center justify-between rounded-xl px-3 py-1.5 text-left text-xs transition-colors',
-                                                    activeSector === s
-                                                        ? 'bg-zinc-100 font-semibold text-zinc-950'
-                                                        : 'text-zinc-700 hover:bg-zinc-50',
+                                                    activeSector === s ? 'bg-zinc-100 font-semibold text-zinc-950' : 'text-zinc-700 hover:bg-zinc-50',
                                                 )}
                                             >
                                                 <span className="truncate pr-2">{s}</span>
-                                                {activeSector === s && (
-                                                    <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />
-                                                )}
+                                                {activeSector === s && <Icon icon="solar:check-read-linear" className="size-3.5 text-zinc-900" />}
                                             </button>
                                         ))}
                                     </div>
@@ -1053,9 +1001,9 @@ export default function AdminInterests({
                 </div>
 
                 {/* ── Table Container with Fixed Non-Scrolling Header ─────────── */}
-                <div className="flex-1 min-h-0 flex flex-col justify-between overflow-hidden">
+                <div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden">
                     {/* Fixed Table Header */}
-                    <div className="flex items-center gap-4 px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 select-none shrink-0">
+                    <div className="flex shrink-0 items-center gap-4 border-b border-zinc-100 px-4 py-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase select-none">
                         <div className="w-52 shrink-0">Investor / Entity</div>
                         <div className="w-48 shrink-0">Target Startup</div>
                         <div className="w-40 shrink-0">Engagement Type</div>
@@ -1066,47 +1014,42 @@ export default function AdminInterests({
                     </div>
 
                     {/* Scrollable Rows */}
-                    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar divide-y divide-zinc-100">
+                    <div className="no-scrollbar min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
                         {interests.data.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <Icon icon="solar:inbox-line-linear" className="size-8 text-zinc-300 mb-2" />
+                                <Icon icon="solar:inbox-line-linear" className="mb-2 size-8 text-zinc-300" />
                                 <p className="text-xs text-zinc-400">No investor interest requests found matching this filter.</p>
                             </div>
                         ) : (
                             interests.data.map((item) => {
-                                const investorName =
-                                    item.investor?.profile?.full_name ?? item.investor?.email ?? 'Investor';
+                                const investorName = item.investor?.profile?.full_name ?? item.investor?.email ?? 'Investor';
                                 const companyName = item.profile?.founder?.company_name ?? 'Startup';
 
                                 return (
                                     <div
                                         key={item.id}
                                         onClick={() => setActiveDrawerInterest(item)}
-                                        className="group flex items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80 cursor-pointer"
+                                        className="group flex cursor-pointer items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80"
                                     >
                                         {/* Investor Column */}
-                                        <div className="w-52 shrink-0 flex items-center gap-2.5 min-w-0">
-                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-100 border border-zinc-200 text-[11px] font-bold text-zinc-700">
+                                        <div className="flex w-52 min-w-0 shrink-0 items-center gap-2.5">
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-[11px] font-bold text-zinc-700">
                                                 {getInitials(investorName)}
                                             </div>
                                             <div className="min-w-0 pr-1">
-                                                <span className="font-semibold text-zinc-950 group-hover:underline text-[12.5px] block truncate">
+                                                <span className="block truncate text-[12.5px] font-semibold text-zinc-950 group-hover:underline">
                                                     {investorName}
                                                 </span>
-                                                <span className="text-zinc-400 text-[11px] truncate block">
+                                                <span className="block truncate text-[11px] text-zinc-400">
                                                     {item.investor?.profile?.company_name ?? item.investor?.email}
                                                 </span>
                                             </div>
                                         </div>
 
                                         {/* Startup Column */}
-                                        <div className="w-48 shrink-0 min-w-0">
-                                            <span className="font-medium text-zinc-900 truncate block text-[12px]">
-                                                {companyName}
-                                            </span>
-                                            <span className="text-[11px] text-zinc-400 truncate block">
-                                                {item.profile?.sector}
-                                            </span>
+                                        <div className="w-48 min-w-0 shrink-0">
+                                            <span className="block truncate text-[12px] font-medium text-zinc-900">{companyName}</span>
+                                            <span className="block truncate text-[11px] text-zinc-400">{item.profile?.sector}</span>
                                         </div>
 
                                         {/* Request Type */}
@@ -1117,11 +1060,9 @@ export default function AdminInterests({
                                         {/* Message Preview */}
                                         <div className="min-w-0 flex-1 pr-4">
                                             {item.message ? (
-                                                <span className="text-zinc-600 truncate block text-[11.5px]">
-                                                    &ldquo;{item.message}&rdquo;
-                                                </span>
+                                                <span className="block truncate text-[11.5px] text-zinc-600">&ldquo;{item.message}&rdquo;</span>
                                             ) : (
-                                                <span className="text-zinc-300 italic text-[11px]">No note attached</span>
+                                                <span className="text-[11px] text-zinc-300 italic">No note attached</span>
                                             )}
                                         </div>
 
@@ -1129,20 +1070,18 @@ export default function AdminInterests({
                                         <div className="w-28 shrink-0 space-y-0.5">
                                             <StatusBadge status={item.status} />
                                             {item.founder_decision === 'approved' && (
-                                                <span className="text-[10px] text-emerald-600 font-semibold block">Founder Authorized</span>
+                                                <span className="block text-[10px] font-semibold text-emerald-600">Founder Authorized</span>
                                             )}
                                             {item.founder_decision === 'declined' && (
-                                                <span className="text-[10px] text-rose-600 font-semibold block">Founder Declined</span>
+                                                <span className="block text-[10px] font-semibold text-rose-600">Founder Declined</span>
                                             )}
                                             {(item.founder_decision === null || item.founder_decision === 'pending') && item.status === 'pending' && (
-                                                <span className="text-[10px] text-amber-600 font-medium block">Awaiting Founder</span>
+                                                <span className="block text-[10px] font-medium text-amber-600">Awaiting Founder</span>
                                             )}
                                         </div>
 
                                         {/* Submitted Date */}
-                                        <div className="w-28 shrink-0 text-zinc-500 text-[11.5px]">
-                                            {formatRelativeTime(item.created_at)}
-                                        </div>
+                                        <div className="w-28 shrink-0 text-[11.5px] text-zinc-500">{formatRelativeTime(item.created_at)}</div>
 
                                         {/* Action Button */}
                                         <div className="w-28 shrink-0 text-right">
@@ -1152,7 +1091,7 @@ export default function AdminInterests({
                                                     e.stopPropagation();
                                                     setActiveDrawerInterest(item);
                                                 }}
-                                                className="whitespace-nowrap rounded-lg border border-zinc-200/80 bg-white px-3 py-1 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                                className="rounded-lg border border-zinc-200/80 bg-white px-3 py-1 text-xs font-semibold whitespace-nowrap text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                                             >
                                                 Inspect & Act
                                             </button>
@@ -1164,7 +1103,7 @@ export default function AdminInterests({
                     </div>
 
                     {/* ── Table Footer & Pagination ────────────────────────────── */}
-                    <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-xs text-zinc-400 shrink-0">
+                    <div className="flex shrink-0 items-center justify-between border-t border-zinc-100 pt-3 text-xs text-zinc-400">
                         <p>
                             Showing {interests.from ?? 0} to {interests.to ?? 0} of {interests.total} requests
                         </p>
@@ -1177,12 +1116,12 @@ export default function AdminInterests({
                                         onClick={() => link.url && router.get(link.url, {}, { preserveScroll: true })}
                                         disabled={!link.url}
                                         className={cn(
-                                            'px-2 py-1 rounded-md text-xs font-medium',
+                                            'rounded-md px-2 py-1 text-xs font-medium',
                                             link.active
-                                                ? 'bg-zinc-950 text-white font-bold'
+                                                ? 'bg-zinc-950 font-bold text-white'
                                                 : link.url
-                                                ? 'text-zinc-600 hover:bg-zinc-100'
-                                                : 'text-zinc-300 cursor-not-allowed',
+                                                  ? 'text-zinc-600 hover:bg-zinc-100'
+                                                  : 'cursor-not-allowed text-zinc-300',
                                         )}
                                         dangerouslySetInnerHTML={{ __html: link.label }}
                                     />

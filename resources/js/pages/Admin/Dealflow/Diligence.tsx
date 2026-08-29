@@ -113,13 +113,7 @@ function getStatusBadge(status: string) {
     }
 }
 
-export default function DiligenceIndex({
-    requests,
-    activeStatus,
-    activeCategory,
-    activeQueue,
-    totals,
-}: PageProps) {
+export default function DiligenceIndex({ requests, activeStatus, activeCategory, activeQueue, totals }: PageProps) {
     const [selectedReq, setSelectedReq] = useState<DiligenceRequestItem | null>(null);
     const [instructions, setInstructions] = useState('');
     const [investorResponse, setInvestorResponse] = useState('');
@@ -141,11 +135,15 @@ export default function DiligenceIndex({
     };
 
     const handleFilterQueue = (queue: string) => {
-        router.get(route('admin.dealflow.diligence.index'), {
-            queue,
-            status: activeStatus !== 'all' ? activeStatus : undefined,
-            category: activeCategory !== 'all' ? activeCategory : undefined,
-        }, { preserveState: true });
+        router.get(
+            route('admin.dealflow.diligence.index'),
+            {
+                queue,
+                status: activeStatus !== 'all' ? activeStatus : undefined,
+                category: activeCategory !== 'all' ? activeCategory : undefined,
+            },
+            { preserveState: true },
+        );
     };
 
     const handleRequestFounder = () => {
@@ -160,7 +158,7 @@ export default function DiligenceIndex({
                     closeModal();
                 },
                 onError: () => setSubmitting(false),
-            }
+            },
         );
     };
 
@@ -180,7 +178,7 @@ export default function DiligenceIndex({
                     closeModal();
                 },
                 onError: () => setSubmitting(false),
-            }
+            },
         );
     };
 
@@ -196,7 +194,7 @@ export default function DiligenceIndex({
                     closeModal();
                 },
                 onError: () => setSubmitting(false),
-            }
+            },
         );
     };
 
@@ -208,7 +206,7 @@ export default function DiligenceIndex({
                 {/* Header */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-white tracking-tight">Post-Introduction Diligence</h1>
+                        <h1 className="text-2xl font-bold tracking-tight text-white">Post-Introduction Diligence</h1>
                         <p className="text-sm text-zinc-400">
                             Admin-mediated post-call questions, operational follow-ups, and confidential document requests.
                         </p>
@@ -217,7 +215,7 @@ export default function DiligenceIndex({
                     <div className="flex items-center gap-2">
                         <button
                             onClick={() => router.get(route('admin.dealflow.interests.index'))}
-                            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800/60 px-3.5 py-2 text-xs font-semibold text-zinc-300 hover:bg-zinc-700/80 transition"
+                            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800/60 px-3.5 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-zinc-700/80"
                         >
                             <Icon icon="solar:users-group-two-rounded-bold" className="size-4 text-zinc-400" />
                             View Dealflow Interests
@@ -229,9 +227,21 @@ export default function DiligenceIndex({
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
                     {[
                         { label: 'All Requests', count: totals.all, queue: 'all', icon: 'solar:folder-with-files-bold' },
-                        { label: 'Awaiting IR Review', count: totals.submitted, queue: 'submitted', icon: 'solar:hourglass-bold', highlight: totals.submitted > 0 },
+                        {
+                            label: 'Awaiting IR Review',
+                            count: totals.submitted,
+                            queue: 'submitted',
+                            icon: 'solar:hourglass-bold',
+                            highlight: totals.submitted > 0,
+                        },
                         { label: 'With Founder', count: totals.waiting_for_founder, queue: 'waiting_for_founder', icon: 'solar:user-speak-bold' },
-                        { label: 'Founder Responded', count: totals.founder_responded, queue: 'founder_responded', icon: 'solar:chat-round-check-bold', highlight: totals.founder_responded > 0 },
+                        {
+                            label: 'Founder Responded',
+                            count: totals.founder_responded,
+                            queue: 'founder_responded',
+                            icon: 'solar:chat-round-check-bold',
+                            highlight: totals.founder_responded > 0,
+                        },
                         { label: 'Resolved / Published', count: totals.resolved, queue: 'resolved', icon: 'solar:check-circle-bold' },
                     ].map((card) => {
                         const active = activeQueue === card.queue;
@@ -243,14 +253,12 @@ export default function DiligenceIndex({
                                     'flex flex-col gap-2 rounded-xl border p-4 text-left transition',
                                     active
                                         ? 'border-indigo-500/50 bg-indigo-500/10 text-white'
-                                        : 'border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/40'
+                                        : 'border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/40',
                                 )}
                             >
                                 <div className="flex items-center justify-between">
                                     <Icon icon={card.icon} className={cn('size-5', active ? 'text-indigo-400' : 'text-zinc-500')} />
-                                    {card.highlight && (
-                                        <span className="inline-flex size-2 rounded-full bg-amber-500 animate-pulse" />
-                                    )}
+                                    {card.highlight && <span className="inline-flex size-2 animate-pulse rounded-full bg-amber-500" />}
                                 </div>
                                 <div>
                                     <span className="text-2xl font-bold text-white">{card.count}</span>
@@ -262,10 +270,10 @@ export default function DiligenceIndex({
                 </div>
 
                 {/* Table */}
-                <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 overflow-hidden shadow-sm">
+                <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm text-zinc-300">
-                            <thead className="border-b border-zinc-800 bg-zinc-900/80 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                            <thead className="border-b border-zinc-800 bg-zinc-900/80 text-xs font-semibold tracking-wider text-zinc-400 uppercase">
                                 <tr>
                                     <th className="px-6 py-4">Startup & Investor</th>
                                     <th className="px-6 py-4">Category & Subject</th>
@@ -285,43 +293,42 @@ export default function DiligenceIndex({
                                     requests.data.map((req) => {
                                         const badge = getStatusBadge(req.status);
                                         return (
-                                            <tr key={req.id} className="hover:bg-zinc-800/30 transition">
+                                            <tr key={req.id} className="transition hover:bg-zinc-800/30">
                                                 <td className="px-6 py-4">
-                                                    <div className="font-semibold text-white">
-                                                        {req.profile?.founder?.company_name || 'Startup'}
-                                                    </div>
+                                                    <div className="font-semibold text-white">{req.profile?.founder?.company_name || 'Startup'}</div>
                                                     <div className="text-xs text-zinc-400">
                                                         By: {req.investor?.profile?.full_name || req.investor?.email || 'Investor'}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="inline-flex rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-300">
+                                                        <span className="inline-flex rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold tracking-wider text-zinc-300 uppercase">
                                                             {req.category.replace('_', ' ')}
                                                         </span>
                                                         {req.data_room_required && (
-                                                            <span className="inline-flex items-center gap-1 rounded bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-400 border border-indigo-500/20">
+                                                            <span className="inline-flex items-center gap-1 rounded border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-400">
                                                                 <Icon icon="solar:shield-check-bold" className="size-3" />
                                                                 Data Room
                                                             </span>
                                                         )}
                                                     </div>
-                                                    <div className="mt-1 font-medium text-zinc-200 line-clamp-1">
-                                                        {req.subject}
-                                                    </div>
+                                                    <div className="mt-1 line-clamp-1 font-medium text-zinc-200">{req.subject}</div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={cn('inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium', badge.bg)}>
+                                                    <span
+                                                        className={cn(
+                                                            'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium',
+                                                            badge.bg,
+                                                        )}
+                                                    >
                                                         {badge.label}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-xs text-zinc-400">
-                                                    {formatDate(req.created_at)}
-                                                </td>
+                                                <td className="px-6 py-4 text-xs text-zinc-400">{formatDate(req.created_at)}</td>
                                                 <td className="px-6 py-4 text-right">
                                                     <button
                                                         onClick={() => openModal(req)}
-                                                        className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-500 transition shadow-sm"
+                                                        className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                                                     >
                                                         <Icon icon="solar:tuning-bold" className="size-3.5" />
                                                         Orchestrate
@@ -339,52 +346,55 @@ export default function DiligenceIndex({
 
             {/* Orchestration Slide-over / Modal */}
             {selectedReq && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 overflow-y-auto">
-                    <div className="w-full max-w-3xl rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl space-y-6 my-8">
+                <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-xs">
+                    <div className="my-8 w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl">
                         {/* Modal Header */}
                         <div className="flex items-start justify-between border-b border-zinc-800 pb-4">
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <span className="inline-flex rounded bg-indigo-500/20 px-2 py-0.5 text-xs font-bold uppercase text-indigo-300">
+                                    <span className="inline-flex rounded bg-indigo-500/20 px-2 py-0.5 text-xs font-bold text-indigo-300 uppercase">
                                         {selectedReq.category.replace('_', ' ')}
                                     </span>
-                                    <span className={cn('inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium', getStatusBadge(selectedReq.status).bg)}>
+                                    <span
+                                        className={cn(
+                                            'inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium',
+                                            getStatusBadge(selectedReq.status).bg,
+                                        )}
+                                    >
                                         {getStatusBadge(selectedReq.status).label}
                                     </span>
                                 </div>
                                 <h2 className="mt-2 text-xl font-bold text-white">{selectedReq.subject}</h2>
                                 <p className="text-xs text-zinc-400">
-                                    Investor: <strong className="text-zinc-200">{selectedReq.investor?.profile?.full_name || 'Investor'}</strong> · Startup: <strong className="text-zinc-200">{selectedReq.profile?.founder?.company_name || 'Startup'}</strong>
+                                    Investor: <strong className="text-zinc-200">{selectedReq.investor?.profile?.full_name || 'Investor'}</strong> ·
+                                    Startup: <strong className="text-zinc-200">{selectedReq.profile?.founder?.company_name || 'Startup'}</strong>
                                 </p>
                             </div>
 
-                            <button
-                                onClick={closeModal}
-                                className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-white transition"
-                            >
+                            <button onClick={closeModal} className="rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-white">
                                 <Icon icon="solar:close-circle-bold" className="size-5" />
                             </button>
                         </div>
 
                         {/* Investor's Inquiry */}
-                        <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 space-y-2">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">Investor Request Details</h3>
-                            <p className="text-sm text-zinc-200 whitespace-pre-wrap">{selectedReq.request_details}</p>
+                        <div className="space-y-2 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4">
+                            <h3 className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Investor Request Details</h3>
+                            <p className="text-sm whitespace-pre-wrap text-zinc-200">{selectedReq.request_details}</p>
                         </div>
 
                         {/* Founder Coordination / Response */}
                         <div className="space-y-4 rounded-xl border border-blue-900/30 bg-blue-950/10 p-4">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                            <h3 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-blue-400 uppercase">
                                 <Icon icon="solar:user-hand-up-bold" className="size-4" />
                                 Pinpoint ↔ Founder Coordination
                             </h3>
 
                             {selectedReq.founder_notes_to_admin ? (
-                                <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 space-y-1">
+                                <div className="space-y-1 rounded-lg border border-zinc-800 bg-zinc-900 p-3">
                                     <div className="text-xs font-semibold text-emerald-400">
                                         Founder Response (Received {formatDate(selectedReq.founder_responded_at)}):
                                     </div>
-                                    <p className="text-sm text-zinc-300 whitespace-pre-wrap">{selectedReq.founder_notes_to_admin}</p>
+                                    <p className="text-sm whitespace-pre-wrap text-zinc-300">{selectedReq.founder_notes_to_admin}</p>
                                 </div>
                             ) : (
                                 <div className="space-y-2">
@@ -402,7 +412,7 @@ export default function DiligenceIndex({
                                         type="button"
                                         onClick={handleRequestFounder}
                                         disabled={submitting}
-                                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition disabled:opacity-50"
+                                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
                                     >
                                         <Icon icon="solar:forward-bold" className="size-4" />
                                         {selectedReq.status === 'waiting_for_founder' ? 'Update Founder Prompt' : 'Forward Request to Founder'}
@@ -413,7 +423,7 @@ export default function DiligenceIndex({
 
                         {/* Investor-Facing Response Release */}
                         <div className="space-y-4 rounded-xl border border-emerald-900/30 bg-emerald-950/10 p-4">
-                            <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                            <h3 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-emerald-400 uppercase">
                                 <Icon icon="solar:check-read-bold" className="size-4" />
                                 Approved Investor-Facing Response
                             </h3>
@@ -445,7 +455,7 @@ export default function DiligenceIndex({
                             </div>
 
                             <div className="flex items-center justify-between pt-2">
-                                <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer">
+                                <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-300">
                                     <input
                                         type="checkbox"
                                         checked={markResolved}
@@ -459,7 +469,7 @@ export default function DiligenceIndex({
                                     type="button"
                                     onClick={handleReleaseResponse}
                                     disabled={submitting || !investorResponse.trim()}
-                                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500 transition disabled:opacity-50"
+                                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
                                 >
                                     <Icon icon="solar:send-bold" className="size-4" />
                                     Release Approved Response to Investor
@@ -469,7 +479,7 @@ export default function DiligenceIndex({
 
                         {/* Decline Option */}
                         <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
-                            <div className="flex items-center gap-2 flex-1 max-w-md">
+                            <div className="flex max-w-md flex-1 items-center gap-2">
                                 <input
                                     type="text"
                                     value={declineReason}
@@ -481,7 +491,7 @@ export default function DiligenceIndex({
                                     type="button"
                                     onClick={handleDecline}
                                     disabled={submitting}
-                                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition"
+                                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 transition hover:bg-red-500/20"
                                 >
                                     Decline Inquiry
                                 </button>

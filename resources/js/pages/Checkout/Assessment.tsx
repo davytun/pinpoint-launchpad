@@ -91,7 +91,6 @@ function ScaleIcon(props: React.SVGProps<SVGSVGElement>) {
     );
 }
 
-
 const EVIDENCE_GRADES = [
     {
         claim: 'Our largest customer is on a two-year contract.',

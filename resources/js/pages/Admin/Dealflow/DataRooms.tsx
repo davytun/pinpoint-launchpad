@@ -153,15 +153,7 @@ function humanizeEvent(event: string): { label: string; icon: string } {
 
 // ─── Slide-Over Data Room Grant Drawer ────────────────────────────────────────
 
-function DataRoomDrawer({
-    grant,
-    onClose,
-    onUpdateGrant,
-}: {
-    grant: Grant;
-    onClose: () => void;
-    onUpdateGrant: (updated: Grant) => void;
-}) {
+function DataRoomDrawer({ grant, onClose, onUpdateGrant }: { grant: Grant; onClose: () => void; onUpdateGrant: (updated: Grant) => void }) {
     const [processing, setProcessing] = useState(false);
     const [copiedEmail, setCopiedEmail] = useState(false);
 
@@ -173,9 +165,7 @@ function DataRoomDrawer({
 
     function toggleRevocation() {
         setProcessing(true);
-        const url = isActive
-            ? `/admin/dealflow/data-rooms/${grant.id}/revoke`
-            : `/admin/dealflow/data-rooms/${grant.id}/reinstate`;
+        const url = isActive ? `/admin/dealflow/data-rooms/${grant.id}/revoke` : `/admin/dealflow/data-rooms/${grant.id}/reinstate`;
 
         router.patch(
             url,
@@ -212,29 +202,26 @@ function DataRoomDrawer({
     return (
         <div className="fixed inset-0 z-50 flex justify-end">
             {/* Backdrop */}
-            <div
-                className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200"
-                onClick={onClose}
-            />
+            <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-xs transition-opacity duration-200" onClick={onClose} />
 
             {/* Slide Panel */}
-            <div className="relative z-10 w-full max-w-xl bg-white h-full shadow-2xl flex flex-col justify-between overflow-hidden border-l border-zinc-200 animate-in slide-in-from-right duration-200">
+            <div className="animate-in slide-in-from-right relative z-10 flex h-full w-full max-w-xl flex-col justify-between overflow-hidden border-l border-zinc-200 bg-white shadow-2xl duration-200">
                 {/* ── Drawer Header ────────────────────────────────────────── */}
-                <div className="flex items-center justify-between px-6 py-4.5 border-b border-zinc-100 shrink-0 bg-white">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-white text-xs font-bold shadow-xs">
+                <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 bg-white px-6 py-4.5">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-xs font-bold text-white shadow-xs">
                             {getInitials(investorName)}
                         </div>
                         <div className="min-w-0">
                             <div className="flex items-center gap-2">
                                 <h3 className="truncate text-sm font-bold text-zinc-950">{investorName}</h3>
                                 {isActive ? (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
                                         <Icon icon="solar:shield-keyhole-linear" className="size-3 text-emerald-600" />
                                         <span>Active Clearance</span>
                                     </span>
                                 ) : (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
+                                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
                                         <Icon icon="solar:shield-cross-linear" className="size-3 text-zinc-500" />
                                         <span>Revoked</span>
                                     </span>
@@ -249,21 +236,21 @@ function DataRoomDrawer({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 transition-colors shrink-0"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                     >
                         <Icon icon="solar:close-circle-linear" className="size-5" />
                     </button>
                 </div>
 
                 {/* ── Quick Action Strip ────────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-3 px-6 py-3 bg-[#FAFBFD] border-b border-zinc-100 shrink-0">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-100 bg-[#FAFBFD] px-6 py-3">
                     <div>
                         {isActive ? (
                             <button
                                 type="button"
                                 onClick={toggleRevocation}
                                 disabled={processing}
-                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 px-3.5 py-1.5 text-xs font-semibold text-zinc-700 transition-all shadow-2xs disabled:opacity-50"
+                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50"
                             >
                                 {processing ? (
                                     <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
@@ -277,7 +264,7 @@ function DataRoomDrawer({
                                 type="button"
                                 onClick={toggleRevocation}
                                 disabled={processing}
-                                className="flex items-center gap-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs disabled:opacity-50"
+                                className="flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800 disabled:opacity-50"
                             >
                                 {processing ? (
                                     <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
@@ -289,40 +276,34 @@ function DataRoomDrawer({
                         )}
                     </div>
 
-                    <span className="text-[11px] font-medium text-zinc-400">
-                        {isActive ? 'Security clearance active' : 'Access terminated'}
-                    </span>
+                    <span className="text-[11px] font-medium text-zinc-400">{isActive ? 'Security clearance active' : 'Access terminated'}</span>
                 </div>
 
                 {/* ── Drawer Body (No scrollbars) ───────────────────────────── */}
-                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar p-6 space-y-6">
+                <div className="no-scrollbar min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
                     {/* Section 1: Security & Clearance Specification */}
-                    <div className="rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4.5 space-y-3 shadow-2xs">
+                    <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4.5 shadow-2xs">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-                                Clearance Status
-                            </span>
+                            <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Clearance Status</span>
                             <span className="text-xs font-semibold text-zinc-900">
                                 {isActive ? 'Permitted Read / Download' : 'Revoked / Terminated'}
                             </span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-100 text-xs">
+                        <div className="grid grid-cols-2 gap-3 border-t border-zinc-100 pt-2 text-xs">
                             <div>
-                                <span className="text-zinc-400 block text-[11px]">Granted At</span>
+                                <span className="block text-[11px] text-zinc-400">Granted At</span>
                                 <span className="font-medium text-zinc-800">{formatDate(grant.granted_at)}</span>
                             </div>
                             <div>
-                                <span className="text-zinc-400 block text-[11px]">Authorized By</span>
-                                <span className="font-medium text-zinc-800">
-                                    {grant.grantor?.full_name ?? 'Founder / Admin'}
-                                </span>
+                                <span className="block text-[11px] text-zinc-400">Authorized By</span>
+                                <span className="font-medium text-zinc-800">{grant.grantor?.full_name ?? 'Founder / Admin'}</span>
                             </div>
                         </div>
 
                         {grant.revoked_at && (
                             <div className="rounded-xl border border-zinc-200/80 bg-zinc-50 p-3 text-xs text-zinc-600">
-                                <span className="font-semibold text-zinc-900 block">Revocation Recorded</span>
+                                <span className="block font-semibold text-zinc-900">Revocation Recorded</span>
                                 <span className="text-[11px] text-zinc-500">
                                     Access was officially revoked on {new Date(grant.revoked_at).toLocaleString()}.
                                 </span>
@@ -333,17 +314,13 @@ function DataRoomDrawer({
                     {/* Section 2: Target Startup Dossier */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                                Shared Startup Data Room
-                            </h4>
-                            <span className="text-[11px] font-semibold text-zinc-600">
-                                Score: {grant.profile?.overall_score ?? '—'}/100
-                            </span>
+                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Shared Startup Data Room</h4>
+                            <span className="text-[11px] font-semibold text-zinc-600">Score: {grant.profile?.overall_score ?? '—'}/100</span>
                         </div>
 
-                        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 space-y-3 shadow-2xs">
+                        <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-2xs">
                             <div className="flex items-center gap-3">
-                                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-100 border border-zinc-200 text-xs font-bold text-zinc-700">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-xs font-bold text-zinc-700">
                                     {getInitials(startupName)}
                                 </div>
                                 <div>
@@ -359,9 +336,7 @@ function DataRoomDrawer({
                                 </div>
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-zinc-400">Founder Email</span>
-                                    <span className="font-medium text-zinc-900 font-mono text-[11px]">
-                                        {grant.profile?.founder?.email ?? '—'}
-                                    </span>
+                                    <span className="font-mono text-[11px] font-medium text-zinc-900">{grant.profile?.founder?.email ?? '—'}</span>
                                 </div>
                                 {grant.profile?.batch && (
                                     <div className="flex items-center justify-between py-2">
@@ -376,13 +351,11 @@ function DataRoomDrawer({
                     {/* Section 3: Investor Dossier & Identification */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                            <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wider">
-                                Investor Dossier
-                            </h4>
+                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Investor Dossier</h4>
                             <span className="text-[11px] text-zinc-400">Identity Record</span>
                         </div>
 
-                        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 space-y-3 shadow-2xs">
+                        <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-2xs">
                             <div className="divide-y divide-zinc-100 text-xs">
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-zinc-400">Legal Representative</span>
@@ -395,24 +368,19 @@ function DataRoomDrawer({
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-zinc-400">Direct Email</span>
                                     <div className="flex items-center gap-2">
-                                        <span className="font-medium text-zinc-900 font-mono text-[11px]">
-                                            {grant.investor?.email ?? '—'}
-                                        </span>
+                                        <span className="font-mono text-[11px] font-medium text-zinc-900">{grant.investor?.email ?? '—'}</span>
                                         <button
                                             onClick={copyEmail}
-                                            className="text-zinc-400 hover:text-zinc-800 transition-colors"
+                                            className="text-zinc-400 transition-colors hover:text-zinc-800"
                                             title="Copy Email"
                                         >
-                                            <Icon
-                                                icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'}
-                                                className="size-3.5"
-                                            />
+                                            <Icon icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'} className="size-3.5" />
                                         </button>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between py-2">
                                     <span className="text-zinc-400">KYC Status</span>
-                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium text-zinc-800 bg-zinc-100 border border-zinc-200/80 rounded-full px-2 py-0.2">
+                                    <span className="py-0.2 inline-flex items-center gap-1 rounded-full border border-zinc-200/80 bg-zinc-100 px-2 text-[11px] font-medium text-zinc-800">
                                         <Icon icon="solar:verified-check-linear" className="size-3 text-zinc-600" />
                                         <span>{grant.investor?.kyc_status ?? 'Approved'}</span>
                                     </span>
@@ -423,11 +391,11 @@ function DataRoomDrawer({
                 </div>
 
                 {/* ── Sticky Action Footer ─────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-3 px-6 py-3.5 border-t border-zinc-100 bg-[#FAFBFD] shrink-0">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-t border-zinc-100 bg-[#FAFBFD] px-6 py-3.5">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 transition-colors"
+                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                     >
                         Close
                     </button>
@@ -438,7 +406,7 @@ function DataRoomDrawer({
                                 type="button"
                                 onClick={toggleRevocation}
                                 disabled={processing}
-                                className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                             >
                                 <Icon icon="solar:shield-cross-linear" className="size-3.5 text-zinc-500" />
                                 <span>Revoke Access</span>
@@ -448,7 +416,7 @@ function DataRoomDrawer({
                                 type="button"
                                 onClick={toggleRevocation}
                                 disabled={processing}
-                                className="flex items-center gap-1.5 rounded-full bg-zinc-950 hover:bg-zinc-800 px-4 py-1.5 text-xs font-semibold text-white transition-all shadow-2xs"
+                                className="flex items-center gap-1.5 rounded-full bg-zinc-950 px-4 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800"
                             >
                                 <Icon icon="solar:shield-keyhole-linear" className="size-3.5 text-emerald-400" />
                                 <span>Reinstate Clearance</span>
@@ -518,12 +486,12 @@ export default function AdminDataRooms({
             <Head title="Data Room Grants & Security — Admin" />
 
             {/* ── Main Full-Height Container ───────────────────────────────────── */}
-            <div className="flex flex-1 min-w-0 h-full max-h-full flex-col bg-white rounded-2xl lg:rounded-[22px] border border-zinc-200/80 shadow-xs overflow-hidden p-6 lg:p-8">
+            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs lg:rounded-[22px] lg:p-8">
                 {/* ── Top Bar ─────────────────────────────────────────────────── */}
-                <div className="flex items-center justify-between shrink-0 mb-6">
+                <div className="mb-6 flex shrink-0 items-center justify-between">
                     <div>
                         <h1 className="text-xl font-bold tracking-tight text-zinc-950">Data Room Clearances & Security</h1>
-                        <p className="text-xs text-zinc-500 mt-0.5">
+                        <p className="mt-0.5 text-xs text-zinc-500">
                             Monitor active data room credentials, investor diligence access, and security audit events.
                         </p>
                     </div>
@@ -532,7 +500,7 @@ export default function AdminDataRooms({
                         <button
                             type="button"
                             onClick={() => router.get('/admin/dealflow/interests')}
-                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:hand-money-linear" className="size-3.5 text-zinc-500" />
                             <span>Investor Interests</span>
@@ -541,7 +509,7 @@ export default function AdminDataRooms({
                         <button
                             type="button"
                             onClick={() => router.get('/admin/spotlight')}
-                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs hover:bg-zinc-50 transition-colors"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:crown-linear" className="size-3.5 text-zinc-500" />
                             <span>Spotlight Startups</span>
@@ -550,46 +518,30 @@ export default function AdminDataRooms({
                 </div>
 
                 {/* ── Minimal Monochrome Stats Strip (Refero Clean Look) ───────── */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 shrink-0 mb-6">
+                <div className="mb-6 grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-4">
                     <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                            Active Clearances
-                        </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
-                            {totals.active}
-                        </span>
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Active Clearances</span>
+                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.active}</span>
                     </div>
 
                     <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                            Revoked Access
-                        </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
-                            {totals.revoked}
-                        </span>
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Revoked Access</span>
+                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.revoked}</span>
                     </div>
 
                     <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                            Unique Startups Shared
-                        </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
-                            {totals.unique_startups}
-                        </span>
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Unique Startups Shared</span>
+                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.unique_startups}</span>
                     </div>
 
                     <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider block">
-                            Security Logs
-                        </span>
-                        <span className="text-xl font-bold text-zinc-950 tabular-nums mt-1 block">
-                            {auditEvents.length}
-                        </span>
+                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Security Logs</span>
+                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{auditEvents.length}</span>
                     </div>
                 </div>
 
                 {/* ── Navigation Tabs ─────────────────────────────────────────── */}
-                <div className="flex items-center justify-between gap-4 shrink-0 pb-3 border-b border-zinc-100 mb-4">
+                <div className="mb-4 flex shrink-0 items-center justify-between gap-4 border-b border-zinc-100 pb-3">
                     <div className="flex items-center gap-1.5 overflow-x-auto">
                         <button
                             type="button"
@@ -598,19 +550,17 @@ export default function AdminDataRooms({
                                 applyFilters({ tab: 'grants', status: '' });
                             }}
                             className={cn(
-                                'shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                                'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
                                 activeTab === 'grants' && activeStatus === 'all'
-                                    ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
-                                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                    ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
+                                    : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
                             )}
                         >
                             <span>All Grants</span>
                             <span
                                 className={cn(
-                                    'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
-                                    activeTab === 'grants' && activeStatus === 'all'
-                                        ? 'bg-zinc-950 text-white'
-                                        : 'bg-zinc-200/70 text-zinc-600',
+                                    'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
+                                    activeTab === 'grants' && activeStatus === 'all' ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
                                 )}
                             >
                                 {totals.total}
@@ -624,19 +574,17 @@ export default function AdminDataRooms({
                                 applyFilters({ tab: 'grants', status: 'active' });
                             }}
                             className={cn(
-                                'shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                                'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
                                 activeTab === 'grants' && activeStatus === 'active'
-                                    ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
-                                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                    ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
+                                    : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
                             )}
                         >
                             <span>Active Clearances</span>
                             <span
                                 className={cn(
-                                    'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
-                                    activeTab === 'grants' && activeStatus === 'active'
-                                        ? 'bg-zinc-950 text-white'
-                                        : 'bg-zinc-200/70 text-zinc-600',
+                                    'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
+                                    activeTab === 'grants' && activeStatus === 'active' ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
                                 )}
                             >
                                 {totals.active}
@@ -650,19 +598,17 @@ export default function AdminDataRooms({
                                 applyFilters({ tab: 'grants', status: 'revoked' });
                             }}
                             className={cn(
-                                'shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                                'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
                                 activeTab === 'grants' && activeStatus === 'revoked'
-                                    ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
-                                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                    ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
+                                    : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
                             )}
                         >
                             <span>Revoked Access</span>
                             <span
                                 className={cn(
-                                    'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
-                                    activeTab === 'grants' && activeStatus === 'revoked'
-                                        ? 'bg-zinc-950 text-white'
-                                        : 'bg-zinc-200/70 text-zinc-600',
+                                    'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
+                                    activeTab === 'grants' && activeStatus === 'revoked' ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
                                 )}
                             >
                                 {totals.revoked}
@@ -676,19 +622,17 @@ export default function AdminDataRooms({
                                 applyFilters({ tab: 'audit_trail' });
                             }}
                             className={cn(
-                                'shrink-0 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                                'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
                                 activeTab === 'audit_trail'
-                                    ? 'bg-zinc-100 border border-zinc-200/80 text-zinc-950 font-semibold shadow-2xs'
-                                    : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent',
+                                    ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
+                                    : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
                             )}
                         >
                             <span>Security Audit Trail</span>
                             <span
                                 className={cn(
-                                    'rounded-full px-1.5 py-0.2 text-[10.5px] font-bold tabular-nums',
-                                    activeTab === 'audit_trail'
-                                        ? 'bg-zinc-950 text-white'
-                                        : 'bg-zinc-200/70 text-zinc-600',
+                                    'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
+                                    activeTab === 'audit_trail' ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
                                 )}
                             >
                                 {auditEvents.length}
@@ -699,23 +643,23 @@ export default function AdminDataRooms({
 
                 {/* ── Search Bar (When on Grants Tab) ─────────────────────────── */}
                 {activeTab === 'grants' && (
-                    <div className="flex items-center justify-between gap-3 shrink-0 mb-3">
+                    <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
                         <div className="relative w-full max-w-md">
                             <Icon
                                 icon="solar:minimalistic-magnifer-linear"
-                                className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none"
+                                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400"
                             />
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Search investor email, name, or startup..."
-                                className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none shadow-2xs transition-colors"
+                                className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                             />
                             {search && (
                                 <button
                                     onClick={() => setSearch('')}
-                                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
+                                    className="absolute top-1/2 right-2.5 -translate-y-1/2 text-zinc-400 hover:text-zinc-700"
                                 >
                                     <Icon icon="solar:close-circle-linear" className="size-3.5" />
                                 </button>
@@ -726,9 +670,9 @@ export default function AdminDataRooms({
 
                 {/* ── Main Tab Content ────────────────────────────────────────── */}
                 {activeTab === 'grants' ? (
-                    <div className="flex-1 min-h-0 flex flex-col justify-between overflow-hidden">
+                    <div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden">
                         {/* Fixed Table Header */}
-                        <div className="flex items-center gap-4 px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 select-none shrink-0">
+                        <div className="flex shrink-0 items-center gap-4 border-b border-zinc-100 px-4 py-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase select-none">
                             <div className="w-64 shrink-0">Investor / Entity</div>
                             <div className="w-56 shrink-0">Target Startup</div>
                             <div className="w-36 shrink-0">Clearance Status</div>
@@ -738,17 +682,16 @@ export default function AdminDataRooms({
                         </div>
 
                         {/* Scrollable Rows (No scrollbar) */}
-                        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar divide-y divide-zinc-100">
+                        <div className="no-scrollbar min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
                             {grants.data.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                                    <Icon icon="solar:shield-keyhole-linear" className="size-8 text-zinc-300 mb-2" />
+                                    <Icon icon="solar:shield-keyhole-linear" className="mb-2 size-8 text-zinc-300" />
                                     <p className="text-xs text-zinc-400">No data room credentials found matching this filter.</p>
                                 </div>
                             ) : (
                                 grants.data.map((grant) => {
                                     const isActive = grant.revoked_at === null;
-                                    const investorName =
-                                        grant.investor?.profile?.full_name ?? grant.investor?.email ?? 'Investor';
+                                    const investorName = grant.investor?.profile?.full_name ?? grant.investor?.email ?? 'Investor';
                                     const companyName = grant.profile?.founder?.company_name ?? 'Startup';
 
                                     return (
@@ -756,44 +699,40 @@ export default function AdminDataRooms({
                                             key={grant.id}
                                             onClick={() => setActiveDrawerGrant(grant)}
                                             className={cn(
-                                                'group flex items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80 cursor-pointer',
+                                                'group flex cursor-pointer items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80',
                                                 !isActive && 'opacity-60',
                                             )}
                                         >
                                             {/* Investor Column */}
-                                            <div className="w-64 shrink-0 flex items-center gap-2.5 min-w-0">
-                                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-100 border border-zinc-200 text-[11px] font-bold text-zinc-700">
+                                            <div className="flex w-64 min-w-0 shrink-0 items-center gap-2.5">
+                                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-[11px] font-bold text-zinc-700">
                                                     {getInitials(investorName)}
                                                 </div>
                                                 <div className="min-w-0 pr-1">
-                                                    <span className="font-semibold text-zinc-950 group-hover:underline text-[12.5px] block truncate">
+                                                    <span className="block truncate text-[12.5px] font-semibold text-zinc-950 group-hover:underline">
                                                         {investorName}
                                                     </span>
-                                                    <span className="text-zinc-400 text-[11px] truncate block">
+                                                    <span className="block truncate text-[11px] text-zinc-400">
                                                         {grant.investor?.profile?.company_name ?? grant.investor?.email}
                                                     </span>
                                                 </div>
                                             </div>
 
                                             {/* Startup Column */}
-                                            <div className="w-56 shrink-0 min-w-0">
-                                                <span className="font-medium text-zinc-900 truncate block text-[12px]">
-                                                    {companyName}
-                                                </span>
-                                                <span className="text-[11px] text-zinc-400 truncate block">
-                                                    {grant.profile?.sector}
-                                                </span>
+                                            <div className="w-56 min-w-0 shrink-0">
+                                                <span className="block truncate text-[12px] font-medium text-zinc-900">{companyName}</span>
+                                                <span className="block truncate text-[11px] text-zinc-400">{grant.profile?.sector}</span>
                                             </div>
 
                                             {/* Status Badge */}
                                             <div className="w-36 shrink-0">
                                                 {isActive ? (
-                                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                                                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
                                                         <Icon icon="solar:shield-keyhole-linear" className="size-3 text-emerald-600" />
                                                         <span>Active</span>
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 border border-zinc-200 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
+                                                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600">
                                                         <Icon icon="solar:shield-cross-linear" className="size-3 text-zinc-500" />
                                                         <span>Revoked</span>
                                                     </span>
@@ -801,12 +740,10 @@ export default function AdminDataRooms({
                                             </div>
 
                                             {/* Granted Date */}
-                                            <div className="w-36 shrink-0 text-zinc-500 text-[11.5px]">
-                                                {formatRelativeTime(grant.granted_at)}
-                                            </div>
+                                            <div className="w-36 shrink-0 text-[11.5px] text-zinc-500">{formatRelativeTime(grant.granted_at)}</div>
 
                                             {/* Authorized By */}
-                                            <div className="min-w-0 flex-1 text-zinc-600 text-[11.5px] truncate">
+                                            <div className="min-w-0 flex-1 truncate text-[11.5px] text-zinc-600">
                                                 {grant.grantor?.full_name ?? 'Founder / Admin'}
                                             </div>
 
@@ -818,7 +755,7 @@ export default function AdminDataRooms({
                                                         e.stopPropagation();
                                                         setActiveDrawerGrant(grant);
                                                     }}
-                                                    className="whitespace-nowrap rounded-lg border border-zinc-200/80 bg-white px-3 py-1 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 shadow-2xs transition-colors"
+                                                    className="rounded-lg border border-zinc-200/80 bg-white px-3 py-1 text-xs font-semibold whitespace-nowrap text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                                                 >
                                                     Inspect & Act
                                                 </button>
@@ -830,7 +767,7 @@ export default function AdminDataRooms({
                         </div>
 
                         {/* Table Footer & Pagination */}
-                        <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-xs text-zinc-400 shrink-0">
+                        <div className="flex shrink-0 items-center justify-between border-t border-zinc-100 pt-3 text-xs text-zinc-400">
                             <p>
                                 Showing {grants.from ?? 0} to {grants.to ?? 0} of {grants.total} grants
                             </p>
@@ -843,12 +780,12 @@ export default function AdminDataRooms({
                                             onClick={() => link.url && router.get(link.url, {}, { preserveScroll: true })}
                                             disabled={!link.url}
                                             className={cn(
-                                                'px-2 py-1 rounded-md text-xs font-medium',
+                                                'rounded-md px-2 py-1 text-xs font-medium',
                                                 link.active
-                                                    ? 'bg-zinc-950 text-white font-bold'
+                                                    ? 'bg-zinc-950 font-bold text-white'
                                                     : link.url
-                                                    ? 'text-zinc-600 hover:bg-zinc-100'
-                                                    : 'text-zinc-300 cursor-not-allowed',
+                                                      ? 'text-zinc-600 hover:bg-zinc-100'
+                                                      : 'cursor-not-allowed text-zinc-300',
                                             )}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
@@ -859,9 +796,9 @@ export default function AdminDataRooms({
                     </div>
                 ) : (
                     /* ── Security Audit Trail View ────────────────────────────── */
-                    <div className="flex-1 min-h-0 flex flex-col justify-between overflow-hidden">
+                    <div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden">
                         {/* Fixed Table Header */}
-                        <div className="flex items-center gap-4 px-4 py-2 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider border-b border-zinc-100 select-none shrink-0">
+                        <div className="flex shrink-0 items-center gap-4 border-b border-zinc-100 px-4 py-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase select-none">
                             <div className="w-56 shrink-0">Security Action</div>
                             <div className="w-52 shrink-0">Actor / Operator</div>
                             <div className="w-56 shrink-0">Target Startup</div>
@@ -870,10 +807,10 @@ export default function AdminDataRooms({
                         </div>
 
                         {/* Scrollable Audit Rows (No scrollbar) */}
-                        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar divide-y divide-zinc-100">
+                        <div className="no-scrollbar min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
                             {auditEvents.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                                    <Icon icon="solar:shield-check-linear" className="size-8 text-zinc-300 mb-2" />
+                                    <Icon icon="solar:shield-check-linear" className="mb-2 size-8 text-zinc-300" />
                                     <p className="text-xs text-zinc-400">No security audit logs recorded yet.</p>
                                 </div>
                             ) : (
@@ -886,28 +823,26 @@ export default function AdminDataRooms({
                                             className="flex items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80"
                                         >
                                             {/* Action Name */}
-                                            <div className="w-56 shrink-0 flex items-center gap-2 font-medium text-zinc-950">
-                                                <Icon icon={icon} className="size-3.5 text-zinc-500 shrink-0" />
+                                            <div className="flex w-56 shrink-0 items-center gap-2 font-medium text-zinc-950">
+                                                <Icon icon={icon} className="size-3.5 shrink-0 text-zinc-500" />
                                                 <span className="truncate">{label}</span>
                                             </div>
 
                                             {/* Actor */}
-                                            <div className="w-52 shrink-0 text-zinc-700 truncate font-mono text-[11.5px]">
-                                                {evt.actor}
-                                            </div>
+                                            <div className="w-52 shrink-0 truncate font-mono text-[11.5px] text-zinc-700">{evt.actor}</div>
 
                                             {/* Target Startup */}
-                                            <div className="w-56 shrink-0 font-medium text-zinc-900 truncate">
+                                            <div className="w-56 shrink-0 truncate font-medium text-zinc-900">
                                                 {evt.startup_name ?? (evt.profile_id ? `#${evt.profile_id.substring(0, 8)}` : '—')}
                                             </div>
 
                                             {/* IP / Host */}
-                                            <div className="min-w-0 flex-1 text-zinc-400 font-mono text-[11px] truncate">
+                                            <div className="min-w-0 flex-1 truncate font-mono text-[11px] text-zinc-400">
                                                 {evt.ip_address ?? 'VPC Internal Gateway'}
                                             </div>
 
                                             {/* Timestamp */}
-                                            <div className="w-36 shrink-0 text-right text-zinc-500 text-[11.5px] tabular-nums">
+                                            <div className="w-36 shrink-0 text-right text-[11.5px] text-zinc-500 tabular-nums">
                                                 {formatRelativeTime(evt.created_at)}
                                             </div>
                                         </div>
@@ -917,9 +852,9 @@ export default function AdminDataRooms({
                         </div>
 
                         {/* Audit Footer */}
-                        <div className="flex items-center justify-between pt-3 border-t border-zinc-100 text-xs text-zinc-400 shrink-0">
+                        <div className="flex shrink-0 items-center justify-between border-t border-zinc-100 pt-3 text-xs text-zinc-400">
                             <p>Displaying latest {auditEvents.length} cryptographic audit logs</p>
-                            <span className="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/80 rounded-full px-2 py-0.5">
+                            <span className="rounded-full border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
                                 Real-Time Logged
                             </span>
                         </div>

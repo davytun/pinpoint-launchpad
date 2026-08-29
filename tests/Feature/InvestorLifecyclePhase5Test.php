@@ -188,7 +188,7 @@ test('complete cross-portal investor lifecycle with strict KYC gating, startup i
     // ─────────────────────────────────────────────────────────────────────────
     // STEP 8: Founder A Authorizes Interest -> Admin Approves -> Grants Data Room Access for Startup A
     // ─────────────────────────────────────────────────────────────────────────
-    $this->actingAs($founderA, 'founder')->patch(route('founder.access-requests.status', $interestA), [
+    $this->actingAs($founderA, 'founder')->patch(route('founder.interests.authorize', $interestA), [
         'status' => 'approved',
     ])->assertRedirect();
 

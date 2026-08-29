@@ -20,20 +20,20 @@ class AdminProfileController extends Controller
             ->latest('verified_at')
             ->get()
             ->map(fn ($p) => [
-                'id'                   => $p->id,
-                'slug'                 => $p->slug,
-                'company_name'         => $p->founder?->company_name,
-                'founder_name'         => $p->founder?->full_name,
-                'founder_email'        => $p->founder?->email,
-                'overall_score'        => $p->overall_score,
-                'is_public'            => $p->is_public,
-                'is_live'              => $p->isLive(),
-                'is_expired'           => $p->isExpired(),
-                'verified_badges_count'=> $p->verified_badges_count,
-                'verified_at'          => $p->verified_at?->format('d M Y'),
-                'expires_at'           => $p->expires_at?->format('d M Y'),
-                'batch'                => $p->batch,
-                'sector'               => $p->sector,
+                'id' => $p->id,
+                'slug' => $p->slug,
+                'company_name' => $p->founder?->company_name,
+                'founder_name' => $p->founder?->full_name,
+                'founder_email' => $p->founder?->email,
+                'overall_score' => $p->overall_score,
+                'is_public' => $p->is_public,
+                'is_live' => $p->isLive(),
+                'is_expired' => $p->isExpired(),
+                'verified_badges_count' => $p->verified_badges_count,
+                'verified_at' => $p->verified_at?->format('d M Y'),
+                'expires_at' => $p->expires_at?->format('d M Y'),
+                'batch' => $p->batch,
+                'sector' => $p->sector,
             ]);
 
         return Inertia::render('Admin/Profiles/Index', [
@@ -60,7 +60,7 @@ class AdminProfileController extends Controller
         $overallScore = $profile->overall_score;
 
         if ($diagnosticSession) {
-            if (empty($radarData) && !empty($diagnosticSession->pillar_scores)) {
+            if (empty($radarData) && ! empty($diagnosticSession->pillar_scores)) {
                 $radarData = $diagnosticSession->pillar_scores;
             }
             if ($overallScore === null) {
@@ -68,41 +68,41 @@ class AdminProfileController extends Controller
             }
         }
 
-        $accessRequests = $profile->investorInterests
+        $investorInterests = $profile->investorInterests
             ->map(fn ($i) => [
-                'id'             => $i->id,
-                'investor_name'  => $i->investor?->profile?->full_name ?? 'Investor',
+                'id' => $i->id,
+                'investor_name' => $i->investor?->profile?->full_name ?? 'Investor',
                 'investor_email' => $i->investor?->email ?? '',
-                'firm_name'      => $i->investor?->profile?->company_name,
-                'type'           => $i->type,
-                'message'        => $i->message,
-                'status'         => $i->status,
-                'created_at'     => $i->created_at?->toISOString(),
+                'firm_name' => $i->investor?->profile?->company_name,
+                'type' => $i->type,
+                'message' => $i->message,
+                'status' => $i->status,
+                'created_at' => $i->created_at?->toISOString(),
             ])
             ->values()
             ->all();
 
         return Inertia::render('Admin/Profiles/Show', [
             'profile' => [
-                'id'              => $profile->id,
-                'slug'            => $profile->slug,
-                'is_public'       => $profile->is_public,
-                'overall_score'   => $overallScore,
-                'radar_data'      => $radarData,
+                'id' => $profile->id,
+                'slug' => $profile->slug,
+                'is_public' => $profile->is_public,
+                'overall_score' => $overallScore,
+                'radar_data' => $radarData,
                 'analyst_summary' => $profile->analyst_summary,
-                'batch'           => $profile->batch,
-                'sector'          => $profile->sector,
-                'verified_at'     => $profile->verified_at?->toISOString(),
-                'expires_at'      => $profile->expires_at?->toISOString(),
+                'batch' => $profile->batch,
+                'sector' => $profile->sector,
+                'verified_at' => $profile->verified_at?->toISOString(),
+                'expires_at' => $profile->expires_at?->toISOString(),
             ],
             'founder' => [
-                'id'           => $profile->founder?->id,
-                'full_name'    => $profile->founder?->full_name,
+                'id' => $profile->founder?->id,
+                'full_name' => $profile->founder?->full_name,
                 'company_name' => $profile->founder?->company_name,
-                'email'        => $profile->founder?->email,
+                'email' => $profile->founder?->email,
             ],
-            'badges'           => $profile->badges,
-            'access_requests'  => $accessRequests,
+            'badges' => $profile->badges,
+            'investor_interests' => $investorInterests,
         ]);
     }
 
@@ -110,12 +110,12 @@ class AdminProfileController extends Controller
     {
         $validated = $request->validate([
             'analyst_summary' => ['nullable', 'string', 'max:2000'],
-            'sector'          => ['nullable', 'string', 'max:150'],
-            'batch'           => ['nullable', 'string', 'max:50'],
-            'overall_score'   => ['nullable', 'integer', 'min:0', 'max:100'],
-            'radar_data'      => ['nullable', 'array'],
-            'radar_data.*'    => ['nullable', 'integer', 'min:0', 'max:100'],
-            'is_public'       => ['nullable', 'boolean'],
+            'sector' => ['nullable', 'string', 'max:150'],
+            'batch' => ['nullable', 'string', 'max:50'],
+            'overall_score' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'radar_data' => ['nullable', 'array'],
+            'radar_data.*' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'is_public' => ['nullable', 'boolean'],
         ]);
 
         $profile->update(array_filter($validated, fn ($v) => $v !== null));
@@ -135,36 +135,5 @@ class AdminProfileController extends Controller
         ]);
 
         return back()->with('success', 'Badge updated.');
-    }
-
-    public function accessRequests(FounderProfile $profile): Response
-    {
-        $profile->load([
-            'founder:id,full_name,company_name',
-            'investorInterests.investor.profile',
-        ]);
-
-        $accessRequests = $profile->investorInterests
-            ->map(fn ($i) => [
-                'id'             => $i->id,
-                'investor_name'  => $i->investor?->profile?->full_name ?? 'Investor',
-                'investor_email' => $i->investor?->email ?? '',
-                'firm_name'      => $i->investor?->profile?->company_name,
-                'type'           => $i->type,
-                'message'        => $i->message,
-                'status'         => $i->status,
-                'created_at'     => $i->created_at?->toISOString(),
-            ])
-            ->values()
-            ->all();
-
-        return Inertia::render('Admin/Profiles/AccessRequests', [
-            'profile'         => [
-                'id'           => $profile->id,
-                'slug'         => $profile->slug,
-                'company_name' => $profile->founder?->company_name,
-            ],
-            'access_requests' => $accessRequests,
-        ]);
     }
 }

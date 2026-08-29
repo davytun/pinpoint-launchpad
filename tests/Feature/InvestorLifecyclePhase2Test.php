@@ -154,7 +154,7 @@ test('founder approves data room interest, creating grant and unlocking investor
 
     // Founder authorizes interest to Pinpoint
     $response = $this->actingAs($founder, 'founder')
-        ->patch(route('founder.access-requests.status', $interest), [
+        ->patch(route('founder.interests.authorize', $interest), [
             'status' => 'approved',
         ]);
 
@@ -282,16 +282,9 @@ test('admin profile view displays unified investorInterests data without legacy 
     $response->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('Admin/Profiles/Show')
-            ->has('access_requests', 1)
-            ->where('access_requests.0.id', $interest->id)
-            ->where('access_requests.0.type', 'founder_call')
-            ->where('access_requests.0.message', 'Would like to schedule a partner call.'));
+            ->has('investor_interests', 1)
+            ->where('investor_interests.0.id', $interest->id)
+            ->where('investor_interests.0.type', 'founder_call')
+            ->where('investor_interests.0.message', 'Would like to schedule a partner call.'));
 
-    // Admin profile access requests dedicated page
-    $accessRequestsResponse = $this->actingAs($admin)->get(route('admin.profiles.access-requests', $profile));
-    $accessRequestsResponse->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('Admin/Profiles/AccessRequests')
-            ->has('access_requests', 1)
-            ->where('access_requests.0.id', $interest->id));
 });

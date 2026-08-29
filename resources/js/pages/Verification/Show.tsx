@@ -174,10 +174,13 @@ export default function VerificationShow({
                             <div>
                                 <h3 className="text-base font-extrabold text-zinc-950">Important Notice: Moving to Secure Access</h3>
                                 <p className="mt-1 text-zinc-700">
-                                    Pinpoint is transitioning to a secure Investor Portal. Public verification pages are now deprecated.
-                                    To continue reviewing detailed PARAGON reports and data rooms, please create your verified investor account.
+                                    Pinpoint is transitioning to a secure Investor Portal. Public verification pages are now deprecated. To continue
+                                    reviewing detailed PARAGON reports and data rooms, please create your verified investor account.
                                 </p>
-                                <a href="/investor" className="mt-4 inline-block rounded-xl bg-[#3A54A5] px-5 py-2.5 font-bold text-white shadow-sm transition hover:bg-[#2D4182]">
+                                <a
+                                    href="/investor"
+                                    className="mt-4 inline-block rounded-xl bg-[#3A54A5] px-5 py-2.5 font-bold text-white shadow-sm transition hover:bg-[#2D4182]"
+                                >
                                     Join Pinpoint Investor Network
                                 </a>
                             </div>

@@ -3,8 +3,8 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import GlobalLoader from '@/components/GlobalLoader';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface AdminUser {
@@ -41,20 +41,18 @@ function NavItem({
             onClick={onClick}
             className={cn(
                 'group relative flex items-center transition-all duration-150',
-                collapsed
-                    ? 'h-10 w-10 justify-center rounded-xl mx-auto'
-                    : 'gap-3.5 rounded-xl px-4 py-2.5 text-[14px]',
+                collapsed ? 'mx-auto h-10 w-10 justify-center rounded-xl' : 'gap-3.5 rounded-xl px-4 py-2.5 text-[14px]',
                 active
-                    ? 'bg-[#E3E3E6] text-zinc-950 font-semibold shadow-2xs'
-                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-[#EAEAEA]/70 font-medium',
+                    ? 'bg-[#E3E3E6] font-semibold text-zinc-950 shadow-2xs'
+                    : 'font-medium text-zinc-600 hover:bg-[#EAEAEA]/70 hover:text-zinc-950',
             )}
         >
-            <div className="relative flex items-center justify-center shrink-0">
+            <div className="relative flex shrink-0 items-center justify-center">
                 <Icon
                     icon={icon}
                     className={cn(
                         'size-5 shrink-0 transition-colors',
-                        active ? 'text-zinc-950 stroke-[0.3]' : 'text-zinc-500 group-hover:text-zinc-900',
+                        active ? 'stroke-[0.3] text-zinc-950' : 'text-zinc-500 group-hover:text-zinc-900',
                     )}
                 />
                 {collapsed && badge != null && badge > 0 && (
@@ -68,8 +66,8 @@ function NavItem({
                     {badge != null && badge > 0 && (
                         <span
                             className={cn(
-                                'ml-auto text-[13px] tabular-nums font-normal transition-colors',
-                                active ? 'text-zinc-800 font-medium' : 'text-zinc-400 group-hover:text-zinc-600',
+                                'ml-auto text-[13px] font-normal tabular-nums transition-colors',
+                                active ? 'font-medium text-zinc-800' : 'text-zinc-400 group-hover:text-zinc-600',
                             )}
                         >
                             {badge > 99 ? '99+' : badge}
@@ -84,12 +82,10 @@ function NavItem({
         return (
             <Tooltip delayDuration={150}>
                 <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                <TooltipContent side="right" sideOffset={12} className="flex items-center gap-2 font-medium text-xs">
+                <TooltipContent side="right" sideOffset={12} className="flex items-center gap-2 text-xs font-medium">
                     <span>{label}</span>
                     {badge != null && badge > 0 && (
-                        <span className="rounded-full bg-blue-600 px-1.5 py-0.2 text-[10px] font-bold text-white">
-                            {badge}
-                        </span>
+                        <span className="py-0.2 rounded-full bg-blue-600 px-1.5 text-[10px] font-bold text-white">{badge}</span>
                     )}
                 </TooltipContent>
             </Tooltip>
@@ -101,13 +97,9 @@ function NavItem({
 
 function NavSection({ label, collapsed }: { label: string; collapsed?: boolean }) {
     if (collapsed) {
-        return <div className="my-2 border-t border-zinc-200/60 mx-2" />;
+        return <div className="mx-2 my-2 border-t border-zinc-200/60" />;
     }
-    return (
-        <p className="mt-6 mb-2 px-4 text-[10.5px] font-bold tracking-[0.14em] text-zinc-400 uppercase first:mt-2">
-            {label}
-        </p>
-    );
+    return <p className="mt-6 mb-2 px-4 text-[10.5px] font-bold tracking-[0.14em] text-zinc-400 uppercase first:mt-2">{label}</p>;
 }
 
 function SidebarContent({
@@ -146,10 +138,8 @@ function SidebarContent({
                 <div className="shrink-0">
                     <div
                         className={cn(
-                            'group mb-3 flex items-center transition-all cursor-pointer',
-                            collapsed
-                                ? 'justify-center py-2'
-                                : 'justify-between gap-3 rounded-2xl px-3.5 py-2.5 hover:bg-[#EAEAEA]/70',
+                            'group mb-3 flex cursor-pointer items-center transition-all',
+                            collapsed ? 'justify-center py-2' : 'justify-between gap-3 rounded-2xl px-3.5 py-2.5 hover:bg-[#EAEAEA]/70',
                         )}
                         onClick={collapsed ? toggleCollapse : undefined}
                     >
@@ -158,13 +148,9 @@ function SidebarContent({
                                 <TooltipTrigger asChild>
                                     <button
                                         onClick={toggleCollapse}
-                                        className="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-[#EAEAEA]/70 transition-colors"
+                                        className="flex h-9 w-9 items-center justify-center rounded-xl transition-colors hover:bg-[#EAEAEA]/70"
                                     >
-                                        <img
-                                            src="/favicon.ico"
-                                            alt="Pinpoint"
-                                            className="h-6.5 w-6.5 rounded-lg object-contain shadow-2xs"
-                                        />
+                                        <img src="/favicon.ico" alt="Pinpoint" className="h-6.5 w-6.5 rounded-lg object-contain shadow-2xs" />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent side="right" sideOffset={12}>
@@ -185,7 +171,7 @@ function SidebarContent({
                                             toggleCollapse?.();
                                         }}
                                         title="Collapse sidebar (⌘B / Ctrl+B)"
-                                        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:bg-[#E1E1E4] hover:text-zinc-900 transition-colors"
+                                        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-[#E1E1E4] hover:text-zinc-900"
                                     >
                                         <Icon icon="solar:sidebar-minimalistic-linear" className="size-4" />
                                     </button>
@@ -196,7 +182,7 @@ function SidebarContent({
                 </div>
 
                 {/* Navigation Links (Scrollable without visible scrollbars) */}
-                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar py-1">
+                <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto py-1">
                     <nav className="flex flex-col space-y-1">
                         <NavSection label="Main" collapsed={collapsed} />
                         <NavItem
@@ -355,21 +341,21 @@ function SidebarContent({
                 </div>
 
                 {/* Bottom User Area (Fixed) */}
-                <div className="shrink-0 mt-auto pt-2 pb-1 border-t border-zinc-200/60">
+                <div className="mt-auto shrink-0 border-t border-zinc-200/60 pt-2 pb-1">
                     {collapsed ? (
                         <Tooltip delayDuration={150}>
                             <TooltipTrigger asChild>
                                 <button
                                     onClick={logout}
-                                    className="flex h-10 w-10 mx-auto items-center justify-center rounded-full bg-zinc-950 text-xs font-bold text-white shadow-2xs hover:opacity-85 transition-opacity"
+                                    className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-zinc-950 text-xs font-bold text-white shadow-2xs transition-opacity hover:opacity-85"
                                 >
                                     {user?.name?.[0] ?? 'A'}
                                 </button>
                             </TooltipTrigger>
                             <TooltipContent side="right" sideOffset={12} className="flex flex-col gap-0.5">
-                                <p className="font-bold text-xs">{user?.name ?? 'Admin'}</p>
+                                <p className="text-xs font-bold">{user?.name ?? 'Admin'}</p>
                                 <p className="text-[10px] text-zinc-400">{user?.email ?? ''}</p>
-                                <p className="text-[10px] text-red-400 font-semibold mt-1">Click to Sign Out</p>
+                                <p className="mt-1 text-[10px] font-semibold text-red-400">Click to Sign Out</p>
                             </TooltipContent>
                         </Tooltip>
                     ) : (
@@ -379,12 +365,8 @@ function SidebarContent({
                                     {user?.name?.[0] ?? 'A'}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <p className="truncate text-[13.5px] font-semibold leading-tight text-zinc-950">
-                                        {user?.name ?? 'Admin'}
-                                    </p>
-                                    <p className="mt-0.5 truncate text-[11px] font-medium leading-none text-zinc-400">
-                                        {user?.email ?? ''}
-                                    </p>
+                                    <p className="truncate text-[13.5px] leading-tight font-semibold text-zinc-950">{user?.name ?? 'Admin'}</p>
+                                    <p className="mt-0.5 truncate text-[11px] leading-none font-medium text-zinc-400">{user?.email ?? ''}</p>
                                 </div>
                             </div>
                             <button
@@ -497,12 +479,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     };
 
     return (
-        <div className="h-screen max-h-screen overflow-hidden bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white flex flex-col lg:flex-row p-3 lg:p-3.5 gap-3.5">
+        <div className="flex h-screen max-h-screen flex-col gap-3.5 overflow-hidden bg-[#F4F4F6] p-3 text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white lg:flex-row lg:p-3.5">
             <GlobalLoader />
             {/* ── Desktop Sidebar (Strictly bounded height, no scrollbar visible) ── */}
             <aside
                 className={cn(
-                    'hidden lg:flex shrink-0 flex-col justify-between py-2 select-none transition-all duration-200 ease-in-out h-full max-h-full overflow-hidden no-scrollbar',
+                    'no-scrollbar hidden h-full max-h-full shrink-0 flex-col justify-between overflow-hidden py-2 transition-all duration-200 ease-in-out select-none lg:flex',
                     collapsed ? 'w-16 px-1' : 'w-72 px-1.5',
                 )}
             >
@@ -513,7 +495,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {sidebarOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden" aria-modal="true">
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setSidebarOpen(false)} />
-                    <aside className="absolute inset-y-0 left-0 flex w-80 flex-col bg-[#F4F4F6] p-4 shadow-2xl border-r border-zinc-200/80 no-scrollbar">
+                    <aside className="no-scrollbar absolute inset-y-0 left-0 flex w-80 flex-col border-r border-zinc-200/80 bg-[#F4F4F6] p-4 shadow-2xl">
                         <button
                             onClick={() => setSidebarOpen(false)}
                             className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-xl text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700"
@@ -526,16 +508,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             )}
 
             {/* ── Main Canvas Content Region (Strictly h-full, zero outer scroll) ─── */}
-            <main className="flex-1 min-w-0 h-full max-h-full flex flex-col relative">
+            <main className="relative flex h-full max-h-full min-w-0 flex-1 flex-col">
                 {/* ── Expand Sidebar Button (Floating on Left Edge) ── */}
                 {collapsed && (
-                    <div className="hidden lg:flex absolute top-6 -left-4 z-50">
+                    <div className="absolute top-6 -left-4 z-50 hidden lg:flex">
                         <TooltipProvider>
                             <Tooltip delayDuration={150}>
                                 <TooltipTrigger asChild>
                                     <button
                                         onClick={toggleCollapse}
-                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white text-zinc-600 shadow-sm transition-all hover:bg-zinc-50 hover:text-zinc-900 ring-4 ring-[#F4F4F6]"
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200/80 bg-white text-zinc-600 shadow-sm ring-4 ring-[#F4F4F6] transition-all hover:bg-zinc-50 hover:text-zinc-900"
                                     >
                                         <Icon icon="solar:sidebar-minimalistic-linear" className="size-4.5" />
                                     </button>
@@ -547,7 +529,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 )}
 
                 {/* Mobile top bar */}
-                <header className="mb-3 flex h-14 items-center gap-3 rounded-2xl border border-zinc-200/80 bg-white px-5 shadow-2xs lg:hidden shrink-0">
+                <header className="mb-3 flex h-14 shrink-0 items-center gap-3 rounded-2xl border border-zinc-200/80 bg-white px-5 shadow-2xs lg:hidden">
                     <button
                         onClick={() => setSidebarOpen(true)}
                         className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-700 hover:bg-zinc-100"
@@ -568,9 +550,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </header>
 
                 {/* Page content strictly bounded */}
-                <div className="flex-1 min-w-0 h-full max-h-full flex flex-col overflow-hidden relative z-0">
-                    {children}
-                </div>
+                <div className="relative z-0 flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden">{children}</div>
             </main>
         </div>
     );

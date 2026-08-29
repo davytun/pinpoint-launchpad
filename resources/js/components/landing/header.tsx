@@ -86,7 +86,10 @@ export default function Header() {
 
                 {/* Desktop Actions */}
                 <div className="hidden shrink-0 items-center gap-4 md:flex">
-                    <a href="/founder/login" className="text-[14.5px] font-bold tracking-wide whitespace-nowrap text-zinc-600 transition-colors hover:text-zinc-950">
+                    <a
+                        href="/founder/login"
+                        className="text-[14.5px] font-bold tracking-wide whitespace-nowrap text-zinc-600 transition-colors hover:text-zinc-950"
+                    >
                         Founder Portal
                     </a>
                     <Magnetic strength={0.2} range={30}>

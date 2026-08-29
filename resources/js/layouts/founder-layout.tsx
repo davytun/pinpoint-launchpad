@@ -156,7 +156,12 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
             { icon: LayoutDashboard, label: 'Dashboard', href: route('founder.dashboard'), disabled: false },
             { icon: FileText, label: 'Documents', href: route('founder.documents.index'), disabled: false },
             { icon: MessageSquare, label: 'Messages', href: route('founder.messages.index'), disabled: false },
-            { icon: Bell, label: unreadNotifications ? `Alerts (${unreadNotifications})` : 'Alerts', href: route('founder.notifications.index'), disabled: false },
+            {
+                icon: Bell,
+                label: unreadNotifications ? `Alerts (${unreadNotifications})` : 'Alerts',
+                href: route('founder.notifications.index'),
+                disabled: false,
+            },
             { icon: Sparkles, label: 'Spotlight', href: route('founder.spotlight.edit'), disabled: false },
         ],
         [unreadNotifications],

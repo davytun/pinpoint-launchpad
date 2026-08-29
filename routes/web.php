@@ -4,13 +4,15 @@ use App\Http\Controllers\Admin\AdminBlogController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminDocumentController;
 use App\Http\Controllers\Admin\AdminFounderController;
-use App\Http\Controllers\Admin\AdminInvestorApplicationController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\BlogImageController;
+use App\Http\Controllers\Admin\DiligenceRequestController;
 use App\Http\Controllers\Admin\InvestorAccountController;
 use App\Http\Controllers\Admin\InvestorKycController as AdminInvestorKycController;
+use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\PlatformAnnouncementController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\SpotlightController as AdminSpotlightController;
@@ -23,6 +25,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiagnosticController;
 use App\Http\Controllers\Founder\FounderAuthController;
 use App\Http\Controllers\Founder\FounderDashboardController;
+use App\Http\Controllers\Founder\FounderDiligenceController;
 use App\Http\Controllers\Founder\FounderDocumentController;
 use App\Http\Controllers\Founder\FounderMessageController;
 use App\Http\Controllers\Founder\FounderSpotlightController;
@@ -74,9 +77,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->name('dashboard');
 
     Route::middleware('require.role:superadmin,analyst,support,compliance,investor_relations')->group(function () {
-        Route::get('/notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
-        Route::patch('/notifications/read-all', [App\Http\Controllers\Admin\NotificationController::class, 'readAll'])->name('notifications.read-all');
-        Route::patch('/notifications/{notification}/read', [App\Http\Controllers\Admin\NotificationController::class, 'read'])->name('notifications.read');
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::patch('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::patch('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
     });
 
     // Messages — all admin roles
@@ -96,9 +99,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/waitlist/{entry}', [AdminWaitlistController::class, 'destroy'])->name('waitlist.destroy');
 
         // Investors
-        Route::get('/investors', [AdminInvestorApplicationController::class, 'index'])->name('investors.index');
-        Route::get('/investors/{application}', [AdminInvestorApplicationController::class, 'show'])->name('investors.show');
-        Route::patch('/investors/{application}/status', [AdminInvestorApplicationController::class, 'updateStatus'])->name('investors.status');
     });
 
     Route::middleware('require.role:superadmin,compliance,investor_relations')->group(function () {
@@ -108,22 +108,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     Route::middleware('require.role:superadmin,investor_relations')->group(function () {
-        Route::get('/announcements', [App\Http\Controllers\Admin\PlatformAnnouncementController::class, 'index'])->name('announcements.index');
-        Route::post('/announcements', [App\Http\Controllers\Admin\PlatformAnnouncementController::class, 'store'])->name('announcements.store');
+        Route::get('/announcements', [PlatformAnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/announcements', [PlatformAnnouncementController::class, 'store'])->name('announcements.store');
         Route::get('/spotlight', [AdminSpotlightController::class, 'index'])->name('spotlight.index');
         Route::patch('/spotlight/{profile}', [AdminSpotlightController::class, 'update'])->name('spotlight.update');
         Route::get('/dealflow/interests', [App\Http\Controllers\Admin\InvestorInterestController::class, 'index'])->name('dealflow.interests.index');
         Route::patch('/dealflow/interests/{interest}', [App\Http\Controllers\Admin\InvestorInterestController::class, 'update'])->name('dealflow.interests.update');
         Route::patch('/dealflow/interests/{interest}/schedule', [App\Http\Controllers\Admin\InvestorInterestController::class, 'schedule'])->name('dealflow.interests.schedule');
         Route::patch('/dealflow/interests/{interest}/complete', [App\Http\Controllers\Admin\InvestorInterestController::class, 'complete'])->name('dealflow.interests.complete');
-        Route::patch('/dealflow/interests/{interest}/deal-stage', [App\Http\Controllers\Admin\DiligenceRequestController::class, 'updateDealStage'])->name('dealflow.interests.deal-stage');
+        Route::patch('/dealflow/interests/{interest}/deal-stage', [DiligenceRequestController::class, 'updateDealStage'])->name('dealflow.interests.deal-stage');
         Route::get('/dealflow/data-rooms', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'index'])->name('dealflow.data-rooms.index');
         Route::patch('/dealflow/data-rooms/{grant}/revoke', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'revoke'])->name('dealflow.data-rooms.revoke');
         Route::patch('/dealflow/data-rooms/{grant}/reinstate', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'reinstate'])->name('dealflow.data-rooms.reinstate');
-        Route::get('/dealflow/diligence', [App\Http\Controllers\Admin\DiligenceRequestController::class, 'index'])->name('dealflow.diligence.index');
-        Route::patch('/dealflow/diligence/{diligenceRequest}/request-founder', [App\Http\Controllers\Admin\DiligenceRequestController::class, 'requestFounder'])->name('dealflow.diligence.request-founder');
-        Route::patch('/dealflow/diligence/{diligenceRequest}/release', [App\Http\Controllers\Admin\DiligenceRequestController::class, 'releaseResponse'])->name('dealflow.diligence.release');
-        Route::patch('/dealflow/diligence/{diligenceRequest}/decline', [App\Http\Controllers\Admin\DiligenceRequestController::class, 'decline'])->name('dealflow.diligence.decline');
+        Route::get('/dealflow/diligence', [DiligenceRequestController::class, 'index'])->name('dealflow.diligence.index');
+        Route::patch('/dealflow/diligence/{diligenceRequest}/request-founder', [DiligenceRequestController::class, 'requestFounder'])->name('dealflow.diligence.request-founder');
+        Route::patch('/dealflow/diligence/{diligenceRequest}/release', [DiligenceRequestController::class, 'releaseResponse'])->name('dealflow.diligence.release');
+        Route::patch('/dealflow/diligence/{diligenceRequest}/decline', [DiligenceRequestController::class, 'decline'])->name('dealflow.diligence.decline');
     });
 
     // Founders — superadmin + analyst
@@ -146,7 +146,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/{profile}', [AdminProfileController::class, 'show'])->name('show');
             Route::patch('/{profile}', [AdminProfileController::class, 'update'])->name('update');
             Route::patch('/badges/{badge}', [AdminProfileController::class, 'updateBadge'])->name('badge.update');
-            Route::get('/{profile}/access-requests', [AdminProfileController::class, 'accessRequests'])->name('access-requests');
         });
     });
 
@@ -235,7 +234,6 @@ Route::post('/assessment/apply', [CheckoutController::class, 'applyAssessment'])
 
 // Investor onboarding
 Route::get('/investor', [InvestorController::class, 'index'])->name('investor.index');
-Route::post('/investor/apply', [InvestorController::class, 'store'])->name('investor.apply')->middleware('throttle:5,1');
 
 Route::prefix('investor')->name('investor.')->group(function () {
     Route::get('/onboarding', [InvestorOnboardingController::class, 'create'])->name('onboarding');
@@ -353,18 +351,18 @@ Route::prefix('founder')->name('founder.')->group(function () {
             Route::get('/attachment/{message}', [FounderMessageController::class, 'downloadAttachment'])->name('attachment.download');
         });
 
-        Route::patch('/access-requests/{accessRequest}/status', [FounderDashboardController::class, 'updateRequestStatus'])
-            ->name('access-requests.status');
+        Route::patch('/interests/{interest}/authorization', [FounderDashboardController::class, 'updateInterestAuthorization'])
+            ->name('interests.authorize');
 
-        Route::get('/diligence', [App\Http\Controllers\Founder\FounderDiligenceController::class, 'index'])->name('diligence.index');
-        Route::patch('/diligence/{diligenceRequest}/respond', [App\Http\Controllers\Founder\FounderDiligenceController::class, 'respond'])->name('diligence.respond');
+        Route::get('/diligence', [FounderDiligenceController::class, 'index'])->name('diligence.index');
+        Route::patch('/diligence/{diligenceRequest}/respond', [FounderDiligenceController::class, 'respond'])->name('diligence.respond');
     });
 });
 
 // Public verification routes — no auth required
 Route::prefix('verify')->name('verify.')->group(function () {
     Route::get('/sample-unicorn', [VerificationController::class, 'sample'])->name('sample');
-    Route::get('/{slug}', [VerificationController::class, 'show'])->name('show');
+    Route::get('/{slug}', fn () => redirect()->route('investor.index'))->name('retired');
 });
 
 // Tester guide PDF — token-protected, no auth required

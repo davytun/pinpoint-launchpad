@@ -46,7 +46,7 @@ interface Founder {
     last_login_at?: string | null;
 }
 
-interface InvestorAccessRequest {
+interface InvestorInterest {
     id: string | number;
     investor_name: string;
     investor_type?: string;
@@ -79,7 +79,7 @@ interface PageProps {
     payment?: { tier: string; total_amount: number; paid_at?: string | null } | null;
     signature?: { status: string; signed_at?: string | null } | null;
     spotlight_featured?: boolean;
-    access_requests: InvestorAccessRequest[];
+    investor_interests: InvestorInterest[];
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -326,7 +326,7 @@ export default function FounderDashboard({
     audit_status_config,
     payment,
     spotlight_featured,
-    access_requests = [],
+    investor_interests = [],
 }: PageProps) {
     const meta = BAND_META[score_band ?? 'mid_high'] ?? BAND_META.mid_high;
     const tierLabel = TIER_LABELS[tier ?? ''] ?? (tier ? tier.charAt(0).toUpperCase() + tier.slice(1) : 'Foundation');
@@ -349,7 +349,7 @@ export default function FounderDashboard({
     function handleRequestStatus(id: number, status: 'approved' | 'denied') {
         setUpdatingStatusId(id);
         router.patch(
-            route('founder.access-requests.status', id),
+            route('founder.interests.authorize', id),
             { status },
             {
                 preserveScroll: true,
@@ -563,7 +563,10 @@ export default function FounderDashboard({
                             </div>
                         </Link>
 
-                        <Link href={route('founder.spotlight.edit')} className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-white/80 bg-white/30 p-6 shadow-md backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#3A54A5]/40 hover:bg-white/50 hover:shadow-lg">
+                        <Link
+                            href={route('founder.spotlight.edit')}
+                            className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-white/80 bg-white/30 p-6 shadow-md backdrop-blur-md transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#3A54A5]/40 hover:bg-white/50 hover:shadow-lg"
+                        >
                             <div className="mb-4 flex items-center justify-between">
                                 <div className="flex h-10 w-10 items-center justify-center rounded-md border border-zinc-200 bg-zinc-50/50">
                                     <Zap className="size-4.5 text-zinc-500 transition-colors group-hover:text-[#3A54A5]" />
@@ -576,9 +579,15 @@ export default function FounderDashboard({
                             </div>
                             <div>
                                 <h3 className="text-zinc-955 text-[15px] font-bold">Spotlight Status</h3>
-                                <p className="text-zinc-555 mt-1 text-[13px]">{spotlight_featured ? 'Your startup is featured for qualified investors.' : 'Prepare your profile for Pinpoint review.'}</p>
+                                <p className="text-zinc-555 mt-1 text-[13px]">
+                                    {spotlight_featured
+                                        ? 'Your startup is featured for qualified investors.'
+                                        : 'Prepare your profile for Pinpoint review.'}
+                                </p>
                             </div>
-                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-[#3A54A5] uppercase">Open Spotlight <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" /></div>
+                            <div className="mt-5 flex items-center gap-1.5 text-[12px] font-bold tracking-wider text-[#3A54A5] uppercase">
+                                Open Spotlight <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                            </div>
                         </Link>
                     </div>
                 </FadeUp>
@@ -593,24 +602,27 @@ export default function FounderDashboard({
                                 </div>
                                 <div>
                                     <h2 className="text-[16px] font-bold text-zinc-800">Investor Engagement Pipeline</h2>
-                                    <p className="text-xs text-zinc-500">Pinpoint Investor Relations mediates all investor discovery, data room authorizations, and introductions.</p>
+                                    <p className="text-xs text-zinc-500">
+                                        Pinpoint Investor Relations mediates all investor discovery, data room authorizations, and introductions.
+                                    </p>
                                 </div>
                             </div>
                             <span className="text-zinc-555 text-[13px] font-semibold">
-                                {access_requests.length} investor engagement{access_requests.length !== 1 ? 's' : ''}
+                                {investor_interests.length} investor engagement{investor_interests.length !== 1 ? 's' : ''}
                             </span>
                         </div>
 
-                        {access_requests.length === 0 ? (
+                        {investor_interests.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-8 text-center">
                                 <p className="text-zinc-450 text-sm font-medium">No investor engagements yet.</p>
                                 <p className="mt-1 text-xs text-zinc-400">
-                                    When KYC-approved investors discover your startup and Pinpoint coordinates information, a founder call, or data room access, requests will appear here.
+                                    When KYC-approved investors discover your startup and Pinpoint coordinates information, a founder call, or data
+                                    room access, requests will appear here.
                                 </p>
                             </div>
                         ) : (
                             <div className="divide-y divide-zinc-200/80">
-                                {access_requests.map((req) => {
+                                {investor_interests.map((req) => {
                                     const stageColors: Record<string, string> = {
                                         new_interest: 'bg-amber-50 text-amber-700 border-amber-200',
                                         reviewing: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -631,7 +643,8 @@ export default function FounderDashboard({
                                         declined: 'Declined',
                                     };
 
-                                    const isAwaitingFounder = req.is_awaiting_founder ?? (req.founder_decision === null || req.founder_decision === 'pending');
+                                    const isAwaitingFounder =
+                                        req.is_awaiting_founder ?? (req.founder_decision === null || req.founder_decision === 'pending');
 
                                     return (
                                         <div key={req.id} className="py-4.5 first:pt-0 last:pb-0">
@@ -649,13 +662,17 @@ export default function FounderDashboard({
                                                                 {req.investor_type.replace('_', ' ')}
                                                             </span>
                                                         )}
-                                                        <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${stageColors[req.stage] ?? 'bg-zinc-100 text-zinc-700'}`}>
+                                                        <span
+                                                            className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${stageColors[req.stage] ?? 'bg-zinc-100 text-zinc-700'}`}
+                                                        >
                                                             {stageLabels[req.stage] ?? req.stage}
                                                         </span>
                                                     </div>
 
                                                     <div className="text-zinc-555 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold">
-                                                        <span>Type: <strong className="text-zinc-800">{req.type.replaceAll('_', ' ')}</strong></span>
+                                                        <span>
+                                                            Type: <strong className="text-zinc-800">{req.type.replaceAll('_', ' ')}</strong>
+                                                        </span>
                                                         <span className="opacity-40">•</span>
                                                         <span>Request Date: {fmtDateTime(req.created_at)}</span>
                                                         {req.data_room_granted && (
@@ -674,17 +691,26 @@ export default function FounderDashboard({
                                                             {req.type === 'data_room_access' ? (
                                                                 <>
                                                                     <p className="font-bold text-amber-950">Authorization Required</p>
-                                                                    <p className="mt-0.5">Pinpoint Investor Relations requests your authorization to provide this verified investor data room access.</p>
+                                                                    <p className="mt-0.5">
+                                                                        Pinpoint Investor Relations requests your authorization to provide this
+                                                                        verified investor data room access.
+                                                                    </p>
                                                                 </>
                                                             ) : req.type === 'founder_call' ? (
                                                                 <>
                                                                     <p className="font-bold text-amber-950">Introduction Request</p>
-                                                                    <p className="mt-0.5">Pinpoint Investor Relations is coordinating an introductory call. Please confirm your willingness to meet.</p>
+                                                                    <p className="mt-0.5">
+                                                                        Pinpoint Investor Relations is coordinating an introductory call. Please
+                                                                        confirm your willingness to meet.
+                                                                    </p>
                                                                 </>
                                                             ) : (
                                                                 <>
                                                                     <p className="font-bold text-amber-950">Information Request</p>
-                                                                    <p className="mt-0.5">Pinpoint requests your confirmation to release verified information to this investor.</p>
+                                                                    <p className="mt-0.5">
+                                                                        Pinpoint requests your confirmation to release verified information to this
+                                                                        investor.
+                                                                    </p>
                                                                 </>
                                                             )}
                                                         </div>
@@ -699,7 +725,7 @@ export default function FounderDashboard({
                                                     {/* Scheduled Call Info Box */}
                                                     {req.scheduled_at && (
                                                         <div className="mt-2.5 flex items-start gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs text-emerald-900">
-                                                            <CheckCircle2 className="size-4 shrink-0 text-emerald-600 mt-0.5" />
+                                                            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
                                                             <div>
                                                                 <p className="font-bold">Introduction Call Scheduled by Pinpoint IR</p>
                                                                 <p className="mt-0.5 text-emerald-800">
@@ -728,18 +754,18 @@ export default function FounderDashboard({
                                                             <button
                                                                 onClick={() => handleRequestStatus(req.id, 'approved')}
                                                                 disabled={updatingStatusId !== null}
-                                                                className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50 transition"
+                                                                className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50"
                                                             >
                                                                 {req.type === 'data_room_access'
                                                                     ? 'Authorize Access'
                                                                     : req.type === 'founder_call'
-                                                                    ? 'Confirm Interest'
-                                                                    : 'Confirm'}
+                                                                      ? 'Confirm Interest'
+                                                                      : 'Confirm'}
                                                             </button>
                                                             <button
                                                                 onClick={() => handleRequestStatus(req.id, 'denied')}
                                                                 disabled={updatingStatusId !== null}
-                                                                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-bold text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 transition"
+                                                                className="rounded-lg border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-bold text-zinc-700 transition hover:bg-zinc-50 disabled:opacity-50"
                                                             >
                                                                 Decline
                                                             </button>
@@ -748,10 +774,14 @@ export default function FounderDashboard({
                                                         <span className="border-emerald-250 animate-fade-in inline-flex items-center gap-1 rounded-full border bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 shadow-xs">
                                                             <CheckCircle2 className="size-3.5 text-emerald-600" />
                                                             {req.type === 'data_room_access'
-                                                                ? (req.data_room_granted ? 'Access granted by Pinpoint' : 'Authorization provided to Pinpoint')
+                                                                ? req.data_room_granted
+                                                                    ? 'Access granted by Pinpoint'
+                                                                    : 'Authorization provided to Pinpoint'
                                                                 : req.type === 'founder_call'
-                                                                ? (req.scheduled_at ? 'Call scheduled by Pinpoint' : 'Interest confirmed (Pinpoint coordinating)')
-                                                                : 'Confirmed to Pinpoint'}
+                                                                  ? req.scheduled_at
+                                                                      ? 'Call scheduled by Pinpoint'
+                                                                      : 'Interest confirmed (Pinpoint coordinating)'
+                                                                  : 'Confirmed to Pinpoint'}
                                                         </span>
                                                     ) : (
                                                         <span className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-0.5 text-xs font-bold text-zinc-500">

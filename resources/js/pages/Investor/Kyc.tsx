@@ -200,8 +200,8 @@ export default function Kyc({
                                             {form.processing
                                                 ? 'Uploading…'
                                                 : isRejected
-                                                    ? 'Resubmit Document for Review'
-                                                    : 'Submit Document for Review'}
+                                                  ? 'Resubmit Document for Review'
+                                                  : 'Submit Document for Review'}
                                         </Button>
                                     </form>
                                 )}

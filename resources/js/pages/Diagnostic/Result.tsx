@@ -222,19 +222,20 @@ export default function DiagnosticResult({
         setChecklistLoading(true);
         setChecklistError(false);
         try {
-            const xsrfCookie = document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('XSRF-TOKEN='))
-                ?.split('=')
-                .slice(1)
-                .join('=') ?? '';
+            const xsrfCookie =
+                document.cookie
+                    .split('; ')
+                    .find((row) => row.startsWith('XSRF-TOKEN='))
+                    ?.split('=')
+                    .slice(1)
+                    .join('=') ?? '';
             const xsrfToken = decodeURIComponent(xsrfCookie);
             const res = await fetch('/diagnostic/send-checklist', {
                 method: 'POST',
                 headers: {
                     'X-XSRF-TOKEN': xsrfToken,
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
             });
             if (res.ok) {

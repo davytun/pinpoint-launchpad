@@ -1,8 +1,8 @@
-import { Head, router } from '@inertiajs/react';
-import { CheckCheck } from 'lucide-react';
-import { Icon } from '@iconify/react';
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
+import { Icon } from '@iconify/react';
+import { Head, router } from '@inertiajs/react';
+import { CheckCheck } from 'lucide-react';
 import { useState } from 'react';
 
 type Notification = {
@@ -35,17 +35,21 @@ export default function NotificationsIndex({
     function markAllAsRead() {
         if (unreadCount === 0 || markingAll) return;
         setMarkingAll(true);
-        router.patch(read_all_url, {}, {
-            preserveScroll: true,
-            onFinish: () => setMarkingAll(false),
-        });
+        router.patch(
+            read_all_url,
+            {},
+            {
+                preserveScroll: true,
+                onFinish: () => setMarkingAll(false),
+            },
+        );
     }
 
     function handleNotificationClick(notification: Notification) {
         if (!notification.read_at) {
             router.patch(read_url_template.replace('__notification__', notification.id), {}, { preserveScroll: true });
         }
-        
+
         if (notification.data.destination_url) {
             // Can be extended to navigate to the URL
         }
@@ -55,13 +59,11 @@ export default function NotificationsIndex({
         <AdminLayout>
             <Head title="Platform Alerts" />
 
-            <div className="flex h-full flex-col p-4 sm:p-8 lg:p-12 overflow-y-auto no-scrollbar">
+            <div className="no-scrollbar flex h-full flex-col overflow-y-auto p-4 sm:p-8 lg:p-12">
                 {/* ── Header ────────────────────────────────────────────────────────── */}
                 <div className="mb-8 flex shrink-0 flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
                     <div>
-                        <h1 className="text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">
-                            Notifications
-                        </h1>
+                        <h1 className="text-3xl font-semibold tracking-tight text-zinc-950 sm:text-4xl">Notifications</h1>
                         <p className="mt-2 text-[15px] text-zinc-500">
                             {unreadCount > 0
                                 ? `You have ${unreadCount} unread alert${unreadCount === 1 ? '' : 's'} requiring attention.`
@@ -92,7 +94,7 @@ export default function NotificationsIndex({
                             <p className="mt-1 text-xs text-zinc-500">When you receive platform alerts, they will appear here.</p>
                         </div>
                     ) : (
-                        <div className="flex-1 divide-y divide-zinc-100 overflow-y-auto no-scrollbar">
+                        <div className="no-scrollbar flex-1 divide-y divide-zinc-100 overflow-y-auto">
                             {notifications.data.map((notification) => {
                                 const isUnread = !notification.read_at;
                                 return (
@@ -101,16 +103,12 @@ export default function NotificationsIndex({
                                         onClick={() => handleNotificationClick(notification)}
                                         className={cn(
                                             'group relative flex w-full items-start gap-4 p-5 text-left transition-all duration-200',
-                                            isUnread
-                                                ? 'bg-blue-50/30 hover:bg-blue-50/50'
-                                                : 'bg-white hover:bg-zinc-50/70'
+                                            isUnread ? 'bg-blue-50/30 hover:bg-blue-50/50' : 'bg-white hover:bg-zinc-50/70',
                                         )}
                                     >
                                         {/* Status Indicator */}
                                         <div className="mt-1.5 flex w-3 shrink-0 items-center justify-center">
-                                            {isUnread ? (
-                                                <div className="h-2 w-2 rounded-full bg-[#3A54A5]"></div>
-                                            ) : null}
+                                            {isUnread ? <div className="h-2 w-2 rounded-full bg-[#3A54A5]"></div> : null}
                                         </div>
 
                                         {/* Content */}
@@ -118,20 +116,13 @@ export default function NotificationsIndex({
                                             <p
                                                 className={cn(
                                                     'text-[14px] font-semibold tracking-tight',
-                                                    isUnread ? 'text-zinc-950' : 'text-zinc-700'
+                                                    isUnread ? 'text-zinc-950' : 'text-zinc-700',
                                                 )}
                                             >
-                                                {notification.data.title ??
-                                                    notification.data.type?.replaceAll('_', ' ') ??
-                                                    'Platform update'}
+                                                {notification.data.title ?? notification.data.type?.replaceAll('_', ' ') ?? 'Platform update'}
                                             </p>
                                             {notification.data.body && (
-                                                <p
-                                                    className={cn(
-                                                        'mt-1 text-[13px] leading-relaxed',
-                                                        isUnread ? 'text-zinc-600' : 'text-zinc-500'
-                                                    )}
-                                                >
+                                                <p className={cn('mt-1 text-[13px] leading-relaxed', isUnread ? 'text-zinc-600' : 'text-zinc-500')}>
                                                     {notification.data.body}
                                                 </p>
                                             )}

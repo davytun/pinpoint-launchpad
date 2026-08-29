@@ -1,6 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Clock3, CheckCircle2, XCircle, Calendar, Video, Lock, ExternalLink, ShieldAlert } from 'lucide-react';
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import { Head, Link } from '@inertiajs/react';
+import { ArrowLeft, Calendar, CheckCircle2, Clock3, ExternalLink, Lock, ShieldAlert, Video, XCircle } from 'lucide-react';
 
 type Interest = {
     id: string;
@@ -83,11 +83,12 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                         <div className="rounded-2xl border border-white/80 bg-white p-10 text-center shadow-[0_16px_36px_rgba(33,56,120,0.06)]">
                             <p className="text-lg font-bold text-zinc-900">No interests submitted yet.</p>
                             <p className="mt-2 text-sm text-zinc-600">
-                                Explore the Spotlight to discover verified startups and request introductions or data room access coordinated by Pinpoint IR.
+                                Explore the Spotlight to discover verified startups and request introductions or data room access coordinated by
+                                Pinpoint IR.
                             </p>
                             <Link
                                 href={route('investor.spotlight.index')}
-                                className="mt-6 inline-block rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#2D4182] transition"
+                                className="mt-6 inline-block rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#2D4182]"
                             >
                                 Browse Spotlight
                             </Link>
@@ -97,18 +98,28 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                             const isFounderCall = interest.type === 'founder_call';
                             const isDataRoom = interest.type === 'data_room_access';
 
-                            const displayStatus = interest.investor_facing_status ?? (
-                                interest.status === 'approved'
-                                    ? (isFounderCall ? (interest.completed_at ? 'Completed' : interest.scheduled_at ? 'Scheduled' : 'Approved') : isDataRoom ? (interest.data_room_status === 'granted' ? 'Data Room Granted' : 'Access Revoked') : 'Approved')
+                            const displayStatus =
+                                interest.investor_facing_status ??
+                                (interest.status === 'approved'
+                                    ? isFounderCall
+                                        ? interest.completed_at
+                                            ? 'Completed'
+                                            : interest.scheduled_at
+                                              ? 'Scheduled'
+                                              : 'Approved'
+                                        : isDataRoom
+                                          ? interest.data_room_status === 'granted'
+                                              ? 'Data Room Granted'
+                                              : 'Access Revoked'
+                                          : 'Approved'
                                     : interest.status === 'denied'
-                                    ? 'Declined'
-                                    : 'Pinpoint Reviewing'
-                            );
+                                      ? 'Declined'
+                                      : 'Pinpoint Reviewing');
 
                             return (
                                 <div
                                     key={interest.id}
-                                    className="rounded-2xl border border-white/80 bg-white p-6 sm:p-7 shadow-[0_16px_36px_rgba(33,56,120,0.06)] transition-all hover:shadow-[0_20px_40px_rgba(33,56,120,0.09)]"
+                                    className="rounded-2xl border border-white/80 bg-white p-6 shadow-[0_16px_36px_rgba(33,56,120,0.06)] transition-all hover:shadow-[0_20px_40px_rgba(33,56,120,0.09)] sm:p-7"
                                 >
                                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                         <div className="space-y-1.5">
@@ -121,30 +132,27 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                                                         {interest.profile.sector}
                                                     </span>
                                                 )}
-                                                <span className="rounded-full bg-[#3A54A5]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#3A54A5] uppercase tracking-wider">
+                                                <span className="rounded-full bg-[#3A54A5]/10 px-2.5 py-0.5 text-[11px] font-bold tracking-wider text-[#3A54A5] uppercase">
                                                     {interest.type.replaceAll('_', ' ')}
                                                 </span>
                                             </div>
 
                                             {interest.profile?.spotlight_one_liner && (
-                                                <p className="text-xs font-medium text-zinc-500 max-w-2xl">
-                                                    {interest.profile.spotlight_one_liner}
-                                                </p>
+                                                <p className="max-w-2xl text-xs font-medium text-zinc-500">{interest.profile.spotlight_one_liner}</p>
                                             )}
 
-                                            <p className="text-xs text-zinc-400 pt-1">
-                                                Submitted on {formatDate(interest.created_at)}
-                                            </p>
+                                            <p className="pt-1 text-xs text-zinc-400">Submitted on {formatDate(interest.created_at)}</p>
                                         </div>
 
                                         {/* Status Header Badge */}
-                                        <div className="flex shrink-0 items-center gap-1.5 rounded-xl bg-zinc-50 px-3.5 py-2 border border-zinc-100 sm:self-start">
-                                            {displayStatus === 'Data Room Granted' || displayStatus === 'Approved' || displayStatus === 'Scheduled' || displayStatus === 'Completed' ? (
+                                        <div className="flex shrink-0 items-center gap-1.5 rounded-xl border border-zinc-100 bg-zinc-50 px-3.5 py-2 sm:self-start">
+                                            {displayStatus === 'Data Room Granted' ||
+                                            displayStatus === 'Approved' ||
+                                            displayStatus === 'Scheduled' ||
+                                            displayStatus === 'Completed' ? (
                                                 <>
                                                     <CheckCircle2 className="size-4.5 text-emerald-600" />
-                                                    <span className="text-xs font-bold text-emerald-700">
-                                                        {displayStatus}
-                                                    </span>
+                                                    <span className="text-xs font-bold text-emerald-700">{displayStatus}</span>
                                                 </>
                                             ) : displayStatus === 'Declined' || displayStatus === 'Access Revoked' ? (
                                                 <>
@@ -167,37 +175,35 @@ export default function Interests({ interests }: { interests: Interest[] }) {
 
                                     {/* Investor message */}
                                     {interest.message && (
-                                        <div className="mt-4 rounded-xl bg-zinc-50/80 border border-zinc-100 p-3.5 text-xs leading-relaxed text-zinc-700 italic">
+                                        <div className="mt-4 rounded-xl border border-zinc-100 bg-zinc-50/80 p-3.5 text-xs leading-relaxed text-zinc-700 italic">
                                             &ldquo;{interest.message}&rdquo;
                                         </div>
                                     )}
 
                                     {/* Introduction Details Box */}
                                     {isFounderCall && interest.status === 'approved' && (
-                                        <div className="mt-5 rounded-xl border border-indigo-100 bg-[#f7f9ff] p-4 text-xs text-indigo-950 space-y-2">
+                                        <div className="mt-5 space-y-2 rounded-xl border border-indigo-100 bg-[#f7f9ff] p-4 text-xs text-indigo-950">
                                             <div className="flex items-center gap-2 font-bold text-indigo-900">
                                                 <Calendar className="size-4 text-indigo-600" />
                                                 <span>
                                                     {interest.completed_at
                                                         ? 'Founder Introduction Completed'
                                                         : interest.scheduled_at
-                                                        ? 'Scheduled Founder Call'
-                                                        : 'Introduction Approved — Coordinating Timing'}
+                                                          ? 'Scheduled Founder Call'
+                                                          : 'Introduction Approved — Coordinating Timing'}
                                                 </span>
                                             </div>
 
                                             {interest.scheduled_at && !interest.completed_at && (
-                                                <div className="pl-6 space-y-1">
-                                                    <p className="font-semibold text-zinc-800">
-                                                        Time: {formatDateTime(interest.scheduled_at)}
-                                                    </p>
+                                                <div className="space-y-1 pl-6">
+                                                    <p className="font-semibold text-zinc-800">Time: {formatDateTime(interest.scheduled_at)}</p>
                                                     {interest.meeting_link && (
-                                                        <p className="flex items-center gap-1.5 text-zinc-600 font-mono">
+                                                        <p className="flex items-center gap-1.5 font-mono text-zinc-600">
                                                             <Video className="size-3.5 text-indigo-500" />
                                                             <span>{interest.meeting_link}</span>
                                                         </p>
                                                     )}
-                                                    <p className="text-[11px] text-zinc-500 pt-1">
+                                                    <p className="pt-1 text-[11px] text-zinc-500">
                                                         Pinpoint Investor Relations will coordinate and facilitate the session.
                                                     </p>
                                                 </div>
@@ -205,7 +211,8 @@ export default function Interests({ interests }: { interests: Interest[] }) {
 
                                             {!interest.scheduled_at && !interest.completed_at && (
                                                 <p className="pl-6 text-[11.5px] text-zinc-600">
-                                                    Pinpoint Investor Relations is coordinating availability and will post verified meeting details here.
+                                                    Pinpoint Investor Relations is coordinating availability and will post verified meeting details
+                                                    here.
                                                 </p>
                                             )}
                                         </div>
@@ -239,7 +246,7 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                                     <div className="mt-4 flex items-center justify-end">
                                         <Link
                                             href={route('investor.spotlight.show', interest.profile.slug)}
-                                            className="text-xs font-semibold text-zinc-400 hover:text-[#3A54A5] transition"
+                                            className="text-xs font-semibold text-zinc-400 transition hover:text-[#3A54A5]"
                                         >
                                             View Spotlight Profile &rarr;
                                         </Link>

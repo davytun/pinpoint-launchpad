@@ -17,7 +17,8 @@ const accessItems = [
 ];
 
 export default function Dashboard({ investor }: { investor: Investor }) {
-    const unreadNotifications = usePage<{ platform_unread_notifications?: { investor?: number } }>().props.platform_unread_notifications?.investor ?? 0;
+    const unreadNotifications =
+        usePage<{ platform_unread_notifications?: { investor?: number } }>().props.platform_unread_notifications?.investor ?? 0;
     const approved = investor.kyc_status === 'approved';
     const pending = investor.kyc_status === 'pending';
     const rejected = investor.kyc_status === 'rejected';
@@ -50,7 +51,13 @@ export default function Dashboard({ investor }: { investor: Investor }) {
                                 My Interests
                             </Link>
                         )}
-                        <Link href={route('investor.notifications.index')} className="inline-flex items-center gap-1.5 hover:text-zinc-950"><Bell className="size-4" />Alerts{unreadNotifications > 0 && <span className="rounded-full bg-[#3A54A5] px-1.5 py-0.5 text-[10px] text-white">{unreadNotifications}</span>}</Link>
+                        <Link href={route('investor.notifications.index')} className="inline-flex items-center gap-1.5 hover:text-zinc-950">
+                            <Bell className="size-4" />
+                            Alerts
+                            {unreadNotifications > 0 && (
+                                <span className="rounded-full bg-[#3A54A5] px-1.5 py-0.5 text-[10px] text-white">{unreadNotifications}</span>
+                            )}
+                        </Link>
                         {approved && (
                             <Link href={route('investor.data-rooms.index')} className="hover:text-zinc-950">
                                 Data Rooms

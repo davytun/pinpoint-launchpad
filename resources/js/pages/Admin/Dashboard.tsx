@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 
-import { Activity, AlertTriangle, DollarSign, MessageSquare, Users, TrendingUp, CreditCard, AlertCircle, AlertOctagon, Filter } from 'lucide-react';
+import { Activity, AlertCircle, AlertOctagon, AlertTriangle, CreditCard, DollarSign, Filter, MessageSquare, TrendingUp, Users } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, XAxis } from 'recharts';
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
@@ -114,20 +114,20 @@ function MetricCard({
     const inner = (
         <div
             className={cn(
-                'group relative flex h-full flex-col justify-between p-4 sm:p-5 bg-white border border-zinc-100 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5',
+                'group relative flex h-full flex-col justify-between rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:p-5',
             )}
         >
             <div className="flex items-start justify-between gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">{label}</span>
+                <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">{label}</span>
                 <div className="flex items-center gap-2">
                     {pulse && (
-                        <span className="relative flex h-2 w-2 mr-1">
+                        <span className="relative mr-1 flex h-2 w-2">
                             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-60" />
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
                         </span>
                     )}
                     {IconComponent && (
-                        <div className={cn("flex h-7 w-7 items-center justify-center rounded-lg", colors.bg, colors.text)}>
+                        <div className={cn('flex h-7 w-7 items-center justify-center rounded-lg', colors.bg, colors.text)}>
                             <IconComponent className="size-3.5" />
                         </div>
                     )}
@@ -135,13 +135,18 @@ function MetricCard({
             </div>
             <div className="mt-3 flex items-end justify-between">
                 <div className="flex flex-col">
-                    <span className="text-[26px] font-bold tracking-tight text-zinc-900 leading-none">{value}</span>
+                    <span className="text-[26px] leading-none font-bold tracking-tight text-zinc-900">{value}</span>
                     {subValue && <span className="mt-1 text-[11px] font-medium text-zinc-500">{subValue}</span>}
                 </div>
             </div>
         </div>
     );
-    if (href) return <Link href={href} className="block h-full">{inner}</Link>;
+    if (href)
+        return (
+            <Link href={href} className="block h-full">
+                {inner}
+            </Link>
+        );
     return inner;
 }
 
@@ -156,7 +161,7 @@ const revenueChartConfig = {
 
 function RevenueAreaChart({ data, thisMonth }: { data: MonthlyRevenue[]; thisMonth: number }) {
     return (
-        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] flex flex-col h-[380px]">
+        <div className="flex h-[380px] min-w-0 flex-col rounded-[20px] border border-zinc-200/60 bg-white p-5 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] sm:p-6">
             <div className="mb-2 flex items-center justify-between">
                 <p className="text-[13px] font-semibold text-zinc-500">Monthly Revenue</p>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-500">
@@ -164,7 +169,7 @@ function RevenueAreaChart({ data, thisMonth }: { data: MonthlyRevenue[]; thisMon
                 </div>
             </div>
             <p className="mb-6 text-2xl font-bold tracking-tight text-zinc-900 sm:text-3xl">{fmtCurrency(thisMonth)}</p>
-            <div className="flex-1 min-h-40">
+            <div className="min-h-40 flex-1">
                 <ChartContainer config={revenueChartConfig} className="h-full w-full">
                     <AreaChart data={data} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                         <defs>
@@ -195,7 +200,7 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
     const chartConfig = buildAuditConfig(data);
 
     return (
-        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] sm:p-6">
             <div className="mb-6 flex items-center justify-between">
                 <p className="text-[13px] font-semibold text-zinc-500">Audit Pipeline</p>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400">
@@ -203,38 +208,38 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
                 </div>
             </div>
             <div className="flex flex-col items-center gap-6 xl:flex-row xl:items-start">
-                <div className="h-32 w-32 shrink-0 relative">
-                    <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
-                        <span className="text-2xl font-bold text-zinc-900 leading-none">{total}</span>
+                <div className="relative h-32 w-32 shrink-0">
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl leading-none font-bold text-zinc-900">{total}</span>
                     </div>
                     <ChartContainer config={chartConfig} className="h-full w-full">
                         <PieChart>
-                        <Pie
-                            data={data}
-                            dataKey="value"
-                            nameKey="label"
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={44}
-                            outerRadius={56}
-                            paddingAngle={4}
-                            stroke="none"
-                        >
-                            {data.map((entry, i) => (
-                                <Cell key={i} fill={entry.color} />
-                            ))}
-                        </Pie>
-                        <ChartTooltip content={<ChartTooltipContent nameKey="label" hideLabel />} />
-                    </PieChart>
+                            <Pie
+                                data={data}
+                                dataKey="value"
+                                nameKey="label"
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={44}
+                                outerRadius={56}
+                                paddingAngle={4}
+                                stroke="none"
+                            >
+                                {data.map((entry, i) => (
+                                    <Cell key={i} fill={entry.color} />
+                                ))}
+                            </Pie>
+                            <ChartTooltip content={<ChartTooltipContent nameKey="label" hideLabel />} />
+                        </PieChart>
                     </ChartContainer>
                 </div>
 
-                <div className="min-w-0 flex-1 w-full space-y-2.5 xl:mt-2">
+                <div className="w-full min-w-0 flex-1 space-y-2.5 xl:mt-2">
                     {data.map((item) => (
                         <div key={item.label} className="flex items-center justify-between gap-2">
                             <div className="flex min-w-0 items-center gap-2.5">
                                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: item.color }} />
-                                <span className="text-zinc-600 truncate text-[13px] font-medium">{item.label}</span>
+                                <span className="truncate text-[13px] font-medium text-zinc-600">{item.label}</span>
                             </div>
                             <span className="shrink-0 text-[13px] font-bold text-zinc-900 tabular-nums">{item.value}</span>
                         </div>
@@ -253,17 +258,17 @@ function WaitlistBars({ founders, investors }: { founders: number; investors: nu
     const investorPct = total ? 100 - founderPct : 0;
 
     return (
-        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] sm:p-6">
             <div className="mb-6 flex items-center justify-between">
                 <p className="text-[13px] font-semibold text-zinc-500">Waitlist Composition</p>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400">
                     <Users className="size-3.5" />
                 </div>
             </div>
-            
+
             <div className="mb-2 flex items-end justify-between">
-                <span className="text-3xl font-bold text-zinc-900 tracking-tight">{total}</span>
-                <span className="text-xs font-medium text-zinc-400 mb-1">Total pending</span>
+                <span className="text-3xl font-bold tracking-tight text-zinc-900">{total}</span>
+                <span className="mb-1 text-xs font-medium text-zinc-400">Total pending</span>
             </div>
 
             <div className="mt-5 flex h-2.5 w-full overflow-hidden rounded-full bg-zinc-100">
@@ -274,14 +279,14 @@ function WaitlistBars({ founders, investors }: { founders: number; investors: nu
             <div className="mt-4 flex gap-5">
                 <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-zinc-900" />
-                    <span className="text-zinc-500 text-xs font-medium">
-                        Founders <span className="font-semibold text-zinc-900 ml-1">{founderPct}%</span>
+                    <span className="text-xs font-medium text-zinc-500">
+                        Founders <span className="ml-1 font-semibold text-zinc-900">{founderPct}%</span>
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-zinc-400" />
-                    <span className="text-zinc-500 text-xs font-medium">
-                        Investors <span className="font-semibold text-zinc-900 ml-1">{investorPct}%</span>
+                    <span className="text-xs font-medium text-zinc-500">
+                        Investors <span className="ml-1 font-semibold text-zinc-900">{investorPct}%</span>
                     </span>
                 </div>
             </div>
@@ -293,7 +298,7 @@ function WaitlistBars({ founders, investors }: { founders: number; investors: nu
 
 function FunnelChart({ data }: { data: FunnelMetrics }) {
     const max = data.signed_up || 1; // prevent divide by zero
-    
+
     const steps = [
         { label: 'Signed Up', value: data.signed_up },
         { label: 'Diagnostic', value: data.completed_diagnostic },
@@ -302,39 +307,37 @@ function FunnelChart({ data }: { data: FunnelMetrics }) {
     ];
 
     return (
-        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 sm:p-6 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] sm:p-6">
             <div className="mb-6 flex items-center justify-between">
                 <p className="text-[13px] font-semibold text-zinc-500">Onboarding Funnel</p>
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400">
                     <Filter className="size-3.5" />
                 </div>
             </div>
-            
+
             <div className="space-y-4">
                 {steps.map((step, idx) => {
                     const percentage = Math.round((step.value / max) * 100);
                     // Calculate drop-off from previous step
                     const prevValue = idx === 0 ? step.value : steps[idx - 1].value;
-                    const dropoff = idx === 0 ? 0 : (prevValue > 0 ? Math.round(((prevValue - step.value) / prevValue) * 100) : 0);
-                    
+                    const dropoff = idx === 0 ? 0 : prevValue > 0 ? Math.round(((prevValue - step.value) / prevValue) * 100) : 0;
+
                     return (
                         <div key={step.label} className="relative">
-                            <div className="flex justify-between items-end mb-1.5">
+                            <div className="mb-1.5 flex items-end justify-between">
                                 <span className="text-[13px] font-semibold text-zinc-900">{step.label}</span>
                                 <div className="flex items-center gap-2">
-                                    {idx > 0 && dropoff > 0 && (
-                                        <span className="text-[11px] font-medium text-red-500">-{dropoff}% drop</span>
-                                    )}
+                                    {idx > 0 && dropoff > 0 && <span className="text-[11px] font-medium text-red-500">-{dropoff}% drop</span>}
                                     <span className="text-[13px] font-bold text-zinc-900 tabular-nums">{step.value}</span>
                                 </div>
                             </div>
                             <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
-                                <div 
-                                    className="h-full rounded-full transition-all duration-500" 
-                                    style={{ 
+                                <div
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{
                                         width: `${percentage}%`,
-                                        backgroundColor: `rgba(24, 24, 27, ${1 - (idx * 0.15)})`
-                                    }} 
+                                        backgroundColor: `rgba(24, 24, 27, ${1 - idx * 0.15})`,
+                                    }}
                                 />
                             </div>
                         </div>
@@ -349,39 +352,44 @@ function FunnelChart({ data }: { data: FunnelMetrics }) {
 
 function SystemAlertsWidget({ alerts }: { alerts?: SystemAlert[] }) {
     if (!alerts || alerts.length === 0) return null;
-    
+
     return (
         <div className="mb-10">
             <div className="mb-4 flex items-center gap-2">
-                <h2 className="text-[13px] font-bold text-zinc-900 tracking-wider uppercase">System Alerts</h2>
+                <h2 className="text-[13px] font-bold tracking-wider text-zinc-900 uppercase">System Alerts</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {alerts.map((alert) => (
-                    <Link 
-                        key={alert.id} 
-                        href={alert.action_url} 
+                    <Link
+                        key={alert.id}
+                        href={alert.action_url}
                         className={cn(
-                            "group relative flex flex-col justify-between p-4 sm:p-5 border rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5",
-                            alert.type === 'error' ? "bg-red-50/30 border-red-100" : "bg-amber-50/30 border-amber-100"
+                            'group relative flex flex-col justify-between rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:p-5',
+                            alert.type === 'error' ? 'border-red-100 bg-red-50/30' : 'border-amber-100 bg-amber-50/30',
                         )}
                     >
                         <div className="flex items-start justify-between gap-2">
-                            <h3 className={cn(
-                                "text-[11px] font-bold uppercase tracking-wider line-clamp-1",
-                                alert.type === 'error' ? "text-red-700" : "text-amber-700"
-                            )}>{alert.title}</h3>
-                            <div className={cn(
-                                "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
-                                alert.type === 'error' ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"
-                            )}>
+                            <h3
+                                className={cn(
+                                    'line-clamp-1 text-[11px] font-bold tracking-wider uppercase',
+                                    alert.type === 'error' ? 'text-red-700' : 'text-amber-700',
+                                )}
+                            >
+                                {alert.title}
+                            </h3>
+                            <div
+                                className={cn(
+                                    'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg',
+                                    alert.type === 'error' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600',
+                                )}
+                            >
                                 {alert.type === 'error' ? <AlertOctagon className="size-3.5" /> : <AlertCircle className="size-3.5" />}
                             </div>
                         </div>
                         <div className="mt-3">
-                            <p className={cn(
-                                "text-[13px] font-medium leading-relaxed",
-                                alert.type === 'error' ? "text-red-900" : "text-amber-900"
-                            )}>{alert.description}</p>
+                            <p className={cn('text-[13px] leading-relaxed font-medium', alert.type === 'error' ? 'text-red-900' : 'text-amber-900')}>
+                                {alert.description}
+                            </p>
                         </div>
                     </Link>
                 ))}
@@ -413,7 +421,14 @@ const colorMap: Record<string, { bg: string; text: string }> = {
     gray: { bg: 'bg-zinc-100/80', text: 'text-zinc-600' },
 };
 
-export default function AdminDashboard({ metrics, recent_activity, needs_attention = [], system_alerts = [], user_role, date_range = 'all' }: PageProps) {
+export default function AdminDashboard({
+    metrics,
+    recent_activity,
+    needs_attention = [],
+    system_alerts = [],
+    user_role,
+    date_range = 'all',
+}: PageProps) {
     const isSuperAdmin = user_role === 'superadmin';
     const isAnalyst = user_role === 'analyst';
 
@@ -422,7 +437,7 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
             <Head title="Dashboard — Admin" />
 
             <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-xs">
-                <div className="flex-1 overflow-y-auto px-6 py-8 sm:px-10 lg:py-10 no-scrollbar">
+                <div className="no-scrollbar flex-1 overflow-y-auto px-6 py-8 sm:px-10 lg:py-10">
                     <div className="mb-10 flex items-start justify-between">
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Overview</h1>
@@ -463,37 +478,45 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                     </div>
 
                     {/* ── System Alerts ───────────────────────────────────────────────────────── */}
-                    {isSuperAdmin && system_alerts.length > 0 && (
-                        <SystemAlertsWidget alerts={system_alerts} />
-                    )}
+                    {isSuperAdmin && system_alerts.length > 0 && <SystemAlertsWidget alerts={system_alerts} />}
 
                     {/* ── Needs Attention Workflow ───────────────────────────────────────── */}
                     {needs_attention.length > 0 && (
                         <div className="mb-10">
                             <div className="mb-4 flex items-center gap-2">
-                                <h2 className="text-[13px] font-bold text-zinc-900 tracking-wider uppercase">Action Required</h2>
+                                <h2 className="text-[13px] font-bold tracking-wider text-zinc-900 uppercase">Action Required</h2>
                             </div>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                 {needs_attention.map((item) => {
                                     const colors = colorMap[item.color] || colorMap.amber;
                                     return (
-                                        <Link 
-                                            key={item.id} 
-                                            href={item.action_url} 
-                                            className="group relative flex flex-col justify-between p-4 sm:p-5 bg-white border border-zinc-100 rounded-2xl shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                                        <Link
+                                            key={item.id}
+                                            href={item.action_url}
+                                            className="group relative flex flex-col justify-between rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:p-5"
                                         >
                                             <div className="flex items-start justify-between gap-2">
-                                                <h3 className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 line-clamp-1">{item.title}</h3>
-                                                <div className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-lg", colors.bg, colors.text)}>
+                                                <h3 className="line-clamp-1 text-[11px] font-bold tracking-wider text-zinc-500 uppercase">
+                                                    {item.title}
+                                                </h3>
+                                                <div
+                                                    className={cn(
+                                                        'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg',
+                                                        colors.bg,
+                                                        colors.text,
+                                                    )}
+                                                >
                                                     <Icon icon={item.icon} className="size-3.5" />
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="mt-3 flex items-end justify-between">
                                                 <div className="flex flex-col">
-                                                    <span className="text-[26px] font-bold tracking-tight text-zinc-900 leading-none">{item.count}</span>
-                                                    <span className="text-[11px] font-medium text-zinc-500 mt-1">Pending</span>
+                                                    <span className="text-[26px] leading-none font-bold tracking-tight text-zinc-900">
+                                                        {item.count}
+                                                    </span>
+                                                    <span className="mt-1 text-[11px] font-medium text-zinc-500">Pending</span>
                                                 </div>
                                             </div>
                                         </Link>
@@ -541,7 +564,7 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                             {/* Charts & Activity (Masonry-style Columns) */}
                             <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
                                 {/* Left Column: Charts and Activity */}
-                                <div className="lg:col-span-2 flex flex-col gap-6">
+                                <div className="flex flex-col gap-6 lg:col-span-2">
                                     {(metrics.monthly_revenue?.length ?? 0) > 0 && (
                                         <RevenueAreaChart data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
                                     )}
@@ -550,28 +573,40 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                                         <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-4">
                                             <span className="text-[15px] font-semibold text-zinc-900">Recent Activity</span>
                                         </div>
-                                        
+
                                         {recent_activity.length === 0 ? (
                                             <div className="rounded-[20px] border border-zinc-200/60 bg-white p-10 text-center text-sm font-medium text-zinc-500 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
                                                 No recent activity.
                                             </div>
                                         ) : (
                                             <div className="overflow-hidden rounded-[20px] border border-zinc-200/60 bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
-                                                {[...recent_activity].reverse().slice(0, 6).map((item, i) => (
-                                                    <div key={i} className="flex items-start gap-4 p-4 sm:p-5 transition-colors hover:bg-zinc-50/50 border-b border-zinc-100 last:border-0">
-                                                        <span className={`mt-1 h-2 w-2 shrink-0 rounded-full shadow-xs ${activityDotColor[item.type] ?? 'bg-zinc-400'}`} />
-                                                        <div className="min-w-0 flex-1">
-                                                            <div className="flex flex-wrap items-center gap-x-2">
-                                                                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                                                                    {activityTypeLabel[item.type]}
-                                                                </span>
-                                                                <p className="truncate text-[13.5px] font-semibold text-zinc-900">{item.description}</p>
+                                                {[...recent_activity]
+                                                    .reverse()
+                                                    .slice(0, 6)
+                                                    .map((item, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className="flex items-start gap-4 border-b border-zinc-100 p-4 transition-colors last:border-0 hover:bg-zinc-50/50 sm:p-5"
+                                                        >
+                                                            <span
+                                                                className={`mt-1 h-2 w-2 shrink-0 rounded-full shadow-xs ${activityDotColor[item.type] ?? 'bg-zinc-400'}`}
+                                                            />
+                                                            <div className="min-w-0 flex-1">
+                                                                <div className="flex flex-wrap items-center gap-x-2">
+                                                                    <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                                                                        {activityTypeLabel[item.type]}
+                                                                    </span>
+                                                                    <p className="truncate text-[13.5px] font-semibold text-zinc-900">
+                                                                        {item.description}
+                                                                    </p>
+                                                                </div>
+                                                                {item.email && (
+                                                                    <p className="mt-1 truncate text-xs font-medium text-zinc-500">{item.email}</p>
+                                                                )}
                                                             </div>
-                                                            {item.email && <p className="mt-1 truncate text-xs font-medium text-zinc-500">{item.email}</p>}
+                                                            <span className="shrink-0 text-[11px] font-medium text-zinc-400">{item.time}</span>
                                                         </div>
-                                                        <span className="shrink-0 text-[11px] font-medium text-zinc-400">{item.time}</span>
-                                                    </div>
-                                                ))}
+                                                    ))}
                                             </div>
                                         )}
                                     </div>
@@ -591,24 +626,24 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                                                 {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
                                                     <div
                                                         key={tier}
-                                                        className="relative h-20 w-full overflow-hidden rounded-2xl bg-white shadow-xs ring-1 ring-zinc-200/50 p-4"
+                                                        className="relative h-20 w-full overflow-hidden rounded-2xl bg-white p-4 shadow-xs ring-1 ring-zinc-200/50"
                                                     >
                                                         <div className="flex items-center justify-between">
                                                             <p className="text-[13px] font-semibold text-zinc-500 capitalize">{tier}</p>
                                                             <CreditCard className="size-3.5 text-zinc-300" />
                                                         </div>
-                                                        <p className="mt-2 text-xl font-bold tracking-tight text-zinc-900">{fmtCurrency(metrics.revenue_by_tier![tier])}</p>
+                                                        <p className="mt-2 text-xl font-bold tracking-tight text-zinc-900">
+                                                            {fmtCurrency(metrics.revenue_by_tier![tier])}
+                                                        </p>
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
-                                    
+
                                     {/* Funnel Metrics */}
-                                    {metrics.funnel && (
-                                        <FunnelChart data={metrics.funnel} />
-                                    )}
-                                    
+                                    {metrics.funnel && <FunnelChart data={metrics.funnel} />}
+
                                     {/* Waitlist Split */}
                                     {metrics.waitlist_count && (
                                         <WaitlistBars founders={metrics.waitlist_count.founders} investors={metrics.waitlist_count.investors} />
@@ -620,13 +655,7 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                     {/* ── Analyst ── */}
                     {isAnalyst && (
                         <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-                            <MetricCard
-                                label="My Assigned"
-                                value={metrics.my_assigned ?? 0}
-                                icon={Users}
-                                href="/admin/founders"
-                                variant="blue"
-                            />
+                            <MetricCard label="My Assigned" value={metrics.my_assigned ?? 0} icon={Users} href="/admin/founders" variant="blue" />
                             <MetricCard
                                 label="Active Audits"
                                 value={metrics.active_audits ?? 0}
@@ -655,12 +684,7 @@ export default function AdminDashboard({ metrics, recent_activity, needs_attenti
                     {/* ── Support ── */}
                     {user_role === 'support' && (
                         <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-                            <MetricCard
-                                label="Unread Messages"
-                                value={metrics.my_open_messages ?? 0}
-                                icon={MessageSquare}
-                                href="/admin/messages"
-                            />
+                            <MetricCard label="Unread Messages" value={metrics.my_open_messages ?? 0} icon={MessageSquare} href="/admin/messages" />
                         </div>
                     )}
                 </div>

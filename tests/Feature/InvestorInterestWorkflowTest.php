@@ -32,7 +32,7 @@ test('only an approved data room request creates a grant after founder and admin
     ]);
 
     $this->actingAs($founder, 'founder')
-        ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
+        ->patch(route('founder.interests.authorize', $interest), ['status' => 'approved'])
         ->assertRedirect();
 
     expect($interest->fresh()->founder_decision)->toBe('approved')
@@ -47,7 +47,7 @@ test('only an approved data room request creates a grant after founder and admin
     ]);
 
     $this->actingAs($founder, 'founder')
-        ->patch(route('founder.access-requests.status', $dataRoomInterest), ['status' => 'approved'])
+        ->patch(route('founder.interests.authorize', $dataRoomInterest), ['status' => 'approved'])
         ->assertRedirect();
 
     expect($dataRoomInterest->fresh()->founder_decision)->toBe('approved')
@@ -77,7 +77,7 @@ test('a founder cannot decide another startup’s investor interest', function (
     ]);
 
     $this->actingAs($otherFounder, 'founder')
-        ->patch(route('founder.access-requests.status', $interest), ['status' => 'approved'])
+        ->patch(route('founder.interests.authorize', $interest), ['status' => 'approved'])
         ->assertForbidden();
 
     expect($interest->fresh()->status)->toBe('pending');

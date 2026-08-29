@@ -135,7 +135,7 @@ export default function FounderForgotPassword({ flash }: PageProps) {
                                 href={route('founder.login')}
                                 className="text-zinc-555 text-[12px] font-bold transition-colors duration-200 hover:text-zinc-950"
                             >
-                                <ArrowLeft className="mb-[2px] mr-1.5 inline-block size-3.5" /> Back to Sign In
+                                <ArrowLeft className="mr-1.5 mb-[2px] inline-block size-3.5" /> Back to Sign In
                             </Link>
                         </div>
                     </div>

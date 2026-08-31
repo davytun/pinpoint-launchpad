@@ -1,9 +1,10 @@
 import { Head, router } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Check, Loader2 } from 'lucide-react';
+import { ArrowRight, Check, CheckCircle2, Loader2, Mail } from 'lucide-react';
 import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 import { cn } from '@/lib/utils';
@@ -32,6 +33,7 @@ interface PageProps {
     billing_currency_symbol?: string;
     billing_ngn_fallback?: boolean;
     request_submitted?: boolean;
+    submitted_tier?: string | null;
 }
 
 // ─── Band meta ────────────────────────────────────────────────────────────────
@@ -71,15 +73,17 @@ export default function CheckoutIndex({
     tiers,
     diagnostic_session_id,
     currency_symbol = '₦',
-    billing_currency_symbol = '₦',
     billing_ngn_fallback = false,
     request_submitted = false,
+    submitted_tier = null,
 }: PageProps) {
-    const [selectedTier, setSelectedTier] = useState<string | null>(null);
+    const [selectedTier, setSelectedTier] = useState<string | null>(submitted_tier);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [requestDialogOpen, setRequestDialogOpen] = useState(request_submitted);
 
     const bandMeta = BAND_META[score_band] ?? BAND_META.mid_high;
+    const submittedTierLabel = tiers.find((tier) => tier.key === submitted_tier)?.label ?? 'your selected assessment tier';
 
     function handleSelectTier(tierKey: string) {
         setError(null);
@@ -127,6 +131,71 @@ export default function CheckoutIndex({
 
             <DiagnosticLayout hideWordmark glowColor={bandMeta.glow}>
                 <TooltipProvider delayDuration={100} skipDelayDuration={0}>
+                    <Dialog open={request_submitted && requestDialogOpen} onOpenChange={setRequestDialogOpen}>
+                        <DialogContent className="max-h-[calc(100vh-2rem)] max-w-xl overflow-y-auto rounded-3xl border-zinc-200 bg-white p-0 text-zinc-900 shadow-[0_24px_80px_rgba(33,56,120,0.22)] sm:rounded-3xl">
+                            <DialogHeader className="border-b border-zinc-100 px-7 pt-8 pb-6 text-left sm:px-9">
+                                <span className="flex size-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+                                    <CheckCircle2 className="size-6" aria-hidden="true" />
+                                </span>
+                                <p className="pt-4 text-[11px] font-bold tracking-[0.16em] text-[#3A54A5] uppercase">PIA request received</p>
+                                <DialogTitle className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">
+                                    We have your request.
+                                </DialogTitle>
+                                <DialogDescription className="max-w-md text-[15px] leading-6 text-zinc-600">
+                                    Your request for the <span className="font-semibold text-zinc-800">{submittedTierLabel}</span> assessment is now with the Pinpoint team.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="px-7 py-6 sm:px-9">
+                                <h2 className="text-sm font-bold text-zinc-900">What happens next</h2>
+                                <ol className="mt-4 space-y-4">
+                                    {[
+                                        'We will confirm the scope of your assessment and send payment instructions.',
+                                        'Once payment is confirmed, we will email a secure link for your PIA agreement.',
+                                        'After you sign, you will set up your Founder dashboard and the assessment can begin.',
+                                    ].map((step, index) => (
+                                        <li key={step} className="flex gap-3 text-sm leading-6 text-zinc-600">
+                                            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-xs font-bold text-[#3A54A5]">
+                                                {index + 1}
+                                            </span>
+                                            <span>{step}</span>
+                                        </li>
+                                    ))}
+                                </ol>
+
+                                <div className="mt-6 flex items-start gap-3 rounded-2xl bg-zinc-50 px-4 py-4 text-sm leading-6 text-zinc-600">
+                                    <Mail className="mt-0.5 size-4 shrink-0 text-[#3A54A5]" aria-hidden="true" />
+                                    <p>
+                                        Need to update your request or ask a question?{' '}
+                                        <a
+                                            href="mailto:support@pinpointlaunchpad.com"
+                                            className="font-semibold text-[#3A54A5] underline decoration-[#3A54A5]/30 underline-offset-4 hover:text-[#2D4182] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A54A5]"
+                                        >
+                                            Contact Pinpoint
+                                        </a>
+                                        .
+                                    </p>
+                                </div>
+
+                                <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <button
+                                        type="button"
+                                        onClick={() => setRequestDialogOpen(false)}
+                                        className="order-2 text-sm font-semibold text-zinc-600 hover:text-zinc-950 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3A54A5] sm:order-1"
+                                    >
+                                        Back to assessment tiers
+                                    </button>
+                                    <a
+                                        href="/diagnostic/result"
+                                        className="order-1 inline-flex h-11 items-center justify-center rounded-full bg-[#3A54A5] px-5 text-sm font-bold text-white transition-colors hover:bg-[#2D4182] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3A54A5] sm:order-2"
+                                    >
+                                        Return to your results
+                                    </a>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+
                     <div className="mx-auto max-w-5xl px-6 pt-8 pb-28 md:px-8">
                         {/* ── Wordmark ── */}
                         <header className="mb-10 flex items-center justify-between">
@@ -166,16 +235,11 @@ export default function CheckoutIndex({
                             </motion.div>
                         )}
 
-                        {request_submitted && (
-                            <div role="status" className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700">
-                                Your PIA request has been received. Pinpoint will contact you to confirm the scope and arrange payment.
-                            </div>
-                        )}
-
                         {/* ── Pricing cards ── */}
                         <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-3">
                             {tiers.map((tier, i) => {
                                 const isSelected = selectedTier === tier.key;
+                                const isSubmittedTier = request_submitted && submitted_tier === tier.key;
                                 const isOther = isLoading && !isSelected;
 
                                 return (
@@ -257,9 +321,17 @@ export default function CheckoutIndex({
                                                                                 : 'bg-[#3A54A5]/10 text-[#3A54A5]',
                                                                         )}
                                                                     >
-                                                                        <Check className="h-3 w-3 stroke-[3]" />
+                                                                        <Check className="h-3 w-3 stroke-3" />
                                                                     </span>
                                                                 )}
+
+
+
+
+
+
+
+
                                                                 <span className={cn('leading-relaxed', isEverything ? 'italic' : '')}>{feature}</span>
                                                             </li>
                                                         );
@@ -286,7 +358,7 @@ export default function CheckoutIndex({
                                                                 </button>
                                                             </TooltipTrigger>
                                                             <TooltipContent
-                                                                className="text-zinc-650 z-[100] max-w-[280px] rounded-xl border border-zinc-200 bg-white p-4 font-sans text-[13px] leading-relaxed shadow-xl"
+                                                                className="text-zinc-650 z-100 max-w-70 rounded-xl border border-zinc-200 bg-white p-4 font-sans text-[13px] leading-relaxed shadow-xl"
                                                                 side="top"
                                                                 align="center"
                                                                 sideOffset={12}
@@ -296,28 +368,36 @@ export default function CheckoutIndex({
                                                         </Tooltip>
                                                     </div>
                                                 )}
-                                                <button
-                                                    type="button"
-                                                    disabled={isLoading || request_submitted}
-                                                    onClick={() => handleSelectTier(tier.key)}
-                                                    className={cn(
-                                                        'group flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-sm font-bold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
-                                                        tier.is_featured
-                                                            ? 'bg-white text-[#2D4182] hover:bg-zinc-100'
-                                                            : 'border border-[#3A54A5] bg-transparent text-[#3A54A5] hover:bg-[#3A54A5] hover:text-white',
-                                                    )}
-                                                >
-                                                    <span className="relative z-10 flex items-center justify-center gap-2">
-                                                        {isSelected && isLoading ? (
-                                                            <>
-                                                                <Loader2 className="size-4 animate-spin" />
-                                                                Submitting request…
-                                                            </>
-                                                        ) : (
-                                                            'Request this assessment'
+                                                {isSubmittedTier ? (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setRequestDialogOpen(true)}
+                                                        className={cn(
+                                                            'flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3A54A5]',
+                                                            tier.is_featured
+                                                                ? 'bg-white text-[#2D4182] hover:bg-zinc-100'
+                                                                : 'border border-[#3A54A5] text-[#3A54A5] hover:bg-[#3A54A5] hover:text-white',
                                                         )}
-                                                    </span>
-                                                </button>
+                                                    >
+                                                        Request received, view details
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        disabled={isLoading || request_submitted}
+                                                        onClick={() => handleSelectTier(tier.key)}
+                                                        className={cn(
+                                                            'group flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-sm font-bold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
+                                                            tier.is_featured
+                                                                ? 'bg-white text-[#2D4182] hover:bg-zinc-100'
+                                                                : 'border border-[#3A54A5] bg-transparent text-[#3A54A5] hover:bg-[#3A54A5] hover:text-white',
+                                                        )}
+                                                    >
+                                                        <span className="relative z-10 flex items-center justify-center gap-2">
+                                                            {isSelected && isLoading ? <><Loader2 className="size-4 animate-spin" />Submitting request…</> : 'Request this assessment'}
+                                                        </span>
+                                                    </button>
+                                                )}
                                             </div>
 
                                             {/* Dim overlay on non-selected cards while loading */}

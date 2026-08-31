@@ -139,6 +139,16 @@ class CheckoutController extends Controller
             $billingNgnFallback = false;
         }
 
+        $requestSubmitted = $request->session()->get('pia_request_submitted') === $sessionId;
+
+        $submittedTier = $requestSubmitted
+            ? PiaApplication::query()
+                ->where('email', $diagnosticSession->email)
+                ->where('source', 'diagnostic_tier_selection')
+                ->latest()
+                ->value('selected_tier')
+            : null;
+
         return Inertia::render('Checkout/Index', [
             'score'                   => $diagnosticSession->score,
             'score_band'              => $diagnosticSession->score_band,
@@ -149,7 +159,8 @@ class CheckoutController extends Controller
             'currency_symbol'         => $currencySymbol,
             'billing_currency_symbol' => $billingCurrencySymbol,
             'billing_ngn_fallback'    => $billingNgnFallback,
-            'request_submitted'       => $request->session()->get('pia_request_submitted') === $sessionId,
+            'request_submitted'       => $requestSubmitted,
+            'submitted_tier'          => $submittedTier,
         ]);
     }
 

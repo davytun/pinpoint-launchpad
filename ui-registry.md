@@ -316,3 +316,23 @@ Last updated: 2026-08-30
 
 **Pattern notes:**
 Use the reusable searchable picker for country fields. It is backed by a local ISO country dataset, so it requires no network request and keeps submitted values as readable country names. The menu must remain restrained: a short search field, scrollable results, no flags or decorative country graphics, and the same rounded field treatment as other Pinpoint forms.
+
+### Founder PIA Request Handoff Dialog
+
+File: resources/js/pages/Checkout/Index.tsx
+Last updated: 2026-08-31
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-white` dialog surface; `bg-zinc-50` contact panel |
+| Border | `border border-zinc-200` dialog; `border-b border-zinc-100` header division |
+| Border radius | `rounded-3xl` dialog; `rounded-2xl` icon and contact panel |
+| Text — primary | `text-zinc-950` |
+| Text — secondary | `text-zinc-600` |
+| Spacing | `px-7 pt-8 pb-6` header; `px-7 py-6` body, expanding to `px-9` on larger screens |
+| Hover state | `hover:bg-[#2D4182]` primary return action; submitted-tier control follows that tier's existing hover treatment; `hover:text-[#2D4182]` contact and quiet close actions |
+| Shadow | `shadow-[0_24px_80px_rgba(33,56,120,0.22)]` |
+| Accent usage | `#3A54A5` for the forward action, step numbers, and contact; emerald only for the receipt icon |
+
+**Pattern notes:**
+When a Founder completes an asynchronous handoff, use one focused dialog to explain the selected tier, the operational sequence, and how to ask for help. Keep the tier-comparison page visually neutral behind it. The dialog must offer both a clear exit to diagnostic results and a direct `mailto:` contact route; it should not turn a comparison card into a success panel. If it can be dismissed, turn the selected tier's `Request received` control into the reopen action.

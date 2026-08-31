@@ -84,9 +84,6 @@ class ScoringService
         foreach ($questions as $question) {
             $rawAnswer = $answers[$question->id] ?? 'A';
 
-            // Legacy boolean format (old frontend sent true/false instead of letters).
-            // true  → highest-scoring option (last in array, e.g. 'D')
-            // false → lowest-scoring option  (first in array, e.g. 'A')
             if (is_bool($rawAnswer)) {
                 $opts = $question->options ?? [];
                 if ($rawAnswer === true) {

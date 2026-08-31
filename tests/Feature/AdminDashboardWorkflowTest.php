@@ -93,3 +93,18 @@ test('analyst dashboard generates analyst-assigned metrics and actions', functio
             ->where('metrics.my_assigned', 1)
             ->where('metrics.active_audits', 1));
 });
+
+test('compliance and investor relations can access their operational dashboard queues', function () {
+    $compliance = User::factory()->create(['role' => 'compliance']);
+    $investorRelations = User::factory()->create(['role' => 'investor_relations']);
+
+    $this->actingAs($compliance)
+        ->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('Admin/Dashboard'));
+
+    $this->actingAs($investorRelations)
+        ->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('Admin/Dashboard'));
+});

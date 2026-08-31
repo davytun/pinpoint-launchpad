@@ -224,13 +224,23 @@ function SidebarContent({
                                     onClick={onNav}
                                 />
                                 <NavItem
-                                    href="/admin/investors"
+                                    href="/admin/investor-accounts"
                                     icon="solar:clipboard-list-linear"
                                     label="Applications"
-                                    active={isActive('/admin/investors')}
+                                    active={isActive('/admin/investor-accounts')}
                                     collapsed={collapsed}
                                     onClick={onNav}
                                 />
+                                {isSuperAdmin && (
+                                    <NavItem
+                                        href="/admin/pia-requests"
+                                        icon="solar:document-add-linear"
+                                        label="PIA Requests"
+                                        active={isActive('/admin/pia-requests')}
+                                        collapsed={collapsed}
+                                        onClick={onNav}
+                                    />
+                                )}
                             </>
                         )}
 

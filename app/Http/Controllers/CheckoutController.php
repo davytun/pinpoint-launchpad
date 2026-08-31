@@ -124,7 +124,7 @@ class CheckoutController extends Controller
         }
 
         $gatewayCurrency = strtoupper(config('services.paystack.currency', 'NGN'));
-        $isNairaUser = $diagnosticSession->country === 'Nigeria';
+        $isNairaUser = strcasecmp(trim((string) $diagnosticSession->country), 'Nigeria') === 0;
 
         $displayAsUsd = !$isNairaUser;
         $currencySymbol = $displayAsUsd ? '$' : '₦';
@@ -149,7 +149,65 @@ class CheckoutController extends Controller
             'currency_symbol'         => $currencySymbol,
             'billing_currency_symbol' => $billingCurrencySymbol,
             'billing_ngn_fallback'    => $billingNgnFallback,
+            'request_submitted'       => $request->session()->get('pia_request_submitted') === $sessionId,
         ]);
+    }
+
+    public function submitDiagnosticPiaRequest(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $validated = $request->validate([
+            'tier' => ['required', 'in:foundation,growth,institutional'],
+            'diagnostic_session_id' => ['required', 'integer', 'exists:diagnostic_sessions,id'],
+        ]);
+
+        $sessionId = (int) $request->session()->get('diagnostic_session_id');
+        if ($sessionId !== (int) $validated['diagnostic_session_id']) {
+            abort(403, 'Session mismatch.');
+        }
+
+        $diagnosticSession = DiagnosticSession::findOrFail($sessionId);
+        if (in_array($diagnosticSession->score_band, ['low', 'mid_low'])) {
+            return redirect()->route('diagnostic.result')
+                ->with('error', 'Your current score does not qualify for the audit programme.');
+        }
+
+        $stage = str_starts_with(strtolower((string) $diagnosticSession->growth_stage), 'concept')
+            ? 'concept'
+            : (str_starts_with(strtolower((string) $diagnosticSession->growth_stage), 'growth') ? 'growth' : 'seed');
+
+        $application = PiaApplication::firstOrCreate(
+            [
+                'email' => $diagnosticSession->email,
+                'source' => 'diagnostic_tier_selection',
+            ],
+            [
+                'name' => $diagnosticSession->name,
+                'company' => $diagnosticSession->company_name ?: 'Not provided',
+                'country' => $diagnosticSession->country ?: 'Not provided',
+                'stage' => $stage,
+                'raise_target' => $diagnosticSession->looking_to_raise ?: 'Not provided',
+                'message' => 'Selected PIA tier: '.$validated['tier'].'.',
+                'selected_tier' => $validated['tier'],
+                'status' => 'pending',
+            ],
+        );
+
+        if ($application->wasRecentlyCreated) {
+            try {
+                Mail::to(config('mail.admin_address', config('mail.from.address')))
+                    ->send(new PiaApplicationAdminMail($application));
+            } catch (\Throwable $e) {
+                Log::error('Failed to send diagnostic PIA request notification', [
+                    'application_id' => $application->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $request->session()->put('pia_request_submitted', $sessionId);
+
+        return redirect()->route('checkout.index')
+            ->with('success', 'Your PIA request has been received. Pinpoint will contact you to confirm the scope and arrange payment.');
     }
 
     public function assessment(Request $request): Response
@@ -231,7 +289,7 @@ class CheckoutController extends Controller
         }
 
         $gatewayCurrency = strtoupper(config('services.paystack.currency', 'NGN'));
-        $isNairaUser = $diagnosticSession->country === 'Nigeria';
+        $isNairaUser = strcasecmp(trim((string) $diagnosticSession->country), 'Nigeria') === 0;
 
         if ($gatewayCurrency === 'NGN') {
             $currency = 'NGN';

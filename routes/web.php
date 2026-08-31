@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\InvestorAccountController;
 use App\Http\Controllers\Admin\InvestorKycController as AdminInvestorKycController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\PlatformAnnouncementController;
+use App\Http\Controllers\Admin\PiaApplicationController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\SpotlightController as AdminSpotlightController;
@@ -73,7 +74,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard — all admin roles
     Route::get('/', [AdminDashboardController::class, 'index'])
-        ->middleware('require.role:superadmin,analyst,support')
+        ->middleware('require.role:superadmin,analyst,support,compliance,investor_relations')
         ->name('dashboard');
 
     Route::middleware('require.role:superadmin,analyst,support,compliance,investor_relations')->group(function () {
@@ -101,7 +102,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Investors
     });
 
+    // PIA requests and offline-payment confirmation are financial operations.
+    Route::middleware('require.role:superadmin')->group(function () {
+        Route::get('/pia-requests', [PiaApplicationController::class, 'index'])->name('pia-requests.index');
+        Route::patch('/pia-requests/{application}/contacted', [PiaApplicationController::class, 'markContacted'])->name('pia-requests.contacted');
+        Route::post('/pia-requests/{application}/payment-received', [PiaApplicationController::class, 'confirmPaymentReceived'])->name('pia-requests.payment-received');
+    });
+
     Route::middleware('require.role:superadmin,compliance,investor_relations')->group(function () {
+        Route::redirect('/investors', '/admin/investor-accounts')->name('investors.legacy');
         Route::get('/investor-accounts', [InvestorAccountController::class, 'index'])->name('investor-accounts.index');
         Route::get('/investor-accounts/{investor}', [InvestorAccountController::class, 'show'])->name('investor-accounts.show');
         Route::patch('/investor-accounts/{investor}', [InvestorAccountController::class, 'update'])->name('investor-accounts.update');
@@ -292,7 +301,7 @@ Route::get('/cookies', function () {
 
 Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
-    Route::post('/initiate', [CheckoutController::class, 'initiate'])->name('initiate')->middleware('throttle:5,1');
+    Route::post('/request', [CheckoutController::class, 'submitDiagnosticPiaRequest'])->name('request')->middleware('throttle:5,1');
     Route::get('/success', [CheckoutController::class, 'success'])->name('success');
     Route::get('/cancel', [CheckoutController::class, 'cancel'])->name('cancel');
 });
@@ -301,6 +310,7 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
 Route::post('/webhooks/paystack', [CheckoutController::class, 'webhook'])->name('webhooks.paystack');
 
 Route::prefix('onboarding')->name('onboarding.')->group(function () {
+    Route::get('/continue', [OnboardingController::class, 'continueFromInvite'])->name('continue')->middleware('throttle:10,1');
     Route::get('/sign', [OnboardingController::class, 'sign'])->name('sign')->middleware(['payment.complete', 'throttle:20,1']);
     Route::get('/confirm-details', fn () => redirect()->route('onboarding.sign'));
     Route::post('/confirm-details', [OnboardingController::class, 'confirmDetails'])->name('confirm-details')->middleware(['payment.complete', 'throttle:10,1']);

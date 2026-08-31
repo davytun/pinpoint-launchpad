@@ -16,5 +16,6 @@ class PiaApplication extends Model
         'message',
         'status',
         'source',
+        'selected_tier',
     ];
 }

@@ -790,7 +790,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
                     <div className="flex items-center gap-2.5">
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/investors')}
+                            onClick={() => router.get('/admin/investor-accounts')}
                             className="flex items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:users-group-rounded-linear" className="size-3.5 text-zinc-500" />

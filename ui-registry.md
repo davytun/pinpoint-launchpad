@@ -296,3 +296,23 @@ Last updated: 2026-08-28
 
 **Pattern notes:**
 Admin list pages use a full-width operational surface with a clear title and contextual count above it. The first column carries the strongest identity signal, metadata sits one step quieter, and actions remain inline text links. Keep table headers compact and uppercase, with generous row height for scanability.
+
+### Searchable Country Picker
+
+File: resources/js/components/country-select.tsx
+Last updated: 2026-08-30
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-white/80`, becoming `bg-white` on focus |
+| Border | `border-zinc-200`; `border-[#3A54A5]` on focus; `border-red-400` for errors |
+| Border radius | `rounded-xl` control and menu |
+| Text — primary | `text-zinc-800` |
+| Text — secondary | `text-zinc-400` placeholder, `text-zinc-500` label |
+| Spacing | `px-3` control; `px-3 py-2.5` option rows |
+| Hover state | `hover:border-zinc-300`; focused option `bg-[#3A54A5]/8` |
+| Shadow | `shadow-2xs` control; `shadow-xl` menu |
+| Accent usage | `#3A54A5` for focused border, active option, and focus ring |
+
+**Pattern notes:**
+Use the reusable searchable picker for country fields. It is backed by a local ISO country dataset, so it requires no network request and keeps submitted values as readable country names. The menu must remain restrained: a short search field, scrollable results, no flags or decorative country graphics, and the same rounded field treatment as other Pinpoint forms.

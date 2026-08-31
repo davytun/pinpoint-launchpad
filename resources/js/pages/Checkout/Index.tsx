@@ -31,6 +31,7 @@ interface PageProps {
     currency_symbol?: string;
     billing_currency_symbol?: string;
     billing_ngn_fallback?: boolean;
+    request_submitted?: boolean;
 }
 
 // ─── Band meta ────────────────────────────────────────────────────────────────
@@ -72,6 +73,7 @@ export default function CheckoutIndex({
     currency_symbol = '₦',
     billing_currency_symbol = '₦',
     billing_ngn_fallback = false,
+    request_submitted = false,
 }: PageProps) {
     const [selectedTier, setSelectedTier] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +85,7 @@ export default function CheckoutIndex({
         setError(null);
         setSelectedTier(tierKey);
         router.post(
-            '/checkout/initiate',
+            '/checkout/request',
             { tier: tierKey, diagnostic_session_id },
             {
                 onStart: () => setIsLoading(true),
@@ -162,6 +164,12 @@ export default function CheckoutIndex({
                             >
                                 {error}
                             </motion.div>
+                        )}
+
+                        {request_submitted && (
+                            <div role="status" className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700">
+                                Your PIA request has been received. Pinpoint will contact you to confirm the scope and arrange payment.
+                            </div>
                         )}
 
                         {/* ── Pricing cards ── */}
@@ -290,7 +298,7 @@ export default function CheckoutIndex({
                                                 )}
                                                 <button
                                                     type="button"
-                                                    disabled={isLoading}
+                                                    disabled={isLoading || request_submitted}
                                                     onClick={() => handleSelectTier(tier.key)}
                                                     className={cn(
                                                         'group flex h-11 w-full cursor-pointer items-center justify-center rounded-full text-sm font-bold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
@@ -303,12 +311,10 @@ export default function CheckoutIndex({
                                                         {isSelected && isLoading ? (
                                                             <>
                                                                 <Loader2 className="size-4 animate-spin" />
-                                                                Redirecting…
+                                                                Submitting request…
                                                             </>
-                                                        ) : billing_ngn_fallback ? (
-                                                            `Get Started — ₦${tier.naira_equivalent.toLocaleString()} (~$${tier.total.toLocaleString()})`
                                                         ) : (
-                                                            `Get Started — ${billing_currency_symbol}${tier.total.toLocaleString()}`
+                                                            'Request this assessment'
                                                         )}
                                                     </span>
                                                 </button>

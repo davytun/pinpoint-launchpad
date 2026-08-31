@@ -18,6 +18,30 @@ class OnboardingController extends Controller
 {
     public function __construct(private BoldSignService $boldSign) {}
 
+    public function continueFromInvite(Request $request): mixed
+    {
+        $token = $request->query('token');
+        $invite = is_string($token) ? Cache::pull('pia_agreement_invite_'.$token) : null;
+
+        if (! is_array($invite) || empty($invite['payment_id'])) {
+            return redirect()->route('assessment')
+                ->with('error', 'This agreement link is invalid or has expired. Please contact Pinpoint for a new link.');
+        }
+
+        $payment = Payment::query()->find($invite['payment_id']);
+        if (! $payment || $payment->status !== 'paid') {
+            return redirect()->route('assessment')
+                ->with('error', 'Your payment could not be confirmed. Please contact Pinpoint.');
+        }
+
+        $request->session()->put('payment_id', $payment->id);
+        if ($payment->diagnostic_session_id) {
+            $request->session()->put('diagnostic_session_id', $payment->diagnostic_session_id);
+        }
+
+        return redirect()->route('onboarding.sign');
+    }
+
     public function sign(Request $request): mixed
     {
         $paymentId = $request->session()->get('payment_id');

@@ -261,13 +261,13 @@ export default function DiagnosticResult({
     let secondaryBtnText = 'Back to Homepage';
     let secondaryBtnHref = '/';
 
-    if (score >= 70 && !hasFlags) {
+    if (['mid_high', 'high'].includes(score_band)) {
         ctaTitle = 'You should apply.';
         ctaCopy =
-            'You are scoring in the range where a full Pinpoint Investment Assessment stops being a diagnosis and starts being preparation. Apply, and we will scope you into the right tier.';
-        primaryBtnText = 'Apply to Pinpoint';
-        primaryBtnHref = '/assessment';
-        secondaryBtnText = 'How the PARAGON Model works';
+            'You qualify to begin the PARAGON Investment Assessment. Choose the audit tier that matches your company stage to proceed to payment and onboarding.';
+        primaryBtnText = 'Choose your audit tier';
+        primaryBtnHref = '/checkout';
+        secondaryBtnText = 'How the assessment works';
         secondaryBtnHref = '/#about';
     } else if (score >= 50 || (score >= 40 && hasFlags)) {
         ctaTitle = 'Close enough that the gaps are worth closing properly.';

@@ -54,3 +54,11 @@ test('the legacy KYC queue redirects to pending investor reviews', function () {
         ->get(route('admin.investor-kyc.index'))
         ->assertRedirect(route('admin.investor-accounts.index', ['kyc_status' => Investor::KYC_STATUS_PENDING]));
 });
+
+test('the legacy investors URL redirects to investor account reviews', function () {
+    $reviewer = User::factory()->create(['role' => 'investor_relations']);
+
+    $this->actingAs($reviewer)
+        ->get('/admin/investors')
+        ->assertRedirect(route('admin.investor-accounts.index'));
+});

@@ -4,6 +4,7 @@ import { ArrowRight, BarChart3, Check, Crosshair, Layout, Shield, Users } from '
 import { useRef, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import { CountrySelect } from '@/components/country-select';
 import { cn } from '@/lib/utils';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -181,19 +182,6 @@ const STATIC_TIERS = [
         meta: '60+ analyst hours · 20 working days · scoped and quoted before invoice',
         featured: false,
     },
-];
-
-const COUNTRIES = [
-    'Nigeria',
-    'Ghana',
-    'Kenya',
-    'South Africa',
-    'Egypt',
-    'Rwanda',
-    "Côte d'Ivoire",
-    'Senegal',
-    'Other African Country',
-    'Outside Africa',
 ];
 
 const RAISE_TARGETS = ['Under $100k', '$100k–$500k', '$500k–$2m', '$2m–$10m', 'Over $10m', 'Not sure yet'];
@@ -469,18 +457,19 @@ function ApplicationForm() {
                     {errors.company && <p className="mt-1 text-xs font-semibold text-red-500">{errors.company}</p>}
                 </div>
 
-                <div>
-                    <label className="text-zinc-455 mb-1.5 block text-[10px] font-bold tracking-wider uppercase">Country of Operation *</label>
-                    <select id="pia-country" name="country" required value={form.country} onChange={handleChange} className={inputCls('country')}>
-                        <option value="">Select country…</option>
-                        {COUNTRIES.map((c) => (
-                            <option key={c} value={c}>
-                                {c}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.country && <p className="mt-1 text-xs font-semibold text-red-500">{errors.country}</p>}
-                </div>
+                <CountrySelect
+                    id="pia-country"
+                    label="Country of operation"
+                    value={form.country}
+                    onChange={(country) => {
+                        setForm((previous) => ({ ...previous, country }));
+                        setErrors((previous) => ({ ...previous, country: '' }));
+                    }}
+                    error={errors.country}
+                    required
+                    labelClassName="text-zinc-455 text-[10px]"
+                    controlClassName="min-h-[52px] py-0.5"
+                />
 
                 <div>
                     <label className="text-zinc-455 mb-1.5 block text-[10px] font-bold tracking-wider uppercase">Stage *</label>

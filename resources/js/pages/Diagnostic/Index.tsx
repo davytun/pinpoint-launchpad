@@ -4,6 +4,7 @@ import { ArrowRight, ChevronDown, ChevronLeft, Clock, Coins, Loader2, ShieldAler
 import { useEffect, useRef, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import { CountrySelect } from '@/components/country-select';
 import { Badge } from '@/components/ui/badge';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 import { cn } from '@/lib/utils';
@@ -306,23 +307,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                     </div>
 
                                     {/* Country of Operation */}
-                                    <CustomSelect
-                                        label="Country of operation"
-                                        value={country}
-                                        onChange={setCountry}
-                                        options={[
-                                            'Nigeria',
-                                            'Ghana',
-                                            'Kenya',
-                                            'South Africa',
-                                            'Egypt',
-                                            'Rwanda',
-                                            "Côte d'Ivoire",
-                                            'Senegal',
-                                            'Other — Africa',
-                                            'Outside Africa',
-                                        ]}
-                                    />
+                                    <CountrySelect id="country" label="Country of operation" value={country} onChange={setCountry} />
 
                                     {/* Sector */}
                                     <CustomSelect

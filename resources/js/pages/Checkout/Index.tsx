@@ -133,64 +133,44 @@ export default function CheckoutIndex({
                 <TooltipProvider delayDuration={100} skipDelayDuration={0}>
                     <Dialog open={request_submitted && requestDialogOpen} onOpenChange={setRequestDialogOpen}>
                         <DialogContent className="max-h-[calc(100vh-2rem)] max-w-xl overflow-y-auto rounded-3xl border-zinc-200 bg-white p-0 text-zinc-900 shadow-[0_24px_80px_rgba(33,56,120,0.22)] sm:rounded-3xl">
-                            <DialogHeader className="border-b border-zinc-100 px-7 pt-8 pb-6 text-left sm:px-9">
-                                <span className="flex size-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
-                                    <CheckCircle2 className="size-6" aria-hidden="true" />
+                            <DialogHeader className="px-7 pt-8 text-left sm:px-9">
+                                <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
+                                    <CheckCircle2 className="size-5" aria-hidden="true" />
                                 </span>
-                                <p className="pt-4 text-[11px] font-bold tracking-[0.16em] text-[#3A54A5] uppercase">PIA request received</p>
-                                <DialogTitle className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">
-                                    We have your request.
+                                <p className="pt-4 text-[11px] font-bold tracking-[0.16em] text-[#3A54A5] uppercase">PARAGON Investment Assessment</p>
+                                <DialogTitle className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-[2.1rem]">
+                                    Your request has been received.
                                 </DialogTitle>
                                 <DialogDescription className="max-w-md text-[15px] leading-6 text-zinc-600">
-                                    Your request for the <span className="font-semibold text-zinc-800">{submittedTierLabel}</span> assessment is now with the Pinpoint team.
+                                    You have requested the <span className="font-semibold text-zinc-800">{submittedTierLabel}</span> assessment.
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <div className="px-7 py-6 sm:px-9">
-                                <h2 className="text-sm font-bold text-zinc-900">What happens next</h2>
-                                <ol className="mt-4 space-y-4">
-                                    {[
-                                        'We will confirm the scope of your assessment and send payment instructions.',
-                                        'Once payment is confirmed, we will email a secure link for your PIA agreement.',
-                                        'After you sign, you will set up your Founder dashboard and the assessment can begin.',
-                                    ].map((step, index) => (
-                                        <li key={step} className="flex gap-3 text-sm leading-6 text-zinc-600">
-                                            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-xs font-bold text-[#3A54A5]">
-                                                {index + 1}
-                                            </span>
-                                            <span>{step}</span>
-                                        </li>
-                                    ))}
-                                </ol>
-
-                                <div className="mt-6 flex items-start gap-3 rounded-2xl bg-zinc-50 px-4 py-4 text-sm leading-6 text-zinc-600">
-                                    <Mail className="mt-0.5 size-4 shrink-0 text-[#3A54A5]" aria-hidden="true" />
+                            <div className="px-7 pt-6 pb-7 sm:px-9">
+                                <div className="space-y-5 border-y border-zinc-100 py-6 text-[15px] leading-6 text-zinc-700">
                                     <p>
-                                        Need to update your request or ask a question?{' '}
-                                        <a
-                                            href="mailto:support@pinpointlaunchpad.com"
-                                            className="font-semibold text-[#3A54A5] underline decoration-[#3A54A5]/30 underline-offset-4 hover:text-[#2D4182] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A54A5]"
-                                        >
-                                            Contact Pinpoint
-                                        </a>
-                                        .
+                                        We will contact you as soon as possible to confirm the scope of your assessment and provide payment instructions.
+                                    </p>
+                                    <p>
+                                        After payment is confirmed, we will send your PIA agreement. Once you sign it, your Founder workspace will be activated and the assessment can begin.
                                     </p>
                                 </div>
 
-                                <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="mt-7 flex items-center justify-between gap-4 border-t border-zinc-100 pt-5">
+                                    <a
+                                        href="mailto:support@pinpointlaunchpad.com"
+                                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#3A54A5] hover:text-[#2D4182] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A54A5]"
+                                    >
+                                        <Mail className="size-4" aria-hidden="true" />
+                                        Questions about your request?
+                                    </a>
                                     <button
                                         type="button"
                                         onClick={() => setRequestDialogOpen(false)}
-                                        className="order-2 text-sm font-semibold text-zinc-600 hover:text-zinc-950 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3A54A5] sm:order-1"
+                                        className="shrink-0 text-sm font-semibold text-zinc-600 hover:text-zinc-950 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3A54A5]"
                                     >
-                                        Back to assessment tiers
+                                        Close
                                     </button>
-                                    <a
-                                        href="/diagnostic/result"
-                                        className="order-1 inline-flex h-11 items-center justify-center rounded-full bg-[#3A54A5] px-5 text-sm font-bold text-white transition-colors hover:bg-[#2D4182] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3A54A5] sm:order-2"
-                                    >
-                                        Return to your results
-                                    </a>
                                 </div>
                             </div>
                         </DialogContent>
@@ -379,7 +359,7 @@ export default function CheckoutIndex({
                                                                 : 'border border-[#3A54A5] text-[#3A54A5] hover:bg-[#3A54A5] hover:text-white',
                                                         )}
                                                     >
-                                                        Request received, view details
+                                                        View next steps
                                                     </button>
                                                 ) : (
                                                     <button
@@ -394,7 +374,7 @@ export default function CheckoutIndex({
                                                         )}
                                                     >
                                                         <span className="relative z-10 flex items-center justify-center gap-2">
-                                                            {isSelected && isLoading ? <><Loader2 className="size-4 animate-spin" />Submitting request…</> : 'Request this assessment'}
+                                                            {isSelected && isLoading ? <><Loader2 className="size-4 animate-spin" />Submitting request…</> : 'Select this tier'}
                                                         </span>
                                                     </button>
                                                 )}
@@ -420,23 +400,24 @@ export default function CheckoutIndex({
                         {/* ── Rationale section ── */}
                         <FadeUp delay={0.6}>
                             <div className="mt-24">
-                                <div className="mb-16 space-y-3 text-center">
+                                <div className="mb-10 space-y-3 text-center">
                                     <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Radical Transparency</span>
                                     <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">
                                         Why we charge what we charge
                                     </h2>
                                 </div>
 
-                                <div className="grid gap-6 md:grid-cols-2">
+                                <div className="border-y border-zinc-200/80">
                                     {rationaleItems.map((item, i) => (
                                         <FadeUp key={item.num} delay={0.7 + i * 0.08}>
-                                            <div className="group relative flex h-full flex-col overflow-hidden rounded-4xl border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.02)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/50 hover:shadow-md">
-                                                <div className="relative z-10 flex flex-1 flex-col">
-                                                    <h3 className="mb-3 text-[12px] font-bold tracking-[0.18em] text-[#3A54A5] uppercase">
+                                            <div className="grid gap-4 py-8 first:pt-7 last:pb-7 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.35fr)] md:gap-12">
+                                                <div className="flex items-start gap-4">
+                                                    <span className="pt-0.5 text-xs font-bold tracking-[0.16em] text-[#3A54A5]">{item.num}</span>
+                                                    <h3 className="text-[12px] leading-5 font-bold tracking-[0.18em] text-[#3A54A5] uppercase">
                                                         {item.title}
                                                     </h3>
-                                                    <p className="text-zinc-650 text-[14px] leading-relaxed">{item.body}</p>
                                                 </div>
+                                                <p className="max-w-2xl text-[15px] leading-7 text-zinc-650">{item.body}</p>
                                             </div>
                                         </FadeUp>
                                     ))}

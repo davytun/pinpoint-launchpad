@@ -82,10 +82,7 @@ test('a qualified founder can request a selected PIA tier without re-entering di
 
     expect(PiaApplication::count())->toBe(1);
 
-    $this->withSession([
-        'diagnostic_session_id' => $diagnosticSession->id,
-        'pia_request_submitted' => $diagnosticSession->id,
-    ])
+    $this->withSession(['diagnostic_session_id' => $diagnosticSession->id])
         ->get(route('checkout.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page

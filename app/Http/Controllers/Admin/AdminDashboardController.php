@@ -53,6 +53,7 @@ class AdminDashboardController extends Controller
 
         if ($user->canAccessFinancials()) {
             $metrics['total_revenue']        = Payment::where('status', 'paid')->when($startDate, fn($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount');
+            $metrics['revenue_by_currency']  = self::revenueByCurrency($startDate);
             $metrics['revenue_this_month']   = Payment::where('status', 'paid')
                 ->whereMonth('paid_at', now()->month)
                 ->whereYear('paid_at', now()->year)
@@ -228,40 +229,51 @@ class AdminDashboardController extends Controller
 
     public function revenue(): Response
     {
+        $currency = strtoupper((string) request('currency', 'NGN'));
+        $currency = in_array($currency, ['NGN', 'USD'], true) ? $currency : 'NGN';
+
         return Inertia::render('Admin/Revenue', [
-            'metrics'   => self::revenueMetrics(),
+            'metrics'   => self::revenueMetrics($currency),
+            'currency'  => $currency,
             'user_role' => Auth::user()->role,
         ]);
     }
 
-    public static function revenueMetrics(): array
+    public static function revenueMetrics(string $currency = 'NGN'): array
     {
+        $paidPayments = fn () => Payment::query()
+            ->where('status', 'paid')
+            ->where('currency', $currency);
+
         return [
-            'total_revenue'      => Payment::where('status', 'paid')->sum('total_amount'),
-            'revenue_this_month' => Payment::where('status', 'paid')
+            'total_revenue'      => (int) $paidPayments()->sum('total_amount'),
+            'revenue_by_currency'=> self::revenueByCurrency(),
+            'revenue_this_month' => (int) $paidPayments()
                 ->whereMonth('paid_at', now()->month)
                 ->whereYear('paid_at', now()->year)
                 ->sum('total_amount'),
-            'revenue_last_month' => Payment::where('status', 'paid')
+            'revenue_last_month' => (int) $paidPayments()
                 ->whereMonth('paid_at', now()->subMonth()->month)
                 ->whereYear('paid_at', now()->subMonth()->year)
                 ->sum('total_amount'),
             'revenue_by_tier' => [
-                'foundation'    => Payment::where('status', 'paid')->where('tier', 'foundation')->sum('total_amount'),
-                'growth'        => Payment::where('status', 'paid')->where('tier', 'growth')->sum('total_amount'),
-                'institutional' => Payment::where('status', 'paid')->where('tier', 'institutional')->sum('total_amount'),
+                'foundation'    => (int) $paidPayments()->where('tier', 'foundation')->sum('total_amount'),
+                'growth'        => (int) $paidPayments()->where('tier', 'growth')->sum('total_amount'),
+                'institutional' => (int) $paidPayments()->where('tier', 'institutional')->sum('total_amount'),
             ],
-            'monthly_revenue' => collect(range(5, 0))->map(function ($i) {
+            'monthly_revenue' => collect(range(5, 0))->map(function ($i) use ($currency) {
                 $date = now()->subMonths($i);
                 return [
                     'month'   => $date->format('M'),
                     'revenue' => (int) Payment::where('status', 'paid')
+                        ->where('currency', $currency)
                         ->whereMonth('paid_at', $date->month)
                         ->whereYear('paid_at', $date->year)
                         ->sum('total_amount'),
                 ];
             })->values()->all(),
             'recent_payments' => Payment::where('status', 'paid')
+                ->where('currency', $currency)
                 ->with('diagnosticSession:id,email')
                 ->latest('paid_at')
                 ->limit(20)
@@ -275,6 +287,25 @@ class AdminDashboardController extends Controller
                     'paid_at'            => $p->paid_at?->format('d M Y'),
                     'paystack_reference' => $p->paystack_reference,
                 ]),
+        ];
+    }
+
+    /**
+     * Amounts in different currencies must never be added together. Keep the
+     * financial dashboard totals explicit until a reporting exchange-rate policy exists.
+     */
+    private static function revenueByCurrency($startDate = null): array
+    {
+        $totals = Payment::query()
+            ->where('status', 'paid')
+            ->when($startDate, fn ($query) => $query->where('paid_at', '>=', $startDate))
+            ->selectRaw('UPPER(currency) as currency, SUM(total_amount) as total')
+            ->groupBy('currency')
+            ->pluck('total', 'currency');
+
+        return [
+            'NGN' => (int) ($totals['NGN'] ?? 0),
+            'USD' => (int) ($totals['USD'] ?? 0),
         ];
     }
 

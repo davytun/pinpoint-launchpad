@@ -162,7 +162,9 @@ class BoldSignService
         }
 
         match ($eventType) {
-            'Completed' => $this->handleDocumentCompleted($payload),
+            // This agreement has one signer. Signed arrives before BoldSign generates the final PDF.
+            'Signed'    => $this->handleDocumentSigned($payload, downloadFinalPdf: false),
+            'Completed' => $this->handleDocumentSigned($payload, downloadFinalPdf: true),
             'Declined'  => $this->handleDocumentDeclined($payload),
             'Revoked'   => $this->handleDocumentRevoked($payload),
             default     => Log::info('BoldSign unhandled event', ['eventType' => $eventType]),
@@ -198,41 +200,96 @@ class BoldSignService
         return null;
     }
 
-    private function handleDocumentCompleted(array $payload): void
+    /**
+     * Recover safely when a provider webhook is delayed or missed.
+     * The signing provider remains the source of truth; this never trusts the browser.
+     */
+    public function reconcileDocumentStatus(Signature $signature): bool
+    {
+        if ($signature->isSigned() || ! $signature->boldsign_document_id) {
+            return $signature->isSigned();
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'X-API-KEY' => $this->apiKey,
+                'Accept'    => 'application/json',
+            ])->get("{$this->baseUrl}/v1/document/properties", [
+                'documentId' => $signature->boldsign_document_id,
+            ]);
+
+            if (! $response->successful()) {
+                Log::warning('BoldSign document-status check failed', [
+                    'documentId' => $signature->boldsign_document_id,
+                    'status'     => $response->status(),
+                ]);
+
+                return false;
+            }
+
+            $status = strtolower((string) $response->json('status'));
+            if ($status !== 'completed') {
+                return false;
+            }
+
+            $this->handleDocumentSigned([
+                'data' => ['documentId' => $signature->boldsign_document_id],
+            ], downloadFinalPdf: true);
+
+            return true;
+        } catch (\Throwable $exception) {
+            Log::warning('BoldSign document-status check failed', [
+                'documentId' => $signature->boldsign_document_id,
+                'error'      => $exception->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    private function handleDocumentSigned(array $payload, bool $downloadFinalPdf): void
     {
         $documentId = $payload['data']['documentId'] ?? null;
 
+        $eventType = $downloadFinalPdf ? 'Completed' : 'Signed';
+
         if (! $documentId) {
-            Log::warning('BoldSign Completed event missing documentId', ['payload' => $payload]);
+            Log::warning('BoldSign signing event missing documentId', ['payload' => $payload]);
             return;
         }
 
         $signature = Signature::query()->where('boldsign_document_id', $documentId)->first();
 
         if (! $signature) {
-            Log::warning('BoldSign Completed: no Signature record found', ['documentId' => $documentId]);
+            Log::warning('BoldSign signing event: no Signature record found', ['documentId' => $documentId]);
             return;
         }
 
-        $signature->log('webhook_received', ['eventType' => 'Completed']);
+        $signature->log('webhook_received', ['eventType' => $eventType]);
 
         // Idempotency — webhook may fire more than once
-        if ($signature->isSigned()) {
-            return;
+        $justSigned = ! $signature->isSigned();
+        if ($justSigned) {
+            $signature->update([
+                'status'    => 'signed',
+                'signed_at' => now(),
+            ]);
+
+            $signature->log('signed');
         }
 
-        $signature->update([
-            'status'    => 'signed',
-            'signed_at' => now(),
-        ]);
+        $pdfPath = $signature->signed_pdf_path;
+        if ($downloadFinalPdf && ! $pdfPath) {
+            $pdfPath = $this->downloadSignedDocument($documentId);
+            if ($pdfPath) {
+                $signature->update(['signed_pdf_path' => $pdfPath]);
+                $signature->log('pdf_downloaded', ['path' => $pdfPath]);
+            }
+        }
 
-        $signature->log('signed');
-
-        // Download and store a local copy of the signed PDF
-        $pdfPath = $this->downloadSignedDocument($documentId);
-        if ($pdfPath) {
-            $signature->update(['signed_pdf_path' => $pdfPath]);
-            $signature->log('pdf_downloaded', ['path' => $pdfPath]);
+        // A later completion event may provide the final PDF, but must not resend setup emails.
+        if (! $justSigned) {
+            return;
         }
 
         $tierLabel = Payment::getTierLabel($signature->metadata['tier'] ?? 'foundation');

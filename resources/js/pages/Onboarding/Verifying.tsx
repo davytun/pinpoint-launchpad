@@ -1,42 +1,21 @@
 import { Head, router } from '@inertiajs/react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Clock, Mail, MailCheck, Send } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Clock, LoaderCircle, Mail, MailCheck, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
-import { cn } from '@/lib/utils';
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
-const MAX_ATTEMPTS = 40; // 40 × 3s = 2 min
 
 // Animated protocol ring
-function ProtocolRing() {
+function ConfirmationSpinner() {
     return (
-        <div className="relative flex h-24 w-24 items-center justify-center">
-            <motion.div className="absolute inset-0 rounded-full border-2 border-[#3A54A5]/10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
-            <motion.div
-                className="absolute inset-0 rounded-full border-t-2 border-r-2 border-[#3A54A5]"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            />
-            <motion.div
-                className="absolute inset-4 rounded-full border border-[#3A54A5]/20"
-                animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-[#3A54A5]/25 bg-[#3A54A5]/10">
-                <Send className="size-5 text-[#3A54A5]" />
-            </div>
+        <div className="flex size-16 items-center justify-center rounded-2xl border border-[#3A54A5]/20 bg-[#3A54A5]/8">
+            <LoaderCircle className="size-7 animate-spin text-[#3A54A5]" strokeWidth={1.7} />
         </div>
     );
 }
 
-const PROTOCOL_STEPS = [
-    { id: 'recording', label: 'Recording signature' },
-    { id: 'encrypting', label: 'Encrypting agreement' },
-    { id: 'securing', label: 'Securing legal chain' },
-    { id: 'provisioning', label: 'Provisioning dashboard' },
-];
 
 // ── Resend invite button with cooldown
 function ResendInviteButton({ email }: { email?: string }) {
@@ -263,7 +242,7 @@ export default function OnboardingVerifying({
 
     useEffect(() => {
         if (confirmed) return;
-        if (attempts >= MAX_ATTEMPTS) {
+        if (attempts >= 20) {
             setTimedOut(true);
             return;
         }
@@ -305,7 +284,7 @@ export default function OnboardingVerifying({
                     <img src="/pinpoint-logo.png" alt="Pinpoint" className="block h-6 w-auto opacity-75" style={{ maxWidth: 130 }} />
                 </div>
 
-                <AnimatePresence mode="wait">
+                <>
                     {timedOut ? (
                         <motion.div
                             key="timeout"
@@ -320,26 +299,28 @@ export default function OnboardingVerifying({
                                 </div>
                             </div>
 
-                            <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-amber-600 uppercase">Network Latency</p>
-                            <h1 className="font-display mb-3 text-xl font-extrabold text-zinc-950">Still confirming</h1>
+                            <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-amber-600 uppercase">Confirmation delayed</p>
+                            <h1 className="font-display mb-3 text-xl font-extrabold text-zinc-950">Your signature is safe.</h1>
                             <p className="text-zinc-650 mb-8 text-[13px] leading-relaxed">
-                                Our system is awaiting BoldSign confirmation. This occasionally takes an extra minute.
+                                We are still waiting for the signing provider to confirm it. This can occasionally take a few minutes.
                             </p>
 
                             <div className="flex flex-col gap-3">
                                 <button
+                                    type="button"
                                     onClick={() => {
                                         setTimedOut(false);
                                         setAttempts(0);
+                                        router.reload({ only: ['signature_verified'] });
                                     }}
                                     className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#2D4182]"
                                     style={{ boxShadow: '0 4px 14px rgba(58,84,165,0.25)' }}
                                 >
-                                    Check Again
-                                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                                    Check status
+                                    <RefreshCw className="size-4 transition-transform group-hover:rotate-90" />
                                 </button>
                                 <a
-                                    href="mailto:hello@pinpointlaunchpad.com"
+                                    href="mailto:support@pinpointlaunchpad.com"
                                     className="py-2 text-[12px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
                                 >
                                     Contact Support
@@ -355,46 +336,31 @@ export default function OnboardingVerifying({
                             exit={{ opacity: 0, scale: 0.95 }}
                         >
                             <div className="mb-8 flex justify-center">
-                                <ProtocolRing />
+                                <ConfirmationSpinner />
                             </div>
 
-                            <p className="mb-2 text-[10px] font-bold tracking-[0.24em] text-[#3A54A5] uppercase">Protocol</p>
-                            <h1 className="font-display mb-6 text-2xl font-extrabold tracking-tight text-zinc-950">Finalizing</h1>
+                            <p className="mb-2 text-[10px] font-bold tracking-[0.24em] text-[#3A54A5] uppercase">Agreement signed</p>
+                            <h1 className="font-display mb-3 text-2xl font-extrabold tracking-tight text-zinc-950">Confirming your signature</h1>
+                            <p className="text-zinc-650 text-[13px] leading-relaxed">
+                                We are checking the signed agreement with our signing provider. This usually completes in a few seconds.
+                            </p>
 
-                            <div className="space-y-4 text-left">
-                                {PROTOCOL_STEPS.map((step, idx) => {
-                                    const isActive = idx === Math.min(Math.floor(attempts / 2), PROTOCOL_STEPS.length - 1);
-                                    const isDone = idx < Math.min(Math.floor(attempts / 2), PROTOCOL_STEPS.length - 1);
-
-                                    return (
-                                        <div key={step.id} className="flex items-center gap-3">
-                                            <div
-                                                className={cn(
-                                                    'h-2 w-2 rounded-full ring-2 ring-offset-2 ring-offset-white transition-all duration-500',
-                                                    isDone
-                                                        ? 'bg-[#3A54A5] ring-[#3A54A5]/30'
-                                                        : isActive
-                                                          ? 'animate-pulse bg-[#3A54A5] ring-[#3A54A5]/25'
-                                                          : 'bg-zinc-200 ring-transparent',
-                                                )}
-                                            />
-                                            <p
-                                                className={cn(
-                                                    'text-[12px] font-medium transition-colors duration-500',
-                                                    isDone ? 'font-medium text-zinc-900' : isActive ? 'font-bold text-zinc-900' : 'text-zinc-400',
-                                                )}
-                                            >
-                                                {step.label}
-                                            </p>
-                                        </div>
-                                    );
-                                })}
+                            <div className="mt-7 border-t border-zinc-200/80 pt-5">
+                                <button
+                                    type="button"
+                                    onClick={() => router.reload({ only: ['signature_verified'] })}
+                                    className="inline-flex items-center gap-2 text-[12px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
+                                >
+                                    Check status now
+                                    <RefreshCw className="size-3.5" aria-hidden="true" />
+                                </button>
+                                <p className="mt-4 text-[11px] leading-relaxed text-zinc-500">
+                                    You can leave this page and return to this link later. You will not need to sign again.
+                                </p>
                             </div>
-
-                            <p className="mt-10 text-[11px] text-zinc-400">This process is automated. Please keep this session active.</p>
                         </motion.div>
                     )}
-                </AnimatePresence>
+                </>
             </div>
         </DiagnosticLayout>
     );

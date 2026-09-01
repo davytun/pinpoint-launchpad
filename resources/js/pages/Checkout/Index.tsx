@@ -84,19 +84,23 @@ export default function CheckoutIndex({
 
     const bandMeta = BAND_META[score_band] ?? BAND_META.mid_high;
     const submittedTierLabel = tiers.find((tier) => tier.key === submitted_tier)?.label ?? 'your selected assessment tier';
+    const activeTierLabel = tiers.find((tier) => tier.key === selectedTier)?.label ?? submittedTierLabel;
+    const isSubmittingPiaRequest = isLoading && !request_submitted;
 
     function handleSelectTier(tierKey: string) {
         setError(null);
         setSelectedTier(tierKey);
+        setRequestDialogOpen(true);
+        setIsLoading(true);
         router.post(
             '/checkout/request',
             { tier: tierKey, diagnostic_session_id },
             {
-                onStart: () => setIsLoading(true),
                 onFinish: () => setIsLoading(false),
                 onError: (errors) => {
                     setIsLoading(false);
                     setSelectedTier(null);
+                    setRequestDialogOpen(false);
                     const first = Object.values(errors)[0];
                     setError(typeof first === 'string' ? first : 'Something went wrong. Please try again.');
                 },
@@ -131,48 +135,63 @@ export default function CheckoutIndex({
 
             <DiagnosticLayout hideWordmark glowColor={bandMeta.glow}>
                 <TooltipProvider delayDuration={100} skipDelayDuration={0}>
-                    <Dialog open={request_submitted && requestDialogOpen} onOpenChange={setRequestDialogOpen}>
+                    <Dialog open={(request_submitted || isSubmittingPiaRequest) && requestDialogOpen} onOpenChange={setRequestDialogOpen}>
                         <DialogContent className="max-h-[calc(100vh-2rem)] max-w-xl overflow-y-auto rounded-3xl border-zinc-200 bg-white p-0 text-zinc-900 shadow-[0_24px_80px_rgba(33,56,120,0.22)] sm:rounded-3xl">
                             <DialogHeader className="px-7 pt-8 text-left sm:px-9">
                                 <span className="flex size-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">
                                     <CheckCircle2 className="size-5" aria-hidden="true" />
                                 </span>
-                                <p className="pt-4 text-[11px] font-bold tracking-[0.16em] text-[#3A54A5] uppercase">PARAGON Investment Assessment</p>
+                                <p className="pt-4 text-[11px] font-bold tracking-[0.16em] text-[#3A54A5] uppercase">
+                                    {isSubmittingPiaRequest ? 'Submitting request' : 'PARAGON Investment Assessment'}
+                                </p>
                                 <DialogTitle className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-[2.1rem]">
-                                    Your request has been received.
+                                    {isSubmittingPiaRequest ? 'Recording your selected tier.' : 'Your request has been received.'}
                                 </DialogTitle>
                                 <DialogDescription className="max-w-md text-[15px] leading-6 text-zinc-600">
-                                    You have requested the <span className="font-semibold text-zinc-800">{submittedTierLabel}</span> assessment.
+                                    {isSubmittingPiaRequest ? (
+                                        <>Please wait while we save your request for the <span className="font-semibold text-zinc-800">{activeTierLabel}</span> assessment.</>
+                                    ) : (
+                                        <>You have requested the <span className="font-semibold text-zinc-800">{submittedTierLabel}</span> assessment.</>
+                                    )}
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <div className="px-7 pt-6 pb-7 sm:px-9">
-                                <div className="space-y-5 border-y border-zinc-100 py-6 text-[15px] leading-6 text-zinc-700">
-                                    <p>
-                                        We will contact you as soon as possible to confirm the scope of your assessment and provide payment instructions.
-                                    </p>
-                                    <p>
-                                        After payment is confirmed, we will send your PIA agreement. Once you sign it, your Founder workspace will be activated and the assessment can begin.
-                                    </p>
+                            {isSubmittingPiaRequest ? (
+                                <div className="px-7 pt-6 pb-8 sm:px-9">
+                                    <div className="flex items-center gap-3 border-t border-zinc-100 pt-6 text-sm text-zinc-600">
+                                        <Loader2 className="size-4 animate-spin text-[#3A54A5]" aria-hidden="true" />
+                                        Saving your request…
+                                    </div>
                                 </div>
+                            ) : (
+                                <div className="px-7 pt-6 pb-7 sm:px-9">
+                                    <div className="space-y-5 border-y border-zinc-100 py-6 text-[15px] leading-6 text-zinc-700">
+                                        <p>
+                                            We will contact you as soon as possible to confirm the scope of your assessment and provide payment instructions.
+                                        </p>
+                                        <p>
+                                            After payment is confirmed, we will send your PIA agreement. Once you sign it, your Founder workspace will be activated and the assessment can begin.
+                                        </p>
+                                    </div>
 
-                                <div className="mt-7 flex items-center justify-between gap-4 border-t border-zinc-100 pt-5">
-                                    <a
-                                        href="mailto:support@pinpointlaunchpad.com"
-                                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#3A54A5] hover:text-[#2D4182] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A54A5]"
-                                    >
-                                        <Mail className="size-4" aria-hidden="true" />
-                                        Questions about your request?
-                                    </a>
-                                    <button
-                                        type="button"
-                                        onClick={() => setRequestDialogOpen(false)}
-                                        className="shrink-0 text-sm font-semibold text-zinc-600 hover:text-zinc-950 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3A54A5]"
-                                    >
-                                        Close
-                                    </button>
+                                    <div className="mt-7 flex items-center justify-between gap-4 border-t border-zinc-100 pt-5">
+                                        <a
+                                            href="mailto:support@pinpointlaunchpad.com"
+                                            className="inline-flex items-center gap-2 text-sm font-semibold text-[#3A54A5] hover:text-[#2D4182] focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3A54A5]"
+                                        >
+                                            <Mail className="size-4" aria-hidden="true" />
+                                            Questions about your request?
+                                        </a>
+                                        <button
+                                            type="button"
+                                            onClick={() => setRequestDialogOpen(false)}
+                                            className="shrink-0 text-sm font-semibold text-zinc-600 hover:text-zinc-950 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3A54A5]"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </DialogContent>
                     </Dialog>
 

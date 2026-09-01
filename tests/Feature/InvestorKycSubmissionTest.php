@@ -88,3 +88,14 @@ test('an approved investor cannot submit replacement KYC documents', function ()
         ->and($investor->fresh()->kyc_approved_at)->not->toBeNull()
         ->and(InvestorKycSubmission::count())->toBe(1);
 });
+
+test('an approved investor is redirected from KYC to the investor spotlight', function () {
+    $investor = investorForKycSubmission([
+        'kyc_status' => Investor::KYC_STATUS_APPROVED,
+        'kyc_approved_at' => now(),
+    ]);
+
+    $this->actingAs($investor, 'investor')
+        ->get(route('investor.kyc.create'))
+        ->assertRedirect(route('investor.spotlight.index'));
+});

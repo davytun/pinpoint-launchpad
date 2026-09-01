@@ -203,6 +203,12 @@ class OnboardingController extends Controller
             return redirect()->route('onboarding.sign');
         }
 
+        // Webhooks are the primary path. This lightweight, throttled provider check
+        // keeps a founder moving if a local tunnel or webhook delivery is interrupted.
+        if (! $signature->isSigned() && Cache::add("boldsign_status_check_{$signature->id}", true, now()->addSeconds(10))) {
+            $this->boldSign->reconcileDocumentStatus($signature);
+        }
+
         $signature->refresh();
 
         $payment = $signature->payment;

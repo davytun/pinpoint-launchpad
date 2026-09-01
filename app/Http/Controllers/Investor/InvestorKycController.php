@@ -18,9 +18,15 @@ use Throwable;
 
 class InvestorKycController extends Controller
 {
-    public function create(Request $request): Response
+    public function create(Request $request): Response|RedirectResponse
     {
-        return Inertia::render('Investor/Kyc', ['investor' => $request->user('investor')->load('profile', 'kycSubmissions')]);
+        $investor = $request->user('investor');
+
+        if ($investor->hasApprovedKyc()) {
+            return redirect()->route('investor.spotlight.index');
+        }
+
+        return Inertia::render('Investor/Kyc', ['investor' => $investor->load('profile', 'kycSubmissions')]);
     }
 
     public function store(StoreInvestorKycSubmissionRequest $request): RedirectResponse

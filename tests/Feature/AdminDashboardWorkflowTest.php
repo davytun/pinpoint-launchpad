@@ -26,6 +26,19 @@ test('superadmin dashboard generates accurate action-required workflows with val
     $payment->audit_status = 'pending';
     $payment->save();
 
+    $nairaPayment = Payment::create([
+        'user_id' => $payingUser->id,
+        'customer_email' => $payingUser->email,
+        'tier' => 'growth',
+        'tier_base_amount' => 2090000,
+        'total_amount' => 2090000,
+        'currency' => 'NGN',
+        'paid_at' => now(),
+    ]);
+    $nairaPayment->status = 'paid';
+    $nairaPayment->audit_status = 'pending';
+    $nairaPayment->save();
+
     // 2. Create a pending KYC investor
     $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_PENDING]);
 
@@ -51,11 +64,31 @@ test('superadmin dashboard generates accurate action-required workflows with val
     $response->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('Admin/Dashboard')
+            ->where('metrics.revenue_by_currency.NGN', 2090000)
+            ->where('metrics.revenue_by_currency.USD', 35000)
             ->has('needs_attention', 4)
             ->where('needs_attention.0.action_url', '/admin/messages')
             ->where('needs_attention.1.action_url', '/admin/investor-accounts?kyc_status=pending')
             ->where('needs_attention.2.action_url', '/admin/dealflow/interests?status=pending')
             ->where('needs_attention.3.action_url', '/admin/founders?status=pending'));
+
+    $this->actingAs($superadmin)
+        ->get(route('admin.revenue', ['currency' => 'NGN']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Admin/Revenue')
+            ->where('currency', 'NGN')
+            ->where('metrics.total_revenue', 2090000)
+            ->where('metrics.revenue_this_month', 2090000));
+
+    $this->actingAs($superadmin)
+        ->get(route('admin.revenue', ['currency' => 'USD']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Admin/Revenue')
+            ->where('currency', 'USD')
+            ->where('metrics.total_revenue', 35000)
+            ->where('metrics.revenue_this_month', 35000));
 });
 
 test('analyst dashboard generates analyst-assigned metrics and actions', function () {

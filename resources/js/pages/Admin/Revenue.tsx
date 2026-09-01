@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { ExternalLink, TrendingDown, TrendingUp } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from 'recharts';
 
@@ -25,6 +25,7 @@ interface MonthlyRevenue {
 
 interface Metrics {
     total_revenue: number;
+    revenue_by_currency: { NGN: number; USD: number };
     revenue_this_month: number;
     revenue_last_month: number;
     revenue_by_tier: { foundation: number; growth: number; institutional: number };
@@ -34,6 +35,7 @@ interface Metrics {
 
 interface PageProps {
     metrics: Metrics;
+    currency: 'NGN' | 'USD';
     user_role: string;
 }
 
@@ -62,11 +64,11 @@ const tierChartConfig = {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function AdminRevenue({ metrics }: PageProps) {
+export default function AdminRevenue({ metrics, currency }: PageProps) {
     const diff = metrics.revenue_this_month - metrics.revenue_last_month;
     const isUp = diff >= 0;
     const TrendIcon = isUp ? TrendingUp : TrendingDown;
-    const diffLabel = isUp ? `+${fmt(diff)} vs last month` : `${fmt(Math.abs(diff))} below last month`;
+    const diffLabel = isUp ? `+${fmt(diff, currency)} vs last month` : `${fmt(Math.abs(diff), currency)} below last month`;
 
     const monthly = metrics.monthly_revenue ?? [];
     const maxRevenue = Math.max(...monthly.map((d) => d.revenue), 1);
@@ -85,11 +87,26 @@ export default function AdminRevenue({ metrics }: PageProps) {
             <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] lg:rounded-[22px]">
                 {/* ── Top Header & Actions Bar ───────────────────────────────── */}
                 <div className="flex shrink-0 flex-col justify-between gap-4 border-b border-zinc-100 bg-white px-6 py-4 sm:flex-row sm:items-center">
-                    <div>
+                        <div>
                         <div className="flex items-center gap-2.5">
                             <h1 className="text-[16.5px] font-bold tracking-tight text-zinc-950">Revenue</h1>
                         </div>
                         <p className="mt-0.5 text-[12px] font-normal text-zinc-500">Platform financial overview</p>
+                        </div>
+                    <div className="inline-flex shrink-0 rounded-lg border border-zinc-200 bg-zinc-50 p-1" role="group" aria-label="Revenue currency">
+                        {(['NGN', 'USD'] as const).map((option) => (
+                            <button
+                                key={option}
+                                type="button"
+                                onClick={() => router.get('/admin/revenue', { currency: option }, { preserveScroll: true })}
+                                className={cn(
+                                    'rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
+                                    currency === option ? 'bg-white text-zinc-950 shadow-xs' : 'text-zinc-500 hover:text-zinc-900',
+                                )}
+                            >
+                                {option}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -98,14 +115,14 @@ export default function AdminRevenue({ metrics }: PageProps) {
                     <div className="px-6 py-3">
                         <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Total Revenue</span>
                         <div className="mt-0.5 flex items-baseline gap-2">
-                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{fmt(metrics.total_revenue)}</span>
+                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{fmt(metrics.total_revenue, currency)}</span>
                         </div>
                     </div>
 
                     <div className="px-6 py-3">
                         <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">This Month</span>
                         <div className="mt-0.5 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-2">
-                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{fmt(metrics.revenue_this_month)}</span>
+                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{fmt(metrics.revenue_this_month, currency)}</span>
                             <span className={cn('flex items-center gap-1 text-[11px] font-medium', isUp ? 'text-emerald-600' : 'text-rose-600')}>
                                 <TrendIcon className="size-3" />
                                 {diffLabel}
@@ -116,7 +133,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                     <div className="px-6 py-3">
                         <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Last Month</span>
                         <div className="mt-0.5 flex items-baseline gap-2">
-                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{fmt(metrics.revenue_last_month)}</span>
+                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{fmt(metrics.revenue_last_month, currency)}</span>
                         </div>
                     </div>
                 </div>
@@ -154,7 +171,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                                         <YAxis hide />
                                         <ChartTooltip
                                             cursor={{ fill: 'rgba(244, 244, 245, 0.5)' }}
-                                            content={<ChartTooltipContent formatter={(v) => fmt(Number(v))} hideLabel />}
+                                            content={<ChartTooltipContent formatter={(v) => fmt(Number(v), currency)} hideLabel />}
                                         />
                                         <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>
                                             {monthly.map((entry, i) => (
@@ -177,7 +194,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                                     <YAxis hide />
                                     <ChartTooltip
                                         cursor={{ fill: 'rgba(244, 244, 245, 0.5)' }}
-                                        content={<ChartTooltipContent formatter={(v) => fmt(Number(v))} hideLabel />}
+                                        content={<ChartTooltipContent formatter={(v) => fmt(Number(v), currency)} hideLabel />}
                                     />
                                     <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                                         {tierData.map((entry, i) => (
@@ -186,7 +203,7 @@ export default function AdminRevenue({ metrics }: PageProps) {
                                         <LabelList
                                             dataKey="value"
                                             position="top"
-                                            formatter={(v: number) => fmt(v)}
+                                            formatter={(v: number) => fmt(v, currency)}
                                             style={{ fill: '#52525B', fontSize: 9, fontWeight: 600 }}
                                         />
                                     </Bar>

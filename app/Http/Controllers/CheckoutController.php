@@ -139,15 +139,18 @@ class CheckoutController extends Controller
             $billingNgnFallback = false;
         }
 
-        $requestSubmitted = $request->session()->get('pia_request_submitted') === $sessionId;
+        // The PIA request is a persisted workflow state, not a browser-session state.
+        // A Founder must still see it after a session expires or they return later.
+        $piaRequest = PiaApplication::query()
+            ->where('email', $diagnosticSession->email)
+            ->where('source', 'diagnostic_tier_selection')
+            ->latest()
+            ->first();
 
-        $submittedTier = $requestSubmitted
-            ? PiaApplication::query()
-                ->where('email', $diagnosticSession->email)
-                ->where('source', 'diagnostic_tier_selection')
-                ->latest()
-                ->value('selected_tier')
-            : null;
+        $requestSubmitted = $piaRequest !== null
+            && in_array($piaRequest->status, ['pending', 'contacted'], true);
+
+        $submittedTier = $requestSubmitted ? $piaRequest->selected_tier : null;
 
         return Inertia::render('Checkout/Index', [
             'score'                   => $diagnosticSession->score,
@@ -214,8 +217,6 @@ class CheckoutController extends Controller
                 ]);
             }
         }
-
-        $request->session()->put('pia_request_submitted', $sessionId);
 
         return redirect()->route('checkout.index')
             ->with('success', 'Your PIA request has been received. Pinpoint will contact you to confirm the scope and arrange payment.');

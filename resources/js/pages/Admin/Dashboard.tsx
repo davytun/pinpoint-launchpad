@@ -55,6 +55,7 @@ interface Metrics {
     needs_info_count?: number;
     my_assigned?: number;
     total_revenue?: number;
+    revenue_by_currency?: { NGN: number; USD: number };
     revenue_this_month?: number;
     revenue_by_tier?: { foundation: number; growth: number; institutional: number };
     waitlist_count?: { founders: number; investors: number };
@@ -81,10 +82,10 @@ interface PageProps {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function fmtCurrency(amount: number) {
-    return new Intl.NumberFormat('en-US', {
+function fmtCurrency(amount: number, currency = 'USD') {
+    return new Intl.NumberFormat(currency === 'NGN' ? 'en-NG' : 'en-US', {
         style: 'currency',
-        currency: 'USD',
+        currency,
         maximumFractionDigits: 0,
     }).format(amount);
 }
@@ -538,8 +539,9 @@ export default function AdminDashboard({
                                     variant="blue"
                                 />
                                 <MetricCard
-                                    label="Total Revenue"
-                                    value={fmtCurrency(metrics.total_revenue ?? 0)}
+                                    label="Revenue collected"
+                                    value={fmtCurrency(metrics.revenue_by_currency?.NGN ?? 0, 'NGN')}
+                                    subValue={`USD: ${fmtCurrency(metrics.revenue_by_currency?.USD ?? 0, 'USD')}`}
                                     icon={DollarSign}
                                     href="/admin/revenue"
                                     variant="emerald"

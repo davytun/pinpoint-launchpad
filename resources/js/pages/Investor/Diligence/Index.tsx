@@ -1,3 +1,4 @@
+import { InvestorHeader } from '@/components/investor-header';
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, CheckCircle2, Clock3, Lock, MessageSquare, XCircle } from 'lucide-react';
@@ -30,48 +31,18 @@ function formatDate(iso?: string | null): string {
 
 export default function DiligenceIndex({ diligence_requests }: { diligence_requests: DiligenceRequest[] }) {
     return (
-        <main className="min-h-screen bg-[#f4f7ff] text-zinc-950">
+        <main className="min-h-screen bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
             <Head title="Post-Introduction Diligence — Pinpoint Investment Network" />
+            <InvestorHeader activeTab="diligence" />
 
-            <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
-                <PinpointLogo height={24} />
-                <div className="flex items-center gap-3">
-                    <Link
-                        href={route('investor.interests.index')}
-                        className="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-zinc-950"
-                    >
-                        My Engagements
-                    </Link>
-                    <Link
-                        href={route('investor.spotlight.index')}
-                        className="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-zinc-950"
-                    >
-                        Browse Spotlight
-                    </Link>
-                    <Link
-                        href={route('investor.dashboard')}
-                        className="rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-zinc-800 shadow-xs hover:bg-zinc-50"
-                    >
-                        Dashboard
-                    </Link>
-                </div>
-            </header>
-
-            <section className="mx-auto max-w-6xl px-6 pt-6 pb-24">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <Link
-                            href={route('investor.interests.index')}
-                            className="mb-2 inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 transition hover:text-zinc-900"
-                        >
-                            <ArrowLeft className="size-3.5" />
-                            Back to Engagements
-                        </Link>
-                        <h1 className="text-3xl font-black tracking-tight text-zinc-950">Post-Introduction Diligence</h1>
-                        <p className="mt-1 text-sm text-zinc-600">
-                            Track the status and approved responses for your post-call inquiries coordinated by Pinpoint Investor Relations.
-                        </p>
-                    </div>
+            <section className="mx-auto max-w-6xl px-4 pt-8 pb-24 sm:px-6 lg:px-8">
+                <div className="mb-8">
+                    <h1 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+                        Post-Introduction Diligence
+                    </h1>
+                    <p className="mt-2 text-sm text-zinc-500">
+                        Track the status and approved responses for your post-call inquiries coordinated by Pinpoint Investor Relations.
+                    </p>
                 </div>
 
                 {diligence_requests.length === 0 ? (

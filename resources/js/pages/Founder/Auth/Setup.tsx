@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -282,12 +282,6 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                 </span>
                             </button>
                         </form>
-
-                        {/* Security note */}
-                        <div className="mt-5 flex items-center justify-center gap-1.5">
-                            <ShieldCheck className="size-3.5 text-emerald-500" aria-hidden="true" />
-                            <p className="text-[11px] text-zinc-400">Secured with industry-standard encryption.</p>
-                        </div>
                     </div>
                 </motion.div>
             </div>

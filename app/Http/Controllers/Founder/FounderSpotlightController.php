@@ -24,7 +24,14 @@ class FounderSpotlightController extends Controller
                 'spotlight_summary' => $founder->profile->spotlight_summary,
                 'is_featured_in_spotlight' => $founder->profile->is_featured_in_spotlight,
             ],
-            'pitch_decks' => $founder->documents()->where('visibility', 'spotlight')->latest()->get(['id', 'original_filename', 'is_reviewed', 'created_at']),
+            'pitch_decks' => $founder->documents()
+                ->where(function ($q) {
+                    $q->where('category', 'pitch_deck')
+                      ->orWhere('visibility', 'spotlight');
+                })
+                ->latest()
+                ->get(['id', 'original_filename', 'is_reviewed', 'created_at']),
+            'audit_status' => $founder->payment?->audit_status ?? 'pending',
         ]);
     }
 

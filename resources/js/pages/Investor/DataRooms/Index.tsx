@@ -1,3 +1,4 @@
+import { InvestorHeader } from '@/components/investor-header';
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight, FolderLock } from 'lucide-react';
@@ -10,31 +11,18 @@ type Grant = {
 
 export default function DataRoomIndex({ grants }: { grants: Grant[] }) {
     return (
-        <main className="min-h-screen bg-[#f4f7ff] text-zinc-950">
+        <main className="min-h-screen bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
             <Head title="Data Rooms" />
+            <InvestorHeader activeTab="data-rooms" />
 
-            <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
-                <PinpointLogo height={24} />
-                <Link
-                    href={route('investor.dashboard')}
-                    className="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-zinc-950"
-                >
-                    Dashboard
-                </Link>
-            </header>
-
-            <section className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
-                <div className="flex items-center gap-4">
-                    <Link
-                        href={route('investor.dashboard')}
-                        className="inline-flex size-10 items-center justify-center rounded-full bg-white text-zinc-500 shadow-sm transition hover:text-zinc-900"
-                    >
-                        <ArrowLeft className="size-5" />
-                    </Link>
-                    <div>
-                        <p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Secure Access</p>
-                        <h1 className="mt-1 text-3xl font-black tracking-tight sm:text-4xl">Your Data Rooms</h1>
-                    </div>
+            <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 sm:py-14">
+                <div className="mb-8">
+                    <h1 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+                        Your Data Rooms
+                    </h1>
+                    <p className="mt-2 text-sm text-zinc-500">
+                        Access secure institutional materials and financial models granted by founders.
+                    </p>
                 </div>
 
                 <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

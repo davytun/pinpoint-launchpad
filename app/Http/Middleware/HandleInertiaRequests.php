@@ -67,6 +67,11 @@ class HandleInertiaRequests extends Middleware
                 'founder' => Auth::guard('founder')->user()?->unreadNotifications()->count() ?? 0,
                 'investor' => Auth::guard('investor')->user()?->unreadNotifications()->count() ?? 0,
             ],
+            'platform_recent_notifications' => [
+                'investor' => Auth::guard('investor')->user()
+                    ? Auth::guard('investor')->user()->notifications()->latest()->take(5)->get()
+                    : [],
+            ],
             'csrf_token' => csrf_token(),
         ]);
     }

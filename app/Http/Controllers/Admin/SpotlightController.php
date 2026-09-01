@@ -129,13 +129,15 @@ class SpotlightController extends Controller
     {
         $data = $request->validate([
             'publish'             => ['sometimes', 'boolean'],
+            'sector'              => ['sometimes', 'nullable', 'string', 'max:50'],
+            'batch'               => ['sometimes', 'nullable', 'string', 'max:50'],
             'spotlight_one_liner' => ['sometimes', 'nullable', 'string', 'max:120'],
             'spotlight_summary'   => ['sometimes', 'nullable', 'string', 'max:500'],
             'mark_deck_reviewed'  => ['sometimes', 'boolean'],
         ]);
 
         abort_unless(
-            array_key_exists('publish', $data) || array_key_exists('spotlight_one_liner', $data) || array_key_exists('spotlight_summary', $data) || array_key_exists('mark_deck_reviewed', $data),
+            array_key_exists('publish', $data) || array_key_exists('spotlight_one_liner', $data) || array_key_exists('spotlight_summary', $data) || array_key_exists('mark_deck_reviewed', $data) || array_key_exists('sector', $data) || array_key_exists('batch', $data),
             422,
             'Choose content to update or a publishing action.'
         );
@@ -151,7 +153,7 @@ class SpotlightController extends Controller
             }
         }
 
-        $content = array_intersect_key($data, array_flip(['spotlight_one_liner', 'spotlight_summary']));
+        $content = array_intersect_key($data, array_flip(['spotlight_one_liner', 'spotlight_summary', 'sector', 'batch']));
 
         if ($content !== []) {
             $profile->update($content);

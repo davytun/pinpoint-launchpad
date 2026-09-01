@@ -4,7 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Head, useForm } from '@inertiajs/react';
-import { Building2, CheckCircle2, Clock3, FileLock2, Mail, MapPin, Phone, ShieldCheck, UploadCloud, User, XCircle } from 'lucide-react';
+import { Building2, CheckCircle2, Clock3, FileLock2, Mail, MapPin, Phone, UploadCloud, User, XCircle } from 'lucide-react';
 
 function ProfileItem({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | null }) {
     if (!value) return null;
@@ -72,9 +72,6 @@ export default function Kyc({
 
                 <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-6 py-8">
                     <PinpointLogo height={24} />
-                    <div className="flex items-center gap-2 rounded-full bg-white/60 px-4 py-1.5 text-xs font-bold text-zinc-600 shadow-sm ring-1 ring-zinc-200/50 backdrop-blur-md">
-                        <ShieldCheck className="h-4 w-4 text-emerald-600" /> Secure Session
-                    </div>
                 </header>
 
                 <main className="relative z-10 mx-auto max-w-6xl px-6 pt-4 pb-20">

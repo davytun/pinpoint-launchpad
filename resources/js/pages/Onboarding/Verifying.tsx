@@ -1,13 +1,12 @@
 import { Head, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Clock, LoaderCircle, Mail, MailCheck, RefreshCw } from 'lucide-react';
+import { ArrowRight, Check, Clock, LoaderCircle, Mail, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 
 const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
-// Animated protocol ring
 function ConfirmationSpinner() {
     return (
         <div className="flex size-16 items-center justify-center rounded-2xl border border-[#3A54A5]/20 bg-[#3A54A5]/8">
@@ -16,23 +15,22 @@ function ConfirmationSpinner() {
     );
 }
 
-
-// ── Resend invite button with cooldown
 function ResendInviteButton({ email }: { email?: string }) {
     const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
     const [cooldown, setCooldown] = useState(0);
 
     useEffect(() => {
         if (cooldown <= 0) return;
-        const t = setInterval(() => setCooldown((c) => c - 1), 1000);
-        return () => clearInterval(t);
+        const timer = setInterval(() => setCooldown((current) => current - 1), 1000);
+        return () => clearInterval(timer);
     }, [cooldown]);
 
     async function handleResend() {
         if (!email || status === 'sending' || cooldown > 0) return;
         setStatus('sending');
+
         try {
-            const res = await fetch('/onboarding/resend-invite', {
+            const response = await fetch('/onboarding/resend-invite', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -40,201 +38,71 @@ function ResendInviteButton({ email }: { email?: string }) {
                 },
                 body: JSON.stringify({ email }),
             });
-            if (res.ok) {
+
+            if (response.ok) {
                 setStatus('sent');
                 setCooldown(60);
-                setTimeout(() => setStatus('idle'), 4000);
             } else {
                 setStatus('error');
-                setTimeout(() => setStatus('idle'), 3000);
             }
         } catch {
             setStatus('error');
-            setTimeout(() => setStatus('idle'), 3000);
         }
+
+        setTimeout(() => setStatus('idle'), 4000);
     }
 
+    const label = status === 'sending' ? 'Sending email' : status === 'sent' ? 'Setup email sent' : status === 'error' ? 'Could not send email. Try again.' : cooldown > 0 ? `Resend available in ${cooldown}s` : 'Resend setup email';
+
     return (
-        <div className="mt-5">
-            <button
-                onClick={handleResend}
-                disabled={status === 'sending' || cooldown > 0}
-                className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-2.5 text-[12px] font-semibold text-zinc-700 shadow-xs transition-all hover:border-zinc-300 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-                {status === 'sending' && <span className="size-3.5 animate-spin rounded-full border-2 border-[#3A54A5] border-t-transparent" />}
-                {status === 'sent' && <span className="text-emerald-500">✓</span>}
-                {status === 'sending'
-                    ? 'Sending…'
-                    : status === 'sent'
-                      ? 'Email sent!'
-                      : status === 'error'
-                        ? 'Failed — try again'
-                        : cooldown > 0
-                          ? `Resend in ${cooldown}s`
-                          : 'Resend setup email'}
-            </button>
-        </div>
+        <button type="button" onClick={handleResend} disabled={status === 'sending' || cooldown > 0} className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#3A54A5] transition-colors hover:text-[#2D4182] disabled:cursor-not-allowed disabled:opacity-45">
+            {status === 'sending' && <LoaderCircle className="size-4 animate-spin" />}
+            {label}
+        </button>
     );
 }
 
-// ── Confirmed / "check your email" screen
-function ConfirmedScreen({
-    signer_email,
-    tier_label,
-    amount_paid,
-    signed_at,
-    setup_url,
-}: {
-    signer_email?: string;
-    tier_label?: string;
-    amount_paid?: string;
-    signed_at?: string;
-    setup_url?: string;
-}) {
+function ConfirmedScreen({ signer_email, tier_label, amount_paid, signed_at, setup_url }: { signer_email?: string; tier_label?: string; amount_paid?: string; signed_at?: string; setup_url?: string }) {
     return (
         <DiagnosticLayout glowColor="#3A54A5" hideWordmark>
-            <Head title="Agreement Confirmed — PARAGON Certification" />
+            <Head title="Agreement Signed | PARAGON Certification" />
 
-            <div className="relative z-10 mx-auto flex w-full max-w-[440px] flex-col items-center px-6 py-16 text-center lg:py-24">
-                {/* Logo */}
-                <div className="mb-10">
-                    <img
-                        src="/pinpoint-logo.png"
-                        alt="Pinpoint"
-                        className="block h-6 w-auto opacity-75 transition-opacity hover:opacity-100"
-                        style={{ maxWidth: 130 }}
-                    />
-                </div>
+            <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-[520px] flex-col items-center justify-center px-5 py-10 sm:px-6">
+                <img src="/pinpoint-logo.png" alt="Pinpoint" className="mb-8 h-7 w-auto" />
 
-                {/* Main Success Card */}
-                <motion.div
-                    className="w-full overflow-hidden rounded-[2.5rem] border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-10"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.55, ease }}
-                >
-                    <div className="mb-7 flex justify-center">
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[#3A54A5]/25 bg-[#3A54A5]/10">
-                            <MailCheck className="size-8 text-[#3A54A5]" strokeWidth={1.5} />
-                        </div>
-                    </div>
+                <motion.main className="w-full rounded-[2rem] border border-white bg-white p-7 shadow-[0_20px_52px_rgba(38,57,115,0.10)] sm:p-9" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease }}>
+                    <div className="flex size-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-700"><Check className="size-5" strokeWidth={2.5} /></div>
+                    <p className="mt-6 text-[11px] font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Agreement signed</p>
+                    <h1 className="font-display mt-2 text-3xl font-extrabold tracking-[-0.04em] text-zinc-950">You are all set.</h1>
+                    <p className="mt-3 text-sm leading-6 text-zinc-600">Your assessment request is confirmed. Pinpoint will contact you as soon as possible with the next requirements.</p>
 
-                    <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-[#3A54A5] uppercase">Agreement Confirmed</p>
-                    <h1 className="font-display mb-4 text-2xl font-extrabold tracking-tight text-zinc-950">You're in.</h1>
-                    <p className="text-zinc-650 mb-8 text-[14px] leading-relaxed">
-                        Your Pinpoint Investment Warrant has been signed and your PARAGON audit has been queued.
-                    </p>
+                    <dl className="mt-7 grid grid-cols-2 gap-x-6 gap-y-5 border-y border-zinc-200 py-5">
+                        <div><dt className="text-[10px] font-bold tracking-[0.1em] text-zinc-500 uppercase">Assessment</dt><dd className="mt-1 text-sm font-semibold leading-5 text-zinc-900">{tier_label || 'PARAGON Audit'}</dd></div>
+                        <div><dt className="text-[10px] font-bold tracking-[0.1em] text-zinc-500 uppercase">Amount paid</dt><dd className="mt-1 text-sm font-semibold leading-5 text-zinc-900">{amount_paid || 'Not available'}</dd></div>
+                        <div><dt className="text-[10px] font-bold tracking-[0.1em] text-zinc-500 uppercase">Signed</dt><dd className="mt-1 text-sm font-semibold leading-5 text-zinc-900">{signed_at || 'Confirmed'}</dd></div>
+                        <div><dt className="text-[10px] font-bold tracking-[0.1em] text-zinc-500 uppercase">Email</dt><dd className="mt-1 truncate text-sm font-semibold leading-5 text-zinc-900" title={signer_email}>{signer_email || 'Not available'}</dd></div>
+                    </dl>
 
-                    {/* Receipt Details */}
-                    <div className="mb-10 space-y-4 rounded-2xl border border-zinc-200 bg-zinc-50/50 p-6 text-left">
-                        {[
-                            { label: 'Audit Tier', value: tier_label },
-                            { label: 'Amount Paid', value: amount_paid },
-                            { label: 'Email', value: signer_email },
-                            { label: 'Signed', value: signed_at },
-                        ].map((item) => (
-                            <div key={item.label} className="flex flex-col gap-1">
-                                <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">{item.label}</span>
-                                <span className="text-[13px] font-medium text-zinc-800">{item.value || '—'}</span>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* What happens next */}
-                    <div className="space-y-6 text-left">
-                        <p className="text-[10px] font-bold tracking-[0.18em] text-zinc-500 uppercase">What happens next</p>
-                        {[
-                            { title: 'Confirmation sent', text: 'Your signed agreement has been emailed to your inbox.' },
-                            { title: 'Analyst assigned', text: 'An analyst will reach out within 2–3 business days to begin your audit.' },
-                            { title: 'PARAGON Certification', text: 'Your certification is issued upon successful audit completion.' },
-                        ].map((s, idx) => (
-                            <div key={idx} className="flex items-start gap-4">
-                                <div className="mt-1.5 flex size-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <div className="space-y-1">
-                                    <p className="text-zinc-850 text-[13px] font-bold">{s.title}</p>
-                                    <p className="text-zinc-550 text-[12px] leading-relaxed">{s.text}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </motion.div>
-
-                {/* Final CTA */}
-                <motion.div className="mt-10 w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
                     {setup_url ? (
-                        <div
-                            className="w-full rounded-2xl border border-zinc-200 bg-white/70 p-6 text-center shadow-xs"
-                            style={{ boxShadow: '0 8px 32px rgba(58,84,165,0.03)' }}
-                        >
-                            <div className="mb-4 flex justify-center">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#3A54A5]/20 bg-[#3A54A5]/10">
-                                    <ArrowRight className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
-                                </div>
-                            </div>
-                            <p className="mb-1 text-[12px] font-bold tracking-[0.18em] text-[#3A54A5] uppercase">Complete Setup</p>
-                            <p className="mb-3 text-[15px] font-extrabold text-zinc-950">Create your account</p>
-                            <p className="text-zinc-650 mb-6 text-[13px] leading-relaxed">
-                                Set up your secure password to access your PARAGON Audit dashboard immediately.
-                            </p>
-                            <a
-                                href={setup_url}
-                                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3.5 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#2D4182]"
-                                style={{ boxShadow: '0 4px 14px rgba(58,84,165,0.25)' }}
-                            >
-                                Create Account
-                                <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
-                            </a>
-                        </div>
+                        <a href={setup_url} className="group mt-7 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] px-5 text-sm font-bold text-white transition-colors hover:bg-[#2D4182]">
+                            Set up Founder workspace
+                            <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                        </a>
                     ) : (
-                        /* Check your email card */
-                        <div
-                            className="w-full rounded-2xl border border-zinc-200 bg-white/70 p-6 text-center shadow-xs"
-                            style={{ boxShadow: '0 8px 32px rgba(58,84,165,0.03)' }}
-                        >
-                            <div className="mb-4 flex justify-center">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#3A54A5]/20 bg-[#3A54A5]/10">
-                                    <Mail className="size-5 text-[#3A54A5]" strokeWidth={1.5} />
-                                </div>
-                            </div>
-                            <p className="mb-1 text-[12px] font-bold tracking-[0.18em] text-[#3A54A5] uppercase">One more step</p>
-                            <p className="mb-3 text-[15px] font-extrabold text-zinc-950">Check your inbox</p>
-                            <p className="text-zinc-650 text-[13px] leading-relaxed">
-                                We've sent a secure account setup link to <span className="font-semibold text-zinc-950">{signer_email}</span>. Open
-                                that email to create your password and access your dashboard.
-                            </p>
-
-                            {/* Resend invite */}
-                            <ResendInviteButton email={signer_email} />
+                        <div className="mt-7 flex items-start gap-3 rounded-xl bg-[#F5F7FF] p-4">
+                            <Mail className="mt-0.5 size-5 shrink-0 text-[#3A54A5]" />
+                            <div><p className="text-sm font-semibold text-zinc-900">Set up your workspace from your inbox.</p><p className="mt-1 text-sm leading-5 text-zinc-600">We sent a secure setup link to {signer_email}.</p><ResendInviteButton email={signer_email} /></div>
                         </div>
                     )}
+                </motion.main>
 
-                    <p className="mt-6 text-[11px] text-zinc-400">
-                        Questions?{' '}
-                        <a href="mailto:support@pinpointlaunchpad.com" className="text-[#3A54A5] hover:underline">
-                            support@pinpointlaunchpad.com
-                        </a>
-                    </p>
-                </motion.div>
+                <a href="mailto:support@pinpointlaunchpad.com" className="mt-5 min-h-11 py-2 text-sm font-semibold text-[#3A54A5] hover:text-[#2D4182]">Need help? Contact Pinpoint</a>
             </div>
         </DiagnosticLayout>
     );
 }
 
-export default function OnboardingVerifying({
-    signature_verified,
-    signer_email,
-    tier_label,
-    amount_paid,
-    signed_at,
-    setup_url,
-}: {
-    signature_verified: boolean;
-    signer_email?: string;
-    tier_label?: string;
-    amount_paid?: string;
-    signed_at?: string;
-    setup_url?: string;
-}) {
+export default function OnboardingVerifying({ signature_verified, signer_email, tier_label, amount_paid, signed_at, setup_url }: { signature_verified: boolean; signer_email?: string; tier_label?: string; amount_paid?: string; signed_at?: string; setup_url?: string }) {
     const [attempts, setAttempts] = useState(0);
     const [timedOut, setTimedOut] = useState(false);
     const [confirmed, setConfirmed] = useState(signature_verified);
@@ -242,12 +110,10 @@ export default function OnboardingVerifying({
 
     useEffect(() => {
         if (confirmed) return;
-        if (attempts >= 20) {
-            setTimedOut(true);
-            return;
-        }
+        if (attempts >= 20) { setTimedOut(true); return; }
+
         intervalRef.current = setInterval(() => {
-            setAttempts((p) => p + 1);
+            setAttempts((value) => value + 1);
             router.reload({
                 only: ['signature_verified'],
                 onSuccess: (page) => {
@@ -258,109 +124,29 @@ export default function OnboardingVerifying({
                 },
             });
         }, 3000);
-        return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-        };
+
+        return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
     }, [confirmed, attempts]);
 
-    if (confirmed) {
-        return (
-            <ConfirmedScreen
-                signer_email={signer_email}
-                tier_label={tier_label}
-                amount_paid={amount_paid}
-                signed_at={signed_at}
-                setup_url={setup_url}
-            />
-        );
-    }
+    if (confirmed) return <ConfirmedScreen {...{ signer_email, tier_label, amount_paid, signed_at, setup_url }} />;
 
     return (
         <DiagnosticLayout glowColor={timedOut ? '#F59E0B' : '#3A54A5'} hideWordmark>
-            <Head title="Verifying Signature — PARAGON Certification" />
-
+            <Head title="Confirming Signature | PARAGON Certification" />
             <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12 text-center">
-                <div className="mb-12">
-                    <img src="/pinpoint-logo.png" alt="Pinpoint" className="block h-6 w-auto opacity-75" style={{ maxWidth: 130 }} />
-                </div>
-
-                <>
-                    {timedOut ? (
-                        <motion.div
-                            key="timeout"
-                            className="w-full max-w-sm overflow-hidden rounded-[2.5rem] border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-10"
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                        >
-                            <div className="mb-7 flex justify-center">
-                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50">
-                                    <Clock className="text-amber-650 size-8" strokeWidth={1.5} />
-                                </div>
-                            </div>
-
-                            <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-amber-600 uppercase">Confirmation delayed</p>
-                            <h1 className="font-display mb-3 text-xl font-extrabold text-zinc-950">Your signature is safe.</h1>
-                            <p className="text-zinc-650 mb-8 text-[13px] leading-relaxed">
-                                We are still waiting for the signing provider to confirm it. This can occasionally take a few minutes.
-                            </p>
-
-                            <div className="flex flex-col gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setTimedOut(false);
-                                        setAttempts(0);
-                                        router.reload({ only: ['signature_verified'] });
-                                    }}
-                                    className="group flex w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] py-3 text-[13px] font-bold tracking-[0.14em] text-white uppercase transition-all hover:bg-[#2D4182]"
-                                    style={{ boxShadow: '0 4px 14px rgba(58,84,165,0.25)' }}
-                                >
-                                    Check status
-                                    <RefreshCw className="size-4 transition-transform group-hover:rotate-90" />
-                                </button>
-                                <a
-                                    href="mailto:support@pinpointlaunchpad.com"
-                                    className="py-2 text-[12px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
-                                >
-                                    Contact Support
-                                </a>
-                            </div>
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="verifying"
-                            className="w-full max-w-sm overflow-hidden rounded-[2.5rem] border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(0,0,0,0.025)] backdrop-blur-md sm:p-10"
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                        >
-                            <div className="mb-8 flex justify-center">
-                                <ConfirmationSpinner />
-                            </div>
-
-                            <p className="mb-2 text-[10px] font-bold tracking-[0.24em] text-[#3A54A5] uppercase">Agreement signed</p>
-                            <h1 className="font-display mb-3 text-2xl font-extrabold tracking-tight text-zinc-950">Confirming your signature</h1>
-                            <p className="text-zinc-650 text-[13px] leading-relaxed">
-                                We are checking the signed agreement with our signing provider. This usually completes in a few seconds.
-                            </p>
-
-                            <div className="mt-7 border-t border-zinc-200/80 pt-5">
-                                <button
-                                    type="button"
-                                    onClick={() => router.reload({ only: ['signature_verified'] })}
-                                    className="inline-flex items-center gap-2 text-[12px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
-                                >
-                                    Check status now
-                                    <RefreshCw className="size-3.5" aria-hidden="true" />
-                                </button>
-                                <p className="mt-4 text-[11px] leading-relaxed text-zinc-500">
-                                    You can leave this page and return to this link later. You will not need to sign again.
-                                </p>
-                            </div>
-                        </motion.div>
-                    )}
-                </>
+                <div className="mb-12"><img src="/pinpoint-logo.png" alt="Pinpoint" className="block h-6 w-auto opacity-75" /></div>
+                {timedOut ? (
+                    <motion.div className="w-full max-w-sm rounded-[2rem] border border-white bg-white p-8 shadow-[0_18px_48px_rgba(38,57,115,0.10)] sm:p-10" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+                        <div className="mb-7 flex justify-center"><div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50"><Clock className="size-8 text-amber-700" strokeWidth={1.5} /></div></div>
+                        <p className="mb-2 text-[10px] font-bold tracking-[0.22em] text-amber-700 uppercase">Confirmation delayed</p><h1 className="font-display mb-3 text-2xl font-extrabold text-zinc-950">Your signature is safe.</h1><p className="mb-8 text-sm leading-6 text-zinc-600">We are still waiting for the signing provider to confirm it. This can occasionally take a few minutes.</p>
+                        <div className="flex flex-col gap-3"><button type="button" onClick={() => { setTimedOut(false); setAttempts(0); router.reload({ only: ['signature_verified'] }); }} className="group flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#3A54A5] px-4 text-sm font-bold text-white transition-colors hover:bg-[#2D4182]">Check status<RefreshCw className="size-4 transition-transform group-hover:rotate-90" /></button><a href="mailto:support@pinpointlaunchpad.com" className="py-2 text-sm font-semibold text-[#3A54A5] hover:text-[#2D4182]">Contact support</a></div>
+                    </motion.div>
+                ) : (
+                    <motion.div className="w-full max-w-sm rounded-[2rem] border border-white bg-white p-8 shadow-[0_18px_48px_rgba(38,57,115,0.10)] sm:p-10" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+                        <div className="mb-8 flex justify-center"><ConfirmationSpinner /></div><p className="mb-2 text-[10px] font-bold tracking-[0.24em] text-[#3A54A5] uppercase">Agreement signed</p><h1 className="font-display mb-3 text-2xl font-extrabold tracking-tight text-zinc-950">Confirming your signature</h1><p className="text-sm leading-6 text-zinc-600">We are checking the signed agreement with our signing provider. This usually completes in a few seconds.</p>
+                        <div className="mt-7 border-t border-zinc-200 pt-5"><button type="button" onClick={() => router.reload({ only: ['signature_verified'] })} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#3A54A5] hover:text-[#2D4182]">Check status now <RefreshCw className="size-3.5" aria-hidden="true" /></button><p className="mt-4 text-xs leading-5 text-zinc-500">You can leave this page and return later. You will not need to sign again.</p></div>
+                    </motion.div>
+                )}
             </div>
         </DiagnosticLayout>
     );

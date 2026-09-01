@@ -106,6 +106,8 @@ function SpotlightDrawer({
 }) {
     const [oneLiner, setOneLiner] = useState(profile.spotlight_one_liner);
     const [summary, setSummary] = useState(profile.spotlight_summary);
+    const [sector, setSector] = useState(profile.sector);
+    const [batch, setBatch] = useState(profile.batch ?? '');
     const [saving, setSaving] = useState(false);
     const [publishing, setPublishing] = useState(false);
     const [reviewingDeck, setReviewingDeck] = useState(false);
@@ -114,7 +116,9 @@ function SpotlightDrawer({
     useEffect(() => {
         setOneLiner(profile.spotlight_one_liner);
         setSummary(profile.spotlight_summary);
-    }, [profile.id, profile.spotlight_one_liner, profile.spotlight_summary]);
+        setSector(profile.sector);
+        setBatch(profile.batch ?? '');
+    }, [profile.id, profile.spotlight_one_liner, profile.spotlight_summary, profile.sector, profile.batch]);
 
     function saveCopy(e?: React.FormEvent) {
         if (e) e.preventDefault();
@@ -126,6 +130,8 @@ function SpotlightDrawer({
             {
                 spotlight_one_liner: oneLiner,
                 spotlight_summary: summary,
+                sector,
+                batch,
             },
             {
                 onSuccess: () => {
@@ -136,6 +142,8 @@ function SpotlightDrawer({
                         ...profile,
                         spotlight_one_liner: oneLiner,
                         spotlight_summary: summary,
+                        sector,
+                        batch,
                         publish_requirements: remainingRequirements,
                         is_ready: remainingRequirements.length === 0,
                     });
@@ -155,6 +163,8 @@ function SpotlightDrawer({
                 publish,
                 spotlight_one_liner: oneLiner,
                 spotlight_summary: summary,
+                sector,
+                batch,
             },
             {
                 onSuccess: () => {
@@ -163,6 +173,8 @@ function SpotlightDrawer({
                         is_published: publish,
                         spotlight_one_liner: oneLiner,
                         spotlight_summary: summary,
+                        sector,
+                        batch,
                     });
                 },
                 onFinish: () => setPublishing(false),
@@ -265,9 +277,28 @@ function SpotlightDrawer({
 
                     {/* Section 1: Investor Copy */}
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Investor-Facing Copy</h4>
-                            <span className="text-[11px] text-zinc-400">Displayed on dealflow cards</span>
+                        {/* Sector & Batch */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                                <label className="block text-xs font-semibold text-zinc-800">Category / Sector</label>
+                                <input
+                                    type="text"
+                                    value={sector}
+                                    onChange={(e) => setSector(e.target.value)}
+                                    placeholder="e.g. B2B SaaS, FinTech, AI..."
+                                    className="w-full rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="block text-xs font-semibold text-zinc-800">Syndicate Cohort / Batch</label>
+                                <input
+                                    type="text"
+                                    value={batch}
+                                    onChange={(e) => setBatch(e.target.value)}
+                                    placeholder="e.g. Cohort 2026-Q1"
+                                    className="w-full rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+                                />
+                            </div>
                         </div>
 
                         {/* One-Liner */}

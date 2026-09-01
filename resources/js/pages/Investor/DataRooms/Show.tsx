@@ -1,3 +1,4 @@
+import { InvestorHeader } from '@/components/investor-header';
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Download, FileText, LockKeyhole } from 'lucide-react';
@@ -20,31 +21,23 @@ type Document = {
 
 export default function DataRoomShow({ company_name, documents }: { company_name: string | null; documents: Document[] }) {
     return (
-        <main className="min-h-screen bg-[#f4f7ff] text-zinc-950">
+        <main className="min-h-screen bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
             <Head title={`${company_name ?? 'Startup'} Data Room`} />
+            <InvestorHeader activeTab="data-rooms" />
 
-            <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
-                <PinpointLogo height={24} />
-                <Link
-                    href={route('investor.dashboard')}
-                    className="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-zinc-950"
-                >
-                    Dashboard
-                </Link>
-            </header>
-
-            <section className="mx-auto max-w-4xl px-6 py-10 sm:py-14">
+            <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8 sm:py-14">
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                     <div className="flex items-center gap-4">
                         <Link
                             href={route('investor.data-rooms.index')}
-                            className="inline-flex size-10 items-center justify-center rounded-full bg-white text-zinc-500 shadow-sm transition hover:text-zinc-900"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:text-zinc-900"
                         >
-                            <ArrowLeft className="size-5" />
+                            <ArrowLeft className="size-3.5" />
+                            Back
                         </Link>
-                        <div>
-                            <p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Secure Data Room</p>
-                            <h1 className="mt-1 text-3xl font-black tracking-tight">{company_name ?? 'PIN Startup'}</h1>
+                        <div className="ml-2">
+                            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">{company_name ?? 'PIN Startup'}</h1>
+                            <p className="mt-1 text-sm text-zinc-500">Secure Data Room</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800">

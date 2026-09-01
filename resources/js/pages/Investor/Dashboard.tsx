@@ -1,4 +1,4 @@
-import { PinpointLogo } from '@/components/pinpoint-logo';
+import { InvestorHeader } from '@/components/investor-header';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -39,36 +39,7 @@ export default function Dashboard({ investor }: { investor: Investor }) {
     return (
         <main className="min-h-screen bg-[#f4f7ff] text-zinc-950">
             <Head title="Investor dashboard" />
-            <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
-                <div className="flex items-center gap-8">
-                    <PinpointLogo height={24} />
-                    <nav className="hidden items-center gap-6 text-sm font-bold text-zinc-600 md:flex">
-                        <Link href={route('investor.spotlight.index')} className="hover:text-zinc-950">
-                            Spotlight
-                        </Link>
-                        {approved && (
-                            <Link href={route('investor.interests.index')} className="hover:text-zinc-950">
-                                My Interests
-                            </Link>
-                        )}
-                        <Link href={route('investor.notifications.index')} className="inline-flex items-center gap-1.5 hover:text-zinc-950">
-                            <Bell className="size-4" />
-                            Alerts
-                            {unreadNotifications > 0 && (
-                                <span className="rounded-full bg-[#3A54A5] px-1.5 py-0.5 text-[10px] text-white">{unreadNotifications}</span>
-                            )}
-                        </Link>
-                        {approved && (
-                            <Link href={route('investor.data-rooms.index')} className="hover:text-zinc-950">
-                                Data Rooms
-                            </Link>
-                        )}
-                    </nav>
-                </div>
-                <Button variant="ghost" className="rounded-xl" onClick={() => router.post(route('investor.logout'))}>
-                    Log out
-                </Button>
-            </header>
+            <InvestorHeader activeTab="dashboard" />
             <section className="mx-auto max-w-5xl px-6 py-12">
                 <div className="grid gap-7 lg:grid-cols-[1.15fr_0.85fr]">
                     <div className="rounded-2xl border border-white/80 bg-white p-7 shadow-[0_20px_55px_rgba(33,56,120,0.10)] sm:p-9">

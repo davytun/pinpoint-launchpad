@@ -67,10 +67,6 @@ class FounderDocumentController extends Controller
 
         $founder = Auth::guard('founder')->user()->load('payment');
 
-        if ($founder->payment?->audit_status === 'complete') {
-            return $this->uploadError('Your audit is complete. No further documents can be uploaded.', $request);
-        }
-
         $currentCount = $founder->documents()->count();
         $incoming     = count($request->file('files'));
 

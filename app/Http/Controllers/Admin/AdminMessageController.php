@@ -24,8 +24,19 @@ class AdminMessageController extends Controller
     {
         $threads = $this->getThreadsData();
         $selectedThreadId = $request->query('thread');
+        $founderId = $request->query('founder_id');
 
         $activeThreadModel = null;
+        if ($founderId) {
+            $targetFounder = \App\Models\Founder::find($founderId);
+            if ($targetFounder) {
+                $thread = $this->messageService->getOrCreateThread($targetFounder);
+                $selectedThreadId = $thread->id;
+                // Refresh threads to include the newly created thread if necessary
+                $threads = $this->getThreadsData();
+            }
+        }
+
         if ($selectedThreadId) {
             $activeThreadModel = MessageThread::with(['founder.diagnosticSession', 'founder.payment'])->find($selectedThreadId);
         }

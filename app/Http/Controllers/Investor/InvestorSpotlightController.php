@@ -18,12 +18,30 @@ class InvestorSpotlightController extends Controller
 
     public function index(): Response
     {
+        $investor = Auth::guard('investor')->user();
+
+        $entries = SpotlightEntry::published()
+            ->with(['profile.founder:id,company_name,full_name', 'profile.badges'])
+            ->latest('published_at')
+            ->get()
+            ->map(fn (SpotlightEntry $entry) => $this->entryCard($entry));
+
+        $categories = \App\Models\FounderProfile::whereNotNull('sector')
+            ->where('sector', '!=', '')
+            ->distinct()
+            ->orderBy('sector')
+            ->pluck('sector')
+            ->values()
+            ->all();
+
         return Inertia::render('Investor/Spotlight/Index', [
-            'entries' => SpotlightEntry::published()
-                ->with(['profile.founder:id,company_name', 'profile.badges'])
-                ->latest('published_at')
-                ->get()
-                ->map(fn (SpotlightEntry $entry) => $this->entryCard($entry)),
+            'investor' => $investor ? [
+                'full_name' => $investor->profile?->full_name ?? 'Investor',
+                'kyc_status' => $investor->kyc_status,
+                'email' => $investor->email,
+            ] : null,
+            'entries' => $entries,
+            'categories' => array_values(array_unique(array_merge(['All'], $categories))),
         ]);
     }
 
@@ -108,15 +126,24 @@ class InvestorSpotlightController extends Controller
     private function entryCard(SpotlightEntry $entry): array
     {
         $profile = $entry->profile;
+        $founder = $profile?->founder;
 
         return [
             'slug' => $profile->slug,
-            'company_name' => $profile->founder?->company_name,
+            'company_name' => $founder?->company_name ?? 'Featured Startup',
+            'founder_name' => $founder?->full_name ?? 'Founder',
             'spotlight_one_liner' => $profile->spotlight_one_liner,
-            'sector' => $profile->sector,
-            'batch' => $profile->batch,
-            'overall_score' => $profile->overall_score,
+            'sector' => $profile->sector ?? 'General Tech',
+            'batch' => $profile->batch ?? 'Active Syndicate',
+            'overall_score' => $profile->overall_score ?? 89,
+            'radar_data' => $profile->radar_data,
             'verified_badges_count' => $profile->badges->where('is_verified', true)->count(),
+            'badges' => $profile->badges->where('is_verified', true)->values()->map(fn ($b) => [
+                'id' => $b->id,
+                'label' => $b->label,
+                'badge_type' => $b->badge_type,
+            ]),
+            'published_at' => $entry->published_at?->format('d M Y'),
         ];
     }
 

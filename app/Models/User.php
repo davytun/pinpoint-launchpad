@@ -80,7 +80,7 @@ class User extends Authenticatable
         return in_array($this->role, ['superadmin', 'analyst']);
     }
 
-    public function canAccessFounder(int $founderId): bool
+    public function canAccessFounder(string $founderId): bool
     {
         if ($this->isSuperAdmin()) {
             return true;

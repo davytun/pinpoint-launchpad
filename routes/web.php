@@ -255,7 +255,7 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::post('/forgot-password', [InvestorAuthController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:3,1');
     Route::get('/reset-password/{token}', [InvestorAuthController::class, 'showResetPassword'])->name('password.reset');
     Route::post('/reset-password', [InvestorAuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:3,1');
-    Route::get('/dashboard', [InvestorAuthController::class, 'dashboard'])->middleware('auth.investor')->name('dashboard');
+    Route::get('/dashboard', fn () => redirect()->route('investor.spotlight.index'))->middleware('auth.investor')->name('dashboard');
     Route::get('/kyc', [InvestorKycController::class, 'create'])->middleware('auth.investor')->name('kyc.create');
     Route::post('/kyc', [InvestorKycController::class, 'store'])->middleware('auth.investor')->name('kyc.store');
     Route::get('/spotlight', [InvestorSpotlightController::class, 'index'])->middleware(['auth.investor', 'kyc.approved'])->name('spotlight.index');

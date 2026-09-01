@@ -1,4 +1,6 @@
+import { InvestorHeader } from '@/components/investor-header';
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import { Icon } from '@iconify/react';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, CheckCircle2, Clock3, ExternalLink, Lock, ShieldAlert, Video, XCircle } from 'lucide-react';
 
@@ -37,60 +39,36 @@ function formatDate(iso?: string | null): string {
 
 export default function Interests({ interests }: { interests: Interest[] }) {
     return (
-        <main className="min-h-screen bg-[#f4f7ff] text-zinc-950">
+        <main className="min-h-screen bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
             <Head title="My Interests & Engagements" />
+            <InvestorHeader activeTab="interests" />
 
-            <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-7">
-                <PinpointLogo height={24} />
-                <div className="flex items-center gap-3">
-                    <Link
-                        href={route('investor.diligence.index')}
-                        className="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-zinc-950"
-                    >
-                        Diligence Requests
-                    </Link>
-                    <Link
-                        href={route('investor.spotlight.index')}
-                        className="rounded-xl px-3 py-2 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-zinc-950"
-                    >
-                        Browse Spotlight
-                    </Link>
-                    <Link
-                        href={route('investor.dashboard')}
-                        className="rounded-xl bg-white px-3.5 py-2 text-sm font-semibold text-zinc-800 shadow-xs hover:bg-zinc-50"
-                    >
-                        Dashboard
-                    </Link>
-                </div>
-            </header>
-
-            <section className="mx-auto max-w-4xl px-6 py-10 sm:py-14">
-                <div className="flex items-center gap-4">
-                    <Link
-                        href={route('investor.dashboard')}
-                        className="inline-flex size-10 items-center justify-center rounded-full bg-white text-zinc-500 shadow-sm transition hover:text-zinc-900"
-                    >
-                        <ArrowLeft className="size-5" />
-                    </Link>
-                    <div>
-                        <p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Dealflow & Engagements</p>
-                        <h1 className="mt-1 text-3xl font-black tracking-tight">Submitted Interests & Calls</h1>
-                    </div>
+            <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8 sm:py-14">
+                <div className="mb-8">
+                    <h1 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
+                        Interests & Engagements
+                    </h1>
+                    <p className="mt-2 text-sm text-zinc-500">
+                        Manage your active startup conversations, diligence requests, and approved data rooms.
+                    </p>
                 </div>
 
-                <div className="mt-10 space-y-5">
+                <div className="mt-10 space-y-6">
                     {interests.length === 0 ? (
-                        <div className="rounded-2xl border border-white/80 bg-white p-10 text-center shadow-[0_16px_36px_rgba(33,56,120,0.06)]">
-                            <p className="text-lg font-bold text-zinc-900">No interests submitted yet.</p>
-                            <p className="mt-2 text-sm text-zinc-600">
-                                Explore the Spotlight to discover verified startups and request introductions or data room access coordinated by
-                                Pinpoint IR.
+                        <div className="rounded-3xl border border-zinc-200 border-dashed bg-white/50 p-16 text-center">
+                            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm text-zinc-400">
+                                <Icon icon="solar:folder-with-files-linear" className="size-7" />
+                            </div>
+                            <h3 className="mt-5 text-lg font-bold text-zinc-950">No interests submitted yet</h3>
+                            <p className="mt-2 text-sm text-zinc-500 max-w-sm mx-auto">
+                                Explore the Spotlight to discover verified startups and request introductions or data room access coordinated by Pinpoint IR.
                             </p>
                             <Link
                                 href={route('investor.spotlight.index')}
-                                className="mt-6 inline-block rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#2D4182]"
+                                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-zinc-950 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-zinc-800 hover:shadow-lg hover:-translate-y-0.5"
                             >
-                                Browse Spotlight
+                                <Icon icon="solar:stars-linear" className="size-4" />
+                                <span>Browse Spotlight</span>
                             </Link>
                         </div>
                     ) : (

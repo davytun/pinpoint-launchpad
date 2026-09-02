@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Payment;
+use App\Models\Founder;
+use App\Models\Investor;
 use App\Observers\PaymentObserver;
 use App\Services\BoldSignService;
 use App\Services\DocumentService;

@@ -5,6 +5,7 @@ import { ReactNode, useEffect, useState } from 'react';
 
 import GlobalLoader from '@/components/GlobalLoader';
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +18,13 @@ interface FounderLayoutProps {
         email?: string;
     };
 }
+
+type FounderNotification = {
+    id: string;
+    data: { type?: string; title?: string; body?: string; destination_url?: string | null };
+    read_at: string | null;
+    created_at: string;
+};
 
 function NavItem({
     href,
@@ -64,11 +72,7 @@ function NavItem({
                 <>
                     <span className="flex-1 truncate tracking-tight">{label}</span>
                     {badge != null && badge > 0 && (
-                        <span
-                            className={cn(
-                                'ml-auto rounded-full bg-blue-600 px-2 py-0.2 text-[11px] font-bold text-white transition-colors',
-                            )}
-                        >
+                        <span className={cn('py-0.2 ml-auto rounded-full bg-blue-600 px-2 text-[11px] font-bold text-white transition-colors')}>
                             {badge > 99 ? '99+' : badge}
                         </span>
                     )}
@@ -84,7 +88,7 @@ function NavItem({
                 <TooltipContent side="right" sideOffset={12} className="flex items-center gap-2 text-xs font-medium">
                     <span>{label}</span>
                     {badge != null && badge > 0 && (
-                        <span className="rounded-full bg-blue-600 px-1.5 py-0.2 text-[10px] font-bold text-white">{badge}</span>
+                        <span className="py-0.2 rounded-full bg-blue-600 px-1.5 text-[10px] font-bold text-white">{badge}</span>
                     )}
                 </TooltipContent>
             </Tooltip>
@@ -94,17 +98,125 @@ function NavItem({
     return linkContent;
 }
 
-function NavSection({ label, collapsed }: { label: string; collapsed?: boolean }) {
-    if (collapsed) {
-        return <p className="mt-4 mb-1 text-[9px] font-extrabold tracking-wider text-zinc-400 uppercase text-center">{label}</p>;
+function FounderNotifications({
+    notifications,
+    unreadCount,
+    collapsed,
+    side = 'right',
+    align = 'start',
+}: {
+    notifications: FounderNotification[];
+    unreadCount: number;
+    collapsed: boolean;
+    side?: 'bottom' | 'left' | 'right' | 'top';
+    align?: 'center' | 'end' | 'start';
+}) {
+    function markAsRead(notification: FounderNotification) {
+        if (!notification.read_at) {
+            router.patch(route('founder.notifications.read', notification.id), {}, { preserveScroll: true });
+        }
+        if (notification.data.destination_url) {
+            router.get(notification.data.destination_url);
+        }
     }
-    return <p className="mt-6 mb-2 px-4 text-[10.5px] font-bold tracking-[0.14em] text-zinc-400 uppercase first:mt-2">{label}</p>;
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button
+                    type="button"
+                    className={cn(
+                        'group relative flex w-full items-center text-zinc-600 transition-all duration-150 hover:bg-[#EAEAEA]/70 hover:text-zinc-950',
+                        collapsed ? 'mx-auto h-10 w-10 justify-center rounded-xl' : 'gap-3.5 rounded-xl px-4 py-2.5 text-[14px] font-medium',
+                    )}
+                >
+                    <span className="relative flex shrink-0 items-center justify-center">
+                        <Icon icon="solar:bell-bing-linear" className="size-5 text-zinc-500 transition-colors group-hover:text-zinc-900" />
+                        {unreadCount > 0 && <span className="absolute -top-1 -right-1 flex size-2 rounded-full bg-blue-600 ring-2 ring-[#F4F4F6]" />}
+                    </span>
+                    {!collapsed && (
+                        <>
+                            <span className="flex-1 text-left tracking-tight">Alerts</span>
+                            {unreadCount > 0 && (
+                                <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[11px] font-bold text-white">
+                                    {unreadCount > 99 ? '99+' : unreadCount}
+                                </span>
+                            )}
+                        </>
+                    )}
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align={align} side={side} sideOffset={12} className="w-80 overflow-hidden rounded-2xl border-zinc-200 p-0 shadow-xl">
+                <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50/50 px-4 py-3">
+                    <span className="text-sm font-semibold text-zinc-900">Notifications</span>
+                    {unreadCount > 0 && (
+                        <button
+                            type="button"
+                            onClick={() => router.patch(route('founder.notifications.read-all'), {}, { preserveScroll: true })}
+                            className="text-[11px] font-semibold text-[#3A54A5] hover:underline"
+                        >
+                            Mark all as read
+                        </button>
+                    )}
+                </div>
+                {notifications.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <Icon icon="solar:bell-off-linear" className="mb-2 size-8 text-zinc-200" />
+                        <p className="text-sm font-medium text-zinc-900">No new alerts</p>
+                        <p className="text-xs text-zinc-500">You are all caught up.</p>
+                    </div>
+                ) : (
+                    <div className="no-scrollbar flex max-h-[400px] flex-col overflow-y-auto">
+                        {notifications.map((notification) => (
+                            <button
+                                key={notification.id}
+                                type="button"
+                                onClick={() => markAsRead(notification)}
+                                className={cn(
+                                    'flex items-start gap-3 border-b border-zinc-50 p-4 text-left transition-colors last:border-0 hover:bg-zinc-50',
+                                    !notification.read_at ? 'bg-blue-50/30' : 'bg-white',
+                                )}
+                            >
+                                <span className="mt-1 flex w-2 shrink-0 justify-center">
+                                    {!notification.read_at && <span className="size-1.5 rounded-full bg-blue-600" />}
+                                </span>
+                                <span className="flex-1">
+                                    <span
+                                        className={cn(
+                                            'block text-[13px] font-semibold tracking-tight',
+                                            !notification.read_at ? 'text-zinc-900' : 'text-zinc-700',
+                                        )}
+                                    >
+                                        {notification.data.title ?? notification.data.type?.replaceAll('_', ' ') ?? 'Platform update'}
+                                    </span>
+                                    {notification.data.body && (
+                                        <span className="mt-0.5 line-clamp-2 block text-[12px] leading-relaxed text-zinc-500">
+                                            {notification.data.body}
+                                        </span>
+                                    )}
+                                    <span className="mt-1.5 block text-[10px] font-medium text-zinc-400">
+                                        {new Date(notification.created_at).toLocaleString(undefined, {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            hour: 'numeric',
+                                            minute: '2-digit',
+                                        })}
+                                    </span>
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
 }
 
 function SidebarContent({
     founder,
     unreadMessages,
     unreadNotifications,
+    recentNotifications,
     isActive,
     collapsed,
     toggleCollapse,
@@ -114,6 +226,7 @@ function SidebarContent({
     founder: FounderLayoutProps['founder'];
     unreadMessages: number;
     unreadNotifications: number;
+    recentNotifications: FounderNotification[];
     isActive: (path: string) => boolean;
     collapsed: boolean;
     toggleCollapse: () => void;
@@ -204,16 +317,7 @@ function SidebarContent({
                             badge={unreadMessages}
                         />
 
-                        <NavItem
-                            href={route('founder.notifications.index')}
-                            icon="solar:bell-bing-linear"
-                            label="Alerts"
-                            active={isActive('/founder/notifications')}
-                            collapsed={collapsed}
-                            onClick={onNav}
-                            badge={unreadNotifications}
-                        />
-
+                        <FounderNotifications notifications={recentNotifications} unreadCount={unreadNotifications} collapsed={collapsed} />
 
                         <NavItem
                             href={route('founder.spotlight.edit')}
@@ -276,9 +380,10 @@ function SidebarContent({
 
 export default function FounderLayout({ children, founder }: FounderLayoutProps) {
     const { url } = usePage();
-    const unreadNotifications =
-        usePage<{ platform_unread_notifications?: { founder?: number } }>().props.platform_unread_notifications?.founder ?? 0;
+    const unreadNotifications = usePage<{ platform_unread_notifications?: { founder?: number } }>().props.platform_unread_notifications?.founder ?? 0;
     const unreadMessages = usePage<{ unread_messages_count?: number }>().props.unread_messages_count ?? 0;
+    const recentNotifications =
+        usePage<{ platform_recent_notifications?: { founder?: FounderNotification[] } }>().props.platform_recent_notifications?.founder ?? [];
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed] = useState<boolean>(() => {
@@ -332,6 +437,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
         founder,
         unreadMessages,
         unreadNotifications,
+        recentNotifications,
         isActive,
         collapsed,
         toggleCollapse,
@@ -377,9 +483,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
                     <Menu className="size-5" />
                 </button>
                 <PinpointLogo height={20} />
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-zinc-950 text-xs font-bold text-white">
-                    {founder?.full_name?.[0] ?? 'F'}
-                </div>
+                <FounderNotifications notifications={recentNotifications} unreadCount={unreadNotifications} collapsed side="bottom" align="end" />
             </header>
 
             {/* ── Main Canvas Content Region (Strictly h-full, zero outer scroll) ─── */}

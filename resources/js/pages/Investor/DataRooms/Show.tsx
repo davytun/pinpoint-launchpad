@@ -1,91 +1,131 @@
 import { InvestorHeader } from '@/components/investor-header';
-import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Download, FileText, LockKeyhole } from 'lucide-react';
-
-function formatBytes(bytes: number) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
+import { ArrowLeft, Download, FileSpreadsheet, FileText, FolderLock, LockKeyhole, Presentation } from 'lucide-react';
 
 type Document = {
     id: number;
+    category: string;
     original_filename: string;
     size_bytes: number;
+    mime_type: string | null;
+    extension: string | null;
     created_at: string;
     download_url: string;
 };
 
+function formatBytes(bytes: number) {
+    if (!bytes) return '—';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const unit = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    return `${(bytes / 1024 ** unit).toFixed(unit === 0 ? 0 : 1)} ${units[unit]}`;
+}
+
+function fileIcon(extension: string | null) {
+    if (['xls', 'xlsx', 'csv'].includes(extension ?? '')) return FileSpreadsheet;
+    if (['ppt', 'pptx'].includes(extension ?? '')) return Presentation;
+    return FileText;
+}
+
+function formatDate(value: string) {
+    return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value));
+}
+
 export default function DataRoomShow({ company_name, documents }: { company_name: string | null; documents: Document[] }) {
+    const companyName = company_name ?? 'Pinpoint venture';
+
     return (
-        <main className="min-h-screen bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
-            <Head title={`${company_name ?? 'Startup'} Data Room`} />
+        <main className="min-h-screen bg-stone-50 text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
+            <Head title={`${companyName} Data Room | Pinpoint`} />
             <InvestorHeader activeTab="data-rooms" />
 
-            <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8 sm:py-14">
-                <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-                    <div className="flex items-center gap-4">
-                        <Link
-                            href={route('investor.data-rooms.index')}
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:text-zinc-900"
-                        >
-                            <ArrowLeft className="size-3.5" />
-                            Back
-                        </Link>
-                        <div className="ml-2">
-                            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">{company_name ?? 'PIN Startup'}</h1>
-                            <p className="mt-1 text-sm text-zinc-500">Secure Data Room</p>
-                        </div>
+            <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+                <Link
+                    href={route('investor.data-rooms.index')}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:text-zinc-950"
+                >
+                    <ArrowLeft className="size-4" />
+                    All data rooms
+                </Link>
+
+                <div className="mt-8 border-b border-zinc-200 pb-8 sm:flex sm:items-end sm:justify-between sm:pb-10">
+                    <div>
+                        <p className="text-[10px] font-bold tracking-[0.16em] text-zinc-400 uppercase">Secure data room</p>
+                        <h1 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-4xl">{companyName}</h1>
+                        <p className="mt-3 text-sm text-zinc-600">
+                            {documents.length} reviewed {documents.length === 1 ? 'document' : 'documents'} available for download.
+                        </p>
                     </div>
-                    <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold text-emerald-800">
+                    <div className="mt-5 inline-flex items-center gap-2 border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800 sm:mt-0">
                         <LockKeyhole className="size-4" />
-                        Access Granted
+                        Access active
                     </div>
                 </div>
 
-                <div className="mt-10">
-                    <h2 className="text-xl font-bold tracking-tight">Available Documents</h2>
-                    <div className="mt-5 space-y-3">
-                        {documents.length === 0 ? (
-                            <div className="rounded-2xl border border-white/80 bg-white p-10 text-center shadow-[0_16px_36px_rgba(33,56,120,0.06)]">
-                                <p className="font-bold text-zinc-900">No documents available.</p>
-                                <p className="mt-2 text-sm text-zinc-600">The founder hasn't uploaded any documents to this data room yet.</p>
-                            </div>
-                        ) : (
-                            documents.map((doc) => (
-                                <div
-                                    key={doc.id}
-                                    className="flex items-center justify-between rounded-2xl border border-white/80 bg-white p-5 shadow-[0_16px_36px_rgba(33,56,120,0.06)] transition hover:border-[#3A54A5]/30"
-                                >
-                                    <div className="flex items-center gap-4 overflow-hidden">
-                                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[#3A54A5]/10 text-[#3A54A5]">
-                                            <FileText className="size-6" />
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="truncate font-bold text-zinc-900" title={doc.original_filename}>
-                                                {doc.original_filename}
-                                            </p>
-                                            <p className="mt-1 text-xs font-semibold text-zinc-500">
-                                                {formatBytes(doc.size_bytes)} &bull; Uploaded {new Date(doc.created_at).toLocaleDateString()}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <a
-                                        href={doc.download_url}
-                                        target="_blank"
-                                        className="ml-4 flex shrink-0 items-center gap-2 rounded-xl bg-zinc-100 px-4 py-2 text-sm font-bold text-zinc-700 transition hover:bg-zinc-200 hover:text-zinc-900"
-                                    >
-                                        <Download className="size-4" />
-                                        <span className="hidden sm:inline">Download</span>
-                                    </a>
-                                </div>
-                            ))
-                        )}
+                <div className="py-8 sm:py-10">
+                    <div className="flex items-end justify-between gap-4">
+                        <div>
+                            <p className="text-[10px] font-bold tracking-[0.16em] text-zinc-400 uppercase">Materials</p>
+                            <h2 className="mt-2 text-xl font-semibold tracking-tight text-zinc-950">Available documents</h2>
+                        </div>
+                        <span className="hidden font-mono text-xs text-zinc-500 sm:inline">{documents.length} files</span>
                     </div>
+                    {documents.length === 0 ? (
+                        <div className="mx-auto max-w-xl py-20 text-center">
+                            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-500">
+                                <FolderLock className="size-5" />
+                            </div>
+                            <h3 className="mt-5 text-base font-semibold text-zinc-950">No documents available yet</h3>
+                            <p className="mt-2 text-sm leading-6 text-zinc-500">The founder has not added reviewed materials to this room.</p>
+                        </div>
+                    ) : (
+                        <div className="mt-6 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
+                            <div className="hidden grid-cols-[minmax(0,1fr)_9rem_8rem_7rem] gap-4 border-b border-zinc-200 bg-stone-100 px-5 py-3 text-[10px] font-bold tracking-[0.14em] text-zinc-400 uppercase sm:grid">
+                                <span>Document</span>
+                                <span>Category</span>
+                                <span>Uploaded</span>
+                                <span className="text-right">Access</span>
+                            </div>
+                            {documents.map((document) => {
+                                const Icon = fileIcon(document.extension);
+                                return (
+                                    <div
+                                        key={document.id}
+                                        className="grid gap-3 border-b border-zinc-100 px-4 py-4 last:border-0 sm:grid-cols-[minmax(0,1fr)_9rem_8rem_7rem] sm:items-center sm:gap-4 sm:px-5"
+                                    >
+                                        <div className="flex min-w-0 items-center gap-3">
+                                            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-600">
+                                                <Icon className="size-4" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="truncate text-sm font-semibold text-zinc-900" title={document.original_filename}>
+                                                    {document.original_filename}
+                                                </p>
+                                                <p className="mt-0.5 text-xs text-zinc-500 sm:hidden">
+                                                    {document.category} · {formatBytes(document.size_bytes)} · {formatDate(document.created_at)}
+                                                </p>
+                                                <p className="mt-0.5 hidden text-xs text-zinc-500 sm:block">
+                                                    {formatBytes(document.size_bytes)} · {document.extension?.toUpperCase() ?? 'FILE'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <span className="hidden text-xs text-zinc-600 sm:block">{document.category}</span>
+                                        <span className="hidden text-xs text-zinc-500 sm:block">{formatDate(document.created_at)}</span>
+                                        <a
+                                            href={document.download_url}
+                                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-300 px-3 py-2 text-xs font-semibold text-zinc-800 transition-colors hover:border-zinc-950 hover:bg-zinc-950 hover:text-white"
+                                        >
+                                            <Download className="size-4" />
+                                            Download
+                                        </a>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
+                <p className="border-t border-zinc-200 pt-5 text-xs leading-5 text-zinc-500">
+                    Downloads are recorded for founder and Pinpoint oversight. Links expire automatically for your protection.
+                </p>
             </section>
         </main>
     );

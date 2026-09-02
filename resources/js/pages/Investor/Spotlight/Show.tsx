@@ -1,11 +1,11 @@
 import { InvestorHeader } from '@/components/investor-header';
-import { PinpointLogo } from '@/components/pinpoint-logo';
 import { cn } from '@/lib/utils';
 import { Icon } from '@iconify/react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
 
 type RadarData = Record<string, number> | null;
+type InterestType = 'more_details' | 'founder_call' | 'data_room_access';
 
 type Entry = {
     slug: string;
@@ -40,19 +40,21 @@ const PILLARS = [
     ['network', 'Network & Ecosystem'],
 ] as const;
 
-export default function SpotlightShow({ entry }: { entry: Entry }) {
-    const radarItems = PILLARS.map(([key, subject]) => ({
-        subject,
-        value: entry.radar_data?.[key] ?? 75,
-    }));
+const interestOptions: { id: InterestType; label: string; description: string }[] = [
+    { id: 'data_room_access', label: 'Request data room', description: 'Cap table, legal documents, financials, and audit materials.' },
+    { id: 'founder_call', label: 'Arrange founder call', description: 'A mediated 30-minute briefing with the founder.' },
+    { id: 'more_details', label: 'Ask a question', description: 'Request analyst context or a specific follow-up.' },
+];
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+    return <p className="text-[10px] font-bold tracking-[0.16em] text-zinc-400 uppercase">{children}</p>;
+}
+
+export default function SpotlightShow({ entry }: { entry: Entry }) {
+    const radarItems = PILLARS.map(([key, subject]) => ({ subject, value: entry.radar_data?.[key] ?? 75 }));
     const companyName = entry.company_name ?? 'Featured Venture';
     const score = entry.overall_score ?? 89;
-
-    const interestForm = useForm<{ type: 'more_details' | 'founder_call' | 'data_room_access'; message: string }>({
-        type: 'more_details',
-        message: '',
-    });
+    const interestForm = useForm<{ type: InterestType; message: string }>({ type: 'data_room_access', message: '' });
 
     function submitInterest(event: React.FormEvent) {
         event.preventDefault();
@@ -60,298 +62,265 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
     }
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
-            <Head title={`${companyName} — Diligence Dossier`} />
+        <div className="min-h-screen bg-stone-50 text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
+            <Head title={`${companyName} | Pinpoint`} />
             <InvestorHeader activeTab="spotlight" />
 
-            {/* ── Sub Header ── */}
-            <div className="sticky top-16 z-30 border-b border-zinc-200/50 bg-white/80 backdrop-blur-xl">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-6">
-                        <Link
-                            href={route('investor.spotlight.index')}
-                            className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-600 shadow-sm transition-all hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900"
-                        >
-                            <Icon icon="solar:arrow-left-linear" className="size-3.5" />
-                            <span>Back to Syndicate Spotlight</span>
-                        </Link>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-zinc-100 px-3 py-1 font-mono text-[11px] font-semibold text-zinc-500 uppercase tracking-widest">
-                            {entry.sector ?? 'General Tech'} · {entry.batch ?? 'Current Cohort'}
-                        </span>
-                    </div>
+            <div className="sticky top-16 z-30 border-b border-zinc-200 bg-stone-50/95 backdrop-blur">
+                <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+                    <Link
+                        href={route('investor.spotlight.index')}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-600 transition-colors hover:text-zinc-950"
+                    >
+                        <Icon icon="solar:arrow-left-linear" className="size-4" />
+                        <span className="hidden sm:inline">Back to syndicate spotlight</span>
+                        <span className="sm:hidden">Back</span>
+                    </Link>
+                    <span className="font-mono text-[10px] font-semibold tracking-[0.14em] text-zinc-500 uppercase">
+                        {entry.sector ?? 'General tech'} <span className="px-1.5 text-zinc-300">/</span> {entry.batch ?? 'Current cohort'}
+                    </span>
                 </div>
             </div>
 
-            {/* ── Main Dossier Canvas ── */}
-            <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-                {/* ── Section 1: Hero Dossier Overview Card ── */}
-                <div className="rounded-[2rem] border border-zinc-200/60 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:p-12">
-                    <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
+            <main className="mx-auto max-w-7xl px-4 py-8 pb-28 sm:px-6 sm:py-12 lg:px-8 lg:pb-12">
+                <section className="border-b border-zinc-200 pb-8 sm:pb-10">
+                    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
                         <div className="max-w-3xl">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-zinc-600">
-                                    {entry.sector ?? 'Technology'}
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                                    <Icon icon="solar:verified-check-bold" className="size-4" /> Analyst verified
                                 </span>
-                                {entry.batch && (
-                                    <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-zinc-500">
-                                        Cohort {entry.batch}
-                                    </span>
-                                )}
-                                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-emerald-700">
-                                    <Icon icon="solar:shield-check-bold" className="size-3.5" />
-                                    <span>Paragon Verified</span>
+                                <span className="h-3.5 w-px bg-zinc-200" />
+                                <span className="text-[11px] font-medium text-zinc-500">
+                                    {entry.badges.length || entry.verified_badges_count} diligence checks complete
                                 </span>
                             </div>
-
-                            <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl">
-                                {companyName}
-                            </h1>
-                            <p className="mt-5 text-lg leading-relaxed text-zinc-500 sm:text-xl">
-                                {entry.spotlight_one_liner}
-                            </p>
+                            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.045em] text-zinc-950 sm:text-5xl">{companyName}</h1>
+                            <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600 sm:text-lg">{entry.spotlight_one_liner}</p>
                         </div>
-
-                        {/* Large Score Metric Card */}
-                        <div className="flex shrink-0 flex-col items-center justify-center lg:w-56">
-                            <span className="block text-[11px] font-bold uppercase tracking-widest text-zinc-400">
-                                Overall Diagnostic
-                            </span>
-                            <div className="mt-2 flex items-baseline justify-center gap-1">
-                                <span className="text-6xl font-black tracking-tighter text-zinc-900">{score}</span>
-                                <span className="text-xl font-bold text-zinc-300">/100</span>
+                        <div className="border-t border-zinc-200 pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-7">
+                            <SectionLabel>Diagnostic readiness</SectionLabel>
+                            <div className="mt-2 flex items-baseline gap-2">
+                                <span className="text-3xl font-semibold tracking-tight">{score}</span>
+                                <span className="text-sm text-zinc-400">/ 100</span>
                             </div>
-                            <span className="mt-2 inline-block rounded-full bg-zinc-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
-                                High Velocity Tier
-                            </span>
+                            <p className="mt-1 text-xs leading-5 text-zinc-500">Verified across seven operating and execution dimensions.</p>
                         </div>
                     </div>
+                </section>
 
-                    {/* Verified Diligence Signals */}
-                    <div className="mt-12 border-t border-zinc-100 pt-8">
-                        <span className="block text-[11px] font-bold uppercase tracking-widest text-zinc-400">
-                            Verified Diligence Checklist ({entry.badges.length} Signals)
-                        </span>
-                        {entry.badges.length > 0 ? (
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                {entry.badges.map((badge) => (
-                                    <div
-                                        key={badge.id}
-                                        className="flex items-center gap-1.5 rounded-full border border-zinc-200/60 bg-zinc-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-zinc-600 transition-colors hover:bg-zinc-100"
-                                    >
-                                        <Icon icon="solar:check-circle-bold" className="size-4 text-emerald-500" />
-                                        <span>{badge.label}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="mt-3 text-sm text-zinc-500">All standard compliance and verification checks confirmed.</p>
-                        )}
-                    </div>
-                </div>
-
-                {/* ── Section 2: Executive Summary & Radar Matrix ── */}
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-                    {/* Left: Summary (7 cols) */}
-                    <div className="rounded-[2rem] border border-zinc-200/60 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:col-span-7 lg:p-10">
-                        <div className="flex items-center gap-3 border-b border-zinc-100 pb-5">
-                            <Icon icon="solar:document-text-bold" className="size-5 text-zinc-300" />
-                            <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-900">
-                                Executive Syndicate Overview
-                            </h2>
-                        </div>
-                        <div className="mt-6 text-[15px] leading-loose text-zinc-600 whitespace-pre-line">
-                            {entry.summary || 'Detailed executive summary has been verified and provided for institutional review.'}
+                <section className="grid gap-x-14 gap-y-10 py-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,.75fr)] lg:py-14">
+                    <div>
+                        <SectionLabel>Company brief</SectionLabel>
+                        <h2 className="mt-3 text-xl font-semibold tracking-tight text-zinc-950">The investment case, in context</h2>
+                        <div className="mt-5 max-w-2xl text-[15px] leading-7 whitespace-pre-line text-zinc-600">
+                            {entry.summary || 'A detailed company brief has been reviewed and is available to qualified investors.'}
                         </div>
                     </div>
-
-                    {/* Right: Radar Chart (5 cols) */}
-                    <div className="rounded-[2rem] border border-zinc-200/60 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:col-span-5 lg:p-10">
-                        <div className="flex items-center gap-3 border-b border-zinc-100 pb-5">
-                            <Icon icon="solar:chart-square-bold" className="size-5 text-zinc-300" />
-                            <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-900">
-                                PARAGON 7-Pillar Matrix
-                            </h2>
+                    <div className="border-t border-zinc-200 pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10">
+                        <div className="flex items-center justify-between">
+                            <SectionLabel>Paragon assessment</SectionLabel>
+                            <span className="font-mono text-xs font-semibold text-zinc-600">{score}%</span>
                         </div>
-
-                        <div className="mt-6 h-64 w-full">
+                        <div className="mt-3 h-56 w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <RadarChart data={radarItems} outerRadius="70%">
-                                    <PolarGrid stroke="#f4f4f5" strokeDasharray="3 3" />
-                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#71717a', fontSize: 10, fontWeight: 600 }} />
-                                    <Radar dataKey="value" stroke="#18181b" fill="#18181b" fillOpacity={0.05} strokeWidth={2} />
+                                <RadarChart data={radarItems} outerRadius="68%">
+                                    <PolarGrid stroke="#e4e4e7" strokeDasharray="2 3" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#71717a', fontSize: 9, fontWeight: 500 }} />
+                                    <Radar dataKey="value" stroke="#18181b" fill="#18181b" fillOpacity={0.04} strokeWidth={1.5} />
                                 </RadarChart>
                             </ResponsiveContainer>
                         </div>
-
-                        <div className="mt-6 grid grid-cols-2 gap-2 text-[11px]">
-                            {radarItems.slice(0, 4).map((p) => (
-                                <div key={p.subject} className="flex items-center justify-between rounded-xl bg-zinc-50 px-3 py-2">
-                                    <span className="font-semibold text-zinc-500">{p.subject}</span>
-                                    <span className="font-mono font-bold text-zinc-900">{p.value}%</span>
+                        <dl className="mt-4 grid grid-cols-2 gap-x-5 gap-y-2 border-t border-zinc-200 pt-4">
+                            {radarItems.slice(0, 4).map((pillar) => (
+                                <div key={pillar.subject} className="flex items-baseline justify-between gap-2 text-[11px]">
+                                    <dt className="text-zinc-500">{pillar.subject}</dt>
+                                    <dd className="font-mono font-semibold text-zinc-800">{pillar.value}</dd>
                                 </div>
                             ))}
-                        </div>
+                        </dl>
                     </div>
-                </div>
+                </section>
 
-                {/* ── Section 3: Pitch Deck & Materials ── */}
-                <div className="rounded-[2rem] border border-zinc-200/60 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:p-10">
-                    <div className="flex items-center justify-between border-b border-zinc-100 pb-5">
-                        <div className="flex items-center gap-3">
-                            <Icon icon="solar:presentation-graph-bold" className="size-5 text-zinc-300" />
-                            <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-900">
-                                Verified Investor Pitch Deck
-                            </h2>
+                <section className="border-y border-zinc-200 py-8 sm:py-10">
+                    <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+                        <div>
+                            <SectionLabel>Verified diligence</SectionLabel>
+                            <h2 className="mt-3 text-xl font-semibold tracking-tight text-zinc-950">Review status</h2>
+                        </div>
+                        <p className="max-w-sm text-sm leading-6 text-zinc-500">
+                            Pinpoint has reviewed the following materials and signals before listing this opportunity.
+                        </p>
+                    </div>
+                    {entry.badges.length > 0 ? (
+                        <ul className="mt-6 grid gap-x-8 border-t border-zinc-200 pt-5 sm:grid-cols-2 lg:grid-cols-3">
+                            {entry.badges.map((badge) => (
+                                <li key={badge.id} className="flex items-center gap-2.5 py-2 text-xs font-medium text-zinc-700">
+                                    <Icon icon="solar:check-circle-bold" className="size-4 shrink-0 text-emerald-600" />
+                                    {badge.label}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="mt-5 text-sm text-zinc-600">All standard compliance and verification checks are confirmed.</p>
+                    )}
+                </section>
+
+                <section className="py-10 sm:py-14">
+                    <div className="flex items-end justify-between gap-5">
+                        <div>
+                            <SectionLabel>Investor materials</SectionLabel>
+                            <h2 className="mt-3 text-xl font-semibold tracking-tight text-zinc-950">Pitch deck</h2>
                         </div>
                         {entry.pitch_deck && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-700">
-                                Verified by Lead Analyst
+                            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                                <Icon icon="solar:verified-check-bold" className="size-4" /> Verified file
                             </span>
                         )}
                     </div>
-
-                    <div className="mt-8">
-                        {entry.pitch_deck ? (
-                            <div className="space-y-6">
-                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-[1.5rem] border border-zinc-100 bg-zinc-50 p-5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-zinc-900 shadow-sm border border-zinc-100">
-                                            <Icon icon="solar:document-text-bold" className="size-6" />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-sm font-bold text-zinc-900">{entry.pitch_deck.original_filename}</h4>
-                                            <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-widest text-zinc-400">Institutional Pitch Deck · PDF</p>
-                                        </div>
+                    {entry.pitch_deck ? (
+                        <div className="mt-6 overflow-hidden border border-zinc-200 bg-white">
+                            <div className="flex flex-col gap-4 border-b border-zinc-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                                <div className="flex items-center gap-3">
+                                    <Icon icon="solar:document-text-linear" className="size-5 text-zinc-500" />
+                                    <div>
+                                        <p className="text-sm font-semibold text-zinc-900">{entry.pitch_deck.original_filename}</p>
+                                        <p className="mt-0.5 text-xs text-zinc-500">Institutional pitch deck · PDF</p>
                                     </div>
-
-                                    {entry.can_view_pitch_deck && entry.pitch_deck.download_url && (
-                                        <a
-                                            href={entry.pitch_deck.download_url}
-                                            className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-5 py-2.5 text-xs font-bold text-white transition-all hover:bg-zinc-800 active:scale-95"
-                                        >
-                                            <Icon icon="solar:download-minimalistic-bold" className="size-4" />
-                                            <span>Download PDF</span>
-                                        </a>
-                                    )}
                                 </div>
-
-                                {entry.pitch_deck.can_preview && entry.pitch_deck.preview_url && (
-                                    <div className="overflow-hidden rounded-[1.5rem] border border-zinc-200/80 bg-zinc-100 shadow-sm">
-                                        <iframe
-                                            title={`${companyName} Pitch Deck`}
-                                            src={entry.pitch_deck.preview_url}
-                                            className="h-[40rem] w-full bg-white"
-                                        />
-                                    </div>
+                                {entry.can_view_pitch_deck && entry.pitch_deck.download_url && (
+                                    <a
+                                        href={entry.pitch_deck.download_url}
+                                        className="inline-flex items-center justify-center gap-2 border border-zinc-300 px-3.5 py-2 text-xs font-semibold text-zinc-800 transition-colors hover:border-zinc-950 hover:bg-zinc-950 hover:text-white"
+                                    >
+                                        <Icon icon="solar:download-minimalistic-linear" className="size-4" />
+                                        Download
+                                    </a>
                                 )}
                             </div>
-                        ) : (
-                            <div className="rounded-[1.5rem] border border-zinc-100 bg-zinc-50 p-8 text-center text-sm text-zinc-500">
-                                Pitch deck is currently being processed by the Pinpoint analyst desk.
-                            </div>
-                        )}
-                    </div>
-                </div>
+                            {entry.pitch_deck.can_preview && entry.pitch_deck.preview_url ? (
+                                <iframe
+                                    title={`${companyName} pitch deck`}
+                                    src={entry.pitch_deck.preview_url}
+                                    className="h-[32rem] w-full bg-zinc-100 sm:h-[38rem]"
+                                />
+                            ) : (
+                                <div className="flex min-h-52 items-center justify-center bg-stone-100 px-6 text-center text-sm text-zinc-500">
+                                    Preview unavailable. Download the verified file to review it.
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="mt-6 border border-dashed border-zinc-300 px-6 py-10 text-center text-sm text-zinc-500">
+                            The pitch deck is being prepared by the analyst desk.
+                        </div>
+                    )}
+                </section>
 
-                {/* ── Section 4: Express Syndicate Interest ── */}
-                <div className="rounded-[2rem] border border-zinc-200/60 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:p-10">
-                    <div className="flex items-center gap-3 border-b border-zinc-100 pb-5">
-                        <Icon icon="solar:hand-stars-bold" className="size-5 text-zinc-300" />
+                <section id="request-data-room" className="border-t border-zinc-200 py-10 sm:py-14">
+                    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,.75fr)] lg:gap-16">
                         <div>
-                            <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-900">
-                                Express Syndicate Interest
-                            </h2>
-                            <p className="mt-1 text-[13px] text-zinc-500">
-                                Engage directly through Pinpoint's mediated syndicate protocol.
+                            <SectionLabel>Next step</SectionLabel>
+                            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-zinc-950">Request data-room access</h2>
+                            <p className="mt-3 max-w-lg text-sm leading-6 text-zinc-600">
+                                Submit a short request for the materials that support a deeper review. Pinpoint will keep the process mediated and
+                                notify you of the decision.
                             </p>
                         </div>
-                    </div>
-
-                    {entry.can_submit_interest ? (
-                        <form onSubmit={submitInterest} className="mt-8 max-w-4xl space-y-8">
-                            <div>
-                                <label className="mb-4 block text-[11px] font-bold uppercase tracking-widest text-zinc-400">
-                                    Select Engagement Objective
+                        {entry.can_submit_interest ? (
+                            <form onSubmit={submitInterest} className="border border-zinc-200 bg-white p-5 sm:p-6">
+                                <fieldset>
+                                    <legend className="text-xs font-semibold text-zinc-900">How would you like to engage?</legend>
+                                    <div className="mt-3 divide-y divide-zinc-100 border-y border-zinc-100">
+                                        {interestOptions.map((option) => (
+                                            <button
+                                                key={option.id}
+                                                type="button"
+                                                onClick={() => interestForm.setData('type', option.id)}
+                                                className={cn(
+                                                    'flex w-full items-start gap-3 py-3 text-left',
+                                                    interestForm.data.type === option.id ? 'text-zinc-950' : 'text-zinc-500',
+                                                )}
+                                            >
+                                                <span
+                                                    className={cn(
+                                                        'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border',
+                                                        interestForm.data.type === option.id
+                                                            ? 'border-zinc-950 bg-zinc-950 text-white'
+                                                            : 'border-zinc-300',
+                                                    )}
+                                                >
+                                                    <span
+                                                        className={cn(
+                                                            'size-1.5 rounded-full bg-white',
+                                                            interestForm.data.type === option.id ? 'opacity-100' : 'opacity-0',
+                                                        )}
+                                                    />
+                                                </span>
+                                                <span>
+                                                    <span className="block text-xs font-semibold">{option.label}</span>
+                                                    <span className="mt-1 block text-xs leading-5 text-zinc-500">{option.description}</span>
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </fieldset>
+                                <label className="mt-5 block text-xs font-semibold text-zinc-900">
+                                    Note <span className="font-normal text-zinc-400">(optional)</span>
+                                    <textarea
+                                        value={interestForm.data.message}
+                                        onChange={(event) => interestForm.setData('message', event.target.value)}
+                                        maxLength={500}
+                                        rows={4}
+                                        placeholder="Questions, intended ticket size, or review requirements"
+                                        className="mt-2 w-full resize-none border border-zinc-200 bg-stone-50 p-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-500 focus:bg-white focus:ring-2 focus:ring-zinc-200 focus:outline-none"
+                                    />
                                 </label>
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                    {[
-                                        { id: 'more_details', label: 'Share More Details', desc: 'Request full financial model and analyst commentary' },
-                                        { id: 'founder_call', label: 'Arrange Founder Call', desc: 'Schedule a 30-min mediated syndicate briefing' },
-                                        { id: 'data_room_access', label: 'Request Data Room', desc: 'Unlock cap tables, legal contracts, and audits' },
-                                    ].map((opt) => (
-                                        <div
-                                            key={opt.id}
-                                            onClick={() => interestForm.setData('type', opt.id as any)}
-                                            className={cn(
-                                                'cursor-pointer rounded-[1.5rem] border p-5 transition-all duration-200',
-                                                interestForm.data.type === opt.id
-                                                    ? 'border-zinc-900 bg-zinc-900 text-white shadow-lg'
-                                                    : 'border-zinc-200/80 bg-zinc-50 text-zinc-500 hover:border-zinc-300 hover:bg-white hover:shadow-sm'
-                                            )}
-                                        >
-                                            <span className={cn("block text-sm font-bold", interestForm.data.type === opt.id ? "text-white" : "text-zinc-900")}>{opt.label}</span>
-                                            <span className={cn('mt-2 block text-[13px] leading-relaxed', interestForm.data.type === opt.id ? 'text-zinc-400' : 'text-zinc-500')}>
-                                                {opt.desc}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="mb-4 block text-[11px] font-bold uppercase tracking-widest text-zinc-400">
-                                    Direct Syndicate Note <span className="font-normal">(Optional)</span>
-                                </label>
-                                <textarea
-                                    value={interestForm.data.message}
-                                    onChange={(e) => interestForm.setData('message', e.target.value)}
-                                    maxLength={500}
-                                    rows={4}
-                                    placeholder="Add any specific questions, ticket size, or requirements for the founder and analyst team..."
-                                    className="w-full resize-none rounded-[1.5rem] border border-zinc-200/80 bg-zinc-50 p-5 text-[15px] text-zinc-900 placeholder:text-zinc-400 transition-colors focus:border-zinc-400 focus:bg-white focus:outline-none focus:ring-0"
-                                />
-                            </div>
-
-                            <div className="flex justify-end border-t border-zinc-100 pt-6">
                                 <button
                                     type="submit"
                                     disabled={interestForm.processing}
-                                    className="flex items-center gap-2 rounded-xl bg-zinc-900 px-8 py-3.5 text-sm font-bold text-white transition-all hover:bg-zinc-800 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+                                    className="mt-5 inline-flex w-full items-center justify-center gap-2 bg-zinc-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50"
                                 >
-                                    {interestForm.processing ? (
-                                        <Icon icon="solar:refresh-linear" className="size-5 animate-spin" />
-                                    ) : (
-                                        <Icon icon="solar:plain-2-bold" className="size-5" />
-                                    )}
-                                    <span>{interestForm.processing ? 'Submitting Interest…' : 'Submit Syndicate Expression'}</span>
+                                    <Icon
+                                        icon={interestForm.processing ? 'solar:refresh-linear' : 'solar:arrow-right-linear'}
+                                        className={cn('size-4', interestForm.processing && 'animate-spin')}
+                                    />
+                                    {interestForm.processing
+                                        ? 'Submitting request…'
+                                        : interestForm.data.type === 'data_room_access'
+                                          ? 'Request data room'
+                                          : 'Submit request'}
                                 </button>
+                            </form>
+                        ) : (
+                            <div className="border border-amber-200 bg-amber-50 p-6">
+                                <Icon icon="solar:shield-warning-linear" className="size-5 text-amber-700" />
+                                <h3 className="mt-4 text-sm font-semibold text-amber-950">KYC verification required</h3>
+                                <p className="mt-2 text-sm leading-6 text-amber-800">
+                                    Complete verification before requesting access to investor materials.
+                                </p>
+                                <Link
+                                    href={route('investor.kyc.create')}
+                                    className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-amber-900 underline underline-offset-4"
+                                >
+                                    Complete KYC <Icon icon="solar:arrow-right-linear" className="size-4" />
+                                </Link>
                             </div>
-                        </form>
-                    ) : (
-                        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center justify-between rounded-[1.5rem] border border-amber-200/60 bg-amber-50/50 p-6">
-                            <div className="flex items-center gap-4">
-                                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-                                    <Icon icon="solar:shield-warning-bold" className="size-5" />
-                                </div>
-                                <div>
-                                    <h4 className="text-sm font-bold text-amber-900">KYC Verification Required</h4>
-                                    <p className="mt-0.5 text-[13px] text-amber-700">Complete KYC to express syndicate interest or request data rooms.</p>
-                                </div>
-                            </div>
-                            <Link
-                                href={route('investor.kyc.create')}
-                                className="flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 text-xs font-bold text-white transition-colors hover:bg-amber-700"
-                            >
-                                <span>Complete KYC</span>
-                                <Icon icon="solar:arrow-right-linear" className="size-4" />
-                            </Link>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
+                </section>
             </main>
+            {entry.can_submit_interest && (
+                <div className="fixed inset-x-0 bottom-0 z-30 border-t border-zinc-200 bg-white p-3 sm:hidden">
+                    <a
+                        href="#request-data-room"
+                        className="flex w-full items-center justify-center gap-2 bg-zinc-950 px-4 py-3 text-sm font-semibold text-white"
+                    >
+                        <Icon icon="solar:lock-keyhole-linear" className="size-4" />
+                        Request data room
+                    </a>
+                </div>
+            )}
         </div>
     );
 }

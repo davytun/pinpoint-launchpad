@@ -341,7 +341,6 @@ Route::prefix('founder')->name('founder.')->group(function () {
 
     // Protected dashboard routes
     Route::middleware(['auth.founder', 'founder.session'])->group(function () {
-        Route::get('/notifications', [App\Http\Controllers\Founder\NotificationController::class, 'index'])->name('notifications.index');
         Route::patch('/notifications/read-all', [App\Http\Controllers\Founder\NotificationController::class, 'readAll'])->name('notifications.read-all');
         Route::patch('/notifications/{notification}/read', [App\Http\Controllers\Founder\NotificationController::class, 'read'])->name('notifications.read');
         Route::get('/dashboard', [FounderDashboardController::class, 'index'])->name('dashboard');

@@ -68,6 +68,9 @@ class HandleInertiaRequests extends Middleware
                 'investor' => Auth::guard('investor')->user()?->unreadNotifications()->count() ?? 0,
             ],
             'platform_recent_notifications' => [
+                'founder' => Auth::guard('founder')->user()
+                    ? Auth::guard('founder')->user()->notifications()->latest()->take(5)->get()
+                    : [],
                 'investor' => Auth::guard('investor')->user()
                     ? Auth::guard('investor')->user()->notifications()->latest()->take(5)->get()
                     : [],

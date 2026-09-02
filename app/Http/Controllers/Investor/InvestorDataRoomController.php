@@ -24,7 +24,13 @@ class InvestorDataRoomController extends Controller
         abort_unless($investor->canAccessProtectedInvestorContent(), 403, 'KYC approval is required to access data rooms.');
 
         $grants = $investor->dataRoomGrants()
-            ->with('profile.founder:id,company_name')
+            ->with([
+                'profile.founder' => fn ($query) => $query->select('id', 'company_name')->withCount([
+                    'documents as data_room_documents_count' => fn ($documents) => $documents
+                        ->where('visibility', 'data_room')
+                        ->where('is_reviewed', true),
+                ]),
+            ])
             ->whereNull('revoked_at')
             ->latest('granted_at')
             ->get()
@@ -32,6 +38,7 @@ class InvestorDataRoomController extends Controller
                 'slug' => $grant->profile->slug,
                 'company_name' => $grant->profile->founder?->company_name,
                 'granted_at' => $grant->granted_at?->toISOString(),
+                'document_count' => $grant->profile->founder?->data_room_documents_count ?? 0,
             ]);
 
         return Inertia::render('Investor/DataRooms/Index', [
@@ -54,11 +61,14 @@ class InvestorDataRoomController extends Controller
             ->where('visibility', 'data_room')
             ->where('is_reviewed', true)
             ->latest()
-            ->get(['id', 'original_filename', 'file_size', 'created_at'])
+            ->get(['id', 'category', 'original_filename', 'file_size', 'mime_type', 'extension', 'created_at'])
             ->map(fn (FounderDocument $document) => [
                 'id' => $document->id,
+                'category' => $document->categoryLabel(),
                 'original_filename' => $document->original_filename,
                 'size_bytes' => $document->file_size,
+                'mime_type' => $document->mime_type,
+                'extension' => $document->extension,
                 'created_at' => $document->created_at,
                 'download_url' => URL::temporarySignedRoute(
                     'investor.data-rooms.download',

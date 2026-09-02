@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 import DashboardTour from '@/components/dashboard-tour';
 import ParagonRadarChart from '@/components/ParagonRadarChart';
@@ -63,6 +63,21 @@ interface PageProps {
     signature?: { status: string; signed_at?: string | null } | null;
     spotlight_featured?: boolean;
     investor_interests: InvestorInterest[];
+}
+
+function engagementLabel(type: InvestorInterest['type']) {
+    return {
+        data_room_access: 'Data Room Access',
+        founder_call: 'Founder Call',
+        more_details: 'Information Request',
+    }[type];
+}
+
+function engagementStatus(interest: InvestorInterest) {
+    if (interest.data_room_granted) return 'Data room granted';
+    if (interest.founder_decision === 'approved') return 'Approved, Pinpoint coordinating';
+    if (interest.founder_decision === 'declined' || interest.status === 'denied') return 'Declined';
+    return 'Awaiting your decision';
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -145,9 +160,7 @@ export default function FounderDashboard({
                             </span>
                             <StatusBadge status={audit_status} />
                         </div>
-                        <h1 className="mt-2 text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">
-                            {companyName}
-                        </h1>
+                        <h1 className="mt-2 text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">{companyName}</h1>
                         <p className="mt-1 text-xs text-zinc-400">
                             Founder: <span className="font-semibold text-zinc-700">{founderName}</span> · {founder.email}
                         </p>
@@ -176,9 +189,7 @@ export default function FounderDashboard({
                     {/* Audit Progression Stepper Banner */}
                     <div className="rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4 shadow-2xs">
                         <div className="flex items-center justify-between border-b border-zinc-200/60 pb-3">
-                            <span className="text-xs font-bold tracking-wider text-zinc-950 uppercase">
-                                PARAGON Audit Progression
-                            </span>
+                            <span className="text-xs font-bold tracking-wider text-zinc-950 uppercase">PARAGON Audit Progression</span>
                             <span className="text-[11px] font-semibold text-zinc-500 capitalize">
                                 Current Stage: {audit_status.replace('_', ' ')}
                             </span>
@@ -218,13 +229,9 @@ export default function FounderDashboard({
                         {/* Left Score Card (5 cols) */}
                         <div className="flex flex-col justify-between rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-2xs lg:col-span-5">
                             <div>
-                                <span className="block text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
-                                    PARAGON Diagnostic Score
-                                </span>
+                                <span className="block text-[11px] font-bold tracking-wider text-zinc-400 uppercase">PARAGON Diagnostic Score</span>
                                 <div className="mt-3 flex items-baseline gap-2">
-                                    <span className="font-mono text-5xl font-bold tracking-tight text-zinc-950">
-                                        {finalScore}
-                                    </span>
+                                    <span className="font-mono text-5xl font-bold tracking-tight text-zinc-950">{finalScore}</span>
                                     <span className="font-mono text-sm text-zinc-400">/ 100</span>
                                 </div>
 
@@ -241,9 +248,7 @@ export default function FounderDashboard({
                                     </div>
                                     <div className="rounded-xl border border-zinc-100 bg-[#FAFBFD] p-2.5">
                                         <span className="text-[11px] text-zinc-400">Agility</span>
-                                        <p className="mt-0.5 font-mono text-sm font-bold text-zinc-950">
-                                            {Math.round(pillar_scores.agility ?? 78)}%
-                                        </p>
+                                        <p className="mt-0.5 font-mono text-sm font-bold text-zinc-950">{Math.round(pillar_scores.agility ?? 78)}%</p>
                                     </div>
                                     <div className="rounded-xl border border-zinc-100 bg-[#FAFBFD] p-2.5">
                                         <span className="text-[11px] text-zinc-400">Governance</span>
@@ -272,12 +277,8 @@ export default function FounderDashboard({
                         <div className="flex flex-col justify-between rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-2xs lg:col-span-7">
                             <div className="mb-2 flex items-center justify-between border-b border-zinc-100 pb-3">
                                 <div>
-                                    <h3 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">
-                                        7-Pillar PARAGON Radar
-                                    </h3>
-                                    <p className="text-[11px] text-zinc-400">
-                                        Diagnostic benchmark compared against institutional startup averages.
-                                    </p>
+                                    <h3 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">7-Pillar PARAGON Radar</h3>
+                                    <p className="text-[11px] text-zinc-400">Diagnostic benchmark compared against institutional startup averages.</p>
                                 </div>
                                 <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-zinc-700">
                                     Benchmark Matrix
@@ -295,9 +296,7 @@ export default function FounderDashboard({
                         <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-3">
                             <div className="flex items-center gap-2">
                                 <Icon icon="solar:box-minimalistic-linear" className="size-4 text-zinc-500" />
-                                <h3 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">
-                                    {tier} Package Deliverables & Scope
-                                </h3>
+                                <h3 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">{tier} Package Deliverables & Scope</h3>
                             </div>
                             {payment && (
                                 <span className="font-mono text-xs font-semibold text-zinc-900">
@@ -334,9 +333,7 @@ export default function FounderDashboard({
                                     <Icon icon="solar:document-text-linear" className="size-5" />
                                 </div>
                                 <h4 className="text-sm font-bold text-zinc-950">Documents Vault</h4>
-                                <p className="text-xs text-zinc-500">
-                                    Manage, upload, and review submitted KYC, financials, and pitch decks.
-                                </p>
+                                <p className="text-xs text-zinc-500">Manage, upload, and review submitted KYC, financials, and pitch decks.</p>
                             </div>
                             <div className="mt-4 flex items-center gap-1 text-xs font-bold text-zinc-950 group-hover:underline">
                                 <span>Manage Files</span>
@@ -353,9 +350,7 @@ export default function FounderDashboard({
                                     <Icon icon="solar:chat-round-dots-linear" className="size-5" />
                                 </div>
                                 <h4 className="text-sm font-bold text-zinc-950">Analyst Engagement</h4>
-                                <p className="text-xs text-zinc-500">
-                                    Direct communication stream with your assigned Lead Analyst team.
-                                </p>
+                                <p className="text-xs text-zinc-500">Direct communication stream with your assigned Lead Analyst team.</p>
                             </div>
                             <div className="mt-4 flex items-center gap-1 text-xs font-bold text-zinc-950 group-hover:underline">
                                 <span>Open Live Chat</span>
@@ -372,9 +367,7 @@ export default function FounderDashboard({
                                     <Icon icon="solar:crown-linear" className="size-5" />
                                 </div>
                                 <h4 className="text-sm font-bold text-zinc-950">Spotlight Profile</h4>
-                                <p className="text-xs text-zinc-500">
-                                    Prepare and manage your public investor syndicate profile and badges.
-                                </p>
+                                <p className="text-xs text-zinc-500">Prepare and manage your public investor syndicate profile and badges.</p>
                             </div>
                             <div className="mt-4 flex items-center gap-1 text-xs font-bold text-zinc-950 group-hover:underline">
                                 <span>Edit Profile</span>
@@ -387,16 +380,12 @@ export default function FounderDashboard({
                     <div className="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-2xs">
                         <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-3">
                             <div>
-                                <h3 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">
-                                    Investor Engagement Pipeline
-                                </h3>
+                                <h3 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Investor Engagement Pipeline</h3>
                                 <p className="text-[11px] text-zinc-400">
                                     Accredited investor discovery, data room grants, and introductory meeting requests.
                                 </p>
                             </div>
-                            <span className="font-mono text-xs font-semibold text-zinc-900">
-                                {investor_interests.length} Engagements
-                            </span>
+                            <span className="font-mono text-xs font-semibold text-zinc-900">{investor_interests.length} Engagements</span>
                         </div>
 
                         {investor_interests.length === 0 ? (
@@ -404,21 +393,81 @@ export default function FounderDashboard({
                                 <Icon icon="solar:users-group-two-rounded-linear" className="mb-2 size-8 text-zinc-300" />
                                 <p className="text-xs font-semibold text-zinc-700">No investor engagements yet.</p>
                                 <p className="mt-0.5 max-w-sm text-xs text-zinc-400">
-                                    Once your PARAGON audit is complete, your venture is syndicated to approved investors and introduction requests will appear here.
+                                    Once your PARAGON audit is complete, your venture is syndicated to approved investors and introduction requests
+                                    will appear here.
                                 </p>
                             </div>
                         ) : (
                             <div className="divide-y divide-zinc-100">
                                 {investor_interests.map((interest) => (
-                                    <div key={interest.id} className="flex items-center justify-between py-3 text-xs">
-                                        <div>
-                                            <p className="font-semibold text-zinc-950">{interest.investor_name}</p>
-                                            <p className="text-[11px] text-zinc-400">{interest.firm_name ?? 'Accredited Syndicate'}</p>
+                                    <details key={interest.id} className="group py-1">
+                                        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-3 text-xs [&::-webkit-details-marker]:hidden">
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-zinc-950">{interest.investor_name}</p>
+                                                <p className="mt-0.5 text-[11px] text-zinc-400">
+                                                    {interest.firm_name ?? 'Accredited Syndicate'} · {engagementStatus(interest)}
+                                                </p>
+                                            </div>
+                                            <div className="flex shrink-0 items-center gap-2">
+                                                <span className="hidden rounded-full bg-zinc-100 px-2.5 py-0.5 text-[11px] font-semibold text-zinc-700 sm:inline">
+                                                    {engagementLabel(interest.type)}
+                                                </span>
+                                                <Icon
+                                                    icon="solar:alt-arrow-down-linear"
+                                                    className="size-4 text-zinc-400 transition-transform duration-200 group-open:rotate-180"
+                                                />
+                                            </div>
+                                        </summary>
+
+                                        <div className="border-t border-zinc-100 py-4">
+                                            <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+                                                <div>
+                                                    <p className="text-[10px] font-bold tracking-[0.14em] text-zinc-400 uppercase">
+                                                        {engagementLabel(interest.type)}
+                                                    </p>
+                                                    <p className="mt-2 text-xs leading-5 text-zinc-600">
+                                                        {interest.message || 'No additional note was provided with this request.'}
+                                                    </p>
+                                                </div>
+                                                {interest.is_awaiting_founder && (
+                                                    <div className="flex gap-2 sm:justify-end">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                router.patch(
+                                                                    route('founder.interests.authorize', interest.id),
+                                                                    { status: 'denied' },
+                                                                    { preserveScroll: true },
+                                                                )
+                                                            }
+                                                            className="rounded-lg border border-zinc-300 px-3 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:border-zinc-950 hover:text-zinc-950"
+                                                        >
+                                                            Decline
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                router.patch(
+                                                                    route('founder.interests.authorize', interest.id),
+                                                                    { status: 'approved' },
+                                                                    { preserveScroll: true },
+                                                                )
+                                                            }
+                                                            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-zinc-800"
+                                                        >
+                                                            <Icon icon="solar:check-circle-linear" className="size-4" />
+                                                            {interest.type === 'data_room_access' ? 'Authorize access' : 'Approve request'}
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {interest.is_awaiting_founder && interest.type === 'data_room_access' && (
+                                                <p className="mt-3 text-[11px] leading-5 text-zinc-400">
+                                                    Pinpoint Investor Relations will activate secure access after your authorization.
+                                                </p>
+                                            )}
                                         </div>
-                                        <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-[11px] font-semibold text-zinc-700 capitalize">
-                                            {interest.type.replace('_', ' ')}
-                                        </span>
-                                    </div>
+                                    </details>
                                 ))}
                             </div>
                         )}

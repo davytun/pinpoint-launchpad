@@ -145,7 +145,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                 <div className="flex shrink-0 flex-col justify-between gap-4 border-b border-zinc-100 bg-white px-6 py-5 sm:flex-row sm:items-center lg:px-8">
                     <div className="flex min-w-0 items-center gap-4">
                         <Link
-                            href="/admin/investor-accounts"
+                            href="/admin/investors/accounts"
                             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-zinc-200/80 bg-white text-zinc-500 shadow-2xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                             title="Back to Investors"
                         >
@@ -292,7 +292,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                                                 <div className="group relative overflow-hidden rounded-xl border border-zinc-200/90 bg-[#F6F8FA] p-3 shadow-2xs">
                                                     {isPdf ? (
                                                         <iframe
-                                                            src={`/admin/investor-kyc/${sub.id}/preview#toolbar=0`}
+                                                            src={`/admin/investors/kyc/${sub.id}/preview#toolbar=0`}
                                                             className="h-80 w-full rounded-lg border-0 bg-white shadow-xs"
                                                             title="PDF Preview"
                                                         />
@@ -302,7 +302,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                                                             className="flex max-h-72 min-h-48 cursor-pointer items-center justify-center overflow-hidden p-2"
                                                         >
                                                             <img
-                                                                src={`/admin/investor-kyc/${sub.id}/preview`}
+                                                                src={`/admin/investors/kyc/${sub.id}/preview`}
                                                                 alt={sub.original_name}
                                                                 className="h-auto max-h-68 w-full rounded-lg border border-zinc-200/60 bg-white object-contain shadow-sm transition-transform duration-200 group-hover:scale-[1.01]"
                                                             />
@@ -319,7 +319,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                                                             <Icon icon="solar:maximize-square-linear" className="size-3.5" />
                                                         </button>
                                                         <a
-                                                            href={`/admin/investor-kyc/${sub.id}/download`}
+                                                            href={`/admin/investors/kyc/${sub.id}/download`}
                                                             className="p-1 text-zinc-300 transition-colors hover:text-white"
                                                             title="Download File"
                                                         >
@@ -339,7 +339,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                                                     </button>
 
                                                     <a
-                                                        href={`/admin/investor-kyc/${sub.id}/download`}
+                                                        href={`/admin/investors/kyc/${sub.id}/download`}
                                                         className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                                                     >
                                                         <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-400" />
@@ -424,7 +424,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
 
                             <div className="flex items-center gap-2">
                                 <a
-                                    href={`/admin/investor-kyc/${lightboxDoc.id}/download`}
+                                    href={`/admin/investors/kyc/${lightboxDoc.id}/download`}
                                     className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                                 >
                                     <Icon icon="solar:download-minimalistic-linear" className="size-3.5" />
@@ -443,13 +443,13 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                         <div className="relative flex max-h-[65vh] min-h-95 items-center justify-center overflow-auto rounded-2xl border border-zinc-200/80 bg-[#F6F8FA] p-4">
                             {lightboxDoc.mime_type === 'application/pdf' || lightboxDoc.original_name.endsWith('.pdf') ? (
                                 <iframe
-                                    src={`/admin/investor-kyc/${lightboxDoc.id}/preview`}
+                                    src={`/admin/investors/kyc/${lightboxDoc.id}/preview`}
                                     className="h-[60vh] w-full rounded-xl border-0 bg-white shadow-sm"
                                     title="PDF Document"
                                 />
                             ) : (
                                 <img
-                                    src={`/admin/investor-kyc/${lightboxDoc.id}/preview`}
+                                    src={`/admin/investors/kyc/${lightboxDoc.id}/preview`}
                                     alt={lightboxDoc.original_name}
                                     className="h-auto max-h-[58vh] w-full max-w-2xl rounded-xl border border-zinc-200/60 bg-white object-contain shadow-md"
                                 />

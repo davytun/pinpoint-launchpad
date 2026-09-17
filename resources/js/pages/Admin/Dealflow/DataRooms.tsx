@@ -165,7 +165,7 @@ function DataRoomDrawer({ grant, onClose, onUpdateGrant }: { grant: Grant; onClo
 
     function toggleRevocation() {
         setProcessing(true);
-        const url = isActive ? `/admin/dealflow/data-rooms/${grant.id}/revoke` : `/admin/dealflow/data-rooms/${grant.id}/reinstate`;
+        const url = isActive ? `/admin/investors/dealflow/data-rooms/${grant.id}/revoke` : `/admin/investors/dealflow/data-rooms/${grant.id}/reinstate`;
 
         router.patch(
             url,
@@ -468,7 +468,7 @@ export default function AdminDataRooms({
             if (sr) p.search = sr;
             if (tb && tb !== 'grants') p.tab = tb;
 
-            router.get('/admin/dealflow/data-rooms', p, { replace: true, preserveState: true });
+            router.get('/admin/investors/dealflow/data-rooms', p, { replace: true, preserveState: true });
         },
         [activeStatus, search, activeTab],
     );
@@ -499,7 +499,7 @@ export default function AdminDataRooms({
                     <div className="flex items-center gap-2">
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/dealflow/interests')}
+                            onClick={() => router.get('/admin/investors/dealflow/interests')}
                             className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:hand-money-linear" className="size-3.5 text-zinc-500" />
@@ -508,7 +508,7 @@ export default function AdminDataRooms({
 
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/spotlight')}
+                            onClick={() => router.get('/admin/investors/spotlight')}
                             className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:crown-linear" className="size-3.5 text-zinc-500" />

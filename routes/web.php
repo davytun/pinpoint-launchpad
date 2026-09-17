@@ -75,9 +75,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Shared dashboard — platform (superadmin). Specialists are redirected to their desk home.
+    // Platform dashboard — superadmin only (wrong-desk staff redirected by admin.side)
     Route::get('/', [AdminDashboardController::class, 'index'])
-        ->middleware(['require.role:superadmin,analyst,compliance,investor_relations', 'admin.side:central'])
+        ->middleware(['admin.side:central', 'require.role:superadmin'])
         ->name('dashboard');
 
     Route::middleware('require.role:superadmin,analyst,compliance,investor_relations')->group(function () {
@@ -86,79 +86,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
     });
 
-    // Founder desk — messages
-    Route::prefix('messages')->name('messages.')->middleware(['require.role:superadmin,analyst', 'admin.side:founder'])->group(function () {
-        Route::get('/', [AdminMessageController::class, 'inbox'])->name('inbox');
-        Route::get('/attachment/{message}', [AdminMessageController::class, 'downloadAttachment'])->name('attachment.download');
-        Route::get('/{thread}', [AdminMessageController::class, 'show'])->name('show');
-        Route::post('/{thread}/reply', [AdminMessageController::class, 'reply'])->name('reply')->middleware('throttle:30,1');
-    });
-
-    // PIA requests — platform (superadmin)
+    // Platform — PIA, settings, revenue, blog, team
     Route::middleware(['require.role:superadmin', 'admin.side:central'])->group(function () {
         Route::get('/pia-requests', [PiaApplicationController::class, 'index'])->name('pia-requests.index');
         Route::patch('/pia-requests/{application}/contacted', [PiaApplicationController::class, 'markContacted'])->name('pia-requests.contacted');
         Route::post('/pia-requests/{application}/payment-received', [PiaApplicationController::class, 'confirmPaymentReceived'])->name('pia-requests.payment-received');
-    });
 
-    Route::middleware(['require.role:superadmin,compliance,investor_relations', 'admin.side:investors'])->group(function () {
-        Route::redirect('/investors', '/admin/investor-accounts')->name('investors.legacy');
-        Route::get('/investor-accounts', [InvestorAccountController::class, 'index'])->name('investor-accounts.index');
-        Route::get('/investor-accounts/{investor}', [InvestorAccountController::class, 'show'])->name('investor-accounts.show');
-        Route::patch('/investor-accounts/{investor}', [InvestorAccountController::class, 'update'])->name('investor-accounts.update');
-    });
-
-    Route::middleware(['require.role:superadmin,investor_relations', 'admin.side:investors'])->group(function () {
-        Route::get('/announcements', [PlatformAnnouncementController::class, 'index'])->name('announcements.index');
-        Route::post('/announcements', [PlatformAnnouncementController::class, 'store'])->name('announcements.store');
-        Route::get('/spotlight', [AdminSpotlightController::class, 'index'])->name('spotlight.index');
-        Route::patch('/spotlight/{profile}', [AdminSpotlightController::class, 'update'])->name('spotlight.update');
-        Route::get('/dealflow/interests', [App\Http\Controllers\Admin\InvestorInterestController::class, 'index'])->name('dealflow.interests.index');
-        Route::patch('/dealflow/interests/{interest}', [App\Http\Controllers\Admin\InvestorInterestController::class, 'update'])->name('dealflow.interests.update');
-        Route::patch('/dealflow/interests/{interest}/schedule', [App\Http\Controllers\Admin\InvestorInterestController::class, 'schedule'])->name('dealflow.interests.schedule');
-        Route::patch('/dealflow/interests/{interest}/complete', [App\Http\Controllers\Admin\InvestorInterestController::class, 'complete'])->name('dealflow.interests.complete');
-        Route::patch('/dealflow/interests/{interest}/deal-stage', [DiligenceRequestController::class, 'updateDealStage'])->name('dealflow.interests.deal-stage');
-        Route::get('/dealflow/data-rooms', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'index'])->name('dealflow.data-rooms.index');
-        Route::patch('/dealflow/data-rooms/{grant}/revoke', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'revoke'])->name('dealflow.data-rooms.revoke');
-        Route::patch('/dealflow/data-rooms/{grant}/reinstate', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'reinstate'])->name('dealflow.data-rooms.reinstate');
-        Route::get('/dealflow/diligence', [DiligenceRequestController::class, 'index'])->name('dealflow.diligence.index');
-        Route::patch('/dealflow/diligence/{diligenceRequest}/request-founder', [DiligenceRequestController::class, 'requestFounder'])->name('dealflow.diligence.request-founder');
-        Route::patch('/dealflow/diligence/{diligenceRequest}/release', [DiligenceRequestController::class, 'releaseResponse'])->name('dealflow.diligence.release');
-        Route::patch('/dealflow/diligence/{diligenceRequest}/decline', [DiligenceRequestController::class, 'decline'])->name('dealflow.diligence.decline');
-    });
-
-    // Founder desk — founders, documents, profiles
-    Route::middleware(['require.role:superadmin,analyst', 'admin.side:founder'])->group(function () {
-        Route::get('/founders', [AdminFounderController::class, 'index'])->name('founders.index');
-        Route::get('/founders/{founder}', [AdminFounderController::class, 'show'])->name('founders.show');
-        Route::post('/founders/{founder}/assign', [AdminFounderController::class, 'assign'])->middleware('require.role:superadmin')->name('founders.assign');
-        Route::patch('/founders/{founder}/audit-status', [AdminFounderController::class, 'updateAuditStatus'])->name('founders.audit-status');
-
-        Route::prefix('founders/{founder}/documents')->name('documents.')->group(function () {
-            Route::get('/', [AdminDocumentController::class, 'index'])->name('index');
-            Route::get('/{document}/download', [AdminDocumentController::class, 'download'])->name('download');
-            Route::get('/{document}/preview', [AdminDocumentController::class, 'preview'])->name('preview');
-            Route::patch('/{document}/reviewed', [AdminDocumentController::class, 'markReviewed'])->name('reviewed');
-            Route::patch('/{document}/note', [AdminDocumentController::class, 'addNote'])->name('note');
-        });
-
-        Route::prefix('profiles')->name('profiles.')->group(function () {
-            Route::get('/', [AdminProfileController::class, 'index'])->name('index');
-            Route::get('/{profile}', [AdminProfileController::class, 'show'])->name('show');
-            Route::patch('/{profile}', [AdminProfileController::class, 'update'])->name('update');
-            Route::patch('/badges/{badge}', [AdminProfileController::class, 'updateBadge'])->name('badge.update');
-        });
-    });
-
-    // Founder desk — questions
-    Route::prefix('questions')->name('questions.')->middleware(['require.role:superadmin,analyst', 'admin.side:founder'])->group(function () {
-        Route::get('/', [AdminQuestionController::class, 'index'])->name('index');
-        Route::get('/{question}/edit', [AdminQuestionController::class, 'edit'])->name('edit');
-        Route::patch('/{question}', [AdminQuestionController::class, 'update'])->name('update');
-    });
-
-    // Platform — settings, revenue, blog
-    Route::middleware(['require.role:superadmin', 'admin.side:central'])->group(function () {
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
         Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
         Route::get('/revenue', [AdminDashboardController::class, 'revenue'])->name('revenue');
@@ -173,17 +106,112 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::patch('/{post}/toggle', [AdminBlogController::class, 'toggle'])->name('toggle');
             Route::post('/images', [BlogImageController::class, 'store'])->name('images.store');
         });
+
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [AdminUserController::class, 'index'])->name('index');
+            Route::get('/create', [AdminUserController::class, 'create'])->name('create');
+            Route::post('/', [AdminUserController::class, 'store'])->name('store');
+            Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
+            Route::patch('/{user}', [AdminUserController::class, 'update'])->name('update');
+            Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
+        });
     });
 
-    // Platform — team
-    Route::prefix('users')->name('users.')->middleware(['require.role:superadmin', 'admin.side:central'])->group(function () {
-        Route::get('/', [AdminUserController::class, 'index'])->name('index');
-        Route::get('/create', [AdminUserController::class, 'create'])->name('create');
-        Route::post('/', [AdminUserController::class, 'store'])->name('store');
-        Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
-        Route::patch('/{user}', [AdminUserController::class, 'update'])->name('update');
-        Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
+    // Founder desk
+    Route::prefix('founder')->middleware('admin.side:founder')->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'founder'])
+            ->middleware('require.role:superadmin,analyst')
+            ->name('founder.dashboard');
+
+        Route::prefix('messages')->name('messages.')->middleware('require.role:superadmin,analyst')->group(function () {
+            Route::get('/', [AdminMessageController::class, 'inbox'])->name('inbox');
+            Route::get('/attachment/{message}', [AdminMessageController::class, 'downloadAttachment'])->name('attachment.download');
+            Route::get('/{thread}', [AdminMessageController::class, 'show'])->name('show');
+            Route::post('/{thread}/reply', [AdminMessageController::class, 'reply'])->name('reply')->middleware('throttle:30,1');
+        });
+
+        Route::middleware('require.role:superadmin,analyst')->group(function () {
+            Route::get('/founders', [AdminFounderController::class, 'index'])->name('founders.index');
+            Route::get('/founders/{founder}', [AdminFounderController::class, 'show'])->name('founders.show');
+            Route::post('/founders/{founder}/assign', [AdminFounderController::class, 'assign'])->middleware('require.role:superadmin')->name('founders.assign');
+            Route::patch('/founders/{founder}/audit-status', [AdminFounderController::class, 'updateAuditStatus'])->name('founders.audit-status');
+
+            Route::prefix('founders/{founder}/documents')->name('documents.')->group(function () {
+                Route::get('/', [AdminDocumentController::class, 'index'])->name('index');
+                Route::get('/{document}/download', [AdminDocumentController::class, 'download'])->name('download');
+                Route::get('/{document}/preview', [AdminDocumentController::class, 'preview'])->name('preview');
+                Route::patch('/{document}/reviewed', [AdminDocumentController::class, 'markReviewed'])->name('reviewed');
+                Route::patch('/{document}/note', [AdminDocumentController::class, 'addNote'])->name('note');
+            });
+
+            Route::prefix('profiles')->name('profiles.')->group(function () {
+                Route::get('/', [AdminProfileController::class, 'index'])->name('index');
+                Route::get('/{profile}', [AdminProfileController::class, 'show'])->name('show');
+                Route::patch('/{profile}', [AdminProfileController::class, 'update'])->name('update');
+                Route::patch('/badges/{badge}', [AdminProfileController::class, 'updateBadge'])->name('badge.update');
+            });
+        });
+
+        Route::prefix('questions')->name('questions.')->middleware('require.role:superadmin,analyst')->group(function () {
+            Route::get('/', [AdminQuestionController::class, 'index'])->name('index');
+            Route::get('/{question}/edit', [AdminQuestionController::class, 'edit'])->name('edit');
+            Route::patch('/{question}', [AdminQuestionController::class, 'update'])->name('update');
+        });
     });
+
+    // Investor desk
+    Route::prefix('investors')->middleware('admin.side:investors')->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'investors'])
+            ->middleware('require.role:superadmin,compliance,investor_relations')
+            ->name('investors.dashboard');
+
+        Route::middleware('require.role:superadmin,compliance,investor_relations')->group(function () {
+            Route::get('/accounts', [InvestorAccountController::class, 'index'])->name('investor-accounts.index');
+            Route::get('/accounts/{investor}', [InvestorAccountController::class, 'show'])->name('investor-accounts.show');
+            Route::patch('/accounts/{investor}', [InvestorAccountController::class, 'update'])->name('investor-accounts.update');
+        });
+
+        Route::middleware('require.role:superadmin,compliance')->group(function () {
+            Route::get('/kyc', fn () => redirect()->route('admin.investor-accounts.index', ['kyc_status' => 'pending']))->name('investor-kyc.index');
+            Route::get('/kyc/{submission}/preview', [AdminInvestorKycController::class, 'preview'])->name('investor-kyc.preview');
+            Route::get('/kyc/{submission}/download', [AdminInvestorKycController::class, 'download'])->name('investor-kyc.download');
+            Route::patch('/kyc/{submission}', [AdminInvestorKycController::class, 'review'])->name('investor-kyc.review');
+        });
+
+        Route::middleware('require.role:superadmin,investor_relations')->group(function () {
+            Route::get('/announcements', [PlatformAnnouncementController::class, 'index'])->name('announcements.index');
+            Route::post('/announcements', [PlatformAnnouncementController::class, 'store'])->name('announcements.store');
+            Route::get('/spotlight', [AdminSpotlightController::class, 'index'])->name('spotlight.index');
+            Route::patch('/spotlight/{profile}', [AdminSpotlightController::class, 'update'])->name('spotlight.update');
+            Route::get('/dealflow/interests', [App\Http\Controllers\Admin\InvestorInterestController::class, 'index'])->name('dealflow.interests.index');
+            Route::patch('/dealflow/interests/{interest}', [App\Http\Controllers\Admin\InvestorInterestController::class, 'update'])->name('dealflow.interests.update');
+            Route::patch('/dealflow/interests/{interest}/schedule', [App\Http\Controllers\Admin\InvestorInterestController::class, 'schedule'])->name('dealflow.interests.schedule');
+            Route::patch('/dealflow/interests/{interest}/complete', [App\Http\Controllers\Admin\InvestorInterestController::class, 'complete'])->name('dealflow.interests.complete');
+            Route::patch('/dealflow/interests/{interest}/deal-stage', [DiligenceRequestController::class, 'updateDealStage'])->name('dealflow.interests.deal-stage');
+            Route::get('/dealflow/data-rooms', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'index'])->name('dealflow.data-rooms.index');
+            Route::patch('/dealflow/data-rooms/{grant}/revoke', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'revoke'])->name('dealflow.data-rooms.revoke');
+            Route::patch('/dealflow/data-rooms/{grant}/reinstate', [App\Http\Controllers\Admin\InvestorDataRoomController::class, 'reinstate'])->name('dealflow.data-rooms.reinstate');
+            Route::get('/dealflow/diligence', [DiligenceRequestController::class, 'index'])->name('dealflow.diligence.index');
+            Route::patch('/dealflow/diligence/{diligenceRequest}/request-founder', [DiligenceRequestController::class, 'requestFounder'])->name('dealflow.diligence.request-founder');
+            Route::patch('/dealflow/diligence/{diligenceRequest}/release', [DiligenceRequestController::class, 'releaseResponse'])->name('dealflow.diligence.release');
+            Route::patch('/dealflow/diligence/{diligenceRequest}/decline', [DiligenceRequestController::class, 'decline'])->name('dealflow.diligence.decline');
+        });
+    });
+
+    // Legacy path redirects (pre–desk-split URLs)
+    Route::redirect('/messages', '/admin/founder/messages');
+    Route::redirect('/founders', '/admin/founder/founders');
+    Route::get('/founders/{founder}', fn (string $founder) => redirect("/admin/founder/founders/{$founder}"));
+    Route::redirect('/profiles', '/admin/founder/profiles');
+    Route::redirect('/questions', '/admin/founder/questions');
+    Route::redirect('/investor-accounts', '/admin/investors/accounts');
+    Route::get('/investor-accounts/{investor}', fn (string $investor) => redirect("/admin/investors/accounts/{$investor}"));
+    Route::redirect('/investor-kyc', '/admin/investors/kyc');
+    Route::redirect('/spotlight', '/admin/investors/spotlight');
+    Route::redirect('/announcements', '/admin/investors/announcements');
+    Route::redirect('/dealflow/interests', '/admin/investors/dealflow/interests');
+    Route::redirect('/dealflow/data-rooms', '/admin/investors/dealflow/data-rooms');
+    Route::redirect('/dealflow/diligence', '/admin/investors/dealflow/diligence');
 });
 
 Route::get('/', function () {
@@ -263,13 +291,6 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::get('/data-rooms', [InvestorDataRoomController::class, 'index'])->middleware(['auth.investor', 'kyc.approved'])->name('data-rooms.index');
     Route::get('/data-rooms/{slug}', [InvestorDataRoomController::class, 'show'])->middleware(['auth.investor', 'kyc.approved'])->name('data-rooms.show');
     Route::get('/data-rooms/{slug}/document/{document}', [InvestorDataRoomController::class, 'download'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('data-rooms.download');
-});
-
-Route::prefix('admin')->name('admin.')->middleware(['require.role:superadmin,compliance', 'admin.side:investors'])->group(function () {
-    Route::get('/investor-kyc', fn () => redirect()->route('admin.investor-accounts.index', ['kyc_status' => 'pending']))->name('investor-kyc.index');
-    Route::get('/investor-kyc/{submission}/preview', [AdminInvestorKycController::class, 'preview'])->name('investor-kyc.preview');
-    Route::get('/investor-kyc/{submission}/download', [AdminInvestorKycController::class, 'download'])->name('investor-kyc.download');
-    Route::patch('/investor-kyc/{submission}', [AdminInvestorKycController::class, 'review'])->name('investor-kyc.review');
 });
 
 Route::get('/terms', function () {

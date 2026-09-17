@@ -67,10 +67,10 @@ test('superadmin dashboard generates accurate action-required workflows with val
             ->where('metrics.revenue_by_currency.NGN', 2090000)
             ->where('metrics.revenue_by_currency.USD', 35000)
             ->has('needs_attention', 4)
-            ->where('needs_attention.0.action_url', '/admin/messages')
-            ->where('needs_attention.1.action_url', '/admin/investor-accounts?kyc_status=pending')
-            ->where('needs_attention.2.action_url', '/admin/dealflow/interests?status=pending')
-            ->where('needs_attention.3.action_url', '/admin/founders?status=pending'));
+            ->where('needs_attention.0.action_url', '/admin/founder/messages')
+            ->where('needs_attention.1.action_url', '/admin/investors/accounts?kyc_status=pending')
+            ->where('needs_attention.2.action_url', '/admin/investors/dealflow/interests?status=pending')
+            ->where('needs_attention.3.action_url', '/admin/founder/founders?status=pending'));
 
     $this->actingAs($superadmin)
         ->get(route('admin.revenue', ['currency' => 'NGN']))
@@ -120,7 +120,11 @@ test('analyst is redirected from platform dashboard to founder desk home', funct
 
     $this->actingAs($analyst)
         ->get(route('admin.dashboard'))
-        ->assertRedirect(route('admin.founders.index'));
+        ->assertRedirect(route('admin.founder.dashboard'));
+
+    $this->actingAs($analyst)
+        ->get(route('admin.founder.dashboard'))
+        ->assertOk();
 
     $this->actingAs($analyst)
         ->get(route('admin.founders.index'))
@@ -133,11 +137,15 @@ test('compliance and investor relations are redirected from platform dashboard t
 
     $this->actingAs($compliance)
         ->get(route('admin.dashboard'))
-        ->assertRedirect(route('admin.investor-accounts.index'));
+        ->assertRedirect(route('admin.investors.dashboard'));
 
     $this->actingAs($investorRelations)
         ->get(route('admin.dashboard'))
-        ->assertRedirect(route('admin.investor-accounts.index'));
+        ->assertRedirect(route('admin.investors.dashboard'));
+
+    $this->actingAs($compliance)
+        ->get(route('admin.investors.dashboard'))
+        ->assertOk();
 
     $this->actingAs($compliance)
         ->get(route('admin.investor-accounts.index'))

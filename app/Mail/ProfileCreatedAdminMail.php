@@ -22,7 +22,7 @@ class ProfileCreatedAdminMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Verification Page Created — ' . ($this->founder->company_name ?? $this->founder->email),
+            subject: 'Verification Page Created — '.($this->founder->company_name ?? $this->founder->email),
         );
     }
 
@@ -31,11 +31,11 @@ class ProfileCreatedAdminMail extends Mailable
         return new Content(
             view: 'emails.verification.profile-created-admin',
             with: [
-                'founder'         => $this->founder,
-                'profile'         => $this->profile,
-                'verificationUrl' => url('/investor/spotlight/' . $this->profile->slug),
-                'adminUrl'        => url('/admin/profiles/' . $this->profile->id),
-                'recipientEmail'  => config('mail.admin_address'),
+                'founder' => $this->founder,
+                'profile' => $this->profile,
+                'verificationUrl' => url('/investor/spotlight/'.$this->profile->slug),
+                'adminUrl' => url('/admin/founder/profiles/'.$this->profile->id),
+                'recipientEmail' => config('mail.admin_address'),
             ],
         );
     }

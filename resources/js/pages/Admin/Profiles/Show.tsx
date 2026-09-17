@@ -83,7 +83,7 @@ export default function AdminProfilesShow({ profile, founder, badges, investor_i
     function handleSave() {
         setSaving(true);
         router.patch(
-            `/admin/profiles/${profile.id}`,
+            `/admin/founder/profiles/${profile.id}`,
             {
                 analyst_summary: summary || null,
                 sector: sector || null,
@@ -98,7 +98,7 @@ export default function AdminProfilesShow({ profile, founder, badges, investor_i
 
     function handleBadgeToggle(badge: Badge, newValue: boolean) {
         setTogglingBadge(badge.id);
-        router.patch(`/admin/profiles/badges/${badge.id}`, { is_verified: newValue }, { onFinish: () => setTogglingBadge(null) });
+        router.patch(`/admin/founder/profiles/badges/${badge.id}`, { is_verified: newValue }, { onFinish: () => setTogglingBadge(null) });
     }
 
     const inputClass =
@@ -114,7 +114,7 @@ export default function AdminProfilesShow({ profile, founder, badges, investor_i
                     <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                         <div>
                             <Link
-                                href="/admin/profiles"
+                                href="/admin/founder/profiles"
                                 className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:text-zinc-900"
                             >
                                 <Icon icon="solar:arrow-left-linear" className="size-3.5" />

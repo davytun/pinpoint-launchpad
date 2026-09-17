@@ -223,7 +223,7 @@ function InterestDrawer({
     function setStatus(status: 'approved' | 'denied' | 'pending') {
         setUpdating(true);
         router.patch(
-            `/admin/dealflow/interests/${interest.id}`,
+            `/admin/investors/dealflow/interests/${interest.id}`,
             { status },
             {
                 onSuccess: () => {
@@ -244,7 +244,7 @@ function InterestDrawer({
         if (!scheduledAt) return;
         setIsScheduling(true);
         router.patch(
-            `/admin/dealflow/interests/${interest.id}/schedule`,
+            `/admin/investors/dealflow/interests/${interest.id}/schedule`,
             {
                 scheduled_at: scheduledAt,
                 meeting_link: meetingLink,
@@ -269,7 +269,7 @@ function InterestDrawer({
     function handleCompleteCall() {
         setIsCompleting(true);
         router.patch(
-            `/admin/dealflow/interests/${interest.id}/complete`,
+            `/admin/investors/dealflow/interests/${interest.id}/complete`,
             {
                 notes: coordinationNotes,
             },
@@ -735,7 +735,7 @@ export default function AdminInterests({
     const applyFilters = useCallback(
         (overrides: Record<string, string | undefined>) => {
             const query = buildParams(overrides, { activeStatus, activeType, activeSector, search });
-            router.get('/admin/dealflow/interests', query, { replace: true, preserveState: true });
+            router.get('/admin/investors/dealflow/interests', query, { replace: true, preserveState: true });
         },
         [activeStatus, activeType, activeSector, search],
     );
@@ -786,7 +786,7 @@ export default function AdminInterests({
                     <div className="flex items-center gap-2">
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/dealflow/diligence')}
+                            onClick={() => router.get('/admin/investors/dealflow/diligence')}
                             className="flex items-center gap-1.5 rounded-xl border border-indigo-200/90 bg-indigo-50/70 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-2xs transition-colors hover:bg-indigo-100"
                         >
                             <Icon icon="solar:folder-with-files-bold" className="size-3.5 text-indigo-600" />
@@ -795,7 +795,7 @@ export default function AdminInterests({
 
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/dealflow/data-rooms')}
+                            onClick={() => router.get('/admin/investors/dealflow/data-rooms')}
                             className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:key-linear" className="size-3.5 text-zinc-500" />
@@ -804,7 +804,7 @@ export default function AdminInterests({
 
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/spotlight')}
+                            onClick={() => router.get('/admin/investors/spotlight')}
                             className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:crown-linear" className="size-3.5 text-zinc-500" />

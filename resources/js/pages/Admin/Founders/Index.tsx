@@ -297,7 +297,7 @@ function FounderAuditDrawer({
         e.preventDefault();
         if (!replyBody.trim() && !replyAttachment) return;
         if (!founder.message_thread_id) {
-            router.get(`/admin/messages?founder_id=${founder.id}`);
+            router.get(`/admin/founder/messages?founder_id=${founder.id}`);
             return;
         }
 
@@ -739,7 +739,7 @@ function FounderAuditDrawer({
                                     Direct Message Thread
                                 </h4>
                                 <a
-                                    href={`/admin/messages?founder_id=${founder.id}`}
+                                    href={`/admin/founder/messages?founder_id=${founder.id}`}
                                     className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-950"
                                 >
                                     Open in Messages →
@@ -909,7 +909,7 @@ export default function AdminFoundersIndex({
             if (an) p.analyst_id = an;
             if (sr) p.search = sr;
 
-            router.get('/admin/founders', p, { replace: true, preserveState: true });
+            router.get('/admin/founder/founders', p, { replace: true, preserveState: true });
         },
         [activeStatus, activeAnalyst, search],
     );
@@ -940,7 +940,7 @@ export default function AdminFoundersIndex({
                     <div className="flex items-center gap-2">
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/messages')}
+                            onClick={() => router.get('/admin/founder/messages')}
                             className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:chat-round-dots-linear" className="size-3.5 text-zinc-500" />
@@ -949,7 +949,7 @@ export default function AdminFoundersIndex({
 
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/spotlight')}
+                            onClick={() => router.get('/admin/investors/spotlight')}
                             className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:crown-linear" className="size-3.5 text-zinc-500" />

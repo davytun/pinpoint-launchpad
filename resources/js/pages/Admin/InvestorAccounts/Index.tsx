@@ -226,7 +226,7 @@ function RejectKycModal({
         setErrorMsg(null);
 
         router.patch(
-            `/admin/investor-kyc/${investor.latest_kyc_submission.id}`,
+            `/admin/investors/kyc/${investor.latest_kyc_submission.id}`,
             {
                 status: 'rejected',
                 review_notes: notes.trim(),
@@ -398,7 +398,7 @@ function KycDrawer({
         if (!submission) return;
         setUpdating(true);
         router.patch(
-            `/admin/investor-kyc/${submission.id}`,
+            `/admin/investors/kyc/${submission.id}`,
             { status: 'approved' },
             {
                 onSuccess: () => {
@@ -519,7 +519,7 @@ function KycDrawer({
                                     <div className="group relative overflow-hidden rounded-xl border border-zinc-200/90 bg-[#F6F8FA] p-3 shadow-2xs">
                                         {isPdf ? (
                                             <iframe
-                                                src={`/admin/investor-kyc/${submission.id}/preview#toolbar=0`}
+                                                src={`/admin/investors/kyc/${submission.id}/preview#toolbar=0`}
                                                 className="h-72 w-full rounded-lg border-0 bg-white shadow-xs"
                                                 title="PDF Preview"
                                             />
@@ -529,7 +529,7 @@ function KycDrawer({
                                                 className="flex max-h-68 min-h-48 cursor-pointer items-center justify-center overflow-hidden p-1"
                                             >
                                                 <img
-                                                    src={`/admin/investor-kyc/${submission.id}/preview`}
+                                                    src={`/admin/investors/kyc/${submission.id}/preview`}
                                                     alt={submission.original_name}
                                                     className="h-auto max-h-64 w-full rounded-lg border border-zinc-200/60 bg-white object-contain shadow-sm transition-transform duration-200 group-hover:scale-[1.01]"
                                                 />
@@ -547,7 +547,7 @@ function KycDrawer({
                                                 <Icon icon="solar:maximize-square-linear" className="size-3.5" />
                                             </button>
                                             <a
-                                                href={`/admin/investor-kyc/${submission.id}/download`}
+                                                href={`/admin/investors/kyc/${submission.id}/download`}
                                                 className="p-1 text-zinc-300 transition-colors hover:text-white"
                                                 title="Download Original"
                                             >
@@ -569,7 +569,7 @@ function KycDrawer({
                                             </button>
 
                                             <a
-                                                href={`/admin/investor-kyc/${submission.id}/download`}
+                                                href={`/admin/investors/kyc/${submission.id}/download`}
                                                 className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                                             >
                                                 <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-400" />
@@ -680,7 +680,7 @@ function KycDrawer({
 
                             <div className="flex items-center gap-2">
                                 <a
-                                    href={`/admin/investor-kyc/${submission.id}/download`}
+                                    href={`/admin/investors/kyc/${submission.id}/download`}
                                     className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                                 >
                                     <Icon icon="solar:download-minimalistic-linear" className="size-3.5" />
@@ -701,13 +701,13 @@ function KycDrawer({
                         <div className="relative flex max-h-[65vh] min-h-95 items-center justify-center overflow-auto rounded-2xl border border-zinc-200/80 bg-[#F6F8FA] p-4">
                             {isPdf ? (
                                 <iframe
-                                    src={`/admin/investor-kyc/${submission.id}/preview`}
+                                    src={`/admin/investors/kyc/${submission.id}/preview`}
                                     className="h-[60vh] w-full rounded-xl border-0 bg-white shadow-sm"
                                     title="PDF Document"
                                 />
                             ) : (
                                 <img
-                                    src={`/admin/investor-kyc/${submission.id}/preview`}
+                                    src={`/admin/investors/kyc/${submission.id}/preview`}
                                     alt={submission.original_name}
                                     className="h-auto max-h-[58vh] w-full max-w-2xl rounded-xl border border-zinc-200/60 bg-white object-contain shadow-md"
                                 />
@@ -745,7 +745,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
     const applyFilters = useCallback(
         (overrides: Record<string, string | undefined>) => {
             const query = buildParams(overrides, { activeKycStatus, activeType, search });
-            router.get('/admin/investor-accounts', query, { replace: true, preserveState: true });
+            router.get('/admin/investors/accounts', query, { replace: true, preserveState: true });
         },
         [activeKycStatus, activeType, search],
     );
@@ -790,7 +790,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
                     <div className="flex items-center gap-2.5">
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/investor-accounts')}
+                            onClick={() => router.get('/admin/investors/accounts')}
                             className="flex items-center gap-2 rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:users-group-rounded-linear" className="size-3.5 text-zinc-500" />
@@ -1042,7 +1042,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     router.patch(
-                                                                        `/admin/investor-kyc/${inv.latest_kyc_submission!.id}`,
+                                                                        `/admin/investors/kyc/${inv.latest_kyc_submission!.id}`,
                                                                         { status: 'approved' },
                                                                         { preserveScroll: true },
                                                                     );
@@ -1074,7 +1074,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
                                                             <div className="my-1 border-t border-zinc-100" />
 
                                                             <a
-                                                                href={`/admin/investor-kyc/${inv.latest_kyc_submission.id}/preview`}
+                                                                href={`/admin/investors/kyc/${inv.latest_kyc_submission.id}/preview`}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 onClick={(e) => e.stopPropagation()}
@@ -1085,7 +1085,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
                                                             </a>
 
                                                             <a
-                                                                href={`/admin/investor-kyc/${inv.latest_kyc_submission.id}/download`}
+                                                                href={`/admin/investors/kyc/${inv.latest_kyc_submission.id}/download`}
                                                                 onClick={(e) => e.stopPropagation()}
                                                                 className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-zinc-700 hover:bg-zinc-100"
                                                             >

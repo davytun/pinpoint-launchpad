@@ -75,8 +75,9 @@ interface PageProps {
     recent_activity: ActivityItem[];
     needs_attention?: NeedsAttentionItem[];
     system_alerts?: SystemAlert[];
-    user_role: 'superadmin' | 'analyst' | 'support';
+    user_role: 'superadmin' | 'analyst' | 'support' | 'compliance' | 'investor_relations';
     date_range?: string;
+    desk?: 'platform' | 'founder' | 'investors';
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -384,9 +385,22 @@ export default function AdminDashboard({
     system_alerts = [],
     user_role,
     date_range = 'all',
+    desk = 'platform',
 }: PageProps) {
     const isSuperAdmin = user_role === 'superadmin';
     const isAnalyst = user_role === 'analyst';
+    const deskHome =
+        desk === 'founder' ? '/admin/founder' : desk === 'investors' ? '/admin/investors' : '/admin';
+    const deskLabel =
+        desk === 'founder'
+            ? isAnalyst
+                ? 'Your assigned engagements'
+                : 'Founder desk overview'
+            : desk === 'investors'
+              ? 'Investor desk overview'
+              : isSuperAdmin
+                ? 'Full platform overview'
+                : 'Admin overview';
 
     return (
         <AdminLayout>
@@ -397,11 +411,9 @@ export default function AdminDashboard({
                     <div className="mb-10 flex items-start justify-between">
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">Overview</h1>
-                            <p className="mt-2 text-[15px] font-medium text-zinc-500">
-                                {isSuperAdmin ? 'Full platform overview' : isAnalyst ? 'Your assigned engagements' : 'Support overview'}
-                            </p>
+                            <p className="mt-2 text-[15px] font-medium text-zinc-500">{deskLabel}</p>
                         </div>
-                        {isSuperAdmin && (
+                        {isSuperAdmin && desk === 'platform' && (
                             <div className="flex shrink-0 items-center gap-1 overflow-x-auto rounded-xl border border-zinc-200/80 bg-white p-1 shadow-2xs">
                                 {(
                                     [
@@ -417,7 +429,9 @@ export default function AdminDashboard({
                                         <button
                                             key={key}
                                             type="button"
-                                            onClick={() => router.get('/admin', { date_range: key }, { preserveState: true, preserveScroll: true })}
+                                            onClick={() =>
+                                                router.get(deskHome, { date_range: key }, { preserveState: true, preserveScroll: true })
+                                            }
                                             className={cn(
                                                 'shrink-0 rounded-lg px-3 py-1.5 text-[12.5px] font-medium transition-all duration-150',
                                                 isSelected
@@ -490,7 +504,7 @@ export default function AdminDashboard({
                                     label={date_range === 'all' ? 'Total Founders' : 'New Founders'}
                                     value={metrics.total_founders ?? 0}
                                     icon={Users}
-                                    href="/admin/founders"
+                                    href="/admin/founder/founders"
                                     variant="blue"
                                 />
                                 <MetricCard
@@ -505,7 +519,7 @@ export default function AdminDashboard({
                                     label="Active Audits"
                                     value={metrics.active_audits ?? 0}
                                     icon={Activity}
-                                    href="/admin/founders?status=in_progress"
+                                    href="/admin/founder/founders?status=in_progress"
                                     variant="amber"
                                 />
                                 <MetricCard
@@ -513,7 +527,7 @@ export default function AdminDashboard({
                                     value={metrics.needs_info_count ?? 0}
                                     icon={AlertTriangle}
                                     pulse={(metrics.needs_info_count ?? 0) > 0}
-                                    href="/admin/founders?status=needs_info"
+                                    href="/admin/founder/founders?status=needs_info"
                                     variant="purple"
                                 />
                             </div>
@@ -607,12 +621,12 @@ export default function AdminDashboard({
                     {/* ── Analyst ── */}
                     {isAnalyst && (
                         <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-                            <MetricCard label="My Assigned" value={metrics.my_assigned ?? 0} icon={Users} href="/admin/founders" variant="blue" />
+                            <MetricCard label="My Assigned" value={metrics.my_assigned ?? 0} icon={Users} href="/admin/founder/founders" variant="blue" />
                             <MetricCard
                                 label="Active Audits"
                                 value={metrics.active_audits ?? 0}
                                 icon={Activity}
-                                href="/admin/founders?status=in_progress"
+                                href="/admin/founder/founders?status=in_progress"
                                 variant="emerald"
                             />
                             <MetricCard
@@ -620,14 +634,14 @@ export default function AdminDashboard({
                                 value={metrics.needs_info_count ?? 0}
                                 icon={AlertTriangle}
                                 pulse={(metrics.needs_info_count ?? 0) > 0}
-                                href="/admin/founders?status=needs_info"
+                                href="/admin/founder/founders?status=needs_info"
                                 variant="amber"
                             />
                             <MetricCard
                                 label="Unread Messages"
                                 value={metrics.my_open_messages ?? 0}
                                 icon={MessageSquare}
-                                href="/admin/messages"
+                                href="/admin/founder/messages"
                                 variant="purple"
                             />
                         </div>
@@ -636,7 +650,7 @@ export default function AdminDashboard({
                     {/* ── Support ── */}
                     {user_role === 'support' && (
                         <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-                            <MetricCard label="Unread Messages" value={metrics.my_open_messages ?? 0} icon={MessageSquare} href="/admin/messages" />
+                            <MetricCard label="Unread Messages" value={metrics.my_open_messages ?? 0} icon={MessageSquare} href="/admin/founder/messages" />
                         </div>
                     )}
                 </div>

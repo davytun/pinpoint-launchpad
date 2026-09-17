@@ -126,7 +126,7 @@ function SpotlightDrawer({
         setErrors({});
 
         router.patch(
-            `/admin/spotlight/${profile.id}`,
+            `/admin/investors/spotlight/${profile.id}`,
             {
                 spotlight_one_liner: oneLiner,
                 spotlight_summary: summary,
@@ -158,7 +158,7 @@ function SpotlightDrawer({
     function togglePublish(publish: boolean) {
         setPublishing(true);
         router.patch(
-            `/admin/spotlight/${profile.id}`,
+            `/admin/investors/spotlight/${profile.id}`,
             {
                 publish,
                 spotlight_one_liner: oneLiner,
@@ -186,7 +186,7 @@ function SpotlightDrawer({
     function markDeckReviewed() {
         setReviewingDeck(true);
         router.patch(
-            `/admin/spotlight/${profile.id}`,
+            `/admin/investors/spotlight/${profile.id}`,
             { mark_deck_reviewed: true },
             {
                 onSuccess: () => {
@@ -522,7 +522,7 @@ export default function SpotlightIndex({ profiles, activeStatus, activeSector, s
     const applyFilters = useCallback(
         (overrides: Record<string, string | undefined>) => {
             const query = buildParams(overrides, { activeStatus, activeSector, search });
-            router.get('/admin/spotlight', query, { replace: true, preserveState: true });
+            router.get('/admin/investors/spotlight', query, { replace: true, preserveState: true });
         },
         [activeStatus, activeSector, search],
     );
@@ -559,7 +559,7 @@ export default function SpotlightIndex({ profiles, activeStatus, activeSector, s
 
                     <button
                         type="button"
-                        onClick={() => router.get('/admin/founders')}
+                        onClick={() => router.get('/admin/founder/founders')}
                         className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                     >
                         <Icon icon="solar:users-group-two-rounded-linear" className="size-3.5 text-zinc-500" />

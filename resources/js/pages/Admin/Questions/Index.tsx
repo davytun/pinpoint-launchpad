@@ -77,7 +77,7 @@ export default function AdminQuestionsIndex() {
                             <h1 className="text-2xl font-extrabold text-zinc-950">Diagnostic Questions</h1>
                         </div>
                         <Link
-                            href={route('admin.dashboard')}
+                            href={route('admin.founder.dashboard')}
                             className="text-zinc-555 hover:text-zinc-955 inline-flex items-center gap-1.5 text-sm font-bold transition-colors"
                         >
                             <ArrowLeft className="size-4" /> Dashboard

@@ -7,15 +7,39 @@ import GlobalLoader from '@/components/GlobalLoader';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
+type AdminRole = 'superadmin' | 'analyst' | 'support' | 'compliance' | 'investor_relations';
+type AdminDesk = 'platform' | 'founder' | 'investors';
+
 interface AdminUser {
     id: number;
     name: string;
     email: string;
-    role: 'superadmin' | 'analyst' | 'support' | 'compliance' | 'investor_relations';
+    role: AdminRole;
 }
 
 interface AdminLayoutProps {
     children: ReactNode;
+}
+
+function resolveDesk(url: string, role: AdminRole): AdminDesk {
+    if (url.startsWith('/admin/founder')) {
+        return 'founder';
+    }
+    if (url.startsWith('/admin/investors')) {
+        return 'investors';
+    }
+
+    // Shared alerts live outside desk prefixes — keep specialists on their shell.
+    if (url.startsWith('/admin/notifications')) {
+        if (role === 'analyst') {
+            return 'founder';
+        }
+        if (role === 'compliance' || role === 'investor_relations') {
+            return 'investors';
+        }
+    }
+
+    return 'platform';
 }
 
 function NavItem({
@@ -102,8 +126,73 @@ function NavSection({ label, collapsed }: { label: string; collapsed?: boolean }
     return <p className="mt-6 mb-2 px-4 text-[10.5px] font-bold tracking-[0.14em] text-zinc-400 uppercase first:mt-2">{label}</p>;
 }
 
+function DeskSwitcher({
+    desk,
+    collapsed,
+    onNav,
+}: {
+    desk: AdminDesk;
+    collapsed?: boolean;
+    onNav?: () => void;
+}) {
+    const desks: { id: AdminDesk; href: string; label: string; short: string }[] = [
+        { id: 'platform', href: '/admin', label: 'Platform', short: 'P' },
+        { id: 'founder', href: '/admin/founder', label: 'Founder', short: 'F' },
+        { id: 'investors', href: '/admin/investors', label: 'Investors', short: 'I' },
+    ];
+
+    if (collapsed) {
+        return (
+            <div className="mb-2 flex flex-col items-center gap-1">
+                {desks.map((item) => (
+                    <Tooltip key={item.id} delayDuration={150}>
+                        <TooltipTrigger asChild>
+                            <Link
+                                href={item.href}
+                                onClick={onNav}
+                                className={cn(
+                                    'flex h-8 w-8 items-center justify-center rounded-lg text-[11px] font-bold transition-colors',
+                                    desk === item.id
+                                        ? 'bg-zinc-950 text-white'
+                                        : 'bg-zinc-200/70 text-zinc-600 hover:bg-zinc-300/80 hover:text-zinc-900',
+                                )}
+                            >
+                                {item.short}
+                            </Link>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={12}>
+                            {item.label} desk
+                        </TooltipContent>
+                    </Tooltip>
+                ))}
+            </div>
+        );
+    }
+
+    return (
+        <div className="mb-3 grid grid-cols-3 gap-1 rounded-xl bg-zinc-200/50 p-1">
+            {desks.map((item) => (
+                <Link
+                    key={item.id}
+                    href={item.href}
+                    onClick={onNav}
+                    className={cn(
+                        'rounded-lg px-1.5 py-1.5 text-center text-[11px] font-semibold transition-colors',
+                        desk === item.id
+                            ? 'bg-white text-zinc-950 shadow-2xs'
+                            : 'text-zinc-500 hover:text-zinc-800',
+                    )}
+                >
+                    {item.label}
+                </Link>
+            ))}
+        </div>
+    );
+}
+
 function SidebarContent({
     user,
+    desk,
     isSuperAdmin,
     isAnalyst,
     isCompliance,
@@ -111,12 +200,14 @@ function SidebarContent({
     unreadMessages,
     unreadNotifications,
     isActive,
+    isExactActive,
     collapsed,
     toggleCollapse,
     logout,
     onNav,
 }: {
     user: AdminUser | null;
+    desk: AdminDesk;
     isSuperAdmin: boolean;
     isAnalyst: boolean;
     isCompliance: boolean;
@@ -124,15 +215,19 @@ function SidebarContent({
     unreadMessages: number;
     unreadNotifications: number;
     isActive: (path: string) => boolean;
+    isExactActive: (path: string) => boolean;
     collapsed?: boolean;
     toggleCollapse?: () => void;
     logout: () => void;
     onNav?: () => void;
 }) {
+    const showFounderNav = desk === 'founder' && (isSuperAdmin || isAnalyst);
+    const showInvestorNav = desk === 'investors' && (isSuperAdmin || isCompliance || isInvestorRelations);
+    const showPlatformNav = desk === 'platform' && isSuperAdmin;
+
     return (
         <TooltipProvider>
             <div className="flex h-full min-h-0 flex-col justify-between overflow-hidden">
-                {/* Top Workspace Header (Fixed) */}
                 <div className="shrink-0">
                     <div
                         className={cn(
@@ -177,41 +272,32 @@ function SidebarContent({
                             </>
                         )}
                     </div>
+
+                    {isSuperAdmin && <DeskSwitcher desk={desk} collapsed={collapsed} onNav={onNav} />}
                 </div>
 
-                {/* Navigation Links (Scrollable without visible scrollbars) */}
                 <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto py-1">
                     <nav className="flex flex-col space-y-1">
-                        <NavSection label="Main" collapsed={collapsed} />
-                        <NavItem
-                            href="/admin"
-                            icon="solar:widget-2-linear"
-                            label="Dashboard"
-                            active={isActive('/admin')}
-                            collapsed={collapsed}
-                            onClick={onNav}
-                        />
-                        <NavItem
-                            href="/admin/messages"
-                            icon="solar:inbox-linear"
-                            label="Messages"
-                            active={isActive('/admin/messages')}
-                            collapsed={collapsed}
-                            onClick={onNav}
-                            badge={unreadMessages}
-                        />
-                        <NavItem
-                            href="/admin/notifications"
-                            icon="solar:bell-bing-linear"
-                            label="Alerts"
-                            active={isActive('/admin/notifications')}
-                            collapsed={collapsed}
-                            onClick={onNav}
-                            badge={unreadNotifications}
-                        />
-
-                        {isSuperAdmin && (
+                        {showPlatformNav && (
                             <>
+                                <NavSection label="Platform" collapsed={collapsed} />
+                                <NavItem
+                                    href="/admin"
+                                    icon="solar:widget-2-linear"
+                                    label="Dashboard"
+                                    active={isExactActive('/admin')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                                <NavItem
+                                    href="/admin/notifications"
+                                    icon="solar:bell-bing-linear"
+                                    label="Alerts"
+                                    active={isActive('/admin/notifications')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                    badge={unreadNotifications}
+                                />
                                 <NavSection label="Operations" collapsed={collapsed} />
                                 <NavItem
                                     href="/admin/pia-requests"
@@ -221,85 +307,6 @@ function SidebarContent({
                                     collapsed={collapsed}
                                     onClick={onNav}
                                 />
-                            </>
-                        )}
-
-                        {(isSuperAdmin || isInvestorRelations || isCompliance) && (
-                            <>
-                                <NavSection label="Investors" collapsed={collapsed} />
-                                <NavItem
-                                    href="/admin/investor-accounts"
-                                    icon="solar:clipboard-list-linear"
-                                    label="Applications"
-                                    active={isActive('/admin/investor-accounts')}
-                                    collapsed={collapsed}
-                                    onClick={onNav}
-                                />
-                                <NavItem
-                                    href="/admin/investor-accounts?kyc_status=pending"
-                                    icon="solar:shield-check-linear"
-                                    label="KYC Reviews"
-                                    active={isActive('/admin/investor-accounts')}
-                                    collapsed={collapsed}
-                                    onClick={onNav}
-                                />
-                            </>
-                        )}
-
-                        {(isSuperAdmin || isInvestorRelations) && (
-                            <>
-                                <NavSection label="Dealflow" collapsed={collapsed} />
-                                <NavItem
-                                    href="/admin/spotlight"
-                                    icon="solar:crown-star-linear"
-                                    label="Spotlight"
-                                    active={isActive('/admin/spotlight')}
-                                    collapsed={collapsed}
-                                    onClick={onNav}
-                                />
-                                <NavItem
-                                    href="/admin/dealflow/interests"
-                                    icon="solar:hand-money-linear"
-                                    label="Interests"
-                                    active={isActive('/admin/dealflow/interests')}
-                                    collapsed={collapsed}
-                                    onClick={onNav}
-                                />
-                                <NavItem
-                                    href="/admin/dealflow/data-rooms"
-                                    icon="solar:folder-with-files-linear"
-                                    label="Data Rooms"
-                                    active={isActive('/admin/dealflow/data-rooms')}
-                                    collapsed={collapsed}
-                                    onClick={onNav}
-                                />
-                            </>
-                        )}
-
-                        {(isSuperAdmin || isAnalyst) && (
-                            <>
-                                {!isSuperAdmin && <NavSection label="Audits" />}
-                                <NavItem
-                                    href="/admin/founders"
-                                    icon="solar:user-speak-linear"
-                                    label="Founders"
-                                    active={isActive('/admin/founders')}
-                                    collapsed={collapsed}
-                                    onClick={onNav}
-                                />
-                                <NavItem
-                                    href="/admin/profiles"
-                                    icon="solar:medal-ribbons-star-linear"
-                                    label="Profiles"
-                                    active={isActive('/admin/profiles')}
-                                    collapsed={collapsed}
-                                    onClick={onNav}
-                                />
-                            </>
-                        )}
-
-                        {isSuperAdmin && (
-                            <>
                                 <NavSection label="Admin" collapsed={collapsed} />
                                 <NavItem
                                     href="/admin/revenue"
@@ -335,10 +342,153 @@ function SidebarContent({
                                 />
                             </>
                         )}
+
+                        {showFounderNav && (
+                            <>
+                                <NavSection label="Founder desk" collapsed={collapsed} />
+                                <NavItem
+                                    href="/admin/founder"
+                                    icon="solar:widget-2-linear"
+                                    label="Dashboard"
+                                    active={isExactActive('/admin/founder')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                                <NavItem
+                                    href="/admin/founder/messages"
+                                    icon="solar:inbox-linear"
+                                    label="Messages"
+                                    active={isActive('/admin/founder/messages')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                    badge={unreadMessages}
+                                />
+                                <NavItem
+                                    href="/admin/notifications"
+                                    icon="solar:bell-bing-linear"
+                                    label="Alerts"
+                                    active={isActive('/admin/notifications')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                    badge={unreadNotifications}
+                                />
+                                <NavSection label="Audits" collapsed={collapsed} />
+                                <NavItem
+                                    href="/admin/founder/founders"
+                                    icon="solar:user-speak-linear"
+                                    label="Founders"
+                                    active={isActive('/admin/founder/founders')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                                <NavItem
+                                    href="/admin/founder/profiles"
+                                    icon="solar:medal-ribbons-star-linear"
+                                    label="Profiles"
+                                    active={isActive('/admin/founder/profiles')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                                <NavItem
+                                    href="/admin/founder/questions"
+                                    icon="solar:question-circle-linear"
+                                    label="Questions"
+                                    active={isActive('/admin/founder/questions')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                            </>
+                        )}
+
+                        {showInvestorNav && (
+                            <>
+                                <NavSection label="Investor desk" collapsed={collapsed} />
+                                <NavItem
+                                    href="/admin/investors"
+                                    icon="solar:widget-2-linear"
+                                    label="Dashboard"
+                                    active={isExactActive('/admin/investors')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                                <NavItem
+                                    href="/admin/notifications"
+                                    icon="solar:bell-bing-linear"
+                                    label="Alerts"
+                                    active={isActive('/admin/notifications')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                    badge={unreadNotifications}
+                                />
+                                <NavSection label="Accounts" collapsed={collapsed} />
+                                <NavItem
+                                    href="/admin/investors/accounts"
+                                    icon="solar:clipboard-list-linear"
+                                    label="Applications"
+                                    active={isActive('/admin/investors/accounts')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                                {(isSuperAdmin || isCompliance) && (
+                                    <NavItem
+                                        href="/admin/investors/accounts?kyc_status=pending"
+                                        icon="solar:shield-check-linear"
+                                        label="KYC Reviews"
+                                        active={isActive('/admin/investors/accounts')}
+                                        collapsed={collapsed}
+                                        onClick={onNav}
+                                    />
+                                )}
+                                {(isSuperAdmin || isInvestorRelations) && (
+                                    <>
+                                        <NavSection label="Dealflow" collapsed={collapsed} />
+                                        <NavItem
+                                            href="/admin/investors/spotlight"
+                                            icon="solar:crown-star-linear"
+                                            label="Spotlight"
+                                            active={isActive('/admin/investors/spotlight')}
+                                            collapsed={collapsed}
+                                            onClick={onNav}
+                                        />
+                                        <NavItem
+                                            href="/admin/investors/dealflow/interests"
+                                            icon="solar:hand-money-linear"
+                                            label="Interests"
+                                            active={isActive('/admin/investors/dealflow/interests')}
+                                            collapsed={collapsed}
+                                            onClick={onNav}
+                                        />
+                                        <NavItem
+                                            href="/admin/investors/dealflow/data-rooms"
+                                            icon="solar:folder-with-files-linear"
+                                            label="Data Rooms"
+                                            active={isActive('/admin/investors/dealflow/data-rooms')}
+                                            collapsed={collapsed}
+                                            onClick={onNav}
+                                        />
+                                        <NavItem
+                                            href="/admin/investors/dealflow/diligence"
+                                            icon="solar:document-medicine-linear"
+                                            label="Diligence"
+                                            active={isActive('/admin/investors/dealflow/diligence')}
+                                            collapsed={collapsed}
+                                            onClick={onNav}
+                                        />
+                                        <NavItem
+                                            href="/admin/investors/announcements"
+                                            icon="solar:megaphone-linear"
+                                            label="Announcements"
+                                            active={isActive('/admin/investors/announcements')}
+                                            collapsed={collapsed}
+                                            onClick={onNav}
+                                        />
+                                    </>
+                                )}
+                            </>
+                        )}
                     </nav>
                 </div>
 
-                {/* Bottom User Area (Fixed) */}
                 <div className="mt-auto shrink-0 border-t border-zinc-200/60 pt-2 pb-1">
                     {collapsed ? (
                         <Tooltip delayDuration={150}>
@@ -394,6 +544,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const role = user?.role ?? 'support';
     const unreadMessages = admin_unread_messages ?? 0;
     const unreadNotifications = platform_unread_notifications?.admin ?? 0;
+    const desk = resolveDesk(currentUrl, role);
 
     const isSuperAdmin = role === 'superadmin';
     const isAnalyst = role === 'analyst';
@@ -421,7 +572,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         });
     }
 
-    // Keyboard shortcut handler: ⌘B / Ctrl+B
     useEffect(() => {
         function handleKeyDown(e: KeyboardEvent) {
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
@@ -452,15 +602,25 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         router.post('/logout');
     }
 
+    function isExactActive(path: string) {
+        const clean = currentUrl.split('?')[0].replace(/\/$/, '') || '/';
+        const target = path.replace(/\/$/, '') || '/';
+        return clean === target;
+    }
+
     function isActive(path: string) {
         if (path === '/admin' || path === '/admin/') {
-            return currentUrl === '/admin' || currentUrl === '/admin/';
+            return isExactActive('/admin');
+        }
+        if (path === '/admin/founder' || path === '/admin/investors') {
+            return isExactActive(path);
         }
         return currentUrl === path || currentUrl.startsWith(path + '/') || currentUrl.startsWith(path + '?');
     }
 
     const sidebarProps = {
         user,
+        desk,
         isSuperAdmin,
         isAnalyst,
         isCompliance,
@@ -468,15 +628,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         unreadMessages,
         unreadNotifications,
         isActive,
+        isExactActive,
         collapsed,
         toggleCollapse,
         logout,
     };
 
+    const showMobileMessages = desk === 'founder' && (isSuperAdmin || isAnalyst);
+
     return (
         <div className="flex h-screen max-h-screen flex-col gap-3.5 overflow-hidden bg-[#F4F4F6] p-3 text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white lg:flex-row lg:p-3.5">
             <GlobalLoader />
-            {/* ── Desktop Sidebar (Strictly bounded height, no scrollbar visible) ── */}
             <aside
                 className={cn(
                     'no-scrollbar hidden h-full max-h-full shrink-0 flex-col justify-between overflow-hidden py-2 transition-all duration-200 ease-in-out select-none lg:flex',
@@ -486,7 +648,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <SidebarContent {...sidebarProps} />
             </aside>
 
-            {/* ── Mobile Sidebar Drawer ────────────────────────────────────── */}
             {sidebarOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden" aria-modal="true">
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setSidebarOpen(false)} />
@@ -502,9 +663,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </div>
             )}
 
-            {/* ── Main Canvas Content Region (Strictly h-full, zero outer scroll) ─── */}
             <main className="relative flex h-full max-h-full min-w-0 flex-1 flex-col">
-                {/* ── Expand Sidebar Button (Floating on Left Edge) ── */}
                 {collapsed && (
                     <div className="absolute top-6 -left-4 z-50 hidden lg:flex">
                         <TooltipProvider>
@@ -523,7 +682,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     </div>
                 )}
 
-                {/* Mobile top bar */}
                 <header className="mb-3 flex h-14 shrink-0 items-center gap-3 rounded-2xl border border-zinc-200/80 bg-white px-5 shadow-2xs lg:hidden">
                     <button
                         onClick={() => setSidebarOpen(true)}
@@ -533,9 +691,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                         <Menu className="size-5" />
                     </button>
                     <img src="/pinpoint-logo.png" alt="Pinpoint" className="h-5 w-auto object-contain" />
-                    {unreadMessages > 0 && (
+                    {showMobileMessages && unreadMessages > 0 && (
                         <Link
-                            href="/admin/messages"
+                            href="/admin/founder/messages"
                             className="ml-auto flex items-center gap-1.5 rounded-full bg-zinc-900 px-2.5 py-0.5 text-[11px] font-bold text-white"
                         >
                             <Icon icon="solar:inbox-linear" className="size-3.5" />
@@ -544,7 +702,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     )}
                 </header>
 
-                {/* Page content strictly bounded */}
                 <div className="relative z-0 flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden">{children}</div>
             </main>
         </div>

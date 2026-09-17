@@ -7,7 +7,7 @@ export default function AdminUsersCreate() {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
-        role: 'analyst' as 'superadmin' | 'analyst' | 'support',
+        role: 'analyst' as 'superadmin' | 'analyst' | 'compliance' | 'investor_relations',
         password: '',
         password_confirmation: '',
     });
@@ -68,9 +68,10 @@ export default function AdminUsersCreate() {
                     <div>
                         <label className="mb-1.5 block text-xs font-bold tracking-widest text-zinc-500 uppercase">Role</label>
                         <select value={data.role} onChange={(e) => setData('role', e.target.value as typeof data.role)} className={inputClass}>
-                            <option value="analyst">Analyst</option>
-                            <option value="support">Support</option>
-                            <option value="superadmin">Super Admin</option>
+                            <option value="analyst">Analyst — Founder desk</option>
+                            <option value="compliance">Compliance — Investor desk</option>
+                            <option value="investor_relations">Investor Relations — Investor desk</option>
+                            <option value="superadmin">Super Admin — Platform</option>
                         </select>
                         {errors.role && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.role}</p>}
                     </div>

@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 
 class NewMessageAdminMail extends Mailable
 {
@@ -24,7 +25,7 @@ class NewMessageAdminMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Message from ' . ($this->founder->company_name ?? $this->founder->full_name) . ' — Pinpoint',
+            subject: 'New Message from '.($this->founder->company_name ?? $this->founder->full_name).' — Pinpoint',
         );
     }
 
@@ -33,15 +34,15 @@ class NewMessageAdminMail extends Mailable
         return new Content(
             view: 'emails.messages.admin-notification',
             with: [
-                'founder_name'    => $this->founder->full_name,
-                'company_name'    => $this->founder->company_name ?? $this->founder->full_name,
+                'founder_name' => $this->founder->full_name,
+                'company_name' => $this->founder->company_name ?? $this->founder->full_name,
                 'message_preview' => $this->message->body
-                    ? \Illuminate\Support\Str::limit($this->message->body, 150)
+                    ? Str::limit($this->message->body, 150)
                     : null,
-                'has_attachment'       => $this->message->has_attachment,
-                'attachment_filename'  => $this->message->attachment_filename,
-                'thread_url'          => url('/admin/messages/' . $this->thread->id),
-                'recipient_email'     => config('mail.admin_address'),
+                'has_attachment' => $this->message->has_attachment,
+                'attachment_filename' => $this->message->attachment_filename,
+                'thread_url' => url('/admin/founder/messages/'.$this->thread->id),
+                'recipient_email' => config('mail.admin_address'),
             ],
         );
     }

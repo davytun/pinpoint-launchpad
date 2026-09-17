@@ -96,17 +96,16 @@ class User extends Authenticatable
     }
 
     /**
-     * Post-login home while desk URL prefixes are still Phase 2.
-     * Specialists land on their lane; superadmin lands on the shared dashboard.
+     * Post-login home: specialists land on their desk dashboard; superadmin on platform.
      */
     public function defaultAdminHomeRoute(): string
     {
         if ($this->isAnalyst()) {
-            return route('admin.founders.index', absolute: false);
+            return route('admin.founder.dashboard', absolute: false);
         }
 
         if ($this->isCompliance() || $this->isInvestorRelations()) {
-            return route('admin.investor-accounts.index', absolute: false);
+            return route('admin.investors.dashboard', absolute: false);
         }
 
         if ($this->canAccessPlatformAdmin()) {

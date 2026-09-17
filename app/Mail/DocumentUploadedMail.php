@@ -22,7 +22,7 @@ class DocumentUploadedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Document Uploaded — ' . $this->founder->company_name,
+            subject: 'New Document Uploaded — '.$this->founder->company_name,
         );
     }
 
@@ -31,13 +31,13 @@ class DocumentUploadedMail extends Mailable
         return new Content(
             view: 'emails.documents.uploaded',
             with: [
-                'founder_name'   => $this->founder->full_name,
-                'founder_email'  => $this->founder->email,
-                'company_name'   => $this->founder->company_name,
+                'founder_name' => $this->founder->full_name,
+                'founder_email' => $this->founder->email,
+                'company_name' => $this->founder->company_name,
                 'category_label' => $this->document->categoryLabel(),
-                'filename'       => $this->document->original_filename,
-                'uploaded_at'    => $this->document->created_at->format('d M Y, H:i') . ' UTC',
-                'review_url'     => url('/admin/founders/' . $this->founder->id . '/documents'),
+                'filename' => $this->document->original_filename,
+                'uploaded_at' => $this->document->created_at->format('d M Y, H:i').' UTC',
+                'review_url' => url('/admin/founder/founders/'.$this->founder->id.'/documents'),
             ],
         );
     }

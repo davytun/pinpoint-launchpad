@@ -276,7 +276,7 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
                                     <div className="flex items-center gap-2">
                                         {founder?.id && (
                                             <Link
-                                                href={`/admin/founders/${founder.id}`}
+                                                href={`/admin/founder/founders/${founder.id}`}
                                                 className="flex items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50 hover:text-zinc-950"
                                             >
                                                 <span>Profile</span>
@@ -494,7 +494,7 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
                                     {/* Action Links */}
                                     <div className="mt-6 space-y-2 border-t border-zinc-200/70 pt-4">
                                         <Link
-                                            href={`/admin/founders/${founder.id}`}
+                                            href={`/admin/founder/founders/${founder.id}`}
                                             className="group flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white p-3 text-[12.5px] font-semibold text-zinc-800 shadow-2xs transition-all hover:border-zinc-300 hover:bg-zinc-50"
                                         >
                                             <div className="flex items-center gap-2.5">
@@ -511,7 +511,7 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
                                         </Link>
 
                                         <Link
-                                            href={`/admin/profiles/${founder.id}`}
+                                            href={`/admin/founder/profiles/${founder.id}`}
                                             className="group flex items-center justify-between rounded-xl border border-zinc-200/80 bg-white p-3 text-[12.5px] font-semibold text-zinc-800 shadow-2xs transition-all hover:border-zinc-300 hover:bg-zinc-50"
                                         >
                                             <div className="flex items-center gap-2.5">

@@ -15,7 +15,7 @@ class AnalystAssignedMail extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public readonly User    $analyst,
+        public readonly User $analyst,
         public readonly Founder $founder,
     ) {}
 
@@ -31,13 +31,13 @@ class AnalystAssignedMail extends Mailable
         return new Content(
             view: 'emails.analyst.assigned',
             with: [
-                'analystName'  => $this->analyst->name,
+                'analystName' => $this->analyst->name,
                 'analystEmail' => $this->analyst->email,
-                'founderName'  => $this->founder->full_name,
-                'companyName'  => $this->founder->company_name,
-                'tier'         => ucfirst((string) $this->founder->tier),
-                'score'        => $this->founder->score,
-                'profileUrl'   => url("/admin/founders/{$this->founder->id}"),
+                'founderName' => $this->founder->full_name,
+                'companyName' => $this->founder->company_name,
+                'tier' => ucfirst((string) $this->founder->tier),
+                'score' => $this->founder->score,
+                'profileUrl' => url("/admin/founder/founders/{$this->founder->id}"),
             ],
         );
     }

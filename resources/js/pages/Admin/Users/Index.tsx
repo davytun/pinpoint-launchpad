@@ -10,7 +10,7 @@ interface TeamMember {
     id: number;
     name: string;
     email: string;
-    role: 'superadmin' | 'analyst' | 'support';
+    role: 'superadmin' | 'analyst' | 'support' | 'compliance' | 'investor_relations';
     assigned_founders_count: number;
     created_at: string;
     is_self: boolean;
@@ -26,13 +26,17 @@ interface PageProps {
 const roleBadge: Record<string, string> = {
     superadmin: 'bg-zinc-100 text-zinc-700 border border-zinc-200/80',
     analyst: 'bg-zinc-100 text-zinc-700 border border-zinc-200/80',
-    support: 'bg-zinc-100 text-zinc-700 border border-zinc-200/80',
+    compliance: 'bg-zinc-100 text-zinc-700 border border-zinc-200/80',
+    investor_relations: 'bg-zinc-100 text-zinc-700 border border-zinc-200/80',
+    support: 'bg-zinc-100 text-zinc-500 border border-zinc-200/80',
 };
 
 const roleLabel: Record<string, string> = {
     superadmin: 'Super Admin',
     analyst: 'Analyst',
-    support: 'Support',
+    compliance: 'Compliance',
+    investor_relations: 'Investor Relations',
+    support: 'Support (retired)',
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────

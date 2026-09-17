@@ -613,7 +613,7 @@ export default function AdminFoundersShow({
                                     </div>
                                 </div>
                                 <Link
-                                    href={`/admin/messages?founder_id=${founder.id}`}
+                                    href={`/admin/founder/messages?founder_id=${founder.id}`}
                                     className="flex items-center gap-1 rounded-lg border border-zinc-200 px-2.5 py-1 text-[11px] font-medium text-zinc-600 hover:bg-zinc-50"
                                 >
                                     <span>Open in Full Inbox</span>
@@ -784,7 +784,7 @@ export default function AdminFoundersShow({
                                                     View Public Page
                                                 </a>
                                                 <Link
-                                                    href={`/admin/profiles/${profile.id}`}
+                                                    href={`/admin/founder/profiles/${profile.id}`}
                                                     className="flex-1 rounded-xl bg-zinc-950 py-2 text-center text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-zinc-800"
                                                 >
                                                     Edit Spotlight Dossier

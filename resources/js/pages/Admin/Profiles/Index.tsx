@@ -311,7 +311,7 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                                                     <Icon icon="solar:external-link-linear" className="size-4" />
                                                 </a>
                                                 <Link
-                                                    href={`/admin/profiles/${profile.id}`}
+                                                    href={`/admin/founder/profiles/${profile.id}`}
                                                     className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                                                     title="Full Profile Editor"
                                                 >

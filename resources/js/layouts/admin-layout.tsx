@@ -106,7 +106,6 @@ function SidebarContent({
     user,
     isSuperAdmin,
     isAnalyst,
-    isSupport,
     isCompliance,
     isInvestorRelations,
     unreadMessages,
@@ -120,7 +119,6 @@ function SidebarContent({
     user: AdminUser | null;
     isSuperAdmin: boolean;
     isAnalyst: boolean;
-    isSupport: boolean;
     isCompliance: boolean;
     isInvestorRelations: boolean;
     unreadMessages: number;
@@ -212,17 +210,23 @@ function SidebarContent({
                             badge={unreadNotifications}
                         />
 
-                        {(isSuperAdmin || isSupport) && (
+                        {isSuperAdmin && (
                             <>
                                 <NavSection label="Operations" collapsed={collapsed} />
                                 <NavItem
-                                    href="/admin/waitlist"
-                                    icon="solar:users-group-rounded-linear"
-                                    label="Waitlist"
-                                    active={isActive('/admin/waitlist')}
+                                    href="/admin/pia-requests"
+                                    icon="solar:document-add-linear"
+                                    label="PIA Requests"
+                                    active={isActive('/admin/pia-requests')}
                                     collapsed={collapsed}
                                     onClick={onNav}
                                 />
+                            </>
+                        )}
+
+                        {(isSuperAdmin || isInvestorRelations || isCompliance) && (
+                            <>
+                                <NavSection label="Investors" collapsed={collapsed} />
                                 <NavItem
                                     href="/admin/investor-accounts"
                                     icon="solar:clipboard-list-linear"
@@ -231,22 +235,6 @@ function SidebarContent({
                                     collapsed={collapsed}
                                     onClick={onNav}
                                 />
-                                {isSuperAdmin && (
-                                    <NavItem
-                                        href="/admin/pia-requests"
-                                        icon="solar:document-add-linear"
-                                        label="PIA Requests"
-                                        active={isActive('/admin/pia-requests')}
-                                        collapsed={collapsed}
-                                        onClick={onNav}
-                                    />
-                                )}
-                            </>
-                        )}
-
-                        {(isSuperAdmin || isInvestorRelations || isCompliance) && (
-                            <>
-                                <NavSection label="Investors" collapsed={collapsed} />
                                 <NavItem
                                     href="/admin/investor-accounts?kyc_status=pending"
                                     icon="solar:shield-check-linear"
@@ -409,7 +397,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     const isSuperAdmin = role === 'superadmin';
     const isAnalyst = role === 'analyst';
-    const isSupport = role === 'support';
     const isCompliance = role === 'compliance';
     const isInvestorRelations = role === 'investor_relations';
 
@@ -474,10 +461,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     const sidebarProps = {
         user,
-        role,
         isSuperAdmin,
         isAnalyst,
-        isSupport,
         isCompliance,
         isInvestorRelations,
         unreadMessages,

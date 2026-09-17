@@ -17,7 +17,6 @@ use App\Http\Controllers\Admin\PlatformAnnouncementController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\SpotlightController as AdminSpotlightController;
-use App\Http\Controllers\Admin\WaitlistController as AdminWaitlistController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CheckoutController;
@@ -42,13 +41,10 @@ use App\Http\Controllers\Seo\LlmsTxtController;
 use App\Http\Controllers\Seo\RobotsController;
 use App\Http\Controllers\Seo\SitemapController;
 use App\Http\Controllers\VerificationController;
-use App\Http\Controllers\WaitlistController;
 use App\Models\BlogPost;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-
-Route::redirect('/waitlist', '/');
 
 Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
@@ -64,8 +60,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             return redirect()->route('admin.login');
         }
-        if (Auth::guard('web')->check() && Auth::guard('web')->user()->isAdmin()) {
-            return redirect()->route('admin.dashboard');
+        if (Auth::guard('web')->check() && Auth::guard('web')->user()->canOperateAdmin()) {
+            return redirect()->to(Auth::guard('web')->user()->defaultAdminHomeRoute());
         }
 
         return Inertia::render('Admin/Login', [
@@ -79,51 +75,40 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Dashboard — all admin roles
+    // Shared dashboard — platform (superadmin). Specialists are redirected to their desk home.
     Route::get('/', [AdminDashboardController::class, 'index'])
-        ->middleware('require.role:superadmin,analyst,support,compliance,investor_relations')
+        ->middleware(['require.role:superadmin,analyst,compliance,investor_relations', 'admin.side:central'])
         ->name('dashboard');
 
-    Route::middleware('require.role:superadmin,analyst,support,compliance,investor_relations')->group(function () {
+    Route::middleware('require.role:superadmin,analyst,compliance,investor_relations')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::patch('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
         Route::patch('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
     });
 
-    // Messages — all admin roles
-    Route::prefix('messages')->name('messages.')->middleware('require.role:superadmin,analyst,support')->group(function () {
+    // Founder desk — messages
+    Route::prefix('messages')->name('messages.')->middleware(['require.role:superadmin,analyst', 'admin.side:founder'])->group(function () {
         Route::get('/', [AdminMessageController::class, 'inbox'])->name('inbox');
         Route::get('/attachment/{message}', [AdminMessageController::class, 'downloadAttachment'])->name('attachment.download');
         Route::get('/{thread}', [AdminMessageController::class, 'show'])->name('show');
         Route::post('/{thread}/reply', [AdminMessageController::class, 'reply'])->name('reply')->middleware('throttle:30,1');
     });
 
-    // Waitlist — superadmin + support
-    Route::middleware('require.role:superadmin,support')->group(function () {
-        Route::get('/waitlist', [AdminWaitlistController::class, 'index'])->name('waitlist.index');
-        Route::get('/waitlist/export', [AdminWaitlistController::class, 'export'])->name('waitlist.export');
-        Route::patch('/waitlist/{entry}/convert', [AdminWaitlistController::class, 'toggleConverted'])->name('waitlist.convert');
-        Route::post('/waitlist/{entry}/resend', [AdminWaitlistController::class, 'resend'])->name('waitlist.resend');
-        Route::delete('/waitlist/{entry}', [AdminWaitlistController::class, 'destroy'])->name('waitlist.destroy');
-
-        // Investors
-    });
-
-    // PIA requests and offline-payment confirmation are financial operations.
-    Route::middleware('require.role:superadmin')->group(function () {
+    // PIA requests — platform (superadmin)
+    Route::middleware(['require.role:superadmin', 'admin.side:central'])->group(function () {
         Route::get('/pia-requests', [PiaApplicationController::class, 'index'])->name('pia-requests.index');
         Route::patch('/pia-requests/{application}/contacted', [PiaApplicationController::class, 'markContacted'])->name('pia-requests.contacted');
         Route::post('/pia-requests/{application}/payment-received', [PiaApplicationController::class, 'confirmPaymentReceived'])->name('pia-requests.payment-received');
     });
 
-    Route::middleware('require.role:superadmin,compliance,investor_relations')->group(function () {
+    Route::middleware(['require.role:superadmin,compliance,investor_relations', 'admin.side:investors'])->group(function () {
         Route::redirect('/investors', '/admin/investor-accounts')->name('investors.legacy');
         Route::get('/investor-accounts', [InvestorAccountController::class, 'index'])->name('investor-accounts.index');
         Route::get('/investor-accounts/{investor}', [InvestorAccountController::class, 'show'])->name('investor-accounts.show');
         Route::patch('/investor-accounts/{investor}', [InvestorAccountController::class, 'update'])->name('investor-accounts.update');
     });
 
-    Route::middleware('require.role:superadmin,investor_relations')->group(function () {
+    Route::middleware(['require.role:superadmin,investor_relations', 'admin.side:investors'])->group(function () {
         Route::get('/announcements', [PlatformAnnouncementController::class, 'index'])->name('announcements.index');
         Route::post('/announcements', [PlatformAnnouncementController::class, 'store'])->name('announcements.store');
         Route::get('/spotlight', [AdminSpotlightController::class, 'index'])->name('spotlight.index');
@@ -142,8 +127,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('/dealflow/diligence/{diligenceRequest}/decline', [DiligenceRequestController::class, 'decline'])->name('dealflow.diligence.decline');
     });
 
-    // Founders — superadmin + analyst
-    Route::middleware('require.role:superadmin,analyst')->group(function () {
+    // Founder desk — founders, documents, profiles
+    Route::middleware(['require.role:superadmin,analyst', 'admin.side:founder'])->group(function () {
         Route::get('/founders', [AdminFounderController::class, 'index'])->name('founders.index');
         Route::get('/founders/{founder}', [AdminFounderController::class, 'show'])->name('founders.show');
         Route::post('/founders/{founder}/assign', [AdminFounderController::class, 'assign'])->middleware('require.role:superadmin')->name('founders.assign');
@@ -165,20 +150,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
     });
 
-    // Questions — superadmin + analyst
-    Route::prefix('questions')->name('questions.')->middleware('require.role:superadmin,analyst')->group(function () {
+    // Founder desk — questions
+    Route::prefix('questions')->name('questions.')->middleware(['require.role:superadmin,analyst', 'admin.side:founder'])->group(function () {
         Route::get('/', [AdminQuestionController::class, 'index'])->name('index');
         Route::get('/{question}/edit', [AdminQuestionController::class, 'edit'])->name('edit');
         Route::patch('/{question}', [AdminQuestionController::class, 'update'])->name('update');
     });
 
-    // Settings + Revenue — superadmin only
-    Route::middleware('require.role:superadmin')->group(function () {
+    // Platform — settings, revenue, blog
+    Route::middleware(['require.role:superadmin', 'admin.side:central'])->group(function () {
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
         Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
         Route::get('/revenue', [AdminDashboardController::class, 'revenue'])->name('revenue');
 
-        // Admin Blog
         Route::prefix('blog')->name('blog.')->group(function () {
             Route::get('/', [AdminBlogController::class, 'index'])->name('index');
             Route::get('/create', [AdminBlogController::class, 'create'])->name('create');
@@ -191,8 +175,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
     });
 
-    // User management — superadmin only
-    Route::prefix('users')->name('users.')->middleware('require.role:superadmin')->group(function () {
+    // Platform — team
+    Route::prefix('users')->name('users.')->middleware(['require.role:superadmin', 'admin.side:central'])->group(function () {
         Route::get('/', [AdminUserController::class, 'index'])->name('index');
         Route::get('/create', [AdminUserController::class, 'create'])->name('create');
         Route::post('/', [AdminUserController::class, 'store'])->name('store');
@@ -221,12 +205,10 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'latest_posts' => $latestPosts,
     ]);
-})->name('waitlist.index');
+})->name('home');
 Route::get('/orbit-demo', function () {
     return Inertia::render('OrbitDemo');
 })->name('orbit.demo');
-Route::post('/waitlist/founders', [WaitlistController::class, 'storeFounder'])->name('waitlist.founders.store');
-Route::post('/waitlist/investors', [WaitlistController::class, 'storeInvestor'])->name('waitlist.investors.store');
 Route::post('/contact', [ContactController::class, 'storeContact'])->name('contact.store');
 Route::post('/newsletter', [ContactController::class, 'storeNewsletter'])->name('newsletter.store');
 
@@ -283,7 +265,7 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::get('/data-rooms/{slug}/document/{document}', [InvestorDataRoomController::class, 'download'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('data-rooms.download');
 });
 
-Route::prefix('admin')->name('admin.')->middleware('require.role:superadmin,compliance')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['require.role:superadmin,compliance', 'admin.side:investors'])->group(function () {
     Route::get('/investor-kyc', fn () => redirect()->route('admin.investor-accounts.index', ['kyc_status' => 'pending']))->name('investor-kyc.index');
     Route::get('/investor-kyc/{submission}/preview', [AdminInvestorKycController::class, 'preview'])->name('investor-kyc.preview');
     Route::get('/investor-kyc/{submission}/download', [AdminInvestorKycController::class, 'download'])->name('investor-kyc.download');

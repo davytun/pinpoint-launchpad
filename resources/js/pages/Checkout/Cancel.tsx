@@ -41,7 +41,7 @@ export default function CheckoutCancel() {
                                 className="group relative block w-full overflow-hidden rounded-xl bg-[#3A54A5] px-5 py-4 text-center text-[13px] font-bold tracking-[0.18em] text-white uppercase transition-all duration-200 outline-none hover:bg-[#3b5ba5]"
                                 style={{ boxShadow: '0 0 28px rgba(68,104,187,0.3)' }}
                             >
-                                <span className="waitlist-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
+                                <span className="surface-shimmer absolute inset-0 opacity-40 mix-blend-overlay transition-opacity duration-300 group-hover:opacity-80" />
                                 <span className="relative z-10 flex items-center justify-center gap-2">
                                     Return to Pricing
                                     <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />

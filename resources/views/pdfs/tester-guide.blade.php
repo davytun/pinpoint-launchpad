@@ -322,21 +322,20 @@
 
     <div class="section">
         <span class="section-number">2</span>
-        <span class="section-title">Founder Journey: Public Entry and Waitlist</span>
+        <span class="section-title">Founder Journey: Public Entry</span>
         <div class="section-body">
-            <p>The public site begins at the waitlist experience and then moves into the diagnostic flow.</p>
+            <p>The public site begins at the homepage and then moves into the diagnostic flow.</p>
 
             <div class="steps">
                 <div class="step">Visit <strong>https://app.pinpointlaunchpad.com</strong></div>
-                <div class="step">Review the public waitlist page for both founder and investor audiences</div>
-                <div class="step">Submit a founder waitlist form and an investor waitlist form if needed for review</div>
+                <div class="step">Review the public homepage for founder and investor entry points</div>
                 <div class="step">Proceed to the diagnostic at <strong>/diagnostic</strong></div>
             </div>
 
             <p style="margin-top:10px;"><strong>What to review:</strong></p>
             <div class="checklist">
                 <div class="check-item">Page messaging is clear for both founders and investors</div>
-                <div class="check-item">Forms submit successfully</div>
+                <div class="check-item">Primary CTAs reach Self-Scan and Assessment flows</div>
                 <div class="check-item">The visual quality matches the expected brand standard</div>
                 <div class="check-item">The next step into the diagnostic feels obvious</div>
                 <div class="check-item">Mobile layout remains easy to use</div>

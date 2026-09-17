@@ -59,15 +59,61 @@ class User extends Authenticatable
         return $this->role === 'investor_relations';
     }
 
-    // Legacy helpers — keep for backward compat with any existing checks
+    /**
+     * Operable staff roles (support is retired from day-to-day admin access).
+     */
+    public function canOperateAdmin(): bool
+    {
+        return in_array($this->role, ['superadmin', 'analyst', 'compliance', 'investor_relations'], true);
+    }
+
+    /**
+     * Legacy helper — now matches operable staff only.
+     */
     public function isAdmin(): bool
     {
-        return in_array($this->role, ['superadmin', 'analyst', 'support', 'compliance', 'investor_relations']);
+        return $this->canOperateAdmin();
     }
 
     public function isFounder(): bool
     {
         return false;
+    }
+
+    public function canAccessPlatformAdmin(): bool
+    {
+        return $this->isSuperAdmin();
+    }
+
+    public function canAccessFounderAdmin(): bool
+    {
+        return $this->isSuperAdmin() || $this->isAnalyst();
+    }
+
+    public function canAccessInvestorAdmin(): bool
+    {
+        return $this->isSuperAdmin() || $this->isCompliance() || $this->isInvestorRelations();
+    }
+
+    /**
+     * Post-login home while desk URL prefixes are still Phase 2.
+     * Specialists land on their lane; superadmin lands on the shared dashboard.
+     */
+    public function defaultAdminHomeRoute(): string
+    {
+        if ($this->isAnalyst()) {
+            return route('admin.founders.index', absolute: false);
+        }
+
+        if ($this->isCompliance() || $this->isInvestorRelations()) {
+            return route('admin.investor-accounts.index', absolute: false);
+        }
+
+        if ($this->canAccessPlatformAdmin()) {
+            return route('admin.dashboard', absolute: false);
+        }
+
+        return route('admin.login', absolute: false);
     }
 
     public function canAccessFinancials(): bool
@@ -77,15 +123,12 @@ class User extends Authenticatable
 
     public function canManageAudit(): bool
     {
-        return in_array($this->role, ['superadmin', 'analyst']);
+        return in_array($this->role, ['superadmin', 'analyst'], true);
     }
 
     public function canAccessFounder(string $founderId): bool
     {
         if ($this->isSuperAdmin()) {
-            return true;
-        }
-        if ($this->isSupport()) {
             return true;
         }
 

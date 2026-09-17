@@ -11,7 +11,6 @@ use App\Models\InvestorInterest;
 use App\Models\Message;
 use App\Models\MessageThread;
 use App\Models\Payment;
-use App\Models\WaitlistEntry;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -62,10 +61,6 @@ class AdminDashboardController extends Controller
                 'foundation'   => Payment::where('status', 'paid')->where('tier', 'foundation')->when($startDate, fn($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount'),
                 'growth'       => Payment::where('status', 'paid')->where('tier', 'growth')->when($startDate, fn($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount'),
                 'institutional'=> Payment::where('status', 'paid')->where('tier', 'institutional')->when($startDate, fn($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount'),
-            ];
-            $metrics['waitlist_count'] = [
-                'founders'  => WaitlistEntry::where('type', 'founder')->count(),
-                'investors' => WaitlistEntry::where('type', 'investor')->count(),
             ];
 
             // Last 6 months revenue for sparkline

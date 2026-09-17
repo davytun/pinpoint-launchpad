@@ -91,7 +91,7 @@ test('superadmin dashboard generates accurate action-required workflows with val
             ->where('metrics.revenue_this_month', 35000));
 });
 
-test('analyst dashboard generates analyst-assigned metrics and actions', function () {
+test('analyst is redirected from platform dashboard to founder desk home', function () {
     $analyst = User::factory()->create(['role' => 'analyst']);
     $founder = Founder::factory()->create();
     $payingUser = User::factory()->create();
@@ -118,26 +118,32 @@ test('analyst dashboard generates analyst-assigned metrics and actions', functio
 
     $founder->update(['payment_id' => $payment->id]);
 
-    $response = $this->actingAs($analyst)->get(route('admin.dashboard'));
+    $this->actingAs($analyst)
+        ->get(route('admin.dashboard'))
+        ->assertRedirect(route('admin.founders.index'));
 
-    $response->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('Admin/Dashboard')
-            ->where('metrics.my_assigned', 1)
-            ->where('metrics.active_audits', 1));
+    $this->actingAs($analyst)
+        ->get(route('admin.founders.index'))
+        ->assertOk();
 });
 
-test('compliance and investor relations can access their operational dashboard queues', function () {
+test('compliance and investor relations are redirected from platform dashboard to investor desk home', function () {
     $compliance = User::factory()->create(['role' => 'compliance']);
     $investorRelations = User::factory()->create(['role' => 'investor_relations']);
 
     $this->actingAs($compliance)
         ->get(route('admin.dashboard'))
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('Admin/Dashboard'));
+        ->assertRedirect(route('admin.investor-accounts.index'));
 
     $this->actingAs($investorRelations)
         ->get(route('admin.dashboard'))
-        ->assertOk()
-        ->assertInertia(fn ($page) => $page->component('Admin/Dashboard'));
+        ->assertRedirect(route('admin.investor-accounts.index'));
+
+    $this->actingAs($compliance)
+        ->get(route('admin.investor-accounts.index'))
+        ->assertOk();
+
+    $this->actingAs($investorRelations)
+        ->get(route('admin.investor-accounts.index'))
+        ->assertOk();
 });

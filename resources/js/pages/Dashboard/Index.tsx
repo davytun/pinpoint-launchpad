@@ -41,8 +41,8 @@ export default function DashboardIndex({ tier, amount_paid, signed_at, email }: 
             <Head title="You're In — PARAGON Certification" />
 
             {/* Background */}
-            <div className="waitlist-shell pointer-events-none fixed inset-0 z-0" />
-            <div className="waitlist-grid pointer-events-none fixed inset-0 z-0" />
+            <div className="surface-shell pointer-events-none fixed inset-0 z-0" />
+            <div className="surface-grid pointer-events-none fixed inset-0 z-0" />
             <div
                 className="pointer-events-none absolute inset-x-0 top-0 z-0 h-80"
                 style={{ background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(16,185,129,0.12) 0%, transparent 100%)' }}

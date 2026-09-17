@@ -53,7 +53,7 @@ return [
 
     'pages' => [
 
-        'waitlist.index' => [
+        'home' => [
             'title' => 'Prove your startup is ready for investment',
             'description' => 'Pinpoint helps founders verify startup information, find gaps, and build a profile investors can review. Start with a free Self-Scan or apply for the Pinpoint Investment Assessment.',
             'robots' => 'index, follow',

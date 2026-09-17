@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureAdminSide;
 use App\Http\Middleware\EnsureFounderAuthenticated;
 use App\Http\Middleware\EnsureInvestorAuthenticated;
 use App\Http\Middleware\EnsureInvestorKycApproved;
@@ -22,7 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->trustProxies(at: '*');
-        
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
@@ -31,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureUserHasRole::class,
             'require.role' => RequireRole::class,
+            'admin.side' => EnsureAdminSide::class,
             'payment.complete' => EnsurePaymentComplete::class,
             'signature.complete' => EnsureSignatureComplete::class,
             'auth.founder' => EnsureFounderAuthenticated::class,

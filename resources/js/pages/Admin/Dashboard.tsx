@@ -58,7 +58,6 @@ interface Metrics {
     revenue_by_currency?: { NGN: number; USD: number };
     revenue_this_month?: number;
     revenue_by_tier?: { foundation: number; growth: number; institutional: number };
-    waitlist_count?: { founders: number; investors: number };
     monthly_revenue?: MonthlyRevenue[];
     audit_breakdown?: AuditBreakdownItem[];
     funnel?: FunnelMetrics;
@@ -245,50 +244,6 @@ function AuditDonut({ data }: { data: AuditBreakdownItem[] }) {
                             <span className="shrink-0 text-[13px] font-bold text-zinc-900 tabular-nums">{item.value}</span>
                         </div>
                     ))}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ─── Waitlist split ───────────────────────────────────────────────────────────
-
-function WaitlistBars({ founders, investors }: { founders: number; investors: number }) {
-    const total = founders + investors;
-    const founderPct = total ? Math.round((founders / total) * 100) : 0;
-    const investorPct = total ? 100 - founderPct : 0;
-
-    return (
-        <div className="min-w-0 rounded-[20px] border border-zinc-200/60 bg-white p-5 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] sm:p-6">
-            <div className="mb-6 flex items-center justify-between">
-                <p className="text-[13px] font-semibold text-zinc-500">Waitlist Composition</p>
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-100/80 text-zinc-400">
-                    <Users className="size-3.5" />
-                </div>
-            </div>
-
-            <div className="mb-2 flex items-end justify-between">
-                <span className="text-3xl font-bold tracking-tight text-zinc-900">{total}</span>
-                <span className="mb-1 text-xs font-medium text-zinc-400">Total pending</span>
-            </div>
-
-            <div className="mt-5 flex h-2.5 w-full overflow-hidden rounded-full bg-zinc-100">
-                <div className="bg-zinc-900 transition-all duration-500" style={{ width: `${founderPct}%` }} />
-                <div className="bg-zinc-400 transition-all duration-500" style={{ width: `${investorPct}%` }} />
-            </div>
-
-            <div className="mt-4 flex gap-5">
-                <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-zinc-900" />
-                    <span className="text-xs font-medium text-zinc-500">
-                        Founders <span className="ml-1 font-semibold text-zinc-900">{founderPct}%</span>
-                    </span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-zinc-400" />
-                    <span className="text-xs font-medium text-zinc-500">
-                        Investors <span className="ml-1 font-semibold text-zinc-900">{investorPct}%</span>
-                    </span>
                 </div>
             </div>
         </div>
@@ -645,11 +600,6 @@ export default function AdminDashboard({
 
                                     {/* Funnel Metrics */}
                                     {metrics.funnel && <FunnelChart data={metrics.funnel} />}
-
-                                    {/* Waitlist Split */}
-                                    {metrics.waitlist_count && (
-                                        <WaitlistBars founders={metrics.waitlist_count.founders} investors={metrics.waitlist_count.investors} />
-                                    )}
                                 </div>
                             </div>
                         </>

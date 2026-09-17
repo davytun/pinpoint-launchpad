@@ -40,7 +40,7 @@ class Seo
         if (empty($overrides['canonical_path']) && $routeName === 'blog.index') {
             $canonicalPath = '/blog';
         }
-        if (empty($overrides['canonical_path']) && $routeName === 'waitlist.index') {
+        if (empty($overrides['canonical_path']) && $routeName === 'home') {
             $canonicalPath = '/';
         }
 

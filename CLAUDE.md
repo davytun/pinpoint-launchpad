@@ -110,15 +110,6 @@ Two layout trees in `resources/js/layouts/`:
 
 Target is **MySQL** (cPanel shared hosting). Config: `strict: false`, `utf8mb4`/`utf8mb4_unicode_ci`. Credentials come from `.env` — see `.env.example` for expected keys (`DB_DATABASE=pinpoint_db`, `DB_USERNAME=pinpoint_user`).
 
-The `waitlist_entries` table is referenced in `WaitlistController` but its migration has not been created yet.
-
-### Jobs
-
-`app/Jobs/SendWaitlistEmail.php` — dispatched after a successful waitlist signup. The `handle()` method is a stub pending email implementation.
-
 ### Key Pending Work
 
-- Migration for `waitlist_entries` table
-- `SendWaitlistEmail` job implementation
-- `Waitlist/Index` React page (`resources/js/pages/Waitlist/Index.tsx`)
 - `ADMIN_PASSWORD` must be set in `.env` before running `AdminSeeder`

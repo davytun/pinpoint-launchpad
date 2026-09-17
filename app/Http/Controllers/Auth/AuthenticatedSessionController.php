@@ -33,9 +33,10 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $default = $request->user()->isAdmin()
-            ? route('admin.dashboard', absolute: false)
-            : route('waitlist.index', absolute: false);
+        $user = $request->user();
+        $default = $user->canOperateAdmin()
+            ? $user->defaultAdminHomeRoute()
+            : route('home', absolute: false);
 
         return redirect()->intended($default);
     }
@@ -45,7 +46,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $wasAdmin = Auth::user()?->isAdmin();
+        $wasAdmin = Auth::user()?->canOperateAdmin();
 
         Auth::guard('web')->logout();
 

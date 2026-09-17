@@ -62,7 +62,6 @@ Real startup `/verify/{slug}` URLs are retired and redirect to `/investor`. `/ve
 | Analyst | Founder audit and documents |
 | Compliance | Investor KYC review |
 | Investor Relations | Spotlight publication, dealflow orchestration, Data Room grants, introductions, diligence release |
-| Support | Support and waitlist operations |
 | Superadmin | Full operational oversight |
 
 Authorization is enforced by Laravel middleware, requests, policies, and controller-level checks. Hiding a UI element is not an authorization boundary.

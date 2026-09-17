@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\BlogPostFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class BlogPost extends Model
 {
+    /** @use HasFactory<BlogPostFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'title',
         'slug',
@@ -42,6 +47,7 @@ class BlogPost extends Model
     public function getReadingTimeMinsAttribute(): int
     {
         $words = str_word_count(strip_tags($this->body));
+
         return max(1, (int) ceil($words / 200));
     }
 
@@ -51,7 +57,7 @@ class BlogPost extends Model
     {
         $base = Str::slug($title);
         $slug = $base;
-        $i    = 1;
+        $i = 1;
 
         while (
             static::where('slug', $slug)

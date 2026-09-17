@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { BookOpen, Calendar, ChevronRight, Clock, Search } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -64,7 +64,6 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
 
     return (
         <>
-            <Head title="Insights & Articles — Pinpoint Launchpad" />
             <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900">
                 {/* Background SideRays */}
                 <div className="pointer-events-none fixed inset-0 z-0">

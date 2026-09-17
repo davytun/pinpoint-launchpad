@@ -3,6 +3,7 @@ import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 import InputError from '@/components/input-error';
+import PrivacyConsent from '@/components/privacy-consent';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,6 +102,7 @@ export default function Register() {
                         <InputError message={errors.password_confirmation} />
                     </div>
 
+                    <PrivacyConsent variant="capture" />
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Create account

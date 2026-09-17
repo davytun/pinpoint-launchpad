@@ -12,8 +12,8 @@ use App\Http\Controllers\Admin\DiligenceRequestController;
 use App\Http\Controllers\Admin\InvestorAccountController;
 use App\Http\Controllers\Admin\InvestorKycController as AdminInvestorKycController;
 use App\Http\Controllers\Admin\NotificationController;
-use App\Http\Controllers\Admin\PlatformAnnouncementController;
 use App\Http\Controllers\Admin\PiaApplicationController;
+use App\Http\Controllers\Admin\PlatformAnnouncementController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\SpotlightController as AdminSpotlightController;
@@ -38,6 +38,9 @@ use App\Http\Controllers\Investor\InvestorOnboardingController;
 use App\Http\Controllers\Investor\InvestorSpotlightController;
 use App\Http\Controllers\InvestorController;
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\Seo\LlmsTxtController;
+use App\Http\Controllers\Seo\RobotsController;
+use App\Http\Controllers\Seo\SitemapController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\WaitlistController;
 use App\Models\BlogPost;
@@ -46,6 +49,10 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 Route::redirect('/waitlist', '/');
+
+Route::get('/robots.txt', RobotsController::class)->name('robots');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/llms.txt', LlmsTxtController::class)->name('llms');
 
 // ── Admin routes ───────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {

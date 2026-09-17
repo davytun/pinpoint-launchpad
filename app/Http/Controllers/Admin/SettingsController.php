@@ -16,7 +16,7 @@ class SettingsController extends Controller
         return Inertia::render('Admin/Settings/Index', [
             'cooldown_days' => (int) Setting::get('diagnostic_cooldown_days', 30),
             'investor_cta' => [
-                'label' => Setting::get('investor_cta_label', 'Join PIN'),
+                'label' => Setting::get('investor_cta_label', 'Join as an investor'),
                 'url' => Setting::get('investor_cta_url', '/investor/onboarding'),
                 'enabled' => Setting::get('investor_cta_enabled', '1') === '1',
             ],

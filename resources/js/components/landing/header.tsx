@@ -1,13 +1,14 @@
-import { Magnetic } from '@/components/landing/animations';
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
-    { label: 'Why Pinpoint', id: 'why-pinpoint' },
-    { label: 'PARAGON Model', id: 'paragon-model' },
+    { label: 'How it works', id: 'blueprint' },
+    { label: 'PARAGON', id: 'paragon-model' },
+    { label: 'Assessment', id: '', href: '/assessment' },
     { label: 'Pricing', id: 'pricing' },
+    { label: 'FAQ', id: 'faq' },
     { label: 'Blog', id: '', href: '/blog' },
 ];
 
@@ -35,17 +36,16 @@ export default function Header() {
     return (
         <div className="fixed top-4 left-1/2 z-50 w-full max-w-6xl -translate-x-1/2 px-4 font-sans">
             <header
-                className={`flex h-15 w-full items-center justify-between rounded-full border border-white/80 bg-white/30 px-6 py-2 backdrop-blur-md transition-all duration-300 md:h-16 ${
-                    scrolled ? 'border-white bg-white/50 shadow-[0_12px_40px_rgba(58,84,165,0.06)]' : 'shadow-[0_4px_20px_rgba(58,84,165,0.02)]'
-                }`}
+                className={`flex h-15 w-full items-center justify-between rounded-full border border-white/80 bg-white/30 px-6 py-2 backdrop-blur-md transition-all duration-300 md:h-16 ${scrolled ? 'border-white bg-white/50 shadow-[0_12px_40px_rgba(58,84,165,0.06)]' : 'shadow-[0_4px_20px_rgba(58,84,165,0.02)]'
+                    }`}
             >
                 {/* Logo */}
-                <a href="#" className="flex shrink-0 items-center gap-2">
+                <a href="/" className="flex shrink-0 items-center gap-2">
                     <PinpointLogo height={25} variant="dark" />
                 </a>
 
                 {/* Desktop Nav Items with sliding background capsule */}
-                <div className="hidden shrink-0 items-center gap-1.5 md:flex" onMouseLeave={() => setHoveredIndex(null)}>
+                <div className="hidden shrink-0 items-center gap-1.5 lg:flex" onMouseLeave={() => setHoveredIndex(null)}>
                     {NAV_ITEMS.map((item, idx) =>
                         item.href ? (
                             <a
@@ -85,21 +85,25 @@ export default function Header() {
                 </div>
 
                 {/* Desktop Actions */}
-                <div className="hidden shrink-0 items-center gap-4 md:flex">
+                <div className="hidden shrink-0 items-center gap-3 md:flex">
+                    <a
+                        href="/investor"
+                        className="text-[14.5px] font-bold tracking-wide whitespace-nowrap text-zinc-600 transition-colors hover:text-zinc-950"
+                    >
+                        For Investors
+                    </a>
                     <a
                         href="/founder/login"
-                        className="text-[14.5px] font-bold tracking-wide whitespace-nowrap text-zinc-600 transition-colors hover:text-zinc-950"
+                        className="hidden text-[14.5px] font-bold tracking-wide whitespace-nowrap text-zinc-500 transition-colors hover:text-zinc-950 xl:inline"
                     >
                         Founder Portal
                     </a>
-                    <Magnetic strength={0.2} range={30}>
-                        <a
-                            href="/diagnostic"
-                            className="inline-flex h-10 items-center justify-center rounded-full bg-[#3A54A5] px-5 text-[14px] font-bold tracking-wide whitespace-nowrap text-white transition-all duration-200 hover:bg-[#2D4182] active:scale-[0.98]"
-                        >
-                            Start Diagnostic
-                        </a>
-                    </Magnetic>
+                    <a
+                        href="/diagnostic"
+                        className="inline-flex h-10 items-center justify-center rounded-full bg-[#3A54A5] px-5 text-[14px] font-bold tracking-wide whitespace-nowrap text-white transition-all duration-200 hover:bg-[#2D4182] active:scale-[0.98]"
+                    >
+                        Start Self-Scan
+                    </a>
                 </div>
 
                 {/* Mobile Menu Toggle */}
@@ -138,6 +142,12 @@ export default function Header() {
                     )}
                     <div className="flex flex-col gap-3 pt-2">
                         <a
+                            href="/investor"
+                            className="rounded-full border border-zinc-200 py-2.5 text-center text-sm font-bold text-zinc-700 hover:text-zinc-900"
+                        >
+                            For Investors
+                        </a>
+                        <a
                             href="/founder/login"
                             className="rounded-full border border-zinc-200 py-2.5 text-center text-sm font-bold text-zinc-700 hover:text-zinc-900"
                         >
@@ -147,7 +157,7 @@ export default function Header() {
                             href="/diagnostic"
                             className="rounded-full bg-[#3A54A5] py-2.5 text-center text-sm font-bold text-white shadow-xs hover:bg-[#2D4182]"
                         >
-                            Start Diagnostic
+                            Start Self-Scan
                         </a>
                     </div>
                 </div>

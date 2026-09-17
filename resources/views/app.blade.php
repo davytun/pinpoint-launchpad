@@ -4,7 +4,54 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        @php
+            $seo = $page['props']['seo'] ?? [];
+            $seoTitle = $seo['title'] ?? config('app.name', 'Pinpoint Launchpad');
+            $seoDescription = $seo['description'] ?? '';
+            $seoCanonical = $seo['canonical'] ?? rtrim(config('app.url'), '/').'/';
+            $seoRobots = $seo['robots'] ?? 'index, follow';
+            $seoOgType = $seo['og_type'] ?? 'website';
+            $seoOgImage = $seo['og_image'] ?? url('/og-image.png');
+            $seoSiteName = $seo['og_site_name'] ?? config('app.name', 'Pinpoint Launchpad');
+            $seoJsonLd = $seo['json_ld'] ?? [];
+            $llmsTxtUrl = $seo['llms_txt'] ?? (rtrim(config('app.url'), '/').'/llms.txt');
+        @endphp
+
+        <title inertia>{{ $seoTitle }}</title>
+        @if ($seoDescription !== '')
+            <meta name="description" content="{{ $seoDescription }}">
+        @endif
+        <meta name="robots" content="{{ $seoRobots }}">
+        <link rel="canonical" href="{{ $seoCanonical }}">
+        <link rel="describedby" href="{{ $llmsTxtUrl }}" title="LLM context">
+
+        <meta property="og:locale" content="en_US">
+        <meta property="og:type" content="{{ $seoOgType }}">
+        <meta property="og:site_name" content="{{ $seoSiteName }}">
+        <meta property="og:title" content="{{ $seo['og_title'] ?? $seoTitle }}">
+        @if ($seoDescription !== '')
+            <meta property="og:description" content="{{ $seo['og_description'] ?? $seoDescription }}">
+        @endif
+        <meta property="og:url" content="{{ $seo['og_url'] ?? $seoCanonical }}">
+        <meta property="og:image" content="{{ $seoOgImage }}">
+
+        <meta name="twitter:card" content="{{ $seo['twitter_card'] ?? 'summary_large_image' }}">
+        <meta name="twitter:title" content="{{ $seo['twitter_title'] ?? $seoTitle }}">
+        @if ($seoDescription !== '')
+            <meta name="twitter:description" content="{{ $seo['twitter_description'] ?? $seoDescription }}">
+        @endif
+        <meta name="twitter:image" content="{{ $seo['twitter_image'] ?? $seoOgImage }}">
+
+        @if (! empty($seo['google_site_verification']))
+            <meta name="google-site-verification" content="{{ $seo['google_site_verification'] }}">
+        @endif
+        @if (! empty($seo['bing_site_verification']))
+            <meta name="msvalidate.01" content="{{ $seo['bing_site_verification'] }}">
+        @endif
+
+        @foreach ($seoJsonLd as $block)
+            <script type="application/ld+json">{!! json_encode(array_merge(['@context' => 'https://schema.org'], $block), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+        @endforeach
 
         <!-- Favicons -->
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />

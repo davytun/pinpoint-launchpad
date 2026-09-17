@@ -336,3 +336,43 @@ Last updated: 2026-08-31
 
 **Pattern notes:**
 When a Founder completes an asynchronous handoff, use one focused dialog to explain the selected tier, the operational sequence, and how to ask for help. Keep the tier-comparison page visually neutral behind it. The dialog must offer both a clear exit to diagnostic results and a direct `mailto:` contact route; it should not turn a comparison card into a success panel. If it can be dismissed, turn the selected tier's `Request received` control into the reopen action.
+
+### Founder Landing Page (`/`)
+
+Files: resources/js/pages/Welcome.tsx, resources/js/components/landing/*
+Last updated: 2026-09-16
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white` with `SideRays` |
+| Border | `border border-white/80` glass panels; output block `bg-[#1A2850]` |
+| Border radius | `rounded-4xl` / `rounded-3xl`; CTAs `rounded-full` |
+| Text — primary | `text-zinc-950` `font-display` headlines with founder-direct voice |
+| Text — secondary | `text-zinc-500` body |
+| Spacing | Section `py-16 sm:py-20`; `max-w-5xl` (or `max-w-3xl` for prose) |
+| Hover state | `hover:bg-[#2D4182]` primary; investor `#6EBE44` |
+| Shadow | Light glass shadows only |
+| Accent usage | `#3A54A5` founder CTAs; green only for investor bridge |
+
+**Pattern notes:**
+Voice: founder-direct, not generic SaaS. Structure: Hero → product → problem → Self-Scan → Assessment → how it works → PARAGON → what you get → investor bridge → verified → pricing → FAQ → final CTA → email-only contact. Do not invent benchmark comparisons. Radar chart is illustrative example only. Contact on homepage is mailto only — no full form.
+
+### Investor Landing Page (`/investor`)
+
+Files: resources/js/pages/Investor/Landing.tsx, resources/js/components/investor-landing/*
+Last updated: 2026-09-16
+
+| Property | Class |
+| --- | --- |
+| Background | Dark hero `#0D1325` with grid + blue bloom; body `#F7F8FC` / white alternating bands |
+| Border | Hairline `border-zinc-200` section rules; dark panels `border-white/10` |
+| Border radius | Sharper `rounded-md` CTAs; product panels `rounded-2xl` (avoid pill soup) |
+| Text — primary | White on dark hero; `font-display` headlines with tight tracking |
+| Text — secondary | `text-white/55` on dark; `text-zinc-500` on light |
+| Spacing | `max-w-6xl`; asymmetric editorial grids; timeline instead of card grids |
+| Hover state | White CTA on dark; quiet text links |
+| Shadow | Deep product shadow on hero profile panel only |
+| Accent usage | `#3A54A5` / `#93C5FD` sparingly; mono labels for diligence tone |
+
+**Pattern notes:**
+Signature is the dark diligence-desk hero with live-feeling Spotlight score panel. Prefer spines, timelines, and Is/Is-not splits over glass card grids. Investor CTA stays settings-driven. No magnetic hover, no return promises.

@@ -15,7 +15,6 @@ import ParagonModel from '@/components/landing/paragon-model';
 import PiaTeaser from '@/components/landing/pia-teaser';
 import ProgramsPricing from '@/components/landing/programs-pricing';
 import WhyPinpoint from '@/components/landing/why-pinpoint';
-import { Head } from '@inertiajs/react';
 
 interface BlogPostItem {
     title: string;
@@ -31,7 +30,6 @@ interface BlogPostItem {
 export default function Welcome({ latest_posts = [] }: { latest_posts?: BlogPostItem[] }) {
     return (
         <>
-            <Head title="Welcome" />
             <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900">
                 {/* Background SideRays */}
                 <div className="pointer-events-none fixed inset-0 z-0">
@@ -66,7 +64,7 @@ export default function Welcome({ latest_posts = [] }: { latest_posts?: BlogPost
                         </ScrollReveal>
 
                         <ScrollReveal>
-                            <AudienceSplit />
+                            <Blueprint />
                         </ScrollReveal>
 
                         <ScrollReveal>
@@ -74,11 +72,11 @@ export default function Welcome({ latest_posts = [] }: { latest_posts?: BlogPost
                         </ScrollReveal>
 
                         <ScrollReveal>
-                            <Blueprint />
+                            <PiaTeaser />
                         </ScrollReveal>
 
                         <ScrollReveal>
-                            <PiaTeaser />
+                            <AudienceSplit />
                         </ScrollReveal>
 
                         <ScrollReveal>

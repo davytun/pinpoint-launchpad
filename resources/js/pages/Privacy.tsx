@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -6,11 +6,6 @@ import { PinpointLogo } from '@/components/pinpoint-logo';
 export default function Privacy() {
     return (
         <>
-            <Head>
-                <title>Privacy Notice — Pinpoint Launchpad</title>
-                <meta name="description" content="How Pinpoint Launchpad collects, uses, and protects your personal data." />
-            </Head>
-
             <div className="text-zinc-850 min-h-screen bg-zinc-50 font-sans antialiased">
                 {/* Header */}
                 <header className="sticky top-0 z-40 w-full border-b border-zinc-200 bg-white/90 backdrop-blur-md">

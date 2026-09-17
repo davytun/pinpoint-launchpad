@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\MessageThread;
+use App\Support\Seo;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,7 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             ...parent::share($request),
             'name' => config('app.name'),
+            'seo' => Seo::forRequest($request),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),

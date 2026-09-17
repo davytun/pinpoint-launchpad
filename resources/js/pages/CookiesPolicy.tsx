@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -6,14 +6,6 @@ import { PinpointLogo } from '@/components/pinpoint-logo';
 export default function CookiesPolicy() {
     return (
         <>
-            <Head>
-                <title>Cookies Policy — Pinpoint Launchpad</title>
-                <meta
-                    name="description"
-                    content="How pinpointlaunchpad.com uses cookies and similar technologies, what they do, and how you can control them."
-                />
-            </Head>
-
             <div className="text-zinc-850 min-h-screen bg-zinc-50 font-sans antialiased">
                 {/* Header */}
                 <header className="sticky top-0 z-40 w-full border-b border-zinc-200 bg-white/90 backdrop-blur-md">

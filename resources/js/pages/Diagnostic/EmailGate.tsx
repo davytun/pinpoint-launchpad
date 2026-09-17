@@ -1,3 +1,4 @@
+import PrivacyConsent from '@/components/privacy-consent';
 import { Label } from '@/components/ui/label';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 import { Head, useForm, usePage } from '@inertiajs/react';
@@ -158,6 +159,8 @@ export default function EmailGate() {
                                             />
                                             {form.errors.email && <p className="text-xs text-rose-500">{form.errors.email}</p>}
                                         </div>
+
+                                        <PrivacyConsent variant="contact" className="mt-1" />
 
                                         <button
                                             type="submit"

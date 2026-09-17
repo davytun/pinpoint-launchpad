@@ -1,9 +1,10 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, BarChart3, Check, Crosshair, Layout, Shield, Users } from 'lucide-react';
 import { useRef, useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import PrivacyConsent from '@/components/privacy-consent';
 import { CountrySelect } from '@/components/country-select';
 import { cn } from '@/lib/utils';
 
@@ -519,11 +520,13 @@ function ApplicationForm() {
                 {errors.message && <p className="mt-1 text-xs font-semibold text-red-500">{errors.message}</p>}
             </div>
 
+            <PrivacyConsent variant="contact" className="mt-7" />
+
             <button
                 id="pia-submit"
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-7 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-zinc-950 text-sm font-bold text-white transition hover:bg-zinc-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-3 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-zinc-950 text-sm font-bold text-white transition hover:bg-zinc-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
                 Submit Application <ArrowRight className="h-4 w-4" />
             </button>
@@ -542,12 +545,6 @@ export default function Assessment() {
 
     return (
         <>
-            <Head title="The Pinpoint Investment Assessment — Pinpoint Launchpad" />
-            <meta
-                name="description"
-                content="Most founders who fail to raise never find out why. The PIA is the diligence process run on your side of the table."
-            />
-
             <div className="relative min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-950 selection:text-white">
                 {/* Ambient background rays matching standard site rays */}
                 <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">

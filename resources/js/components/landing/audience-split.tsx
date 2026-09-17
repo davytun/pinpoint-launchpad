@@ -2,88 +2,26 @@ import { ChevronRight } from 'lucide-react';
 
 export default function AudienceSplit() {
     return (
-        <section className="relative z-10 w-full py-20 font-sans">
+        <section className="relative z-10 w-full py-16 font-sans sm:py-20">
             <div className="mx-auto max-w-5xl px-6 md:px-8">
-                <div className="grid grid-cols-1 gap-16 md:grid-cols-2">
-                    {/* Left Column: Startups */}
-                    <div className="space-y-6">
-                        <div className="space-y-3">
-                            <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-950 sm:text-5xl">Startups</h2>
-                            <p className="font-sans text-base leading-relaxed text-zinc-500">
-                                With Pinpoint, get your startup investment-ready and get connected to investors.
-                            </p>
-                        </div>
-
-                        {/* Features list */}
-                        <ul className="space-y-4 pt-4 text-sm text-zinc-600">
-                            <li className="flex items-start gap-3">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Reposition your startup by applying our PARAGON Model.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Gain increased credibility through our investment-readiness vetting process.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Increase your chances of raising funds through our partner investors.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Access our growing network of investors, mentors, and incubators and accelerators.</span>
-                            </li>
-                        </ul>
-
-                        <a
-                            href="/diagnostic"
-                            className="group inline-flex h-10 items-center justify-between rounded-full bg-[#3A54A5] pr-1 pl-5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-[#2d4182] active:scale-[0.98]"
-                        >
-                            <span>Apply as a Startup</span>
-                            <span className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition-transform duration-300 group-hover:translate-x-0.5">
-                                <ChevronRight className="h-4 w-4 stroke-[2.5]" />
-                            </span>
-                        </a>
+                <div className="rounded-4xl border border-white/80 bg-white/40 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.03)] backdrop-blur-md sm:p-10 md:flex md:items-center md:justify-between md:gap-10">
+                    <div className="max-w-2xl space-y-3">
+                        <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">For investors</span>
+                        <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl">Looking to discover startups?</h2>
+                        <p className="text-base leading-relaxed text-zinc-500">
+                            Join Pinpoint as an investor and explore startups with structured business information, readiness scores, and
+                            analyst-reviewed profiles, all on the same platform.
+                        </p>
                     </div>
-
-                    {/* Right Column: Investors */}
-                    <div className="space-y-6">
-                        <div className="space-y-3">
-                            <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-950 sm:text-5xl">Investors</h2>
-                            <p className="font-sans text-base leading-relaxed text-zinc-500">
-                                With Pinpoint, discover high-potential startups that will not waste your time.
-                            </p>
-                        </div>
-
-                        {/* Features list */}
-                        <ul className="space-y-4 pt-4 text-sm text-zinc-600">
-                            <li className="flex items-start gap-3">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Meet startups that promise significantly higher returns on investments.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Access to vetted startups with higher credibility for investments.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>De-risk your investment portfolio in the short-term to long-term.</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#3A54A5]" />
-                                <span>Access to our growing network of startups, partners, and industry players.</span>
-                            </li>
-                        </ul>
-
-                        <a
-                            href="/investor"
-                            className="group inline-flex h-10 items-center justify-between rounded-full bg-[#6EBE44] pr-1 pl-5 text-xs font-bold text-white shadow-xs transition-all duration-300 hover:bg-[#5da837] active:scale-[0.98]"
-                        >
-                            <span>Apply as an Investor</span>
-                            <span className="ml-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white transition-transform duration-300 group-hover:translate-x-0.5">
-                                <ChevronRight className="h-4 w-4 stroke-[2.5]" />
-                            </span>
-                        </a>
-                    </div>
+                    <a
+                        href="/investor"
+                        className="group mt-8 inline-flex h-11 shrink-0 items-center justify-between rounded-full bg-[#6EBE44] pr-1 pl-5 text-sm font-bold text-white shadow-xs transition-all duration-300 hover:bg-[#5da837] active:scale-[0.98] md:mt-0"
+                    >
+                        <span>Explore as an investor</span>
+                        <span className="ml-2 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white transition-transform duration-300 group-hover:translate-x-0.5">
+                            <ChevronRight className="h-4 w-4 stroke-[2.5]" />
+                        </span>
+                    </a>
                 </div>
             </div>
         </section>

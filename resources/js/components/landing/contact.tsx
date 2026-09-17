@@ -1,3 +1,4 @@
+import PrivacyConsent from '@/components/privacy-consent';
 import { useForm } from '@inertiajs/react';
 import { ArrowRight, Check } from 'lucide-react';
 import React from 'react';
@@ -24,14 +25,12 @@ export default function Contact() {
                 <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12">
                     {/* Left Column: Wording */}
                     <div className="space-y-6 lg:col-span-5">
-                        <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-950 sm:text-5xl">Let's build trust together.</h2>
+                        <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl">
+                            Questions about Self-Scan or Assessment?
+                        </h2>
                         <p className="max-w-sm text-base leading-relaxed text-zinc-500">
-                            Have inquiries regarding our PARAGON verification cycles, analyst audits, or investor partner integration? Send a message
-                            and our support team will connect with you.
+                            Ask about PARAGON, pricing tiers, or how founders and investors use Pinpoint. We typically reply within 24 hours.
                         </p>
-                        <div className="space-y-2 pt-4">
-                            <span className="text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase">Direct Email</span>
-                        </div>
                     </div>
 
                     {/* Right Column: Contact Form */}
@@ -120,7 +119,8 @@ export default function Contact() {
                                 </div>
 
                                 {/* Submit Button */}
-                                <div className="pt-2">
+                                <div className="space-y-3 pt-2">
+                                    <PrivacyConsent variant="contact" />
                                     <button
                                         type="submit"
                                         disabled={processing}

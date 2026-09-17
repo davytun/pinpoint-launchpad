@@ -3,6 +3,7 @@ import { CheckCircle2, ShieldCheck } from 'lucide-react';
 
 import InputError from '@/components/input-error';
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import PrivacyConsent from '@/components/privacy-consent';
 import SideRays from '@/components/SideRays';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -205,6 +206,7 @@ export default function Onboarding() {
                                 </label>
                                 <InputError message={errors.aml_confirmed} />
                             </div>
+                            <PrivacyConsent variant="capture" />
                             <Button
                                 type="submit"
                                 size="lg"

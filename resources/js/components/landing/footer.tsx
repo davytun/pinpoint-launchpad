@@ -1,4 +1,5 @@
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import PrivacyConsent from '@/components/privacy-consent';
 import { Link, useForm } from '@inertiajs/react';
 import { Facebook, Linkedin, Twitter } from 'lucide-react';
 import React from 'react';
@@ -24,7 +25,7 @@ export default function Footer() {
                     <div className="space-y-4">
                         <PinpointLogo height={26} variant="white" />
                         <p className="max-w-xs text-sm leading-relaxed text-zinc-400 md:text-base">
-                            Venture diligence & investment-readiness verification using the PARAGON Model.
+                            Helping founders build investment-readiness profiles investors can review on Pinpoint.
                         </p>
                         <p className="text-xs text-zinc-500 md:text-sm">© {new Date().getFullYear()} Pinpoint Launchpad.</p>
                     </div>
@@ -38,22 +39,25 @@ export default function Footer() {
                         {wasSuccessful ? (
                             <div className="text-sm font-bold text-[#93C5FD] transition-all duration-300">✓ Thank you for subscribing!</div>
                         ) : (
-                            <form onSubmit={handleSubscribe} className="relative mt-2 flex max-w-sm items-center">
-                                <input
-                                    type="email"
-                                    placeholder="Enter your email"
-                                    required
-                                    value={data.email}
-                                    onChange={(e) => setData('email', e.target.value)}
-                                    className="h-10 w-full rounded-full border border-white/10 bg-white/5 pr-28 pl-4 text-xs text-white placeholder-zinc-500 transition-colors focus:border-zinc-700 focus:outline-none md:text-sm"
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={processing}
-                                    className="absolute top-1 right-1 flex h-8 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-xs font-bold text-[#0D1325] transition-colors hover:bg-zinc-200 disabled:opacity-50 md:text-sm"
-                                >
-                                    Subscribe
-                                </button>
+                            <form onSubmit={handleSubscribe} className="mt-2 max-w-sm space-y-2">
+                                <div className="relative flex items-center">
+                                    <input
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        required
+                                        value={data.email}
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        className="h-10 w-full rounded-full border border-white/10 bg-white/5 pr-28 pl-4 text-xs text-white placeholder-zinc-500 transition-colors focus:border-zinc-700 focus:outline-none md:text-sm"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="absolute top-1 right-1 flex h-8 cursor-pointer items-center justify-center rounded-full bg-white px-4 text-xs font-bold text-[#0D1325] transition-colors hover:bg-zinc-200 disabled:opacity-50 md:text-sm"
+                                    >
+                                        Subscribe
+                                    </button>
+                                </div>
+                                <PrivacyConsent variant="subscribe" tone="dark" />
                             </form>
                         )}
                         {errors.email && <p className="mt-1 text-xs text-red-400 md:text-sm">{errors.email}</p>}
@@ -61,8 +65,20 @@ export default function Footer() {
 
                     {/* Legal & Socials (Right Aligned on desktop) */}
                     <div className="flex flex-col space-y-4 md:items-end">
-                        <h4 className="text-xs font-bold tracking-widest text-zinc-400 uppercase md:text-sm">Legal & Social</h4>
+                        <h4 className="text-xs font-bold tracking-widest text-zinc-400 uppercase md:text-sm">Explore</h4>
                         <div className="text-zinc-350 flex flex-col space-y-2.5 text-sm font-semibold md:items-end md:text-base">
+                            <Link href="/assessment" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                Pinpoint Investment Assessment
+                            </Link>
+                            <Link href="/investor" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                For investors
+                            </Link>
+                            <Link href="/" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                For founders
+                            </Link>
+                            <a href="/blog" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                Blog
+                            </a>
                             <Link href="/terms" className="text-left transition-colors outline-none hover:text-white md:text-right">
                                 Terms & Conditions
                             </Link>
@@ -75,9 +91,6 @@ export default function Footer() {
                             <Link href="/cookies" className="text-left transition-colors outline-none hover:text-white md:text-right">
                                 Cookies Policy
                             </Link>
-                            <a href="/blog" className="text-left transition-colors outline-none hover:text-white md:text-right">
-                                Blog
-                            </a>
                         </div>
 
                         {/* Social Icons */}

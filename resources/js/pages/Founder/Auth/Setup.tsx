@@ -4,6 +4,7 @@ import { ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import PrivacyConsent from '@/components/privacy-consent';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 import { cn } from '@/lib/utils';
 
@@ -259,6 +260,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                             </div>
 
                             {/* Submit */}
+                            <PrivacyConsent variant="capture" className="mt-1" />
                             <button
                                 type="submit"
                                 disabled={processing}

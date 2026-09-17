@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Clock, Share2, User } from 'lucide-react';
 
 import SideRays from '@/components/SideRays';
@@ -52,7 +52,6 @@ export default function BlogShow({ post, related }: PageProps) {
 
     return (
         <>
-            <Head title={`${post.title} — The Pinpoint Blog`} />
             <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900">
                 {/* Background SideRays */}
                 <div className="pointer-events-none fixed inset-0 z-0">
@@ -132,12 +131,28 @@ export default function BlogShow({ post, related }: PageProps) {
                             <div className="prose prose-zinc text-zinc-850 max-w-none space-y-6 pt-4 font-sans text-base leading-relaxed md:text-lg lg:text-xl">
                                 <div dangerouslySetInnerHTML={{ __html: post.body }} className="blog-content space-y-5" />
                             </div>
+
+                            <aside className="mt-12 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-6 sm:p-8">
+                                <p className="font-display text-lg font-bold text-zinc-950 sm:text-xl">
+                                    Preparing for investor review?
+                                </p>
+                                <p className="mt-2 text-sm leading-relaxed text-zinc-600 sm:text-base">
+                                    The Pinpoint Investment Assessment is an analyst-led review against the PARAGON framework, with a written
+                                    report for your team.
+                                </p>
+                                <Link
+                                    href="/assessment"
+                                    className="mt-4 inline-flex text-sm font-bold text-[#3A54A5] transition-colors hover:text-[#2D4182]"
+                                >
+                                    Learn about the Pinpoint Investment Assessment
+                                </Link>
+                            </aside>
                         </article>
 
                         {/* Related Articles */}
                         {related.length > 0 && (
                             <section className="mt-20 border-t border-zinc-200 pt-16">
-                                <h3 className="font-display mb-8 text-xl font-extrabold text-zinc-950">Related Articles</h3>
+                                <h2 className="font-display mb-8 text-xl font-extrabold text-zinc-950">Related Articles</h2>
                                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                                     {related.map((rel) => (
                                         <div

@@ -1,15 +1,15 @@
 import { motion } from 'motion/react';
 
+import ParagonMockup from '@/components/landing/paragon-mockup';
+
 export default function DashboardPreview() {
     return (
         <section className="relative z-10 w-full px-6 py-8 md:px-8 md:py-12">
             <div className="mx-auto max-w-5xl">
-                {/* Background Glow */}
                 <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
                     <div className="h-[350px] w-[600px] rounded-full bg-[#3A54A5]/10 blur-[80px]" />
                 </div>
 
-                {/* Dashboard Frame */}
                 <motion.div
                     initial={{ opacity: 0, y: 30, scale: 0.98 }}
                     whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -21,16 +21,16 @@ export default function DashboardPreview() {
                         WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 95%)',
                     }}
                 >
-                    <div className="overflow-hidden rounded-[1.625rem] border border-zinc-200 bg-zinc-950/5 shadow-inner">
-                        <img
-                            alt="Pinpoint Diligence Dashboard Preview"
-                            src="/diligence_dashboard_mockup.png"
-                            className="h-auto w-full rounded-[1.625rem]"
-                            width="1920"
-                            height="1080"
-                        />
-                    </div>
+                    <ParagonMockup />
                 </motion.div>
+
+                <div className="mx-auto mt-6 max-w-xl text-center">
+                    <p className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">PARAGON Readiness Score</p>
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-500 sm:text-base">
+                        Example: <span className="font-semibold text-zinc-800">85/100</span>. A clearer view of investor readiness across seven
+                        areas, not an approval to raise capital.
+                    </p>
+                </div>
             </div>
         </section>
     );

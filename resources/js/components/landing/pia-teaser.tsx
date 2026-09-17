@@ -1,81 +1,90 @@
-import { ArrowRight, FileSearch, Scale, ShieldAlert } from 'lucide-react';
+import { ArrowRight, Check, FileSearch, Scale, ShieldAlert } from 'lucide-react';
 
 const POINTS = [
     {
         icon: FileSearch,
-        headline: '37 criteria. 7 dimensions.',
-        body: 'Every criterion is assessed at every tier. What changes is how far we go to verify it.',
+        headline: 'Self-Scan vs Assessment',
+        body: 'Self-Scan is free, automated, and private. The Assessment is paid, analyst-led, and produces a written report from your evidence.',
     },
     {
         icon: Scale,
-        headline: 'Every score is graded twice.',
-        body: 'Once for substance, once for proof. The lower one governs. Belief in your own numbers is not a flaw of character. It is a condition of the job.',
+        headline: 'What “analyst-reviewed” means',
+        body: 'Analysts assess your information against PARAGON. It is a professional opinion on readiness, not a guarantee you will raise, and not investment advice.',
     },
     {
         icon: ShieldAlert,
-        headline: '22 findings that end a process.',
-        body: 'A company can score 78 and be unfundable. The register tells you what they are, before anyone else does.',
+        headline: 'What happens after Assessment',
+        body: 'You get a report, gaps to fix, and a profile path. Eligible startups can be published to Spotlight so investors on Pinpoint can discover you.',
     },
+];
+
+const DELIVERABLES = [
+    'PARAGON readiness score',
+    'Seven-pillar breakdown',
+    'Identified gaps and next steps',
+    'Written Assessment Report (paid PIA)',
+    'Startup profile for investor review',
+    'Path to Spotlight discoverability',
 ];
 
 export default function PiaTeaser() {
     return (
         <section id="pia-teaser" className="relative z-10 w-full overflow-hidden py-16 font-sans sm:py-20 md:py-24">
             <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8">
-                {/* ── Section header row ── */}
-                <div className="mb-8 flex items-center justify-between">
-                    <span className="text-[11px] font-bold tracking-widest text-[#3A54A5] uppercase">The Pinpoint Investment Assessment</span>
+                <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-[11px] font-bold tracking-widest text-[#3A54A5] uppercase">What you get</span>
                     <a
                         href="/assessment"
                         className="hidden items-center gap-1.5 text-[11px] font-bold text-zinc-400 transition hover:text-[#3A54A5] sm:flex"
                     >
-                        Learn more <ArrowRight className="h-3.5 w-3.5" />
+                        Learn about the Assessment <ArrowRight className="h-3.5 w-3.5" />
                     </a>
                 </div>
 
-                {/* ── Responsive Bento Grid ── */}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.35fr_1fr]">
-                    {/* ── Left Hero Card ── */}
-                    <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-[#1A2850] p-6 shadow-lg sm:p-10">
-                        {/* Glow Blobs */}
-                        <div className="pointer-events-none absolute -right-16 -bottom-24 h-72 w-72 rounded-full bg-[#3A54A5]/35 blur-[80px]" />
-                        <div className="pointer-events-none absolute -top-16 -left-8 h-56 w-56 rounded-full bg-[#93C5FD]/10 blur-[70px]" />
-
-                        {/* Content */}
-                        <div className="relative z-10">
-                            <span className="mb-4 inline-block text-[10px] font-bold tracking-widest text-[#93C5FD]/60 uppercase">
-                                Pinpoint Launchpad
+                    <div className="flex flex-col justify-between rounded-3xl border border-white/80 bg-white/30 p-6 shadow-[0_8px_30px_rgba(58,84,165,0.03)] backdrop-blur-md sm:p-10">
+                        <div>
+                            <span className="mb-4 inline-block text-[10px] font-bold tracking-widest text-[#3A54A5] uppercase">
+                                Pinpoint for founders
                             </span>
-                            <h2 className="font-display sm:text-3.5xl text-2xl leading-tight font-black text-white md:text-4xl">
-                                Most founders who fail to raise never find out why.
+                            <h2 className="font-display text-2xl leading-tight font-bold tracking-tight text-zinc-950 sm:text-3xl md:text-4xl">
+                                Not getting investor interest? Find out what is missing.
                             </h2>
-                            <p className="mt-4 text-sm leading-relaxed text-white/50 sm:max-w-md">
-                                Investors do not tell you. They thank you for your time, they say the timing is not right, and they stop replying. The
-                                PIA is the diligence process run on your side of the table, by people whose job is to find what an investor would find
-                                — and to tell you.
+                            <p className="mt-4 text-sm leading-relaxed text-zinc-500 sm:max-w-md sm:text-base">
+                                Get a clear view of the areas that may be holding your startup back, then build an analyst-reviewed profile investors
+                                on Pinpoint can actually evaluate.
                             </p>
+
+                            <ul className="mt-8 space-y-3">
+                                {DELIVERABLES.map((item) => (
+                                    <li key={item} className="flex items-start gap-2.5 text-sm text-zinc-700">
+                                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
+                                            <Check className="h-3 w-3 stroke-[3]" />
+                                        </span>
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
 
-                        {/* CTAs with clean primary pill and elegant secondary text link */}
-                        <div className="relative z-10 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                             <a
                                 href="/assessment"
                                 id="pia-teaser-learn-more"
-                                className="inline-flex h-11 w-full shrink-0 items-center justify-center rounded-full bg-white px-6 text-center text-sm font-bold text-[#1A2850] transition hover:bg-zinc-100 active:scale-[0.98] sm:w-auto"
+                                className="inline-flex h-11 w-full shrink-0 items-center justify-center rounded-full bg-[#3A54A5] px-6 text-center text-sm font-bold text-white transition hover:bg-[#2D4182] active:scale-[0.98] sm:w-auto"
                             >
-                                Learn about the Assessment
+                                Start Assessment
                             </a>
                             <a
                                 href="/diagnostic"
                                 id="pia-teaser-free-scan"
-                                className="inline-flex w-full items-center justify-center gap-1.5 py-2 text-sm font-bold text-white/80 transition hover:text-white sm:w-auto sm:py-0"
+                                className="inline-flex w-full items-center justify-center gap-1.5 py-2 text-sm font-bold text-[#3A54A5] transition hover:text-[#2D4182] sm:w-auto sm:py-0"
                             >
                                 Take the free Self-Scan <ArrowRight className="h-4 w-4" />
                             </a>
                         </div>
                     </div>
 
-                    {/* ── Right: 3 Stacked Cards ── */}
                     <div className="flex flex-col gap-4">
                         {POINTS.map((point, i) => {
                             const Icon = point.icon;
@@ -89,8 +98,8 @@ export default function PiaTeaser() {
                                             <Icon className="h-5 w-5 text-[#3A54A5]" strokeWidth={1.5} />
                                         </div>
                                         <div>
-                                            <h3 className="text-sm leading-snug font-bold text-zinc-950">{point.headline}</h3>
-                                            <p className="mt-1.5 text-[13px] leading-relaxed text-zinc-500">{point.body}</p>
+                                            <h3 className="text-sm leading-snug font-bold text-zinc-950 sm:text-base">{point.headline}</h3>
+                                            <p className="mt-1.5 text-sm leading-relaxed text-zinc-500">{point.body}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -99,7 +108,6 @@ export default function PiaTeaser() {
                     </div>
                 </div>
 
-                {/* Mobile-only bottom link */}
                 <div className="mt-6 flex justify-center sm:hidden">
                     <a href="/assessment" className="inline-flex items-center gap-1.5 text-[11px] font-bold text-zinc-400 hover:text-[#3A54A5]">
                         Learn more about the Assessment <ArrowRight className="h-3 w-3" />

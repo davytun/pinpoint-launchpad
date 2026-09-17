@@ -2,6 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { AlertTriangle, ArrowRight, Building2, LockKeyhole, Mail, User } from 'lucide-react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
+import PrivacyConsent from '@/components/privacy-consent';
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
 import { cn } from '@/lib/utils';
 
@@ -131,7 +132,8 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                         />
                                     </Field>
 
-                                    <div className="pt-2">
+                                    <div className="space-y-3 pt-2">
+                                        <PrivacyConsent variant="capture" />
                                         <button
                                             type="submit"
                                             disabled={processing}
@@ -140,7 +142,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                             {processing ? 'Preparing your agreement…' : 'Continue to agreement'}
                                             {!processing && <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true" />}
                                         </button>
-                                        <p className="mt-4 flex items-start justify-center gap-2 text-center text-xs leading-relaxed text-zinc-500">
+                                        <p className="flex items-start justify-center gap-2 text-center text-xs leading-relaxed text-zinc-500">
                                             <LockKeyhole className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
                                             Your information is used only to prepare your agreement.
                                         </p>

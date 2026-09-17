@@ -1,15 +1,10 @@
 import { PinpointLogo } from '@/components/pinpoint-logo';
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 
 export default function Terms() {
     return (
         <>
-            <Head>
-                <title>Terms of Service — Pinpoint Launchpad</title>
-                <meta name="description" content="Terms of Service governing the use of pinpointlaunchpad.com and the Pinpoint services." />
-            </Head>
-
             <div className="text-zinc-850 min-h-screen bg-zinc-50 font-sans antialiased">
                 {/* Header */}
                 <header className="sticky top-0 z-40 w-full border-b border-zinc-200 bg-white/90 backdrop-blur-md">

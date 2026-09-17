@@ -2,60 +2,63 @@ import ParagonRadarChart from '@/components/ParagonRadarChart';
 
 const PILLARS_DATA = [
     {
-        name: 'Potential & Scale',
-        description: 'Validating addressable market size, business model leverage, and scale vectors.',
+        name: 'Potential',
+        description: 'How big this can get, and why now.',
     },
     {
-        name: 'Agility & Execution',
-        description: 'Auditing MVP velocity, deployment cycles, user feedback loops, and pivot capacity.',
+        name: 'Agility',
+        description: 'How fast the team builds, learns, and adapts.',
     },
     {
-        name: 'Risk Mitigation',
-        description: 'Examining client dependencies, technical debt exposure, and capital runways.',
+        name: 'Risk',
+        description: 'What could kill the deal or the company.',
     },
     {
-        name: 'Alignment & Vision',
-        description: 'Evaluating cap-table structures, founder vesting, and key executive alignments.',
+        name: 'Alignment',
+        description: 'Whether the business model and use of funds actually work.',
     },
     {
-        name: 'Corporate Governance',
-        description: 'Auditing boardroom processes, IP assignment records, and corporate structures.',
+        name: 'Governance',
+        description: 'Ownership, filings, and whether the company is clean to invest in.',
     },
     {
-        name: 'Operational Systems',
-        description: 'Validating unit economics, CAC/LTV ratios, cohort retention, and stack scalability.',
+        name: 'Operations',
+        description: 'Whether this runs as a real company, not just a project.',
     },
     {
-        name: 'Network & Ecosystem',
-        description: 'Reviewing strategic supplier contracts, integration channels, and partnership networks.',
+        name: 'Network',
+        description: 'Relationships, channels, and whether the fundraising package is ready.',
     },
 ];
 
 export default function ParagonModel() {
     return (
-        <section id="paragon-model" className="relative z-10 w-full py-24 font-sans">
+        <section id="paragon-model" className="relative z-10 w-full py-20 font-sans sm:py-24">
             <div className="mx-auto max-w-5xl px-6 md:px-8">
-                <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
-                    {/* Left Column: Headline and Chart */}
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
                     <div className="space-y-8 lg:col-span-5">
                         <div className="space-y-4">
                             <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">The PARAGON Model</span>
-                            <h2 className="font-display text-4xl font-bold tracking-tight text-zinc-950 sm:text-5xl">Seven pillars. One verdict.</h2>
+                            <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl">
+                                Seven areas. One readiness score.
+                            </h2>
                             <p className="font-sans text-base leading-relaxed text-zinc-500">
-                                Our proprietary PARAGON model audits your venture across 7 critical pillars from IP Governance to Unit Economics. It's
-                                the credential that turns a "Maybe" into a "Yes".
+                                PARAGON assesses investment-readiness across seven business dimensions. The score helps you and investors understand
+                                where you stand. It is not an investment decision or a guarantee you will raise.
+                            </p>
+                            <p className="text-sm leading-relaxed text-zinc-500">
+                                Use the chart to see strengths and gaps at a glance. Stronger shape means stronger readiness signal; thinner areas
+                                show where investors are likely to ask harder questions.
                             </p>
                         </div>
-                        {/* Radar Chart Visual */}
                         <div className="w-full">
                             <ParagonRadarChart />
                         </div>
                     </div>
 
-                    {/* Right Column: 7 Pillars List */}
                     <div className="space-y-6 lg:col-span-7 lg:pl-4">
                         <h3 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">The Seven Pillars</h3>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
                             {PILLARS_DATA.map((pillar, index) => (
                                 <div
                                     key={index}
@@ -65,8 +68,8 @@ export default function ParagonModel() {
                                         {index + 1}
                                     </div>
                                     <div className="space-y-1">
-                                        <h4 className="font-sans text-sm font-semibold text-zinc-900">{pillar.name}</h4>
-                                        <p className="font-sans text-xs leading-relaxed text-zinc-500">{pillar.description}</p>
+                                        <h4 className="font-sans text-sm font-semibold text-zinc-900 sm:text-base">{pillar.name}</h4>
+                                        <p className="font-sans text-sm leading-relaxed text-zinc-500">{pillar.description}</p>
                                     </div>
                                 </div>
                             ))}

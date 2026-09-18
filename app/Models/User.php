@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -134,6 +135,33 @@ class User extends Authenticatable
         return AuditAssignment::where('analyst_id', $this->id)
             ->where('founder_id', $founderId)
             ->exists();
+    }
+
+    /**
+     * Founder IDs this analyst is assigned to (empty for non-analysts).
+     *
+     * @return Collection<int, string>
+     */
+    public function assignedFounderIds()
+    {
+        return AuditAssignment::where('analyst_id', $this->id)->pluck('founder_id');
+    }
+
+    /**
+     * Unread founder→admin message count for the current staff member's desk scope.
+     */
+    public function adminUnreadMessagesCount(): int
+    {
+        if ($this->isSuperAdmin()) {
+            return (int) MessageThread::sum('admin_unread_count');
+        }
+
+        if ($this->isAnalyst()) {
+            return (int) MessageThread::whereIn('founder_id', $this->assignedFounderIds())
+                ->sum('admin_unread_count');
+        }
+
+        return 0;
     }
 
     public function auditAssignments()

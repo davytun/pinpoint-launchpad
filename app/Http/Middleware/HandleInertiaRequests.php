@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\MessageThread;
 use App\Support\Seo;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -61,8 +60,11 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
                 'info' => $request->session()->get('info'),
             ],
-            'admin_unread_messages' => Auth::guard('web')->user()?->isAdmin()
-                ? MessageThread::sum('admin_unread_count')
+            'admin_unread_messages' => ($admin = Auth::guard('web')->user())?->canAccessFounderAdmin()
+                ? $admin->adminUnreadMessagesCount()
+                : null,
+            'unread_messages_count' => Auth::guard('founder')->check()
+                ? (int) (Auth::guard('founder')->user()->messageThread?->founder_unread_count ?? 0)
                 : null,
             'platform_unread_notifications' => [
                 'admin' => Auth::guard('web')->user()?->unreadNotifications()->count() ?? 0,

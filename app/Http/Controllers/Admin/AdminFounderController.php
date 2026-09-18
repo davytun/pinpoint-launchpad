@@ -64,15 +64,17 @@ class AdminFounderController extends Controller
             });
         }
 
-        $allFounders = Founder::with(['payment', 'auditAssignment'])->get();
+        $scopedFounders = Founder::with(['payment', 'auditAssignment'])
+            ->when($user->isAnalyst(), fn ($q) => $q->whereIn('id', AuditAssignment::where('analyst_id', $user->id)->pluck('founder_id')))
+            ->get();
         $totals = [
-            'total' => $allFounders->count(),
-            'pending' => $allFounders->filter(fn ($f) => ($f->payment?->audit_status ?? 'pending') === 'pending')->count(),
-            'in_progress' => $allFounders->filter(fn ($f) => $f->payment?->audit_status === 'in_progress')->count(),
-            'needs_info' => $allFounders->filter(fn ($f) => $f->payment?->audit_status === 'needs_info')->count(),
-            'on_hold' => $allFounders->filter(fn ($f) => $f->payment?->audit_status === 'on_hold')->count(),
-            'complete' => $allFounders->filter(fn ($f) => $f->payment?->audit_status === 'complete')->count(),
-            'unassigned' => $allFounders->filter(fn ($f) => $f->auditAssignment === null)->count(),
+            'total' => $scopedFounders->count(),
+            'pending' => $scopedFounders->filter(fn ($f) => ($f->payment?->audit_status ?? 'pending') === 'pending')->count(),
+            'in_progress' => $scopedFounders->filter(fn ($f) => $f->payment?->audit_status === 'in_progress')->count(),
+            'needs_info' => $scopedFounders->filter(fn ($f) => $f->payment?->audit_status === 'needs_info')->count(),
+            'on_hold' => $scopedFounders->filter(fn ($f) => $f->payment?->audit_status === 'on_hold')->count(),
+            'complete' => $scopedFounders->filter(fn ($f) => $f->payment?->audit_status === 'complete')->count(),
+            'unassigned' => $scopedFounders->filter(fn ($f) => $f->auditAssignment === null)->count(),
         ];
 
         $founders = $query->latest()->paginate(15)->withQueryString()->through(function ($f) {
@@ -81,28 +83,28 @@ class AdminFounderController extends Controller
             $tier = $f->tier ?? ($score ? ($score >= 85 ? 'institutional' : ($score >= 70 ? 'growth' : 'foundation')) : 'foundation');
 
             $threadMessages = $f->messageThread ? $f->messageThread->messages()->visible()->oldest()->get()->map(fn ($msg) => [
-                'id'                  => $msg->id,
-                'sender_type'         => $msg->sender_type,
-                'sender_name'         => $msg->senderName($f),
-                'body'                => $msg->body,
-                'has_attachment'      => $msg->has_attachment,
+                'id' => $msg->id,
+                'sender_type' => $msg->sender_type,
+                'sender_name' => $msg->senderName($f),
+                'body' => $msg->body,
+                'has_attachment' => $msg->has_attachment,
                 'attachment_filename' => $msg->attachment_filename,
-                'attachment_size'     => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
-                'created_at'          => $msg->created_at->format('d M, H:i'),
-                'is_from_founder'     => $msg->isFromFounder(),
+                'attachment_size' => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
+                'created_at' => $msg->created_at->format('d M, H:i'),
+                'is_from_founder' => $msg->isFromFounder(),
             ]) : [];
 
             return [
-                'id'               => $f->id,
-                'full_name'        => $f->full_name,
-                'company_name'     => $f->company_name,
-                'email'            => $f->email,
-                'phone'            => $f->phone,
-                'score'            => $score,
-                'score_band'       => $scoreBand,
-                'tier'             => $tier,
-                'tier_label'       => Payment::getTierLabel($tier),
-                'audit_status'     => $f->payment?->audit_status ?? 'pending',
+                'id' => $f->id,
+                'full_name' => $f->full_name,
+                'company_name' => $f->company_name,
+                'email' => $f->email,
+                'phone' => $f->phone,
+                'score' => $score,
+                'score_band' => $scoreBand,
+                'tier' => $tier,
+                'tier_label' => Payment::getTierLabel($tier),
+                'audit_status' => $f->payment?->audit_status ?? 'pending',
                 'assigned_analyst' => $f->auditAssignment?->analyst
                     ? [
                         'id' => $f->auditAssignment->analyst->id,
@@ -110,36 +112,36 @@ class AdminFounderController extends Controller
                         'email' => $f->auditAssignment->analyst->email,
                     ]
                     : null,
-                'assigned_at'      => $f->auditAssignment?->assigned_at?->toISOString(),
-                'audit_notes'      => $f->auditAssignment?->notes,
-                'documents_count'  => $f->documents->count(),
-                'documents'        => $f->documents->map(fn ($doc) => [
-                    'id'                => $doc->id,
+                'assigned_at' => $f->auditAssignment?->assigned_at?->toISOString(),
+                'audit_notes' => $f->auditAssignment?->notes,
+                'documents_count' => $f->documents->count(),
+                'documents' => $f->documents->map(fn ($doc) => [
+                    'id' => $doc->id,
                     'original_filename' => $doc->original_filename,
-                    'category'          => $doc->category,
-                    'category_label'    => $doc->categoryLabel(),
-                    'file_size'         => $doc->fileSizeForHumans(),
-                    'reviewed'          => $doc->is_reviewed,
-                    'analyst_note'      => $doc->analyst_note,
-                    'created_at'        => $doc->created_at->format('d M Y'),
+                    'category' => $doc->category,
+                    'category_label' => $doc->categoryLabel(),
+                    'file_size' => $doc->fileSizeForHumans(),
+                    'reviewed' => $doc->is_reviewed,
+                    'analyst_note' => $doc->analyst_note,
+                    'created_at' => $doc->created_at->format('d M Y'),
                 ]),
-                'signature'        => $f->signature ? [
-                    'status'      => $f->signature->status,
-                    'signed_at'   => $f->signature->signed_at?->format('d M Y'),
+                'signature' => $f->signature ? [
+                    'status' => $f->signature->status,
+                    'signed_at' => $f->signature->signed_at?->format('d M Y'),
                     'signer_name' => $f->signature->signer_name,
                 ] : null,
-                'message_thread_id'=> $f->messageThread?->id,
-                'messages'         => $threadMessages,
-                'unread_messages'  => $f->messageThread?->admin_unread_count ?? 0,
-                'pillar_scores'    => $f->diagnosticSession?->pillar_scores,
-                'profile'          => $f->profile ? [
+                'message_thread_id' => $f->messageThread?->id,
+                'messages' => $threadMessages,
+                'unread_messages' => $f->messageThread?->admin_unread_count ?? 0,
+                'pillar_scores' => $f->diagnosticSession?->pillar_scores,
+                'profile' => $f->profile ? [
                     'id' => $f->profile->id,
                     'slug' => $f->profile->slug,
                     'sector' => $f->profile->sector,
                     'batch' => $f->profile->batch,
                     'is_public' => $f->profile->is_public,
                 ] : null,
-                'created_at'       => $f->created_at->toISOString(),
+                'created_at' => $f->created_at->toISOString(),
                 'created_at_human' => $f->created_at->format('d M Y'),
             ];
         });
@@ -149,13 +151,13 @@ class AdminFounderController extends Controller
             : collect();
 
         return Inertia::render('Admin/Founders/Index', [
-            'founders'      => $founders,
-            'analysts'      => $analysts,
-            'user_role'     => $user->role,
-            'activeStatus'  => $status,
+            'founders' => $founders,
+            'analysts' => $analysts,
+            'user_role' => $user->role,
+            'activeStatus' => $status,
             'activeAnalyst' => $analystFilter,
-            'search'        => $search,
-            'totals'        => $totals,
+            'search' => $search,
+            'totals' => $totals,
         ]);
     }
 
@@ -163,7 +165,7 @@ class AdminFounderController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->canAccessFounder($founder->id)) {
+        if (! $user->canAccessFounder($founder->id)) {
             abort(403);
         }
 
@@ -184,16 +186,16 @@ class AdminFounderController extends Controller
             ->oldest()
             ->get()
             ->map(fn ($msg) => [
-                'id'                  => $msg->id,
-                'sender_type'         => $msg->sender_type,
-                'sender_name'         => $msg->senderName($founder),
-                'body'                => $msg->body,
-                'has_attachment'      => $msg->has_attachment,
+                'id' => $msg->id,
+                'sender_type' => $msg->sender_type,
+                'sender_name' => $msg->senderName($founder),
+                'body' => $msg->body,
+                'has_attachment' => $msg->has_attachment,
                 'attachment_filename' => $msg->attachment_filename,
-                'attachment_size'     => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
-                'created_at'          => $msg->created_at->format('d M, H:i'),
-                'created_at_date'     => $msg->created_at->format('Y-m-d'),
-                'is_from_founder'     => $msg->isFromFounder(),
+                'attachment_size' => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
+                'created_at' => $msg->created_at->format('d M, H:i'),
+                'created_at_date' => $msg->created_at->format('Y-m-d'),
+                'is_from_founder' => $msg->isFromFounder(),
             ]);
 
         $analysts = $user->isSuperAdmin()
@@ -201,64 +203,64 @@ class AdminFounderController extends Controller
             : collect();
 
         return Inertia::render('Admin/Founders/Show', [
-            'founder'   => [
-                'id'           => $founder->id,
-                'full_name'    => $founder->full_name,
+            'founder' => [
+                'id' => $founder->id,
+                'full_name' => $founder->full_name,
                 'company_name' => $founder->company_name,
-                'email'        => $founder->email,
-                'phone'        => $founder->phone,
-                'created_at'   => $founder->created_at->format('d M Y'),
-                'last_login_at'=> $founder->last_login_at?->format('d M Y, H:i'),
-                'score'        => $founder->score ?? $founder->profile?->overall_score,
-                'score_band'   => $founder->score_band,
-                'tier'         => $founder->tier,
-                'pillar_scores'=> $founder->diagnosticSession?->pillar_scores,
+                'email' => $founder->email,
+                'phone' => $founder->phone,
+                'created_at' => $founder->created_at->format('d M Y'),
+                'last_login_at' => $founder->last_login_at?->format('d M Y, H:i'),
+                'score' => $founder->score ?? $founder->profile?->overall_score,
+                'score_band' => $founder->score_band,
+                'tier' => $founder->tier,
+                'pillar_scores' => $founder->diagnosticSession?->pillar_scores,
             ],
-            'payment'   => $founder->payment ? [
-                'id'            => $founder->payment->id,
-                'tier'          => $founder->payment->tier,
-                'total_amount'  => $founder->payment->total_amount,
-                'currency'      => $founder->payment->currency,
-                'status'        => $founder->payment->status,
-                'audit_status'  => $founder->payment->audit_status,
-                'paid_at'       => $founder->payment->paid_at?->format('d M Y'),
+            'payment' => $founder->payment ? [
+                'id' => $founder->payment->id,
+                'tier' => $founder->payment->tier,
+                'total_amount' => $founder->payment->total_amount,
+                'currency' => $founder->payment->currency,
+                'status' => $founder->payment->status,
+                'audit_status' => $founder->payment->audit_status,
+                'paid_at' => $founder->payment->paid_at?->format('d M Y'),
                 'paystack_reference' => $founder->payment->paystack_reference,
             ] : null,
             'signature' => $founder->signature ? [
-                'id'          => $founder->signature->id,
-                'status'      => $founder->signature->status,
-                'signed_at'   => $founder->signature->signed_at?->format('d M Y'),
+                'id' => $founder->signature->id,
+                'status' => $founder->signature->status,
+                'signed_at' => $founder->signature->signed_at?->format('d M Y'),
                 'signer_name' => $founder->signature->signer_name,
             ] : null,
             'documents' => $founder->documents->map(fn ($d) => [
-                'id'                => $d->id,
+                'id' => $d->id,
                 'original_filename' => $d->original_filename,
-                'category'          => $d->category,
-                'category_label'    => $d->categoryLabel(),
-                'file_size'         => $d->fileSizeForHumans(),
-                'reviewed'          => $d->is_reviewed,
-                'analyst_note'      => $d->analyst_note,
-                'created_at'        => $d->created_at->format('d M Y'),
+                'category' => $d->category,
+                'category_label' => $d->categoryLabel(),
+                'file_size' => $d->fileSizeForHumans(),
+                'reviewed' => $d->is_reviewed,
+                'analyst_note' => $d->analyst_note,
+                'created_at' => $d->created_at->format('d M Y'),
             ]),
             'message_thread' => [
-                'id'            => $thread->id,
-                'total_messages'=> $messages->count(),
-                'unread_count'  => $thread->admin_unread_count,
+                'id' => $thread->id,
+                'total_messages' => $messages->count(),
+                'unread_count' => $thread->admin_unread_count,
             ],
             'thread_messages' => $messages,
             'profile' => $founder->profile ? [
-                'id'       => $founder->profile->id,
-                'is_live'  => $founder->profile->is_live,
-                'is_public'=> $founder->profile->is_public,
-                'slug'     => $founder->profile->slug,
+                'id' => $founder->profile->id,
+                'is_live' => $founder->profile->is_live,
+                'is_public' => $founder->profile->is_public,
+                'slug' => $founder->profile->slug,
             ] : null,
             'assignment' => $founder->auditAssignment ? [
-                'analyst_id'   => $founder->auditAssignment->analyst_id,
+                'analyst_id' => $founder->auditAssignment->analyst_id,
                 'analyst_name' => $founder->auditAssignment->analyst?->name,
-                'assigned_at'  => $founder->auditAssignment->assigned_at?->format('d M Y'),
-                'notes'        => $founder->auditAssignment->notes,
+                'assigned_at' => $founder->auditAssignment->assigned_at?->format('d M Y'),
+                'notes' => $founder->auditAssignment->notes,
             ] : null,
-            'analysts'  => $analysts,
+            'analysts' => $analysts,
             'user_role' => $user->role,
         ]);
     }
@@ -267,27 +269,28 @@ class AdminFounderController extends Controller
     {
         $request->validate([
             'analyst_id' => ['nullable', 'exists:users,id'],
-            'notes'      => ['nullable', 'string', 'max:500'],
+            'notes' => ['nullable', 'string', 'max:500'],
         ]);
 
-        if (!$request->analyst_id) {
+        if (! $request->analyst_id) {
             AuditAssignment::where('founder_id', $founder->id)->delete();
+
             return back()->with('success', 'Analyst assignment cleared.');
         }
 
         $analyst = User::findOrFail($request->analyst_id);
 
-        if (!$analyst->isAnalyst()) {
+        if (! $analyst->isAnalyst()) {
             return back()->withErrors(['analyst_id' => 'Selected user is not an analyst.']);
         }
 
         AuditAssignment::updateOrCreate(
             ['founder_id' => $founder->id],
             [
-                'analyst_id'  => $request->analyst_id,
+                'analyst_id' => $request->analyst_id,
                 'assigned_by' => Auth::id(),
                 'assigned_at' => now(),
-                'notes'       => $request->notes,
+                'notes' => $request->notes,
             ]
         );
 
@@ -304,28 +307,22 @@ class AdminFounderController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->canAccessFounder($founder->id)) {
+        if (! $user->canAccessFounder($founder->id)) {
             abort(403);
         }
 
         $request->validate([
-            'audit_status'            => ['required', 'in:pending,in_progress,needs_info,on_hold,complete'],
-            'audit_notes'             => ['nullable', 'string', 'max:2000'],
-            'response_message'        => ['nullable', 'string', 'max:2000'],
+            'audit_status' => ['required', 'in:pending,in_progress,needs_info,on_hold,complete'],
+            'audit_notes' => ['nullable', 'string', 'max:2000'],
+            'response_message' => ['nullable', 'string', 'max:2000'],
             'send_message_to_founder' => ['nullable', 'boolean'],
         ]);
 
         $payment = $founder->payment;
-        if (!$payment) {
-            $payment = Payment::create([
-                'customer_email' => $founder->email,
-                'tier' => 'foundation',
-                'total_amount' => 35000,
-                'currency' => 'USD',
+        if (! $payment) {
+            return back()->withErrors([
+                'audit_status' => 'This founder has no payment record. Confirm offline payment before updating audit status.',
             ]);
-            $payment->status = 'paid';
-            $founder->payment_id = $payment->id;
-            $founder->save();
         }
 
         $payment->audit_status = $request->audit_status;
@@ -333,20 +330,20 @@ class AdminFounderController extends Controller
 
         // Update or record audit notes
         $notesToSave = $request->audit_notes ?? $request->response_message;
-        if (!empty($notesToSave)) {
+        if (! empty($notesToSave)) {
             AuditAssignment::updateOrCreate(
                 ['founder_id' => $founder->id],
                 [
-                    'analyst_id'  => $founder->auditAssignment?->analyst_id ?? ($user->isAnalyst() ? $user->id : null),
+                    'analyst_id' => $founder->auditAssignment?->analyst_id ?? ($user->isAnalyst() ? $user->id : null),
                     'assigned_by' => $founder->auditAssignment?->assigned_by ?? Auth::id(),
                     'assigned_at' => $founder->auditAssignment?->assigned_at ?? now(),
-                    'notes'       => $notesToSave,
+                    'notes' => $notesToSave,
                 ]
             );
         }
 
         // Send direct message to founder if requested
-        if ($request->send_message_to_founder && !empty(trim((string) $request->response_message))) {
+        if ($request->send_message_to_founder && ! empty(trim((string) $request->response_message))) {
             $thread = $this->messageService->getOrCreateThread($founder);
             $message = $this->messageService->sendMessage(
                 $thread,

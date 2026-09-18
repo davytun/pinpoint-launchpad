@@ -51,7 +51,7 @@ class AdminDashboardController extends Controller
         $showPlatform = $desk === 'platform';
 
         if ($showFounder) {
-            $metrics['my_open_messages'] = MessageThread::where('admin_unread_count', '>', 0)->count();
+            $metrics['my_open_messages'] = $user->adminUnreadMessagesCount();
 
             if ($user->canManageAudit()) {
                 if ($user->isSuperAdmin()) {
@@ -124,7 +124,7 @@ class AdminDashboardController extends Controller
         $systemAlerts = [];
 
         if ($showFounder) {
-            $unreadMessagesCount = MessageThread::where('admin_unread_count', '>', 0)->count();
+            $unreadMessagesCount = $user->adminUnreadMessagesCount();
             if ($unreadMessagesCount > 0) {
                 $needsAttention[] = [
                     'id' => 'unread_messages',

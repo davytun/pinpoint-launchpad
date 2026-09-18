@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Founder;
 use App\Models\FounderDocument;
 use App\Services\DocumentService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -18,54 +19,62 @@ class AdminDocumentController extends Controller
 
     public function index(Founder $founder): Response
     {
+        $this->authorizeFounder($founder);
+
         $founder->load(['documents.reviewer', 'payment']);
 
         $documents = $founder->documents()
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(fn ($doc) => [
-                'id'                => $doc->id,
-                'category'          => $doc->category,
-                'category_label'    => $doc->categoryLabel(),
+                'id' => $doc->id,
+                'category' => $doc->category,
+                'category_label' => $doc->categoryLabel(),
                 'original_filename' => $doc->original_filename,
-                'file_size'         => $doc->fileSizeForHumans(),
-                'extension'         => $doc->extension,
-                'file_icon'         => $doc->fileIcon(),
-                'mime_type'         => $doc->mime_type,
-                'is_reviewed'       => $doc->is_reviewed,
-                'reviewed_at'       => $doc->reviewed_at?->format('d M Y H:i'),
-                'reviewed_by'       => $doc->reviewer?->name,
-                'analyst_note'      => $doc->analyst_note,
-                'created_at'        => $doc->created_at->format('d M Y H:i'),
-                'download_url'      => route('admin.documents.download', [$founder->id, $doc->id]),
-                'preview_url'       => route('admin.documents.preview', [$founder->id, $doc->id]),
+                'file_size' => $doc->fileSizeForHumans(),
+                'extension' => $doc->extension,
+                'file_icon' => $doc->fileIcon(),
+                'mime_type' => $doc->mime_type,
+                'is_reviewed' => $doc->is_reviewed,
+                'reviewed_at' => $doc->reviewed_at?->format('d M Y H:i'),
+                'reviewed_by' => $doc->reviewer?->name,
+                'analyst_note' => $doc->analyst_note,
+                'created_at' => $doc->created_at->format('d M Y H:i'),
+                'download_url' => route('admin.documents.download', [$founder->id, $doc->id]),
+                'preview_url' => route('admin.documents.preview', [$founder->id, $doc->id]),
             ]);
 
         return Inertia::render('Admin/Documents/Index', [
-            'founder'      => [
-                'id'           => $founder->id,
-                'full_name'    => $founder->full_name,
+            'founder' => [
+                'id' => $founder->id,
+                'full_name' => $founder->full_name,
                 'company_name' => $founder->company_name,
-                'email'        => $founder->email,
+                'email' => $founder->email,
             ],
-            'documents'    => $documents,
+            'documents' => $documents,
             'audit_status' => $founder->payment?->audit_status ?? 'pending',
         ]);
     }
 
     public function download(Founder $founder, FounderDocument $document): StreamedResponse
     {
+        $this->authorizeFounderDocument($founder, $document);
+
         return $this->documents->download($document);
     }
 
     public function preview(Founder $founder, FounderDocument $document): StreamedResponse
     {
+        $this->authorizeFounderDocument($founder, $document);
+
         return $this->documents->preview($document);
     }
 
-    public function markReviewed(Founder $founder, FounderDocument $document): \Illuminate\Http\RedirectResponse
+    public function markReviewed(Founder $founder, FounderDocument $document): RedirectResponse
     {
-        $isReviewed = !$document->is_reviewed;
+        $this->authorizeFounderDocument($founder, $document);
+
+        $isReviewed = ! $document->is_reviewed;
 
         $document->update([
             'is_reviewed' => $isReviewed,
@@ -76,8 +85,10 @@ class AdminDocumentController extends Controller
         return back()->with('success', $isReviewed ? 'Document marked as reviewed.' : 'Document marked as unreviewed.');
     }
 
-    public function addNote(Request $request, Founder $founder, FounderDocument $document): \Illuminate\Http\RedirectResponse
+    public function addNote(Request $request, Founder $founder, FounderDocument $document): RedirectResponse
     {
+        $this->authorizeFounderDocument($founder, $document);
+
         $request->validate([
             'note' => ['required', 'string', 'max:500'],
         ]);
@@ -85,5 +96,21 @@ class AdminDocumentController extends Controller
         $document->update(['analyst_note' => $request->input('note')]);
 
         return back()->with('success', 'Note saved.');
+    }
+
+    private function authorizeFounder(Founder $founder): void
+    {
+        if (! Auth::user()->canAccessFounder($founder->id)) {
+            abort(403, 'You are not assigned to this founder.');
+        }
+    }
+
+    private function authorizeFounderDocument(Founder $founder, FounderDocument $document): void
+    {
+        $this->authorizeFounder($founder);
+
+        if ($document->founder_id !== $founder->id) {
+            abort(404);
+        }
     }
 }

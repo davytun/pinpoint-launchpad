@@ -308,6 +308,15 @@ function SidebarContent({
                         />
 
                         <NavItem
+                            href={route('founder.diligence.index')}
+                            icon="solar:document-medicine-linear"
+                            label="Diligence"
+                            active={isActive('/founder/diligence')}
+                            collapsed={collapsed}
+                            onClick={onNav}
+                        />
+
+                        <NavItem
                             href={route('founder.messages.index')}
                             icon="solar:chat-round-dots-linear"
                             label="Messages"

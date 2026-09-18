@@ -8,6 +8,7 @@ use App\Models\FounderProfile;
 use App\Models\VerificationBadge;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,8 +16,16 @@ class AdminProfileController extends Controller
 {
     public function index(): Response
     {
-        $profiles = FounderProfile::with(['founder:id,full_name,company_name,email'])
-            ->withCount(['badges as verified_badges_count' => fn ($q) => $q->where('is_verified', true)])
+        $user = Auth::user();
+
+        $query = FounderProfile::with(['founder:id,full_name,company_name,email'])
+            ->withCount(['badges as verified_badges_count' => fn ($q) => $q->where('is_verified', true)]);
+
+        if ($user->isAnalyst()) {
+            $query->whereIn('founder_id', $user->assignedFounderIds());
+        }
+
+        $profiles = $query
             ->latest('verified_at')
             ->get()
             ->map(fn ($p) => [
@@ -43,6 +52,8 @@ class AdminProfileController extends Controller
 
     public function show(FounderProfile $profile): Response
     {
+        $this->authorizeProfile($profile);
+
         $profile->load([
             'founder:id,full_name,company_name,email',
             'badges',
@@ -108,6 +119,8 @@ class AdminProfileController extends Controller
 
     public function update(Request $request, FounderProfile $profile): RedirectResponse
     {
+        $this->authorizeProfile($profile);
+
         $validated = $request->validate([
             'analyst_summary' => ['nullable', 'string', 'max:2000'],
             'sector' => ['nullable', 'string', 'max:150'],
@@ -125,6 +138,14 @@ class AdminProfileController extends Controller
 
     public function updateBadge(Request $request, VerificationBadge $badge): RedirectResponse
     {
+        $badge->loadMissing('founderProfile');
+
+        if (! $badge->founderProfile) {
+            abort(404);
+        }
+
+        $this->authorizeProfile($badge->founderProfile);
+
         $validated = $request->validate([
             'is_verified' => ['required', 'boolean'],
         ]);
@@ -135,5 +156,12 @@ class AdminProfileController extends Controller
         ]);
 
         return back()->with('success', 'Badge updated.');
+    }
+
+    private function authorizeProfile(FounderProfile $profile): void
+    {
+        if (! $profile->founder_id || ! Auth::user()->canAccessFounder((string) $profile->founder_id)) {
+            abort(403, 'You are not assigned to this founder.');
+        }
     }
 }

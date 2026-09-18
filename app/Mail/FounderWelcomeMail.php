@@ -27,9 +27,9 @@ class FounderWelcomeMail extends Mailable
         return new Content(
             view: 'emails.founder.welcome',
             with: [
-                'founder'    => $this->founder,
-                'tierLabel'  => $this->founder->tier_label,
-                'dashboardUrl' => url('/dashboard'),
+                'founder' => $this->founder,
+                'tierLabel' => $this->founder->tier_label,
+                'dashboardUrl' => route('founder.dashboard'),
             ],
         );
     }

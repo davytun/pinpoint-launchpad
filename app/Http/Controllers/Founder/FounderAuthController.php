@@ -13,7 +13,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -34,7 +33,7 @@ class FounderAuthController extends Controller
                 ->with('error', 'Invalid setup link. Please check your email for the setup invitation.');
         }
 
-        $cachedToken = Cache::get('founder_setup_token_' . $email);
+        $cachedToken = Cache::get('founder_setup_token_'.$email);
 
         if (! $cachedToken || ! hash_equals($cachedToken, $token)) {
             return redirect()->route('founder.login')
@@ -55,9 +54,9 @@ class FounderAuthController extends Controller
             ->latest()->first();
 
         return Inertia::render('Founder/Auth/Setup', [
-            'email'        => $email,
-            'token'        => $token,
-            'full_name'    => $signature?->signer_full_name,
+            'email' => $email,
+            'token' => $token,
+            'full_name' => $signature?->signer_full_name,
             'company_name' => $signature?->signer_company_name,
         ]);
     }
@@ -65,15 +64,15 @@ class FounderAuthController extends Controller
     public function setup(Request $request): RedirectResponse
     {
         $request->validate([
-            'token'        => ['required', 'string'],
-            'email'        => ['required', 'email'],
-            'password'     => ['required', 'min:8', 'confirmed'],
-            'full_name'    => ['required', 'string', 'min:2', 'max:100'],
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'min:8', 'confirmed'],
+            'full_name' => ['required', 'string', 'min:2', 'max:100'],
             'company_name' => ['required', 'string', 'min:2', 'max:150'],
         ]);
 
         // Re-verify token — one-time use
-        $cachedToken = Cache::get('founder_setup_token_' . $request->email);
+        $cachedToken = Cache::get('founder_setup_token_'.$request->email);
 
         if (! $cachedToken || ! hash_equals($cachedToken, $request->token)) {
             return back()->withErrors([
@@ -97,14 +96,14 @@ class FounderAuthController extends Controller
         $founder = Founder::query()->firstOrNew(['email' => $request->email]);
 
         $founder->fill([
-            'password'              => $request->password,
-            'full_name'             => $request->full_name,
-            'company_name'          => $request->company_name,
-            'email_verified_at'     => now(),
+            'password' => $request->password,
+            'full_name' => $request->full_name,
+            'company_name' => $request->company_name,
+            'email_verified_at' => now(),
             'diagnostic_session_id' => $diagnosticSession?->id,
-            'payment_id'            => $payment?->id,
-            'signature_id'          => $signature?->id,
-            'last_login_at'         => now(),
+            'payment_id' => $payment?->id,
+            'signature_id' => $signature?->id,
+            'last_login_at' => now(),
         ]);
         $founder->save();
 
@@ -115,7 +114,7 @@ class FounderAuthController extends Controller
         $request->session()->put('founder_last_activity', now()->timestamp);
 
         // Invalidate token — one-time use only
-        Cache::forget('founder_setup_token_' . $request->email);
+        Cache::forget('founder_setup_token_'.$request->email);
 
         // Clear onboarding session keys
         session()->forget([
@@ -127,6 +126,8 @@ class FounderAuthController extends Controller
             'signer_company_name',
             'pending_payment_reference',
         ]);
+
+        Mail::to($founder->email)->queue(new FounderWelcomeMail($founder));
 
         return redirect()->route('founder.dashboard');
     }
@@ -145,7 +146,7 @@ class FounderAuthController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $request->validate([
-            'email'    => ['required', 'email'],
+            'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
@@ -211,9 +212,9 @@ class FounderAuthController extends Controller
     public function resetPassword(Request $request): RedirectResponse
     {
         $request->validate([
-            'token'                 => ['required'],
-            'email'                 => ['required', 'email'],
-            'password'              => ['required', 'min:8', 'confirmed'],
+            'token' => ['required'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'min:8', 'confirmed'],
             'password_confirmation' => ['required'],
         ]);
 
@@ -221,7 +222,7 @@ class FounderAuthController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (Founder $founder, string $password) {
                 $founder->forceFill([
-                    'password'       => Hash::make($password),
+                    'password' => $password,
                     'remember_token' => Str::random(60),
                 ])->save();
 

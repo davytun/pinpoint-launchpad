@@ -31,47 +31,47 @@ class PaymentObserver
         }
 
         $pillarScores = $founder->diagnosticSession?->pillar_scores ?? [
-            'potential'   => 0,
-            'agility'     => 0,
-            'risk'        => 0,
-            'alignment'   => 0,
-            'governance'  => 0,
-            'operations'  => 0,
-            'network'     => 0,
+            'potential' => 0,
+            'agility' => 0,
+            'risk' => 0,
+            'alignment' => 0,
+            'governance' => 0,
+            'operations' => 0,
+            'network' => 0,
         ];
 
         $overallScore = $founder->diagnosticSession?->score ?? 0;
 
-        $slug     = Str::slug($founder->company_name ?? $founder->email);
+        $slug = Str::slug($founder->company_name ?? $founder->email);
         $baseSlug = $slug;
-        $counter  = 1;
+        $counter = 1;
 
         while (FounderProfile::where('slug', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $counter++;
+            $slug = $baseSlug.'-'.$counter++;
         }
 
         $profile = FounderProfile::updateOrCreate(
             ['founder_id' => $founder->id],
             [
-                'payment_id'    => $payment->id,
-                'slug'          => $slug,
-                'is_public'     => true,
-                'radar_data'    => $pillarScores,
+                'payment_id' => $payment->id,
+                'slug' => $slug,
+                'is_public' => true,
+                'radar_data' => $pillarScores,
                 'overall_score' => $overallScore,
-                'batch'         => 'Spring 2026',
-                'verified_at'   => now(),
-                'expires_at'    => now()->addDays(90),
+                'batch' => 'Spring 2026',
+                'verified_at' => now(),
+                'expires_at' => now()->addDays(90),
             ]
         );
 
         $defaultBadges = [
-            'legal'          => 'LEGAL: VERIFIED',
-            'financial'      => 'FINANCING: VERIFIED',
-            'tech_stack'     => 'TECH STACK: AUDITED',
-            'cap_table'      => 'CAP TABLE: CLEAN',
-            'ip_ownership'   => 'IP OWNERSHIP: CONFIRMED',
+            'legal' => 'LEGAL: VERIFIED',
+            'financial' => 'FINANCING: VERIFIED',
+            'tech_stack' => 'TECH STACK: AUDITED',
+            'cap_table' => 'CAP TABLE: CLEAN',
+            'ip_ownership' => 'IP OWNERSHIP: CONFIRMED',
             'unit_economics' => 'UNIT ECONOMICS: VERIFIED',
-            'market_size'    => 'MARKET SIZE: VALIDATED',
+            'market_size' => 'MARKET SIZE: VALIDATED',
         ];
 
         foreach ($defaultBadges as $type => $label) {

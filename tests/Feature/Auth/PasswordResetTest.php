@@ -3,13 +3,14 @@
 use App\Models\Founder;
 use App\Models\Investor;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Mail;
 
 test('founder forgot-password screen can be rendered', function () {
     $this->get('/founder/forgot-password')->assertStatus(200);
 });
 
 test('founder reset-password link can be requested', function () {
-    \Illuminate\Support\Facades\Mail::fake();
+    Mail::fake();
     Founder::factory()->create(['email' => 'test@example.com']);
 
     $response = $this->post('/founder/forgot-password', [
@@ -25,7 +26,7 @@ test('investor password reset notifications use the investor reset route', funct
 
     expect($url)
         ->toStartWith(url('/investor/reset-password/test-token'))
-        ->toContain('email=' . urlencode($investor->email));
+        ->toContain('email='.urlencode($investor->email));
 });
 
 test('founder password reset notifications use the founder reset route', function () {
@@ -34,5 +35,5 @@ test('founder password reset notifications use the founder reset route', functio
 
     expect($url)
         ->toStartWith(url('/founder/reset-password/test-token'))
-        ->toContain('email=' . urlencode($founder->email));
+        ->toContain('email='.urlencode($founder->email));
 });

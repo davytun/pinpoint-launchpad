@@ -135,6 +135,7 @@ class InvestorInterestController extends Controller
                 'scheduled_at' => null,
                 'completed_at' => null,
             ]);
+
             return back()->with('success', 'Interest request reset to pending.');
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,13 +12,20 @@ class RequireRole
 {
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!Auth::check()) {
+        /** @var User|null $user */
+        $user = Auth::guard('web')->user();
+
+        if (! $user instanceof User) {
+            if (Auth::guard('investor')->check() || Auth::guard('founder')->check()) {
+                abort(403);
+            }
+
             return redirect()->route('admin.login');
         }
 
-        $user = Auth::user();
+        Auth::shouldUse('web');
 
-        if (!in_array($user->role, $roles)) {
+        if (! in_array($user->role, $roles, true)) {
             abort(403, 'Insufficient permissions.');
         }
 

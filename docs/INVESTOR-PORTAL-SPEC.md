@@ -1,6 +1,6 @@
 # Pinpoint Investor Portal — Current Production Architecture
 
-> **Status:** Active production architecture, updated for Phase 9B (28 August 2026).
+> **Status:** Active production architecture (admin desks + offline PIA path, September 2026).
 >
 > Historical migrations and archived records remain in the repository and database. They are not part of the active product flow.
 
@@ -18,9 +18,11 @@ Pinpoint Investment Network is a controlled investor portal. Pinpoint, Admin, an
 6. Founder authorizes or declines Pinpoint coordination
 7. Investor Relations makes the final operational decision
 8. Pinpoint schedules an introduction and/or grants a startup-specific Data Room
-9. Post-introduction diligence is mediated by Pinpoint
+9. Post-introduction diligence is mediated by Pinpoint (submit only after a completed founder introduction)
 
 The public `/investor` page is the portal landing page. It directs visitors to registration and does not submit an old investor application.
+
+Account access statuses for Investors are `pending_review | active | rejected`. Onboarding still auto-activates accounts; staff can reject or reactivate from the Investor desk.
 
 ## Founder, Pinpoint, and Investor boundaries
 
@@ -30,7 +32,7 @@ Founder authorization is consent for Pinpoint or Investor Relations to proceed. 
 
 ### Data Rooms
 
-`InvestorDataRoomGrant` is startup-specific and independent from an introduction. A grant is created or revoked only by authorized Admin or Investor Relations actions. Investors need approved KYC, an active grant for the correct startup, permitted document visibility, correct document ownership, and signed access where configured.
+`InvestorDataRoomGrant` is startup-specific and independent from an introduction. A grant is created or revoked only by authorized Admin or Investor Relations actions. Investors need approved KYC, an active grant for the correct startup, permitted document visibility, correct document ownership, and signed access where configured. Reinstate notifies the Investor.
 
 ### Diligence
 
@@ -40,7 +42,7 @@ The workflow is:
 Investor → Pinpoint → Founder → Pinpoint → Investor
 ```
 
-Founder input and internal Admin notes remain private until Admin or Investor Relations explicitly releases an Investor-visible response.
+Founder input and internal Admin notes remain private until Admin or Investor Relations explicitly releases an Investor-visible response. Server rejects diligence submit unless a completed `founder_call` introduction exists for that startup.
 
 ## Spotlight
 
@@ -49,22 +51,42 @@ Spotlight is visible only to approved Investors. It presents approved startup in
 - Founder editing: `/founder/spotlight`
 - Investor browse: `/investor/spotlight`
 - Investor detail: `/investor/spotlight/{slug}`
-- Admin publication: `/admin/spotlight`
+- Admin publication: `/admin/investors/spotlight`
 
 Real startup `/verify/{slug}` URLs are retired and redirect to `/investor`. `/verify/sample-unicorn` is retained solely as an intentional marketing demo.
 
-## Roles and server-side authorization
+## Staff desks and roles
+
+Staff share one login. Work is split into desks:
+
+| Desk | URL | Roles |
+|---|---|---|
+| Platform | `/admin` | Superadmin (team, settings, revenue, blog, PIA requests) |
+| Founder | `/admin/founder/*` | Superadmin, Analyst |
+| Investor | `/admin/investors/*` | Superadmin, Compliance, Investor Relations |
 
 | Role | Active responsibility |
 |---|---|
-| Founder | Startup profile, documents, Spotlight content, Pinpoint authorization, diligence response |
-| Investor | Registration, KYC, Spotlight, interests, granted Data Rooms, diligence requests |
-| Analyst | Founder audit and documents |
-| Compliance | Investor KYC review |
-| Investor Relations | Spotlight publication, dealflow orchestration, Data Room grants, introductions, diligence release |
-| Superadmin | Full operational oversight |
+| Founder (portal) | Startup profile, documents, Spotlight content, Pinpoint authorization, diligence response |
+| Investor (portal) | Registration, KYC, Spotlight, interests, granted Data Rooms, post-intro diligence |
+| Analyst | Founder desk audits, documents, messages |
+| Compliance | Investor KYC review only (not IR) |
+| Investor Relations | Spotlight, dealflow, Data Rooms, introductions, diligence release, announcements |
+| Superadmin | Full operational oversight across desks |
 
-Authorization is enforced by Laravel middleware, requests, policies, and controller-level checks. Hiding a UI element is not an authorization boundary.
+The `support` role is retired and cannot operate admin desks.
+
+Authorization is enforced by Laravel middleware (`require.role`, `admin.side`), requests, and controller-level checks. Hiding a UI element is not an authorization boundary.
+
+## Founder money path (offline PIA)
+
+Primary checkout is offline, not Paystack:
+
+```text
+Diagnostic → /checkout/request (PIA) → Admin confirm payment → BoldSign → Founder setup
+```
+
+`paystack_reference` may store offline identifiers (e.g. `offline-pia-{id}`). Legacy Paystack webhook/success endpoints remain only for historical transactions.
 
 ## Core models and states
 
@@ -101,6 +123,8 @@ The following are preserved only as historical database/migration records and mu
 - `admin.profiles.access-requests`
 - the former Founder access-request route
 - public real-startup verification pages and token document links
+- operable `support` staff role
+- Paystack as the high-ticket happy path
 
 Archived tables include `investor_applications` and `investor_access_requests`. Do not delete or modify their historical migrations without a separate approved data-retention plan.
 

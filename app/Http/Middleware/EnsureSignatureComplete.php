@@ -27,6 +27,7 @@ class EnsureSignatureComplete
 
             if ($payment && $payment->signature && $payment->signature->isSigned()) {
                 $request->session()->put('signature_id', $payment->signature->id);
+
                 return $next($request);
             }
         }
@@ -48,6 +49,7 @@ class EnsureSignatureComplete
 
                 if ($signature) {
                     $request->session()->put('signature_id', $signature->id);
+
                     return $next($request);
                 }
             }

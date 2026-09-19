@@ -31,9 +31,9 @@ class SignatureAdminNotificationMail extends Mailable
             view: 'emails.signature.admin-notification',
             with: [
                 'signer_email' => $this->signature->signer_email,
-                'tier_label'   => $this->tierLabel,
-                'signed_at'    => $this->signature->signed_at,
-                'document_id'  => $this->signature->boldsign_document_id,
+                'tier_label' => $this->tierLabel,
+                'signed_at' => $this->signature->signed_at,
+                'document_id' => $this->signature->boldsign_document_id,
             ],
         );
     }

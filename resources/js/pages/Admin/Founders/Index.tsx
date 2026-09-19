@@ -175,7 +175,7 @@ function StatusBadge({ status }: { status: string }) {
     }
 }
 
-function ScoreBadge({ score, band }: { score: number | null; band?: string | null }) {
+function ScoreBadge({ score }: { score: number | null; band?: string | null }) {
     if (score === null || score === undefined) {
         return <span className="text-xs font-medium text-zinc-400">—</span>;
     }

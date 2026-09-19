@@ -1,9 +1,8 @@
 import { InvestorHeader } from '@/components/investor-header';
-import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Icon } from '@iconify/react';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
 type Entry = {
@@ -32,10 +31,7 @@ interface PageProps {
     categories?: string[];
 }
 
-export default function SpotlightIndex({ entries = [], investor, categories = ['All'] }: PageProps) {
-    const unreadNotifications =
-        usePage<{ platform_unread_notifications?: { investor?: number } }>().props.platform_unread_notifications?.investor ?? 0;
-
+export default function SpotlightIndex({ entries = [], categories = ['All'] }: PageProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSector, setSelectedSector] = useState('All');
     const [sortBy, setSortBy] = useState<'score' | 'badges' | 'latest'>('score');
@@ -138,7 +134,14 @@ export default function SpotlightIndex({ entries = [], investor, categories = ['
                         {/* Sort Selector */}
                         <div className="flex items-center gap-3">
                             <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Sort By</span>
-                            <Select value={sortBy} onValueChange={(val) => setSortBy(val as any)}>
+                            <Select
+                                value={sortBy}
+                                onValueChange={(val) => {
+                                    if (val === 'score' || val === 'badges' || val === 'latest') {
+                                        setSortBy(val);
+                                    }
+                                }}
+                            >
                                 <SelectTrigger className="w-[220px] rounded-xl border border-zinc-200 bg-white text-sm font-semibold text-zinc-700 shadow-2xs focus:ring-1 focus:ring-zinc-900 h-9">
                                     <SelectValue placeholder="Select Sort Order" />
                                 </SelectTrigger>

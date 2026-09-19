@@ -28,73 +28,73 @@ class PaystackService
 
     public function initializeTransaction(array $data): array
     {
-        $currency    = isset($data['currency']) ? strtoupper($data['currency']) : strtoupper(config('services.paystack.currency', 'NGN'));
-        $isNaira     = $currency === 'NGN';
+        $currency = isset($data['currency']) ? strtoupper($data['currency']) : strtoupper(config('services.paystack.currency', 'NGN'));
+        $isNaira = $currency === 'NGN';
 
         $tierMap = [
             'foundation' => [
                 'amount' => $isNaira ? 35000000 : 50000,
-                'base'   => $isNaira ? 350000 : 500,
-                'total'  => $isNaira ? 350000 : 500,
-                'label'  => $isNaira
+                'base' => $isNaira ? 350000 : 500,
+                'total' => $isNaira ? 350000 : 500,
+                'label' => $isNaira
                     ? 'Tier 1 (Domestic & Local Founders) Audit — PARAGON Certification'
                     : 'Tier 1 (Diaspora & International) Audit — PARAGON Certification',
             ],
             'growth' => [
                 'amount' => $isNaira ? 209000000 : 150000,
-                'base'   => $isNaira ? 2090000 : 1500,
-                'total'  => $isNaira ? 2090000 : 1500,
-                'label'  => 'Seed / Early Traction Audit — PARAGON Certification',
+                'base' => $isNaira ? 2090000 : 1500,
+                'total' => $isNaira ? 2090000 : 1500,
+                'label' => 'Seed / Early Traction Audit — PARAGON Certification',
             ],
             'institutional' => [
                 'amount' => $isNaira ? 485000000 : 350000,
-                'base'   => $isNaira ? 4850000 : 3500,
-                'total'  => $isNaira ? 4850000 : 3500,
-                'label'  => 'Seed+ / Growth Audit — PARAGON Certification',
+                'base' => $isNaira ? 4850000 : 3500,
+                'total' => $isNaira ? 4850000 : 3500,
+                'label' => 'Seed+ / Growth Audit — PARAGON Certification',
             ],
         ];
 
         // Validate required keys before any access
         $requiredKeys = ['tier', 'email', 'callback_url', 'diagnostic_session_id'];
-        $missing      = array_filter($requiredKeys, fn($k) => ! isset($data[$k]) || $data[$k] === '');
+        $missing = array_filter($requiredKeys, fn ($k) => ! isset($data[$k]) || $data[$k] === '');
 
         if (! empty($missing)) {
-            throw new \InvalidArgumentException('Missing required payment data keys: ' . implode(', ', $missing));
+            throw new \InvalidArgumentException('Missing required payment data keys: '.implode(', ', $missing));
         }
 
         $tier = $data['tier'];
 
         if (! isset($tierMap[$tier])) {
-            throw new \InvalidArgumentException("Invalid tier: '{$tier}'. Must be one of: " . implode(', ', array_keys($tierMap)));
+            throw new \InvalidArgumentException("Invalid tier: '{$tier}'. Must be one of: ".implode(', ', array_keys($tierMap)));
         }
 
-        $tierData    = $tierMap[$tier];
-        $amount      = $tierData['amount'];
-        $baseAmount  = $tierData['base'];
+        $tierData = $tierMap[$tier];
+        $amount = $tierData['amount'];
+        $baseAmount = $tierData['base'];
         $totalAmount = $tierData['total'];
-        $tierLabel   = $tierData['label'];
+        $tierLabel = $tierData['label'];
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->secretKey,
-                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer '.$this->secretKey,
+                'Content-Type' => 'application/json',
             ])->timeout(10)->post('https://api.paystack.co/transaction/initialize', [
-                'email'        => $data['email'],
-                'amount'       => $amount,
-                'currency'     => $currency,
+                'email' => $data['email'],
+                'amount' => $amount,
+                'currency' => $currency,
                 'callback_url' => $data['callback_url'],
-                'channels'     => ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
-                'metadata'     => [
-                    'tier'                  => $tier,
-                    'tier_label'            => $tierLabel,
+                'channels' => ['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
+                'metadata' => [
+                    'tier' => $tier,
+                    'tier_label' => $tierLabel,
                     'diagnostic_session_id' => $data['diagnostic_session_id'],
-                    'cancel_action'         => route('checkout.cancel'),
+                    'cancel_action' => route('checkout.cancel'),
                 ],
             ])->json();
         } catch (\Throwable $e) {
             Log::error('Paystack HTTP request failed during initialization', [
-                'error'      => $e->getMessage(),
-                'tier'       => $tier,
+                'error' => $e->getMessage(),
+                'tier' => $tier,
                 'email_hash' => hash('sha256', $data['email']),
             ]);
             throw new RuntimeException('Payment gateway unavailable. Please try again.');
@@ -103,32 +103,32 @@ class PaystackService
         if (! ($response['status'] ?? false)) {
             Log::error('Paystack initialization rejected', [
                 'message' => $response['message'] ?? 'Unknown',
-                'tier'    => $tier,
+                'tier' => $tier,
             ]);
             throw new RuntimeException('Payment could not be initialized. Please try again.');
         }
 
         // status='pending' and audit_status='pending' are set atomically by DB column defaults
         $payment = Payment::create([
-            'paystack_reference'    => $response['data']['reference'],
-            'paystack_access_code'  => $response['data']['access_code'],
-            'tier'                  => $tier,
-            'tier_base_amount'      => $baseAmount,
-            'total_amount'          => $totalAmount,
-            'customer_email'        => $data['email'],
+            'paystack_reference' => $response['data']['reference'],
+            'paystack_access_code' => $response['data']['access_code'],
+            'tier' => $tier,
+            'tier_base_amount' => $baseAmount,
+            'total_amount' => $totalAmount,
+            'customer_email' => $data['email'],
             'diagnostic_session_id' => $data['diagnostic_session_id'],
-            'currency'              => strtolower($currency),
+            'currency' => strtolower($currency),
         ]);
 
         $payment->log('initialized', [
-            'tier'   => $tier,
+            'tier' => $tier,
             'amount' => $totalAmount,
         ]);
 
         return [
             'authorization_url' => $response['data']['authorization_url'],
-            'reference'         => $response['data']['reference'],
-            'access_code'       => $response['data']['access_code'],
+            'reference' => $response['data']['reference'],
+            'access_code' => $response['data']['access_code'],
         ];
     }
 
@@ -136,12 +136,12 @@ class PaystackService
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->secretKey,
-            ])->timeout(10)->get('https://api.paystack.co/transaction/verify/' . rawurlencode($reference))->json();
+                'Authorization' => 'Bearer '.$this->secretKey,
+            ])->timeout(10)->get('https://api.paystack.co/transaction/verify/'.rawurlencode($reference))->json();
         } catch (\Throwable $e) {
             Log::error('Paystack HTTP request failed during verification', [
                 'reference' => $reference,
-                'error'     => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
             throw new RuntimeException('Payment gateway unavailable. Please try again.');
         }
@@ -149,7 +149,7 @@ class PaystackService
         if (! ($response['status'] ?? false)) {
             Log::warning('Paystack verification returned failure', [
                 'reference' => $reference,
-                'message'   => $response['message'] ?? 'Unknown',
+                'message' => $response['message'] ?? 'Unknown',
             ]);
             throw new RuntimeException('Payment verification failed.');
         }
@@ -169,7 +169,7 @@ class PaystackService
         // Verify signature FIRST — before touching anything
         if (! $this->verifyWebhookSignature($request)) {
             Log::warning('Paystack webhook signature mismatch', [
-                'ip'        => $request->ip(),
+                'ip' => $request->ip(),
                 'timestamp' => now()->toIso8601String(),
             ]);
             abort(400, 'Invalid signature');
@@ -180,17 +180,17 @@ class PaystackService
         // Validate payload structure before processing
         if (! isset($payload['event'], $payload['data'])) {
             Log::warning('Paystack webhook malformed payload', [
-                'ip'             => $request->ip(),
+                'ip' => $request->ip(),
                 'payload_length' => strlen($request->getContent()),
-                'payload_hash'   => hash('sha256', $request->getContent()),
+                'payload_hash' => hash('sha256', $request->getContent()),
             ]);
             abort(400, 'Malformed payload');
         }
 
         match ($payload['event']) {
             'charge.success' => $this->handleChargeSuccess($payload['data']),
-            'charge.failed'  => $this->handleChargeFailed($payload['data']),
-            default          => null,
+            'charge.failed' => $this->handleChargeFailed($payload['data']),
+            default => null,
         };
     }
 
@@ -209,22 +209,23 @@ class PaystackService
         }
 
         $amountPaid = isset($data['amount']) ? ($data['amount'] / 100) : $payment->total_amount;
-        $currency   = isset($data['currency']) ? strtolower($data['currency']) : $payment->currency;
+        $currency = isset($data['currency']) ? strtolower($data['currency']) : $payment->currency;
 
         // Atomic idempotent update — only proceeds if not already paid
         $affected = Payment::where('id', $payment->id)
             ->where('status', '!=', 'paid')
             ->update([
-                'status'       => 'paid',
-                'paid_at'      => now(),
+                'status' => 'paid',
+                'paid_at' => now(),
                 'total_amount' => $amountPaid,
-                'currency'     => $currency,
+                'currency' => $currency,
             ]);
 
         if ($affected === 0) {
             Log::info('Webhook received for already-paid payment', [
                 'reference' => $reference,
             ]);
+
             return;
         }
 
@@ -246,7 +247,7 @@ class PaystackService
         } catch (\Throwable $e) {
             Log::error('Failed to queue payment emails after webhook', [
                 'payment_id' => $payment->id,
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
     }

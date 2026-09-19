@@ -33,7 +33,7 @@ class InvestorDiligenceResponseReadyNotification extends Notification implements
 
         return (new MailMessage)
             ->subject('Pinpoint Diligence Update: Response Available')
-            ->greeting('Hello ' . ($notifiable->profile?->full_name ?? 'Investor') . ',')
+            ->greeting('Hello '.($notifiable->profile?->full_name ?? 'Investor').',')
             ->line("Pinpoint Investor Relations has prepared and released a verified response to your diligence inquiry regarding {$company}.")
             ->line("Subject: {$this->diligenceRequest->subject}")
             ->action('View Approved Response', route('investor.interests.index'));

@@ -42,11 +42,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->validateCsrfTokens(except: [
-            'webhooks/paystack',
-            'webhooks/pandadoc',
+            'webhooks/paystack', // legacy Paystack callbacks (offline PIA is the happy path)
             'webhooks/boldsign',
-            'diagnostic/submit',
-            'diagnostic/capture-email',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

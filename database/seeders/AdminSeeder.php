@@ -35,5 +35,23 @@ class AdminSeeder extends Seeder
                 'role' => 'analyst',
             ]
         );
+
+        User::firstOrCreate(
+            ['email' => 'ada.okonkwo@pinpointlaunchpad.com'],
+            [
+                'name' => 'Ada Okonkwo',
+                'password' => bcrypt('password123'),
+                'role' => 'compliance',
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'james.okoro@pinpointlaunchpad.com'],
+            [
+                'name' => 'James Okoro',
+                'password' => bcrypt('password123'),
+                'role' => 'investor_relations',
+            ]
+        );
     }
 }

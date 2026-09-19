@@ -14,7 +14,10 @@ use Inertia\Response;
 
 class PlatformAnnouncementController extends Controller
 {
-    public function index(): Response { return Inertia::render('Admin/Announcements/Index', ['announcements' => PlatformAnnouncement::latest('published_at')->get()]); }
+    public function index(): Response
+    {
+        return Inertia::render('Admin/Announcements/Index', ['announcements' => PlatformAnnouncement::latest('published_at')->get()]);
+    }
 
     public function store(Request $request)
     {
@@ -24,9 +27,10 @@ class PlatformAnnouncementController extends Controller
             'active_investors' => Investor::where('account_status', Investor::ACCOUNT_STATUS_ACTIVE)->get(),
             'kyc_approved_investors' => Investor::where('account_status', Investor::ACCOUNT_STATUS_ACTIVE)->where('kyc_status', Investor::KYC_STATUS_APPROVED)->get(),
             'founders' => Founder::all(),
-            default => User::whereIn('role', ['superadmin', 'analyst', 'support', 'compliance', 'investor_relations'])->get(),
+            default => User::whereIn('role', ['superadmin', 'analyst', 'compliance', 'investor_relations'])->get(),
         };
         $recipients->each(fn ($recipient) => $recipient->notify(new PlatformAnnouncementNotification($announcement)));
+
         return back()->with('success', 'Announcement published.');
     }
 }

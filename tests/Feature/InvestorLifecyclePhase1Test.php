@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AuditLog;
 use App\Models\Investor;
 use App\Models\InvestorKycSubmission;
 use App\Models\InvestorProfile;
@@ -329,21 +328,26 @@ test('confidential KYC documents cannot be downloaded or previewed by unauthoriz
     // Logged-in Investor -> 403 Forbidden
     $this->actingAs($investor, 'investor')->get(route('admin.investor-kyc.preview', $submission))->assertForbidden();
 
-    // Unauthorized Staff (Support or Analyst role) -> 403 Forbidden
+    // Unauthorized Staff (Analyst) -> redirected off investor desk
     $analyst = User::factory()->create(['role' => 'analyst']);
-    $this->actingAs($analyst)->get(route('admin.investor-kyc.preview', $submission))->assertForbidden();
-    $this->actingAs($analyst)->get(route('admin.investor-kyc.download', $submission))->assertForbidden();
+    $this->actingAs($analyst, 'web')
+        ->get(route('admin.investor-kyc.preview', $submission))
+        ->assertRedirect(route('admin.founder.dashboard'));
+    $this->actingAs($analyst, 'web')
+        ->get(route('admin.investor-kyc.download', $submission))
+        ->assertRedirect(route('admin.founder.dashboard'));
 
+    // Retired support role -> 403 Forbidden
     $support = User::factory()->create(['role' => 'support']);
-    $this->actingAs($support)->get(route('admin.investor-kyc.preview', $submission))->assertForbidden();
+    $this->actingAs($support, 'web')->get(route('admin.investor-kyc.preview', $submission))->assertForbidden();
 
     // Authorized Staff (Compliance) -> 200 OK
     $compliance = User::factory()->create(['role' => 'compliance']);
-    $this->actingAs($compliance)->get(route('admin.investor-kyc.preview', $submission))->assertOk();
-    $this->actingAs($compliance)->get(route('admin.investor-kyc.download', $submission))->assertOk();
+    $this->actingAs($compliance, 'web')->get(route('admin.investor-kyc.preview', $submission))->assertOk();
+    $this->actingAs($compliance, 'web')->get(route('admin.investor-kyc.download', $submission))->assertOk();
 
     // Authorized Staff (Superadmin) -> 200 OK
     $superadmin = User::factory()->create(['role' => 'superadmin']);
-    $this->actingAs($superadmin)->get(route('admin.investor-kyc.preview', $submission))->assertOk();
-    $this->actingAs($superadmin)->get(route('admin.investor-kyc.download', $submission))->assertOk();
+    $this->actingAs($superadmin, 'web')->get(route('admin.investor-kyc.preview', $submission))->assertOk();
+    $this->actingAs($superadmin, 'web')->get(route('admin.investor-kyc.download', $submission))->assertOk();
 });

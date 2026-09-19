@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AuditLog;
 use App\Models\DiligenceRequest;
 use App\Models\Founder;
 use App\Models\FounderProfile;
@@ -72,6 +71,26 @@ test('1. Investor can submit post-introduction diligence request to Pinpoint IR'
         'event' => 'diligence.request_submitted',
         'actor_type' => $investor::class,
         'actor_id' => $investor->id,
+    ]);
+});
+
+test('1b. Investor cannot submit diligence without a completed founder introduction', function () {
+    Notification::fake();
+    [$founder, $profile, $investor] = setupDiligenceContext();
+
+    InvestorInterest::where('investor_id', $investor->id)->update(['completed_at' => null]);
+
+    $this->actingAs($investor, 'investor')
+        ->post(route('investor.diligence.store', $profile->slug), [
+            'category' => 'financial',
+            'subject' => 'Premature diligence',
+            'request_details' => 'Should be blocked until introduction is completed.',
+        ])
+        ->assertSessionHasErrors('subject');
+
+    $this->assertDatabaseMissing('diligence_requests', [
+        'investor_id' => $investor->id,
+        'subject' => 'Premature diligence',
     ]);
 });
 

@@ -4,11 +4,12 @@ use App\Models\Investor;
 use App\Models\User;
 use App\Notifications\PlatformAnnouncementNotification;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 
 test('investors can mark only their own notifications read', function () {
     $investor = Investor::factory()->create();
     $otherInvestor = Investor::factory()->create();
-    $notification = $investor->notifications()->create(['id' => (string) \Illuminate\Support\Str::uuid(), 'type' => 'test', 'data' => ['type' => 'test']]);
+    $notification = $investor->notifications()->create(['id' => (string) Str::uuid(), 'type' => 'test', 'data' => ['type' => 'test']]);
 
     $this->actingAs($otherInvestor, 'investor')->patch(route('investor.notifications.read', $notification->id))->assertNotFound();
     $this->actingAs($investor, 'investor')->patch(route('investor.notifications.read', $notification->id))->assertRedirect();

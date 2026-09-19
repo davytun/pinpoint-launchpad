@@ -7,6 +7,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+
 class FounderSetupInviteMail extends Mailable
 {
     use Queueable, SerializesModels;
@@ -29,7 +30,7 @@ class FounderSetupInviteMail extends Mailable
             view: 'emails.founder.setup-invite',
             with: [
                 'setupUrl' => $this->setupUrl,
-                'email'    => $this->email,
+                'email' => $this->email,
             ],
         );
     }

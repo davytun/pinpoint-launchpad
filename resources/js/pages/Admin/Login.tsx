@@ -80,6 +80,15 @@ export default function AdminLogin({ status }: { status?: string }) {
                             </div>
                         )}
 
+                        {(errors.email || errors.password) && (
+                            <div
+                                role="alert"
+                                className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-[13px] font-bold text-red-700"
+                            >
+                                {errors.email || errors.password}
+                            </div>
+                        )}
+
                         <form onSubmit={submit} className="space-y-4">
                             {/* Email */}
                             <div>
@@ -97,10 +106,19 @@ export default function AdminLogin({ status }: { status?: string }) {
                                         value={data.email}
                                         onChange={(e) => setData('email', e.target.value)}
                                         placeholder="admin@pinpointlaunchpad.com"
-                                        className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-4 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 shadow-xs transition outline-none focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10"
+                                        aria-invalid={Boolean(errors.email)}
+                                        className={`w-full rounded-xl border bg-white py-2.5 pr-4 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 shadow-xs transition outline-none focus:ring-2 ${
+                                            errors.email
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
+                                                : 'border-zinc-200 focus:border-[#3A54A5]/60 focus:ring-[#3A54A5]/10'
+                                        }`}
                                     />
                                 </div>
-                                {errors.email && <p className="text-red-650 mt-1.5 text-[11px]">{errors.email}</p>}
+                                {errors.email && (
+                                    <p role="alert" className="mt-1.5 text-[12px] font-semibold text-red-600">
+                                        {errors.email}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Password */}
@@ -118,18 +136,27 @@ export default function AdminLogin({ status }: { status?: string }) {
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pr-10 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 shadow-xs transition outline-none focus:border-[#3A54A5]/60 focus:ring-2 focus:ring-[#3A54A5]/10"
+                                        aria-invalid={Boolean(errors.password)}
+                                        className={`w-full rounded-xl border bg-white py-2.5 pr-10 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 shadow-xs transition outline-none focus:ring-2 ${
+                                            errors.password
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
+                                                : 'border-zinc-200 focus:border-[#3A54A5]/60 focus:ring-[#3A54A5]/10'
+                                        }`}
                                     />
                                     <button
                                         type="button"
                                         tabIndex={-1}
                                         onClick={() => setShowPassword((v) => !v)}
-                                        className="hover:text-zinc-650 absolute top-1/2 right-3.5 -translate-y-1/2 text-zinc-400 transition"
+                                        className="absolute top-1/2 right-3.5 -translate-y-1/2 text-zinc-400 transition hover:text-zinc-600"
                                     >
                                         {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                                     </button>
                                 </div>
-                                {errors.password && <p className="text-red-650 mt-1.5 text-[11px]">{errors.password}</p>}
+                                {errors.password && (
+                                    <p role="alert" className="mt-1.5 text-[12px] font-semibold text-red-600">
+                                        {errors.password}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Remember */}

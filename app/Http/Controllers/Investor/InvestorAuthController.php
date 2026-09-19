@@ -9,7 +9,6 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -45,6 +44,7 @@ class InvestorAuthController extends Controller
 
         if ($investor->account_status !== Investor::ACCOUNT_STATUS_ACTIVE) {
             Auth::guard('investor')->logout();
+
             return back()->withErrors([
                 'email' => 'We could not sign you in. Your account may still be under review.',
             ])->onlyInput('email');
@@ -63,16 +63,6 @@ class InvestorAuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('investor.login');
-    }
-
-    public function dashboard(): Response
-    {
-        return Inertia::render('Investor/Dashboard', [
-            'investor' => Auth::guard('investor')->user()->load([
-                'profile:investor_id,full_name',
-                'kycSubmissions:id,investor_id,status,original_name,review_notes,reviewed_at',
-            ]),
-        ]);
     }
 
     public function showForgotPassword(): Response|RedirectResponse
@@ -110,9 +100,9 @@ class InvestorAuthController extends Controller
     public function resetPassword(Request $request): RedirectResponse
     {
         $request->validate([
-            'token'                 => ['required'],
-            'email'                 => ['required', 'email'],
-            'password'              => ['required', 'min:8', 'confirmed'],
+            'token' => ['required'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'min:8', 'confirmed'],
             'password_confirmation' => ['required'],
         ]);
 
@@ -120,7 +110,7 @@ class InvestorAuthController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (Investor $investor, string $password) {
                 $investor->forceFill([
-                    'password'       => Hash::make($password),
+                    'password' => $password,
                     'remember_token' => Str::random(60),
                 ])->save();
 

@@ -32,7 +32,7 @@ interface KycSubmission {
 interface InvestorAccount {
     id: string;
     email: string;
-    account_status: 'active' | 'suspended';
+    account_status: 'pending_review' | 'active' | 'rejected';
     kyc_status: KycStatus;
     kyc_approved_at: string | null;
     created_at: string;
@@ -69,6 +69,7 @@ interface PageProps {
     activeType: 'all' | 'individual' | 'corporate';
     search: string;
     totals: Totals;
+    canReviewKyc: boolean;
 }
 
 // ─── Preset Compliance Rejection Reasons ──────────────────────────────────────
@@ -378,11 +379,13 @@ function RejectKycModal({
 
 function KycDrawer({
     investor,
+    canReviewKyc,
     onClose,
     onOpenRejectModal,
     onUpdateInvestor,
 }: {
     investor: InvestorAccount;
+    canReviewKyc: boolean;
     onClose: () => void;
     onOpenRejectModal: () => void;
     onUpdateInvestor?: (updated: InvestorAccount) => void;
@@ -456,8 +459,8 @@ function KycDrawer({
                         </button>
                     </div>
 
-                    {/* Quick Decision Bar */}
-                    {submission && investor.kyc_status === 'pending' && (
+                    {/* Quick Decision Bar — compliance / superadmin only */}
+                    {canReviewKyc && submission && investor.kyc_status === 'pending' && (
                         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-zinc-100 bg-[#FAFBFD] px-6 py-3">
                             <div className="flex items-center gap-2">
                                 <button
@@ -515,70 +518,76 @@ function KycDrawer({
                                         <KycStatusBadge status={submission.status as KycStatus} />
                                     </div>
 
-                                    {/* VISIBLE DOCUMENT EMBED */}
-                                    <div className="group relative overflow-hidden rounded-xl border border-zinc-200/90 bg-[#F6F8FA] p-3 shadow-2xs">
-                                        {isPdf ? (
-                                            <iframe
-                                                src={`/admin/investors/kyc/${submission.id}/preview#toolbar=0`}
-                                                className="h-72 w-full rounded-lg border-0 bg-white shadow-xs"
-                                                title="PDF Preview"
-                                            />
-                                        ) : (
-                                            <div
-                                                onClick={() => setLightboxOpen(true)}
-                                                className="flex max-h-68 min-h-48 cursor-pointer items-center justify-center overflow-hidden p-1"
-                                            >
-                                                <img
-                                                    src={`/admin/investors/kyc/${submission.id}/preview`}
-                                                    alt={submission.original_name}
-                                                    className="h-auto max-h-64 w-full rounded-lg border border-zinc-200/60 bg-white object-contain shadow-sm transition-transform duration-200 group-hover:scale-[1.01]"
-                                                />
+                                    {/* VISIBLE DOCUMENT EMBED — compliance preview routes only */}
+                                    {canReviewKyc ? (
+                                        <>
+                                            <div className="group relative overflow-hidden rounded-xl border border-zinc-200/90 bg-[#F6F8FA] p-3 shadow-2xs">
+                                                {isPdf ? (
+                                                    <iframe
+                                                        src={`/admin/investors/kyc/${submission.id}/preview#toolbar=0`}
+                                                        className="h-72 w-full rounded-lg border-0 bg-white shadow-xs"
+                                                        title="PDF Preview"
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        onClick={() => setLightboxOpen(true)}
+                                                        className="flex max-h-68 min-h-48 cursor-pointer items-center justify-center overflow-hidden p-1"
+                                                    >
+                                                        <img
+                                                            src={`/admin/investors/kyc/${submission.id}/preview`}
+                                                            alt={submission.original_name}
+                                                            className="h-auto max-h-64 w-full rounded-lg border border-zinc-200/60 bg-white object-contain shadow-sm transition-transform duration-200 group-hover:scale-[1.01]"
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/80 p-1 opacity-90 backdrop-blur-xs transition-opacity group-hover:opacity-100">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setLightboxOpen(true)}
+                                                        className="p-1 text-zinc-300 transition-colors hover:text-white"
+                                                        title="Expand Preview"
+                                                    >
+                                                        <Icon icon="solar:maximize-square-linear" className="size-3.5" />
+                                                    </button>
+                                                    <a
+                                                        href={`/admin/investors/kyc/${submission.id}/download`}
+                                                        className="p-1 text-zinc-300 transition-colors hover:text-white"
+                                                        title="Download Original"
+                                                    >
+                                                        <Icon icon="solar:download-minimalistic-linear" className="size-3.5" />
+                                                    </a>
+                                                </div>
                                             </div>
-                                        )}
 
-                                        {/* Hover Overlay Toolbar */}
-                                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/80 p-1 opacity-90 backdrop-blur-xs transition-opacity group-hover:opacity-100">
-                                            <button
-                                                type="button"
-                                                onClick={() => setLightboxOpen(true)}
-                                                className="p-1 text-zinc-300 transition-colors hover:text-white"
-                                                title="Expand Preview"
-                                            >
-                                                <Icon icon="solar:maximize-square-linear" className="size-3.5" />
-                                            </button>
-                                            <a
-                                                href={`/admin/investors/kyc/${submission.id}/download`}
-                                                className="p-1 text-zinc-300 transition-colors hover:text-white"
-                                                title="Download Original"
-                                            >
-                                                <Icon icon="solar:download-minimalistic-linear" className="size-3.5" />
-                                            </a>
-                                        </div>
-                                    </div>
+                                            <div className="flex items-center justify-between pt-1 text-xs">
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setLightboxOpen(true)}
+                                                        className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
+                                                    >
+                                                        <Icon icon="solar:eye-linear" className="size-3.5 text-zinc-400" />
+                                                        <span>Expand View</span>
+                                                    </button>
 
-                                    {/* Action Links */}
-                                    <div className="flex items-center justify-between pt-1 text-xs">
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={() => setLightboxOpen(true)}
-                                                className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
-                                            >
-                                                <Icon icon="solar:eye-linear" className="size-3.5 text-zinc-400" />
-                                                <span>Expand View</span>
-                                            </button>
+                                                    <a
+                                                        href={`/admin/investors/kyc/${submission.id}/download`}
+                                                        className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
+                                                    >
+                                                        <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-400" />
+                                                        <span>Download File</span>
+                                                    </a>
+                                                </div>
 
-                                            <a
-                                                href={`/admin/investors/kyc/${submission.id}/download`}
-                                                className="flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
-                                            >
-                                                <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-400" />
-                                                <span>Download File</span>
-                                            </a>
-                                        </div>
-
-                                        <span className="text-[11px] text-zinc-400">Encrypted AES-256</span>
-                                    </div>
+                                                <span className="text-[11px] text-zinc-400">Encrypted AES-256</span>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <p className="rounded-xl border border-amber-100 bg-amber-50/80 px-3 py-2.5 text-[11.5px] font-medium text-amber-900">
+                                            Document preview is restricted to Compliance. Ask a compliance officer to review KYC files.
+                                        </p>
+                                    )}
 
                                     {/* Review Notes Callout */}
                                     {submission.review_notes && (
@@ -722,7 +731,14 @@ function KycDrawer({
 
 // ─── Main Investor Reviews Workspace ──────────────────────────────────────────
 
-export default function InvestorAccountsIndex({ investors, activeKycStatus, activeType, search: initialSearch, totals }: PageProps) {
+export default function InvestorAccountsIndex({
+    investors,
+    activeKycStatus,
+    activeType,
+    search: initialSearch,
+    totals,
+    canReviewKyc = false,
+}: PageProps) {
     const [search, setSearch] = useState(initialSearch);
     const [activeDrawerInvestor, setActiveDrawerInvestor] = useState<InvestorAccount | null>(null);
     const [rejectingInvestor, setRejectingInvestor] = useState<InvestorAccount | null>(null);
@@ -1033,7 +1049,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
                                                         <span>Inspect KYC</span>
                                                     </button>
 
-                                                    {inv.latest_kyc_submission && inv.kyc_status === 'pending' && (
+                                                    {canReviewKyc && inv.latest_kyc_submission && inv.kyc_status === 'pending' && (
                                                         <>
                                                             <div className="my-1 border-t border-zinc-100" />
 
@@ -1069,7 +1085,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
                                                         </>
                                                     )}
 
-                                                    {inv.latest_kyc_submission && (
+                                                    {canReviewKyc && inv.latest_kyc_submission && (
                                                         <>
                                                             <div className="my-1 border-t border-zinc-100" />
 
@@ -1136,6 +1152,7 @@ export default function InvestorAccountsIndex({ investors, activeKycStatus, acti
                 {activeDrawerInvestor && (
                     <KycDrawer
                         investor={activeDrawerInvestor}
+                        canReviewKyc={canReviewKyc}
                         onClose={() => setActiveDrawerInvestor(null)}
                         onUpdateInvestor={(updated) => setActiveDrawerInvestor(updated)}
                         onOpenRejectModal={() => {

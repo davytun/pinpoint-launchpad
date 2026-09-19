@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AuditLog;
 use App\Models\Founder;
 use App\Models\FounderDocument;
 use App\Models\FounderProfile;
@@ -11,6 +10,7 @@ use App\Models\SpotlightEntry;
 use App\Models\User;
 use App\Models\VerificationBadge;
 use App\Notifications\DealflowAdminNotification;
+use App\Notifications\InvestorDataRoomReinstatedNotification;
 use App\Notifications\InvestorDataRoomRevokedNotification;
 use App\Notifications\InvestorInterestDecisionNotification;
 use App\Notifications\InvestorInterestReceivedNotification;
@@ -259,6 +259,7 @@ test('admin can override/review interest and revoke/reinstate data room access',
         ->assertSessionHas('success');
 
     expect($grant->fresh()->isActive())->toBeTrue();
+    Notification::assertSentTo($investor, InvestorDataRoomReinstatedNotification::class);
 
     // 6. Investor can download document again
     $this->actingAs($investor, 'investor')->get($downloadUrl)->assertOk();

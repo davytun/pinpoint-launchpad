@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class DiagnosticQuestion extends Model
 {
@@ -18,7 +18,7 @@ class DiagnosticQuestion extends Model
     ];
 
     protected $casts = [
-        'options'   => 'array',
+        'options' => 'array',
         'is_active' => 'boolean',
     ];
 

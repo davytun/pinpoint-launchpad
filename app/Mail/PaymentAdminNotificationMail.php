@@ -35,12 +35,12 @@ class PaymentAdminNotificationMail extends Mailable
         return new Content(
             view: 'emails.payment.admin-notification',
             with: [
-                'tier_label'      => $this->payment->tier_label,
-                'total_amount'    => $this->payment->total_amount,
-                'email'           => $this->payment->customer_email,
-                'paid_at'         => $this->payment->paid_at,
-                'tier'            => $this->payment->tier,
-                'currency'        => $currency,
+                'tier_label' => $this->payment->tier_label,
+                'total_amount' => $this->payment->total_amount,
+                'email' => $this->payment->customer_email,
+                'paid_at' => $this->payment->paid_at,
+                'tier' => $this->payment->tier,
+                'currency' => $currency,
                 'currency_symbol' => $currencySymbol,
             ],
         );

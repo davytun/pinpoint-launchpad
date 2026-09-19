@@ -15,7 +15,11 @@ class Investor extends Authenticatable
     /** @use HasFactory<InvestorFactory> */
     use HasFactory, HasUlids, Notifiable;
 
+    public const ACCOUNT_STATUS_PENDING_REVIEW = 'pending_review';
+
     public const ACCOUNT_STATUS_ACTIVE = 'active';
+
+    public const ACCOUNT_STATUS_REJECTED = 'rejected';
 
     public const KYC_STATUS_NOT_SUBMITTED = 'not_submitted';
 

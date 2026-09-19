@@ -38,13 +38,13 @@ return [
     'paystack' => [
         'public_key' => env('PAYSTACK_PUBLIC_KEY'),
         'secret_key' => env('PAYSTACK_SECRET_KEY'),
-        'currency'   => env('PAYSTACK_CURRENCY', 'NGN'),
+        'currency' => env('PAYSTACK_CURRENCY', 'NGN'),
     ],
 
     'boldsign' => [
-        'api_key'        => env('BOLDSIGN_API_KEY'),
-        'template_id'    => env('BOLDSIGN_TEMPLATE_ID'),
-        'base_url'       => env('BOLDSIGN_BASE_URL', 'https://api.boldsign.com'),
+        'api_key' => env('BOLDSIGN_API_KEY'),
+        'template_id' => env('BOLDSIGN_TEMPLATE_ID'),
+        'base_url' => env('BOLDSIGN_BASE_URL', 'https://api.boldsign.com'),
         'webhook_secret' => env('BOLDSIGN_WEBHOOK_SECRET'),
     ],
 

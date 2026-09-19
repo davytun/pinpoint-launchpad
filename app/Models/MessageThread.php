@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class MessageThread extends Model
 {
     use HasUlids;
+
     protected $fillable = [
         'founder_id',
         'last_message_at',

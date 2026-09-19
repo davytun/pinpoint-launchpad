@@ -27,14 +27,14 @@ class PiaApplicationAdminMail extends Mailable
         return new Content(
             view: 'emails.pia.admin-notification',
             with: [
-                'name'         => $this->application->name,
-                'email'        => $this->application->email,
-                'company'      => $this->application->company,
-                'country'      => $this->application->country,
-                'stage'        => $this->application->stage,
+                'name' => $this->application->name,
+                'email' => $this->application->email,
+                'company' => $this->application->company,
+                'country' => $this->application->country,
+                'stage' => $this->application->stage,
                 'raise_target' => $this->application->raise_target,
                 'founder_message' => $this->application->message,
-                'submitted_at'    => $this->application->created_at,
+                'submitted_at' => $this->application->created_at,
             ],
         );
     }

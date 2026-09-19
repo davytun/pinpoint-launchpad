@@ -31,10 +31,10 @@ class SignatureCompleteMail extends Mailable
         return new Content(
             view: 'emails.signature.complete',
             with: [
-                'tier_label'   => $this->tierLabel,
+                'tier_label' => $this->tierLabel,
                 'signer_email' => $this->signature->signer_email,
-                'signed_at'    => $this->signature->signed_at,
-                'setupUrl'     => $this->setupUrl,
+                'signed_at' => $this->signature->signed_at,
+                'setupUrl' => $this->setupUrl,
             ],
         );
     }

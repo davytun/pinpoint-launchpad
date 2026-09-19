@@ -44,6 +44,7 @@ class EnsurePaymentComplete
 
                 if ($payment && $ownershipOk) {
                     $request->session()->put('payment_id', $payment->id);
+
                     return $next($request);
                 }
             }
@@ -68,6 +69,7 @@ class EnsurePaymentComplete
 
             if ($payment) {
                 $request->session()->put('payment_id', $payment->id);
+
                 return $next($request);
             }
         }

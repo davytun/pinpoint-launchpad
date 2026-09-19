@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Mail\DocumentUploadedMail;
 use App\Models\FounderDocument;
 use App\Services\DocumentService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -25,65 +28,66 @@ class FounderDocumentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(fn ($doc) => [
-                'id'                => $doc->id,
-                'category'          => $doc->category,
-                'category_label'    => $doc->categoryLabel(),
+                'id' => $doc->id,
+                'category' => $doc->category,
+                'category_label' => $doc->categoryLabel(),
                 'original_filename' => $doc->original_filename,
-                'file_size'         => $doc->fileSizeForHumans(),
-                'extension'         => $doc->extension,
-                'file_icon'         => $doc->fileIcon(),
-                'is_reviewed'       => $doc->is_reviewed,
-                'is_deletable'      => $doc->isDeletable(),
-                'created_at'        => $doc->created_at->format('d M Y'),
+                'file_size' => $doc->fileSizeForHumans(),
+                'extension' => $doc->extension,
+                'file_icon' => $doc->fileIcon(),
+                'is_reviewed' => $doc->is_reviewed,
+                'is_deletable' => $doc->isDeletable(),
+                'created_at' => $doc->created_at->format('d M Y'),
             ]);
 
-        $totalCount  = $founder->documents()->count();
-        $canUpload   = $totalCount < 20;
+        $totalCount = $founder->documents()->count();
+        $canUpload = $totalCount < 20;
         $auditStatus = $founder->payment?->audit_status ?? 'pending';
 
         return Inertia::render('Founder/Documents/Index', [
             'founder' => [
-                'id'           => $founder->id,
-                'email'        => $founder->email,
-                'full_name'    => $founder->full_name,
+                'id' => $founder->id,
+                'email' => $founder->email,
+                'full_name' => $founder->full_name,
                 'company_name' => $founder->company_name,
             ],
-            'documents'    => $documents,
-            'can_upload'   => $canUpload,
+            'documents' => $documents,
+            'can_upload' => $canUpload,
             'audit_status' => $auditStatus,
-            'categories'   => $this->categoryList(),
-            'total_count'  => $totalCount,
-            'max_files'    => 20,
+            'categories' => $this->categoryList(),
+            'total_count' => $totalCount,
+            'max_files' => 20,
         ]);
     }
 
-    public function store(Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $request->validate([
-            'files'    => ['required', 'array', 'min:1'],
-            'files.*'  => ['file'],
+            'files' => ['required', 'array', 'min:1'],
+            'files.*' => ['file'],
             'category' => ['required', 'in:cap_table,financial_forecast,bank_statement,pitch_deck,articles_of_incorporation,ip_assignment,customer_contracts,unit_economics,other'],
         ]);
 
         $founder = Auth::guard('founder')->user()->load('payment');
 
         $currentCount = $founder->documents()->count();
-        $incoming     = count($request->file('files'));
+        $incoming = count($request->file('files'));
 
         if ($currentCount >= 20) {
             return $this->uploadError('You have reached the maximum of 20 documents.', $request);
         }
 
         if ($currentCount + $incoming > 20) {
-            return $this->uploadError('Only ' . (20 - $currentCount) . ' more document(s) can be uploaded.', $request);
+            return $this->uploadError('Only '.(20 - $currentCount).' more document(s) can be uploaded.', $request);
         }
 
         $uploaded = 0;
         foreach ($request->file('files') as $file) {
             try {
                 $this->documents->validateFile($file);
-            } catch (\Illuminate\Validation\ValidationException $e) {
+            } catch (ValidationException $e) {
                 $msg = collect($e->errors())->flatten()->first() ?? 'Invalid file.';
+
                 return $this->uploadError($msg, $request);
             }
 
@@ -105,7 +109,7 @@ class FounderDocumentController extends Controller
         return back()->with('success', $msg);
     }
 
-    private function uploadError(string $message, Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+    private function uploadError(string $message, Request $request): JsonResponse|RedirectResponse
     {
         if ($request->expectsJson()) {
             return response()->json(['errors' => ['files' => $message]], 422);
@@ -121,11 +125,11 @@ class FounderDocumentController extends Controller
         return $this->documents->download($document);
     }
 
-    public function destroy(FounderDocument $document): \Illuminate\Http\RedirectResponse
+    public function destroy(FounderDocument $document): RedirectResponse
     {
         $this->authorizeDocument($document);
 
-        if (!$document->isDeletable()) {
+        if (! $document->isDeletable()) {
             return back()->withErrors(['file' => 'Documents cannot be deleted once your audit has begun.']);
         }
 

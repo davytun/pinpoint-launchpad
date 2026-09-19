@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Founder;
 use App\Models\InvestorInterest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,22 +28,22 @@ class IntroductionCompletedNotification extends Notification implements ShouldQu
         $company = $this->interest->profile->founder?->company_name ?? 'the startup';
         $investorName = $this->interest->investor?->profile?->full_name ?? 'the investor';
 
-        $isFounder = $notifiable instanceof \App\Models\Founder;
+        $isFounder = $notifiable instanceof Founder;
 
         if ($isFounder) {
             return (new MailMessage)
                 ->subject("Introduction Call Completed with {$investorName}")
                 ->greeting("Hello {$notifiable->full_name},")
                 ->line("Your introductory conversation with {$investorName} has been marked as completed.")
-                ->line("Pinpoint Investor Relations remains available to support any diligence or follow-up coordination.")
+                ->line('Pinpoint Investor Relations remains available to support any diligence or follow-up coordination.')
                 ->action('View Founder Dashboard', route('founder.dashboard'));
         }
 
         return (new MailMessage)
             ->subject("Introduction Call Completed with {$company}")
-            ->greeting("Hello " . ($notifiable->profile?->full_name ?? 'Investor') . ",")
+            ->greeting('Hello '.($notifiable->profile?->full_name ?? 'Investor').',')
             ->line("Your introductory conversation with {$company} has been marked as completed.")
-            ->line("If you would like to request Data Room access or additional materials, you can manage your requests from your portal.")
+            ->line('If you would like to request Data Room access or additional materials, you can manage your requests from your portal.')
             ->action('View Submitted Interests', route('investor.interests.index'));
     }
 

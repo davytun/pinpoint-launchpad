@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Notifications\DealflowAdminNotification;
 use App\Notifications\IntroductionCompletedNotification;
 use App\Notifications\IntroductionScheduledNotification;
+use App\Notifications\InvestorDataRoomReinstatedNotification;
 use App\Notifications\InvestorDataRoomRevokedNotification;
 use App\Notifications\InvestorInterestDecisionNotification;
 use App\Notifications\InvestorInterestReceivedNotification;
@@ -357,6 +358,7 @@ class InvestorInterestWorkflowService
 
             DB::afterCommit(function () use ($grant) {
                 $grant->loadMissing(['investor.profile', 'profile.founder']);
+                $grant->investor->notify(new InvestorDataRoomReinstatedNotification($grant));
                 $this->notifyDealflowStaff(new DealflowAdminNotification('data_room_granted', null, null, $grant));
             });
         });

@@ -44,26 +44,27 @@ class InvestorAccountController extends Controller
         $investors = $query->latest()->paginate(20)->withQueryString();
 
         $totals = [
-            'all'           => Investor::count(),
-            'pending'       => Investor::where('kyc_status', Investor::KYC_STATUS_PENDING)->count(),
-            'approved'      => Investor::where('kyc_status', Investor::KYC_STATUS_APPROVED)->count(),
+            'all' => Investor::count(),
+            'pending' => Investor::where('kyc_status', Investor::KYC_STATUS_PENDING)->count(),
+            'approved' => Investor::where('kyc_status', Investor::KYC_STATUS_APPROVED)->count(),
             'not_submitted' => Investor::where('kyc_status', Investor::KYC_STATUS_NOT_SUBMITTED)->count(),
-            'rejected'      => Investor::where('kyc_status', Investor::KYC_STATUS_REJECTED)->count(),
+            'rejected' => Investor::where('kyc_status', Investor::KYC_STATUS_REJECTED)->count(),
         ];
 
         return Inertia::render('Admin/InvestorAccounts/Index', [
-            'investors'       => $investors,
+            'investors' => $investors,
             'activeKycStatus' => $kycStatus ?: 'all',
-            'activeType'      => $type ?: 'all',
-            'search'          => $search,
-            'totals'          => $totals,
+            'activeType' => $type ?: 'all',
+            'search' => $search,
+            'totals' => $totals,
+            'canReviewKyc' => $request->user()->isSuperAdmin() || $request->user()->isCompliance(),
         ]);
     }
 
     public function show(Request $request, Investor $investor): Response
     {
         return Inertia::render('Admin/InvestorAccounts/Show', [
-            'investor'     => $investor->load(['profile', 'kycSubmissions']),
+            'investor' => $investor->load(['profile', 'kycSubmissions']),
             'canReviewKyc' => $request->user()->isSuperAdmin() || $request->user()->isCompliance(),
         ]);
     }
@@ -74,14 +75,14 @@ class InvestorAccountController extends Controller
         $investor->update(['account_status' => $request->validated('account_status')]);
 
         AuditLog::create([
-            'event'          => 'investor.account_status_updated',
-            'actor_type'     => $request->user()::class,
-            'actor_id'       => $request->user()->id,
+            'event' => 'investor.account_status_updated',
+            'actor_type' => $request->user()::class,
+            'actor_id' => $request->user()->id,
             'auditable_type' => Investor::class,
-            'auditable_id'   => $investor->id,
-            'metadata'       => ['from' => $previousStatus, 'to' => $investor->account_status],
-            'ip_address'     => $request->ip(),
-            'user_agent'     => $request->userAgent(),
+            'auditable_id' => $investor->id,
+            'metadata' => ['from' => $previousStatus, 'to' => $investor->account_status],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
         ]);
 
         return back()->with('success', 'Investor account status updated.');

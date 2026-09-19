@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('role')->nullable();
             $table->string('country');
             $table->string('website')->nullable();
-            
+
             // Mandate details (JSON arrays & strings)
             $table->json('stages')->nullable();
             $table->json('sectors')->nullable();

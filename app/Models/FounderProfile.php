@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class FounderProfile extends Model
 {
     use HasUlids;
+
     protected $fillable = [
         'founder_id',
         'payment_id',
@@ -51,7 +52,6 @@ class FounderProfile extends Model
     {
         return $this->hasMany(VerificationBadge::class, 'profile_id');
     }
-
 
     public function spotlightEntry(): HasOne
     {

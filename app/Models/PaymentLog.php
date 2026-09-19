@@ -9,6 +9,7 @@ class PaymentLog extends Model
 {
     // Only auto-manage created_at — no updated_at on immutable audit log rows
     const CREATED_AT = 'created_at';
+
     const UPDATED_AT = null;
 
     protected $fillable = [
@@ -19,7 +20,7 @@ class PaymentLog extends Model
     ];
 
     protected $casts = [
-        'metadata'   => 'array',
+        'metadata' => 'array',
         'created_at' => 'datetime',
     ];
 

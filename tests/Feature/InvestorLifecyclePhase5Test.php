@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\AuditLog;
 use App\Models\Founder;
 use App\Models\FounderDocument;
 use App\Models\FounderProfile;
@@ -11,7 +10,6 @@ use App\Models\InvestorKycSubmission;
 use App\Models\SpotlightEntry;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 

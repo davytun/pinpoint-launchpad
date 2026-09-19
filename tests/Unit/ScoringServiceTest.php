@@ -2,10 +2,10 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
-use App\Services\ScoringService;
 use App\Models\DiagnosticQuestion;
+use App\Services\ScoringService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ScoringServiceTest extends TestCase
 {
@@ -14,61 +14,61 @@ class ScoringServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Seed some dummy questions with custom options for scoring test
         DiagnosticQuestion::create([
-            'id'            => 1,
-            'pillar'        => 'potential',
+            'id' => 1,
+            'pillar' => 'potential',
             'question_text' => 'Dummy Potential Q1',
-            'sub_text'      => 'Sub text',
-            'options'       => [
+            'sub_text' => 'Sub text',
+            'options' => [
                 ['letter' => 'A', 'text' => 'Opt A', 'points' => 0, 'flag' => null],
                 ['letter' => 'B', 'text' => 'Opt B', 'points' => 1, 'flag' => null],
                 ['letter' => 'C', 'text' => 'Opt C', 'points' => 3, 'flag' => null],
                 ['letter' => 'D', 'text' => 'Opt D', 'points' => 4, 'flag' => null],
             ],
-            'strand'        => null,
-            'order'         => 1,
-            'is_active'     => true,
+            'strand' => null,
+            'order' => 1,
+            'is_active' => true,
         ]);
 
         DiagnosticQuestion::create([
-            'id'            => 2,
-            'pillar'        => 'agility',
+            'id' => 2,
+            'pillar' => 'agility',
             'question_text' => 'Dummy Agility Q1',
-            'sub_text'      => 'Sub text',
-            'options'       => [
+            'sub_text' => 'Sub text',
+            'options' => [
                 ['letter' => 'A', 'text' => 'Opt A', 'points' => 0, 'flag' => null],
                 ['letter' => 'B', 'text' => 'Opt B', 'points' => 1, 'flag' => null],
                 ['letter' => 'C', 'text' => 'Opt C', 'points' => 3, 'flag' => null],
                 ['letter' => 'D', 'text' => 'Opt D', 'points' => 4, 'flag' => null],
             ],
-            'strand'        => null,
-            'order'         => 2,
-            'is_active'     => true,
+            'strand' => null,
+            'order' => 2,
+            'is_active' => true,
         ]);
 
         DiagnosticQuestion::create([
-            'id'            => 3,
-            'pillar'        => 'risk',
+            'id' => 3,
+            'pillar' => 'risk',
             'question_text' => 'Dummy Risk Q1',
-            'sub_text'      => 'Sub text',
-            'options'       => [
+            'sub_text' => 'Sub text',
+            'options' => [
                 ['letter' => 'A', 'text' => 'Opt A', 'points' => 0, 'flag' => 'Regulatory status unknown.'],
                 ['letter' => 'B', 'text' => 'Opt B', 'points' => 1, 'flag' => null],
                 ['letter' => 'C', 'text' => 'Opt C', 'points' => 3, 'flag' => null],
                 ['letter' => 'D', 'text' => 'Opt D', 'points' => 4, 'flag' => null],
             ],
-            'strand'        => null,
-            'order'         => 3,
-            'is_active'     => true,
+            'strand' => null,
+            'order' => 3,
+            'is_active' => true,
         ]);
     }
 
     public function test_it_calculates_stage_weighted_scores_and_captures_flags(): void
     {
         /** @var ScoringService $scorer */
-        $scorer = new ScoringService();
+        $scorer = new ScoringService;
 
         // 1. Test Seed weights
         $answers = [

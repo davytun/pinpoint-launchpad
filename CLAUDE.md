@@ -88,23 +88,40 @@ Controllers return `Inertia::render('PageName', $props)`. The Blade root templat
 
 ### Authentication
 
-Full Breeze auth scaffolding is present (`routes/auth.php`, `app/Http/Controllers/Auth/`). Auth pages live in `resources/js/pages/auth/`. No dashboard or settings pages exist — only auth flows are kept.
+Staff use the web guard (`routes/auth.php`, `resources/js/pages/auth/`). Founders and investors have separate guards and login surfaces:
 
-### Role System
+- Founder: `/founder/login` (`auth.founder`)
+- Investor: `/investor/login` (`auth.investor`)
 
-`users.role` is an enum `['founder', 'admin']` defaulting to `'founder'`. Use `$user->isAdmin()` / `$user->isFounder()` for checks. Protect routes with the `role` middleware alias:
+### Role System (staff)
+
+`users.role` is one of `superadmin | analyst | compliance | investor_relations`. The retired `support` value is no longer operable.
+
+Desk access helpers on `User`: `canAccessPlatformAdmin()`, `canAccessFounderAdmin()`, `canAccessInvestorAdmin()`, `defaultAdminHomeRoute()`. Protect admin routes with:
 
 ```php
-Route::get('/admin', ...)->middleware('role:admin');
+Route::middleware(['require.role:superadmin', 'admin.side:central'])->group(...);   // Platform
+Route::middleware(['admin.side:founder', 'require.role:superadmin,analyst'])->...; // Founder desk
+Route::middleware(['admin.side:investors', ...])->...;                               // Investor desk
 ```
 
-Middleware: `app/Http/Middleware/EnsureUserHasRole.php`.
+Middleware: `RequireRole` (`require.role`), `EnsureAdminSide` (`admin.side:central|founder|investors`).
+
+### Admin desks
+
+| Desk | URL prefix | Roles |
+|---|---|---|
+| Platform | `/admin` | superadmin |
+| Founder | `/admin/founder/*` | superadmin, analyst |
+| Investor | `/admin/investors/*` | superadmin, compliance, investor_relations |
+
+### Money path
+
+Primary: diagnostic → PIA request (`/checkout/request`) → offline admin confirm → BoldSign → founder setup. Paystack initiate is removed; webhook/success remain only for historical references (`paystack_reference` may store offline IDs like `offline-pia-{id}`).
 
 ### Layouts
 
-Two layout trees in `resources/js/layouts/`:
-- `auth-layout.tsx` — wraps auth pages; delegates to `auth/auth-card-layout`, `auth-simple-layout`, or `auth-split-layout`
-- `app-layout.tsx` — wraps authenticated app pages; delegates to `app/app-sidebar-layout` or `app/app-header-layout`
+Admin uses `resources/js/layouts/admin-layout.tsx` (three desk shells). Founder uses `founder-layout.tsx`. Investor pages use `InvestorHeader`. Auth pages use `auth-layout.tsx`.
 
 ### Database
 
@@ -113,3 +130,4 @@ Target is **MySQL** (cPanel shared hosting). Config: `strict: false`, `utf8mb4`/
 ### Key Pending Work
 
 - `ADMIN_PASSWORD` must be set in `.env` before running `AdminSeeder`
+- `TESTER_GUIDE_TOKEN` must be set in `.env` for `/tester-guide` (no default token)

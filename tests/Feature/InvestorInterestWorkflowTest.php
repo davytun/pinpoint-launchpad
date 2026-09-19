@@ -6,6 +6,7 @@ use App\Models\FounderProfile;
 use App\Models\Investor;
 use App\Models\InvestorDataRoomGrant;
 use App\Models\InvestorInterest;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
@@ -23,7 +24,7 @@ function phaseFiveProfile(): array
 
 test('only an approved data room request creates a grant after founder and admin review', function () {
     [$founder, $profile] = phaseFiveProfile();
-    $admin = \App\Models\User::factory()->create(['role' => 'investor_relations']);
+    $admin = User::factory()->create(['role' => 'investor_relations']);
     $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
     $interest = InvestorInterest::create([
         'investor_id' => $investor->id,

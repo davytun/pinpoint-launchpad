@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\AuditLog;
 use App\Models\Founder;
-use App\Models\FounderDocument;
 use App\Models\FounderProfile;
 use App\Models\Investor;
 use App\Models\InvestorDataRoomGrant;
@@ -12,10 +10,8 @@ use App\Models\User;
 use App\Notifications\DealflowAdminNotification;
 use App\Notifications\IntroductionCompletedNotification;
 use App\Notifications\IntroductionScheduledNotification;
-use App\Notifications\InvestorInterestDecisionNotification;
 use App\Notifications\InvestorInterestReceivedNotification;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function setupPhase6Startup(string $name, string $slug): array
@@ -232,22 +228,22 @@ test('6. Unauthorized Admin roles cannot manage or decide introductions', functi
         'status' => 'pending',
     ]);
 
-    // Analyst access blocked
+    // Analyst access blocked (wrong desk → redirected home)
     $this->actingAs($analyst)
         ->get(route('admin.dealflow.interests.index'))
-        ->assertForbidden();
+        ->assertRedirect(route('admin.founder.dashboard'));
 
     $this->actingAs($analyst)
         ->patch(route('admin.dealflow.interests.update', $interest), ['status' => 'approved'])
-        ->assertForbidden();
+        ->assertRedirect(route('admin.founder.dashboard'));
 
     $this->actingAs($analyst)
         ->patch(route('admin.dealflow.interests.schedule', $interest), [
             'scheduled_at' => now()->addDay()->toISOString(),
         ])
-        ->assertForbidden();
+        ->assertRedirect(route('admin.founder.dashboard'));
 
-    // Compliance access blocked
+    // Compliance access blocked (investor desk allowed, dealflow role-gated)
     $this->actingAs($compliance)
         ->get(route('admin.dealflow.interests.index'))
         ->assertForbidden();

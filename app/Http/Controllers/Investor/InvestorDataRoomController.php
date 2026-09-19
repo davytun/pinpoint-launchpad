@@ -7,7 +7,6 @@ use App\Models\AuditLog;
 use App\Models\FounderDocument;
 use App\Models\InvestorDataRoomGrant;
 use App\Services\DocumentService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;

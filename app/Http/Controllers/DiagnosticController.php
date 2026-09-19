@@ -16,6 +16,7 @@ use App\Models\Founder;
 use App\Models\Payment;
 use App\Models\Setting;
 use App\Services\ScoringService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -26,10 +27,10 @@ use Inertia\Response;
 class DiagnosticController extends Controller
 {
     private const BAND_MESSAGES = [
-        'low'      => 'Raising now would waste your time and your reputation. That is not a judgement on the idea. It is a judgement on the state of the company around it — and every item is fixable.',
-        'mid_low'  => 'There is something here, but it is not yet an investable proposition. Do not start a raise from this position. You will burn your best introductions on a package that is not ready.',
+        'low' => 'Raising now would waste your time and your reputation. That is not a judgement on the idea. It is a judgement on the state of the company around it — and every item is fixable.',
+        'mid_low' => 'There is something here, but it is not yet an investable proposition. Do not start a raise from this position. You will burn your best introductions on a package that is not ready.',
         'mid_high' => 'The business is fundable. The package is not — yet. This is the most common band, and the most fixable. The two dimensions below are what is costing you.',
-        'high'     => 'You are in the top band. The gap now is polish, not repair. Companies scoring here are usually one focused sprint away from a credible process.',
+        'high' => 'You are in the top band. The gap now is polish, not repair. Companies scoring here are usually one focused sprint away from a credible process.',
     ];
 
     public function index(Request $request): Response|RedirectResponse
@@ -59,7 +60,7 @@ class DiagnosticController extends Controller
         $questions = DiagnosticQuestion::active()->get();
 
         return Inertia::render('Diagnostic/Index', [
-            'questions'       => $questions,
+            'questions' => $questions,
             'total_questions' => $questions->count(),
         ]);
     }
@@ -67,13 +68,13 @@ class DiagnosticController extends Controller
     public function submit(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'answers'          => ['required', 'array', 'min:1'],
-            'answers.*'        => ['required'], // ScoringService normalises the value; boolean legacy format is handled there
-            'company_name'     => ['required', 'string', 'max:255'],
-            'country'          => ['required', 'string', 'max:255'],
-            'sector'           => ['required', 'string', 'max:255'],
-            'growth_stage'     => ['required', 'string', 'max:255'],
-            'describe_you'     => ['required', 'string', 'max:255'],
+            'answers' => ['required', 'array', 'min:1'],
+            'answers.*' => ['required'], // ScoringService normalises the value; boolean legacy format is handled there
+            'company_name' => ['required', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:255'],
+            'sector' => ['required', 'string', 'max:255'],
+            'growth_stage' => ['required', 'string', 'max:255'],
+            'describe_you' => ['required', 'string', 'max:255'],
             'looking_to_raise' => ['required', 'string', 'max:255'],
         ]);
 
@@ -91,11 +92,11 @@ class DiagnosticController extends Controller
 
         $request->session()->put('diagnostic_result', $result);
         $request->session()->put('diagnostic_basics', [
-            'company_name'     => $validated['company_name'],
-            'country'          => $validated['country'],
-            'sector'           => $validated['sector'],
-            'growth_stage'     => $validated['growth_stage'],
-            'describe_you'     => $validated['describe_you'],
+            'company_name' => $validated['company_name'],
+            'country' => $validated['country'],
+            'sector' => $validated['sector'],
+            'growth_stage' => $validated['growth_stage'],
+            'describe_you' => $validated['describe_you'],
             'looking_to_raise' => $validated['looking_to_raise'],
         ]);
 
@@ -128,8 +129,8 @@ class DiagnosticController extends Controller
 
         $validated = $request->validate([
             'email' => ['required', 'email'],
-            'name'  => ['required', 'string', 'max:255'],
-            'role'  => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'role' => ['required', 'string', 'max:255'],
         ]);
 
         $email = $validated['email'];
@@ -144,7 +145,7 @@ class DiagnosticController extends Controller
         // Block if this email already has a paid payment — no re-entry
         $alreadyPaid = Payment::query()->where([
             ['customer_email', '=', (string) $email],
-            ['status', '=', 'paid']
+            ['status', '=', 'paid'],
         ])->exists();
 
         if ($alreadyPaid) {
@@ -156,14 +157,15 @@ class DiagnosticController extends Controller
         $ipAddress = (string) $request->ip();
         $recentByIp = DiagnosticSession::query()->where([
             ['ip_address', '=', $ipAddress],
-            ['created_at', '>=', now()->subHours(24)]
+            ['created_at', '>=', now()->subHours(24)],
         ])->count();
 
         if ($recentByIp >= 3) {
             Log::warning('Diagnostic IP abuse detected', [
-                'ip_hash'    => hash_hmac('sha256', (string) $request->ip(), config('app.key')),
+                'ip_hash' => hash_hmac('sha256', (string) $request->ip(), config('app.key')),
                 'email_hash' => hash_hmac('sha256', $email, config('app.key')),
             ]);
+
             return redirect()->route('diagnostic.email-gate')
                 ->with('error', 'Too many attempts from your network. Please try again in 24 hours.');
         }
@@ -179,8 +181,8 @@ class DiagnosticController extends Controller
             return redirect()->route('diagnostic.blocked');
         }
 
-        $result      = $request->session()->get('diagnostic_result');
-        $scoreBand   = $result['score_band'];
+        $result = $request->session()->get('diagnostic_result');
+        $scoreBand = $result['score_band'];
         $cooldownDays = (int) Setting::get('diagnostic_cooldown_days', 30);
 
         $cooldownUntil = in_array($scoreBand, ['low', 'mid_low'])
@@ -190,22 +192,22 @@ class DiagnosticController extends Controller
         $basics = $request->session()->get('diagnostic_basics', []);
 
         $session = DiagnosticSession::create([
-            'email'            => $email,
-            'name'             => $validated['name'],
-            'role'             => $validated['role'],
-            'company_name'     => $basics['company_name'] ?? null,
-            'country'          => $basics['country'] ?? null,
-            'sector'           => $basics['sector'] ?? null,
-            'growth_stage'     => $basics['growth_stage'] ?? null,
-            'describe_you'     => $basics['describe_you'] ?? null,
+            'email' => $email,
+            'name' => $validated['name'],
+            'role' => $validated['role'],
+            'company_name' => $basics['company_name'] ?? null,
+            'country' => $basics['country'] ?? null,
+            'sector' => $basics['sector'] ?? null,
+            'growth_stage' => $basics['growth_stage'] ?? null,
+            'describe_you' => $basics['describe_you'] ?? null,
             'looking_to_raise' => $basics['looking_to_raise'] ?? null,
-            'answers'          => $result['answers'],
-            'score'            => $result['total_score'],
-            'score_band'       => $scoreBand,
-            'pillar_scores'    => $result['pillar_scores'],
-            'cooldown_until'   => $cooldownUntil,
-            'completed_at'     => now(),
-            'ip_address'       => $request->ip(),
+            'answers' => $result['answers'],
+            'score' => $result['total_score'],
+            'score_band' => $scoreBand,
+            'pillar_scores' => $result['pillar_scores'],
+            'cooldown_until' => $cooldownUntil,
+            'completed_at' => now(),
+            'ip_address' => $request->ip(),
         ]);
 
         $request->session()->put('diagnostic_email', $email);
@@ -270,21 +272,21 @@ class DiagnosticController extends Controller
         $result = $scorer->calculate($flatAnswers, $stage);
 
         return Inertia::render('Diagnostic/Result', [
-            'score'              => $session->score,
-            'score_band'         => $session->score_band,
-            'pillar_scores'      => $session->pillar_scores,
-            'score_band_label'   => $session->getScoreBandLabel(),
+            'score' => $session->score,
+            'score_band' => $session->score_band,
+            'pillar_scores' => $session->pillar_scores,
+            'score_band_label' => $session->getScoreBandLabel(),
             'score_band_message' => self::BAND_MESSAGES[$session->score_band],
-            'next_action'        => $this->nextAction($session->score_band),
-            'completed_at'       => $session->completed_at->toIso8601String(),
-            'describe_you'       => $session->describe_you,
-            'hard_flags'         => $result['hard_flags'] ?? [],
+            'next_action' => $this->nextAction($session->score_band),
+            'completed_at' => $session->completed_at->toIso8601String(),
+            'describe_you' => $session->describe_you,
+            'hard_flags' => $result['hard_flags'] ?? [],
             'weakest_dimensions' => $result['weakest_dimensions'] ?? [],
-            'network_strands'    => $result['network_strands'] ?? ['commercial' => 0, 'capital' => 0],
+            'network_strands' => $result['network_strands'] ?? ['commercial' => 0, 'capital' => 0],
         ]);
     }
 
-    public function sendChecklist(Request $request): \Illuminate\Http\JsonResponse
+    public function sendChecklist(Request $request): JsonResponse
     {
         $sessionId = $request->session()->get('diagnostic_session_id');
 
@@ -310,9 +312,9 @@ class DiagnosticController extends Controller
 
     public function viewById(Request $request, int $id): RedirectResponse
     {
+        // Route is signed — unsigned links cannot restore another person's diagnostic session.
         $session = DiagnosticSession::findOrFail($id);
 
-        // Restore the session so the standard result() method can render it
         $request->session()->put('diagnostic_session_id', $session->id);
         $request->session()->put('diagnostic_email', $session->email);
         $request->session()->put('result_viewed', true);
@@ -334,7 +336,7 @@ class DiagnosticController extends Controller
 
         return Inertia::render('Diagnostic/Blocked', [
             'days_remaining' => $session ? $session->daysRemainingOnCooldown() : 0,
-            'score_band'     => $session?->score_band,
+            'score_band' => $session?->score_band,
             'score_band_label' => $session?->getScoreBandLabel(),
         ]);
     }
@@ -342,11 +344,11 @@ class DiagnosticController extends Controller
     private function nextAction(string $band): string
     {
         return match ($band) {
-            'low'      => 'build',
-            'mid_low'  => 'pia_assessment',
+            'low' => 'build',
+            'mid_low' => 'pia_assessment',
             'mid_high' => 'paragon_certification',
-            'high'     => 'fast_track',
-            default    => 'build',
+            'high' => 'fast_track',
+            default => 'build',
         };
     }
 }

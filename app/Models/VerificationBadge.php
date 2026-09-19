@@ -28,13 +28,13 @@ class VerificationBadge extends Model
     public static function displayMap(): array
     {
         return [
-            'legal'          => 'LEGAL: VERIFIED',
-            'financial'      => 'FINANCING: VERIFIED',
-            'tech_stack'     => 'TECH STACK: AUDITED',
-            'cap_table'      => 'CAP TABLE: CLEAN',
-            'ip_ownership'   => 'IP OWNERSHIP: CONFIRMED',
+            'legal' => 'LEGAL: VERIFIED',
+            'financial' => 'FINANCING: VERIFIED',
+            'tech_stack' => 'TECH STACK: AUDITED',
+            'cap_table' => 'CAP TABLE: CLEAN',
+            'ip_ownership' => 'IP OWNERSHIP: CONFIRMED',
             'unit_economics' => 'UNIT ECONOMICS: VERIFIED',
-            'market_size'    => 'MARKET SIZE: VALIDATED',
+            'market_size' => 'MARKET SIZE: VALIDATED',
         ];
     }
 }

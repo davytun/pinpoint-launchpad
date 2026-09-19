@@ -17,7 +17,7 @@ class BlogImageController extends Controller
         $path = $request->file('image')->store('blog-images', 'public');
 
         return response()->json([
-            'url' => asset('storage/' . $path),
+            'url' => asset('storage/'.$path),
         ]);
     }
 }

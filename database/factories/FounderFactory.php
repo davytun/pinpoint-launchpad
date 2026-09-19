@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Founder;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -15,12 +14,12 @@ class FounderFactory extends Factory
     public function definition(): array
     {
         return [
-            'email'             => fake()->unique()->safeEmail(),
-            'password'          => 'password',
-            'full_name'         => fake()->name(),
-            'company_name'      => fake()->company(),
+            'email' => fake()->unique()->safeEmail(),
+            'password' => 'password',
+            'full_name' => fake()->name(),
+            'company_name' => fake()->company(),
             'email_verified_at' => now(),
-            'remember_token'    => Str::random(10),
+            'remember_token' => Str::random(10),
         ];
     }
 

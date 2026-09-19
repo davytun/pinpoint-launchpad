@@ -7,7 +7,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
@@ -19,12 +18,14 @@ class NotificationController extends Controller
     public function read(string $notification): RedirectResponse
     {
         Auth::guard('investor')->user()->notifications()->whereKey($notification)->firstOrFail()->markAsRead();
+
         return back();
     }
 
     public function readAll(): RedirectResponse
     {
         Auth::guard('investor')->user()->unreadNotifications->markAsRead();
+
         return back();
     }
 }

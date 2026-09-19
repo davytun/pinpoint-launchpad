@@ -48,7 +48,30 @@ class DiligenceRequestController extends Controller
 
         return Inertia::render('Investor/Diligence/Index', [
             'diligence_requests' => $requests,
+            'eligible_profiles' => $this->eligibleProfiles($investor),
         ]);
+    }
+
+    /**
+     * @return list<array{slug: string, company_name: string, sector: string|null}>
+     */
+    private function eligibleProfiles(Investor $investor): array
+    {
+        return $investor->interests()
+            ->where('type', 'founder_call')
+            ->whereNotNull('completed_at')
+            ->with(['profile.founder:id,company_name', 'profile:id,founder_id,slug,sector'])
+            ->latest('completed_at')
+            ->get()
+            ->filter(fn ($interest) => $interest->profile !== null)
+            ->unique('profile_id')
+            ->values()
+            ->map(fn ($interest) => [
+                'slug' => $interest->profile->slug,
+                'company_name' => $interest->profile->founder?->company_name ?? 'PIN Startup',
+                'sector' => $interest->profile->sector,
+            ])
+            ->all();
     }
 
     public function store(

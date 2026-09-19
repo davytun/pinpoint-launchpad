@@ -61,6 +61,26 @@ test('a support user cannot review investor KYC submissions', function () {
         ->and($submission->investor->fresh()->kyc_status)->toBe(Investor::KYC_STATUS_PENDING);
 });
 
+test('investor relations cannot review or preview KYC submissions', function () {
+    $ir = User::factory()->create(['role' => 'investor_relations']);
+    $submission = pendingKycSubmissionForReview();
+
+    $this->actingAs($ir)
+        ->patch(route('admin.investor-kyc.review', $submission), ['status' => InvestorKycSubmission::STATUS_APPROVED])
+        ->assertForbidden();
+
+    $this->actingAs($ir)
+        ->get(route('admin.investor-kyc.preview', $submission))
+        ->assertForbidden();
+
+    $this->actingAs($ir)
+        ->get(route('admin.investor-accounts.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Admin/InvestorAccounts/Index')
+            ->where('canReviewKyc', false));
+});
+
 test('a reviewed KYC submission cannot receive a second decision', function () {
     $superAdmin = User::factory()->create(['role' => 'superadmin']);
     $submission = pendingKycSubmissionForReview();

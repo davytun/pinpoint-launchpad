@@ -10,7 +10,7 @@ test('founders can authenticate using the login screen', function () {
     $founder = Founder::factory()->create();
 
     $response = $this->post('/founder/login', [
-        'email'    => $founder->email,
+        'email' => $founder->email,
         'password' => 'password',
     ]);
 
@@ -22,7 +22,7 @@ test('founders cannot authenticate with invalid password', function () {
     $founder = Founder::factory()->create();
 
     $this->post('/founder/login', [
-        'email'    => $founder->email,
+        'email' => $founder->email,
         'password' => 'wrong-password',
     ]);
 

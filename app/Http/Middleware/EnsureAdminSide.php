@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,11 +12,18 @@ class EnsureAdminSide
 {
     public function handle(Request $request, Closure $next, string $side): Response
     {
-        if (! Auth::check()) {
+        /** @var User|null $user */
+        $user = Auth::guard('web')->user();
+
+        if (! $user instanceof User) {
+            if (Auth::guard('investor')->check() || Auth::guard('founder')->check()) {
+                abort(403);
+            }
+
             return redirect()->route('admin.login');
         }
 
-        $user = Auth::user();
+        Auth::shouldUse('web');
 
         $allowed = match ($side) {
             'central' => $user->canAccessPlatformAdmin(),

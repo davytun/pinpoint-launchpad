@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class FounderDocument extends Model
 {
     use HasUlids;
+
     protected $fillable = [
         'founder_id',
         'payment_id',

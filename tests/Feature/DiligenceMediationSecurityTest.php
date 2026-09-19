@@ -6,7 +6,6 @@ use App\Models\FounderDocument;
 use App\Models\FounderProfile;
 use App\Models\Investor;
 use App\Models\InvestorDataRoomGrant;
-use App\Models\InvestorInterest;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -202,19 +201,19 @@ test('5. Non-IR/Superadmin staff roles (Analyst/Compliance) cannot manage dilige
         'status' => 'submitted',
     ]);
 
-    // Analyst blocked
+    // Analyst blocked (wrong desk → redirected home)
     $this->actingAs($analyst)
         ->get(route('admin.dealflow.diligence.index'))
-        ->assertForbidden();
+        ->assertRedirect(route('admin.founder.dashboard'));
 
     $this->actingAs($analyst)
         ->patch(route('admin.dealflow.diligence.release', $diligence), [
             'investor_visible_response' => 'Analyst response.',
             'mark_resolved' => true,
         ])
-        ->assertForbidden();
+        ->assertRedirect(route('admin.founder.dashboard'));
 
-    // Compliance blocked
+    // Compliance blocked (investor desk allowed, diligence role-gated)
     $this->actingAs($compliance)
         ->get(route('admin.dealflow.diligence.index'))
         ->assertForbidden();

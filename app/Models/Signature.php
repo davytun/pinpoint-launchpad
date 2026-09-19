@@ -27,10 +27,10 @@ class Signature extends Model
     ];
 
     protected $casts = [
-        'signed_at'            => 'datetime',
+        'signed_at' => 'datetime',
         'embed_url_expires_at' => 'datetime',
-        'details_confirmed'    => 'boolean',
-        'metadata'             => 'array',
+        'details_confirmed' => 'boolean',
+        'metadata' => 'array',
     ];
 
     public function payment(): BelongsTo
@@ -62,12 +62,12 @@ class Signature extends Model
 
     public function log(string $event, array $metadata = []): void
     {
-        $logs   = $this->metadata['logs'] ?? [];
+        $logs = $this->metadata['logs'] ?? [];
         $logs[] = [
-            'event'     => $event,
+            'event' => $event,
             'timestamp' => now()->toISOString(),
-            'ip'        => request()->ip(),
-            'metadata'  => $metadata,
+            'ip' => request()->ip(),
+            'metadata' => $metadata,
         ];
 
         $this->update([

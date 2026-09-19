@@ -79,7 +79,7 @@ class AdminUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:100'],
-            'role' => ['required', 'in:superadmin,analyst,compliance,investor_relations,support'],
+            'role' => ['required', 'in:superadmin,analyst,compliance,investor_relations'],
         ]);
 
         if ($user->id === Auth::id() && $request->role !== $user->role) {

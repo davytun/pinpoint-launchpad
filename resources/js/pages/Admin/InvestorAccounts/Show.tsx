@@ -22,6 +22,7 @@ interface KycSubmission {
 interface Investor {
     id: string;
     email: string;
+    account_status: 'pending_review' | 'active' | 'rejected';
     kyc_status: KycStatus;
     kyc_approved_at: string | null;
     created_at: string;
@@ -107,6 +108,9 @@ function KycStatusBadge({ status }: { status: KycStatus }) {
 
 export default function InvestorAccountShow({ investor, canReviewKyc }: PageProps) {
     const form = useForm({ review_notes: '' });
+    const statusForm = useForm<{ account_status: 'pending_review' | 'active' | 'rejected' }>({
+        account_status: investor.account_status ?? 'pending_review',
+    });
     const [isRejecting, setIsRejecting] = useState(false);
     const [copied, setCopied] = useState(false);
     const [lightboxDoc, setLightboxDoc] = useState<KycSubmission | null>(null);
@@ -127,6 +131,11 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
             preserveScroll: true,
             onSuccess: () => setIsRejecting(false),
         });
+    }
+
+    function handleAccountStatus(e: React.FormEvent) {
+        e.preventDefault();
+        statusForm.patch(route('admin.investor-accounts.update', investor.id), { preserveScroll: true });
     }
 
     function copyEmail() {
@@ -200,7 +209,7 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                 {/* ── Content Stream ─────────────────────────────────────────── */}
                 <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6 lg:p-8">
                     {/* Polar Top Metric Strip */}
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
                         <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/50 p-4">
                             <span className="block text-[11px] font-medium text-zinc-500">Investor Type</span>
                             <p className="mt-1 text-sm font-semibold text-zinc-950">{humanize(investor.profile?.investor_type ?? 'individual')}</p>
@@ -209,6 +218,11 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                         <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/50 p-4">
                             <span className="block text-[11px] font-medium text-zinc-500">Company / Firm</span>
                             <p className="mt-1 truncate text-sm font-semibold text-zinc-950">{investor.profile?.company_name ?? 'Individual'}</p>
+                        </div>
+
+                        <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/50 p-4">
+                            <span className="block text-[11px] font-medium text-zinc-500">Account Status</span>
+                            <p className="mt-1 text-sm font-semibold text-zinc-950">{humanize(investor.account_status)}</p>
                         </div>
 
                         <div className="rounded-xl border border-zinc-200/80 bg-zinc-50/50 p-4">
@@ -221,6 +235,40 @@ export default function InvestorAccountShow({ investor, canReviewKyc }: PageProp
                             <p className="mt-1 text-sm font-semibold text-zinc-950">{formatDate(investor.created_at)}</p>
                         </div>
                     </div>
+
+                    {/* Account status controls */}
+                    <form
+                        onSubmit={handleAccountStatus}
+                        className="flex flex-col gap-3 rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-2xs sm:flex-row sm:items-end sm:justify-between"
+                    >
+                        <div className="min-w-0 flex-1">
+                            <h2 className="text-xs font-semibold text-zinc-950">Account access</h2>
+                            <p className="mt-1 text-[11.5px] text-zinc-500">
+                                Reject or reactivate PIN access. Onboarding still auto-activates new accounts.
+                            </p>
+                            <select
+                                value={statusForm.data.account_status}
+                                onChange={(e) =>
+                                    statusForm.setData('account_status', e.target.value as 'pending_review' | 'active' | 'rejected')
+                                }
+                                className="mt-3 w-full max-w-xs rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-2xs focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none"
+                            >
+                                <option value="pending_review">Pending review</option>
+                                <option value="active">Active</option>
+                                <option value="rejected">Rejected / Suspended</option>
+                            </select>
+                            {statusForm.errors.account_status && (
+                                <p className="mt-1 text-xs font-semibold text-rose-600">{statusForm.errors.account_status}</p>
+                            )}
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={statusForm.processing || statusForm.data.account_status === investor.account_status}
+                            className="rounded-xl bg-zinc-950 px-4 py-2 text-xs font-semibold text-white shadow-2xs transition hover:bg-zinc-800 disabled:opacity-50"
+                        >
+                            {statusForm.processing ? 'Saving…' : 'Update status'}
+                        </button>
+                    </form>
 
                     {/* Properties List */}
                     <div className="space-y-6 rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-2xs">

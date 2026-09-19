@@ -7,12 +7,12 @@ use App\Models\Founder;
 use App\Models\Payment;
 use App\Models\Signature;
 use App\Services\BoldSignService;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class OnboardingController extends Controller
 {
@@ -66,11 +66,11 @@ class OnboardingController extends Controller
         // Declined — reset so the founder can start fresh
         if ($payment->signature && $payment->signature->status === 'declined') {
             $payment->signature->update([
-                'status'                => 'pending',
-                'boldsign_document_id'  => null,
-                'embed_url'             => null,
-                'embed_url_expires_at'  => null,
-                'details_confirmed'     => false,
+                'status' => 'pending',
+                'boldsign_document_id' => null,
+                'embed_url' => null,
+                'embed_url_expires_at' => null,
+                'details_confirmed' => false,
             ]);
 
             return redirect()->route('onboarding.sign')
@@ -88,56 +88,57 @@ class OnboardingController extends Controller
             } catch (\RuntimeException $e) {
                 if (str_contains($e->getMessage(), 'already been completed') || str_contains($e->getMessage(), 'already completed')) {
                     $payment->signature->update(['status' => 'signed', 'signed_at' => now()]);
+
                     return redirect()->route('founder.setup');
                 }
                 throw $e;
             }
 
             return Inertia::render('Onboarding/Sign', [
-                'embed_url'    => $embedResult,
+                'embed_url' => $embedResult,
                 'signer_email' => $payment->signature->signer_email,
-                'tier_label'   => $tierLabel,
-                'document_id'  => $payment->signature->boldsign_document_id,
+                'tier_label' => $tierLabel,
+                'document_id' => $payment->signature->boldsign_document_id,
             ]);
         }
 
         // No confirmed details yet — show pre-signing form
         return Inertia::render('Onboarding/ConfirmDetails', [
-            'email'      => $payment->customer_email,
+            'email' => $payment->customer_email,
             'tier_label' => $tierLabel,
-            'info'       => session('info'),
+            'info' => session('info'),
         ]);
     }
 
     public function confirmDetails(Request $request): mixed
     {
         $request->validate([
-            'full_name'    => ['required', 'string', 'min:2', 'max:100'],
+            'full_name' => ['required', 'string', 'min:2', 'max:100'],
             'company_name' => ['required', 'string', 'min:2', 'max:150'],
         ]);
 
         $paymentId = $request->session()->get('payment_id');
-        $payment   = Payment::with('signature')->find($paymentId);
+        $payment = Payment::with('signature')->find($paymentId);
 
         if (! $payment) {
             return redirect()->route('checkout.index')
                 ->with('error', 'Please complete payment first.');
         }
 
-        $email     = $payment->customer_email;
-        $fullName  = $request->full_name;
-        $company   = $request->company_name;
+        $email = $payment->customer_email;
+        $fullName = $request->full_name;
+        $company = $request->company_name;
         $tierLabel = ucfirst($payment->tier);
 
         // Create the BoldSign document with real founder details
         $result = $this->boldSign->createDocumentFromTemplate([
-            'email'         => $email,
-            'name'          => $fullName,
-            'founder_name'  => $fullName,
-            'company_name'  => $company,
-            'tier_selected' => $tierLabel . ' Audit',
-            'amount_paid'   => number_format($payment->total_amount, 2),
-            'date'          => now()->format('d M Y'),
+            'email' => $email,
+            'name' => $fullName,
+            'founder_name' => $fullName,
+            'company_name' => $company,
+            'tier_selected' => $tierLabel.' Audit',
+            'amount_paid' => number_format($payment->total_amount, 2),
+            'date' => now()->format('d M Y'),
         ]);
 
         // Get embed URL and cache it on the record
@@ -147,21 +148,21 @@ class OnboardingController extends Controller
         $signature = $payment->signature ?? new Signature(['payment_id' => $payment->id]);
 
         $signature->fill([
-            'payment_id'            => $payment->id,
+            'payment_id' => $payment->id,
             'diagnostic_session_id' => $payment->diagnostic_session_id,
-            'boldsign_document_id'  => $result['document_id'],
-            'boldsign_template_id'  => config('services.boldsign.template_id'),
-            'status'                => 'sent',
-            'signer_email'          => $email,
-            'signer_name'           => $fullName,
-            'signer_full_name'      => $fullName,
-            'signer_company_name'   => $company,
-            'details_confirmed'     => true,
-            'embed_url'             => $embedResult['url'],
-            'embed_url_expires_at'  => $embedResult['expires_at'],
-            'metadata'              => [
-                'tier'         => $payment->tier,
-                'amount'       => $payment->total_amount,
+            'boldsign_document_id' => $result['document_id'],
+            'boldsign_template_id' => config('services.boldsign.template_id'),
+            'status' => 'sent',
+            'signer_email' => $email,
+            'signer_name' => $fullName,
+            'signer_full_name' => $fullName,
+            'signer_company_name' => $company,
+            'details_confirmed' => true,
+            'embed_url' => $embedResult['url'],
+            'embed_url_expires_at' => $embedResult['expires_at'],
+            'metadata' => [
+                'tier' => $payment->tier,
+                'amount' => $payment->total_amount,
                 'company_name' => $company,
             ],
         ])->save();
@@ -174,10 +175,10 @@ class OnboardingController extends Controller
         $request->session()->put('signer_company_name', $company);
 
         return Inertia::render('Onboarding/Sign', [
-            'embed_url'    => $embedResult['url'],
+            'embed_url' => $embedResult['url'],
             'signer_email' => $email,
-            'tier_label'   => $tierLabel,
-            'document_id'  => $result['document_id'],
+            'tier_label' => $tierLabel,
+            'document_id' => $result['document_id'],
         ]);
     }
 
@@ -191,7 +192,7 @@ class OnboardingController extends Controller
         }
 
         if (! $signature && $request->session()->has('payment_id')) {
-            $payment   = Payment::query()->with('signature')->find($request->session()->get('payment_id'));
+            $payment = Payment::query()->with('signature')->find($request->session()->get('payment_id'));
             $signature = $payment?->signature;
 
             if ($signature) {
@@ -217,26 +218,26 @@ class OnboardingController extends Controller
         if ($signature->isSigned()) {
             $founder = Founder::query()->where('email', $signature->signer_email)->first();
             if (! $founder || ! $founder->hasSetupAccount()) {
-                $setupToken = Cache::get('founder_setup_token_' . $signature->signer_email);
+                $setupToken = Cache::get('founder_setup_token_'.$signature->signer_email);
                 if (! $setupToken) {
                     $setupToken = Str::random(64);
                     Cache::put(
-                        'founder_setup_token_' . $signature->signer_email,
+                        'founder_setup_token_'.$signature->signer_email,
                         $setupToken,
                         now()->addHours(48)
                     );
                 }
-                $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
+                $setupUrl = route('founder.setup').'?token='.$setupToken.'&email='.urlencode($signature->signer_email);
             }
         }
 
         return Inertia::render('Onboarding/Verifying', [
             'signature_verified' => $signature->isSigned(),
-            'signer_email'       => $signature->signer_email,
-            'tier_label'         => ($payment ? $payment->tier_label : 'Concept / Pre-Seed') . ' Audit',
-            'amount_paid'        => ($payment && strtoupper($payment->currency) === 'NGN' ? '₦' : '$') . number_format($payment?->total_amount ?? 0) . ($payment && strtoupper($payment->currency) === 'NGN' ? ' NGN' : ' USD'),
-            'signed_at'          => $signature->signed_at?->format('M j, Y, g:i A') ?? now()->format('M j, Y, g:i A'),
-            'setup_url'          => $setupUrl,
+            'signer_email' => $signature->signer_email,
+            'tier_label' => ($payment ? $payment->tier_label : 'Concept / Pre-Seed').' Audit',
+            'amount_paid' => ($payment && strtoupper($payment->currency) === 'NGN' ? '₦' : '$').number_format($payment?->total_amount ?? 0).($payment && strtoupper($payment->currency) === 'NGN' ? ' NGN' : ' USD'),
+            'signed_at' => $signature->signed_at?->format('M j, Y, g:i A') ?? now()->format('M j, Y, g:i A'),
+            'setup_url' => $setupUrl,
         ]);
     }
 
@@ -252,10 +253,10 @@ class OnboardingController extends Controller
         if (! $signature) {
             // Try session fallback
             $signatureId = $request->session()->get('signature_id');
-            $signature   = $signatureId ? Signature::query()->find($signatureId) : null;
+            $signature = $signatureId ? Signature::query()->find($signatureId) : null;
 
             if (! $signature && $request->session()->has('payment_id')) {
-                $payment   = Payment::query()->with('signature')->find($request->session()->get('payment_id'));
+                $payment = Payment::query()->with('signature')->find($request->session()->get('payment_id'));
                 $signature = $payment?->signature;
             }
         }
@@ -266,12 +267,12 @@ class OnboardingController extends Controller
 
         $setupToken = Str::random(64);
         Cache::put(
-            'founder_setup_token_' . $signature->signer_email,
+            'founder_setup_token_'.$signature->signer_email,
             $setupToken,
             now()->addHours(48)
         );
 
-        $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
+        $setupUrl = route('founder.setup').'?token='.$setupToken.'&email='.urlencode($signature->signer_email);
 
         Mail::to($signature->signer_email)
             ->queue(new FounderSetupInviteMail($signature->signer_email, $setupUrl));
@@ -299,7 +300,7 @@ class OnboardingController extends Controller
         );
 
         $signature->update([
-            'embed_url'            => $embedResult['url'],
+            'embed_url' => $embedResult['url'],
             'embed_url_expires_at' => $embedResult['expires_at'],
         ]);
 

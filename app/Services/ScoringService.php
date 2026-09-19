@@ -8,31 +8,31 @@ class ScoringService
 {
     private const STAGE_WEIGHTS = [
         'concept' => [
-            'potential'  => 22,
-            'agility'    => 15,
-            'risk'       => 10,
-            'alignment'  => 11,
+            'potential' => 22,
+            'agility' => 15,
+            'risk' => 10,
+            'alignment' => 11,
             'governance' => 9,
             'operations' => 11,
-            'network'    => 22,
+            'network' => 22,
         ],
         'seed' => [
-            'potential'  => 16,
-            'agility'    => 11,
-            'risk'       => 12,
-            'alignment'  => 16,
+            'potential' => 16,
+            'agility' => 11,
+            'risk' => 12,
+            'alignment' => 16,
             'governance' => 11,
             'operations' => 16,
-            'network'    => 18,
+            'network' => 18,
         ],
         'growth' => [
-            'potential'  => 11,
-            'agility'    => 8,
-            'risk'       => 16,
-            'alignment'  => 15,
+            'potential' => 11,
+            'agility' => 8,
+            'risk' => 16,
+            'alignment' => 15,
             'governance' => 15,
             'operations' => 19,
-            'network'    => 16,
+            'network' => 16,
         ],
     ];
 
@@ -56,22 +56,22 @@ class ScoringService
         $questions = DiagnosticQuestion::active()->get()->keyBy('id');
 
         $pillarEarned = [
-            'potential'  => 0,
-            'agility'    => 0,
-            'risk'       => 0,
-            'alignment'  => 0,
+            'potential' => 0,
+            'agility' => 0,
+            'risk' => 0,
+            'alignment' => 0,
             'governance' => 0,
             'operations' => 0,
-            'network'    => 0,
+            'network' => 0,
         ];
         $pillarMax = [
-            'potential'  => 0,
-            'agility'    => 0,
-            'risk'       => 0,
-            'alignment'  => 0,
+            'potential' => 0,
+            'agility' => 0,
+            'risk' => 0,
+            'alignment' => 0,
             'governance' => 0,
             'operations' => 0,
-            'network'    => 0,
+            'network' => 0,
         ];
 
         // Network strand scores
@@ -121,8 +121,8 @@ class ScoringService
             }
 
             $enriched[] = [
-                'question_id'    => $question->id,
-                'answer'         => $selectedLetter,
+                'question_id' => $question->id,
+                'answer' => $selectedLetter,
                 'points_awarded' => $pointsAwarded,
             ];
         }
@@ -137,7 +137,7 @@ class ScoringService
         // Compute Network sub-scores
         $networkStrands = [
             'commercial' => $networkStrandMax['commercial'] > 0 ? (int) round(($networkStrandEarned['commercial'] / $networkStrandMax['commercial']) * 100) : 0,
-            'capital'    => $networkStrandMax['capital'] > 0 ? (int) round(($networkStrandEarned['capital'] / $networkStrandMax['capital']) * 100) : 0,
+            'capital' => $networkStrandMax['capital'] > 0 ? (int) round(($networkStrandEarned['capital'] / $networkStrandMax['capital']) * 100) : 0,
         ];
 
         // Compute stage-weighted overall score
@@ -155,7 +155,7 @@ class ScoringService
         foreach ($pillarScores as $pillar => $score) {
             $candidates[] = [
                 'pillar' => $pillar,
-                'score'  => $score,
+                'score' => $score,
                 'weight' => $stageWeights[$pillar] ?? 0,
             ];
         }
@@ -165,23 +165,24 @@ class ScoringService
             if ($a['score'] !== $b['score']) {
                 return $a['score'] <=> $b['score'];
             }
+
             // Higher weight first if score is tied
             return $b['weight'] <=> $a['weight'];
         });
 
         $weakest = [
             $candidates[0]['pillar'],
-            $candidates[1]['pillar']
+            $candidates[1]['pillar'],
         ];
 
         return [
-            'total_score'        => $totalScore,
-            'score_band'         => $this->scoreBand($totalScore),
-            'pillar_scores'      => $pillarScores,
-            'answers'            => $enriched,
-            'hard_flags'         => $hardFlags,
+            'total_score' => $totalScore,
+            'score_band' => $this->scoreBand($totalScore),
+            'pillar_scores' => $pillarScores,
+            'answers' => $enriched,
+            'hard_flags' => $hardFlags,
             'weakest_dimensions' => $weakest,
-            'network_strands'    => $networkStrands,
+            'network_strands' => $networkStrands,
         ];
     }
 
@@ -196,6 +197,7 @@ class ScoringService
         if ($score <= 74) {
             return 'mid_high';
         }
+
         return 'high';
     }
 }

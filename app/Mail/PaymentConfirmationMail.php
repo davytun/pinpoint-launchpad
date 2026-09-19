@@ -30,11 +30,11 @@ class PaymentConfirmationMail extends Mailable
         return new Content(
             view: 'emails.payment.confirmation',
             with: [
-                'tier_label'      => $this->payment->tier_label,
-                'total_amount'    => $this->payment->total_amount,
-                'email'           => $this->payment->customer_email,
-                'paid_at'         => $this->payment->paid_at,
-                'currency'        => $currency,
+                'tier_label' => $this->payment->tier_label,
+                'total_amount' => $this->payment->total_amount,
+                'email' => $this->payment->customer_email,
+                'paid_at' => $this->payment->paid_at,
+                'currency' => $currency,
                 'currency_symbol' => $currencySymbol,
             ],
         );

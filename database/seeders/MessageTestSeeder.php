@@ -63,7 +63,7 @@ class MessageTestSeeder extends Seeder
             'thread_id' => $thread1->id,
             'sender_type' => 'founder',
             'sender_id' => $founder1->id,
-            'body' => "Hi Pinpoint Team, we just finished uploading our updated Q3 financials and diagnostic metrics. Could you review our readiness score for Tier 1 matching?",
+            'body' => 'Hi Pinpoint Team, we just finished uploading our updated Q3 financials and diagnostic metrics. Could you review our readiness score for Tier 1 matching?',
             'has_attachment' => false,
             'created_at' => Carbon::now()->subHours(3),
         ]);
@@ -109,7 +109,7 @@ class MessageTestSeeder extends Seeder
             'thread_id' => $thread2->id,
             'sender_type' => 'founder',
             'sender_id' => $founder2->id,
-            'body' => "Hello, our cap table has been updated with the latest seed angel notes. Is there anything else required before investor syndication?",
+            'body' => 'Hello, our cap table has been updated with the latest seed angel notes. Is there anything else required before investor syndication?',
             'has_attachment' => false,
             'created_at' => Carbon::now()->subHours(5),
         ]);
@@ -118,7 +118,7 @@ class MessageTestSeeder extends Seeder
             'thread_id' => $thread2->id,
             'sender_type' => 'admin',
             'sender_id' => $adminId,
-            'body' => "Hi Connie, everything looks in order. Your profile is now live in the investor spotlight section.",
+            'body' => 'Hi Connie, everything looks in order. Your profile is now live in the investor spotlight section.',
             'has_attachment' => false,
             'created_at' => Carbon::now()->subHours(4),
         ]);
@@ -144,7 +144,7 @@ class MessageTestSeeder extends Seeder
             'thread_id' => $thread3->id,
             'sender_type' => 'founder',
             'sender_id' => $founder3->id,
-            'body' => "We have surpassed \$50k MRR this month. Can we update our company spotlight profile highlights?",
+            'body' => 'We have surpassed $50k MRR this month. Can we update our company spotlight profile highlights?',
             'has_attachment' => false,
             'created_at' => Carbon::now()->subDays(1),
         ]);

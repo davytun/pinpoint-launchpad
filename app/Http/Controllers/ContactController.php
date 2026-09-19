@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
 use App\Models\NewsletterSubscriber;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -12,17 +13,17 @@ class ContactController extends Controller
     public function storeContact(Request $request): RedirectResponse
     {
         $request->validate([
-            'name'         => ['required', 'string', 'max:100'],
-            'email'        => ['required', 'email', 'max:150'],
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:150'],
             'company_name' => ['nullable', 'string', 'max:150'],
-            'message'      => ['required', 'string', 'max:2000'],
+            'message' => ['required', 'string', 'max:2000'],
         ]);
 
         ContactMessage::create([
-            'name'         => $request->name,
-            'email'        => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'company_name' => $request->company_name,
-            'message'      => $request->message,
+            'message' => $request->message,
         ]);
 
         return back()->with('contactStatus', [
@@ -41,7 +42,7 @@ class ContactController extends Controller
             NewsletterSubscriber::firstOrCreate([
                 'email' => $request->email,
             ]);
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             // Silence unique duplicate key violations since they are already subscribed
         }
 

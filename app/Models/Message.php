@@ -10,11 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Message extends Model
 {
     use HasUlids;
+
     protected $guarded = ['id'];
 
     protected $casts = [
         'has_attachment' => 'boolean',
-        'is_deleted'     => 'boolean',
+        'is_deleted' => 'boolean',
         'attachment_size' => 'integer',
     ];
 
@@ -40,12 +41,13 @@ class Message extends Model
         }
 
         if ($this->attachment_size < 1024) {
-            return $this->attachment_size . ' B';
+            return $this->attachment_size.' B';
         }
         if ($this->attachment_size < 1048576) {
-            return round($this->attachment_size / 1024, 1) . ' KB';
+            return round($this->attachment_size / 1024, 1).' KB';
         }
-        return round($this->attachment_size / 1048576, 1) . ' MB';
+
+        return round($this->attachment_size / 1048576, 1).' MB';
     }
 
     public function senderName(?Founder $founder): string
@@ -53,6 +55,7 @@ class Message extends Model
         if ($this->isFromFounder()) {
             return $founder?->full_name ?? 'Founder';
         }
+
         return 'Pinpoint Team';
     }
 

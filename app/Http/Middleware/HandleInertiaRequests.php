@@ -54,7 +54,6 @@ class HandleInertiaRequests extends Middleware
                     ? Auth::guard('investor')->user()->only(['id', 'email', 'account_status'])
                     : null,
             ],
-            'paystack_public_key' => config('services.paystack.public_key') ?: '',
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),

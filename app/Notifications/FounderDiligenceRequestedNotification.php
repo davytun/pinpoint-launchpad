@@ -33,7 +33,7 @@ class FounderDiligenceRequestedNotification extends Notification implements Shou
 
         return (new MailMessage)
             ->subject('Pinpoint Information Request — Response Required')
-            ->greeting('Hello ' . ($notifiable->full_name ?? 'Founder') . ',')
+            ->greeting('Hello '.($notifiable->full_name ?? 'Founder').',')
             ->line('An approved Investor currently engaged with your venture has requested additional clarification through Pinpoint Investor Relations.')
             ->line("Category: {$category}")
             ->line("Subject: {$this->diligenceRequest->subject}")

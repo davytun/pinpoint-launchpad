@@ -1,8 +1,7 @@
 import { InvestorHeader } from '@/components/investor-header';
-import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Icon } from '@iconify/react';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calendar, CheckCircle2, Clock3, ExternalLink, Lock, ShieldAlert, Video, XCircle } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock3, ExternalLink, Lock, ShieldAlert, Video, XCircle } from 'lucide-react';
 
 type Interest = {
     id: string;
@@ -192,6 +191,20 @@ export default function Interests({ interests }: { interests: Interest[] }) {
                                                     Pinpoint Investor Relations is coordinating availability and will post verified meeting details
                                                     here.
                                                 </p>
+                                            )}
+
+                                            {interest.completed_at && (
+                                                <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-indigo-100/80 pt-3 pl-6">
+                                                    <p className="text-[11.5px] text-zinc-600">
+                                                        Introduction complete — you can submit mediated diligence questions to Pinpoint IR.
+                                                    </p>
+                                                    <Link
+                                                        href={route('investor.diligence.index')}
+                                                        className="inline-flex items-center gap-1 rounded-lg bg-[#3A54A5] px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-[#2D4182]"
+                                                    >
+                                                        Submit diligence inquiry
+                                                    </Link>
+                                                </div>
                                             )}
                                         </div>
                                     )}

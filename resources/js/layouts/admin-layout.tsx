@@ -541,7 +541,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     const user = auth?.user ?? null;
     const currentUrl = usePage().url as string;
-    const role = user?.role ?? 'support';
+    const role = user?.role ?? 'analyst';
     const unreadMessages = admin_unread_messages ?? 0;
     const unreadNotifications = platform_unread_notifications?.admin ?? 0;
     const desk = resolveDesk(currentUrl, role);

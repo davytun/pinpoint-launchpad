@@ -17,60 +17,62 @@ use Illuminate\Support\Str;
 class BoldSignService
 {
     private string $baseUrl;
+
     private string $apiKey;
+
     private string $templateId;
 
     public function __construct()
     {
-        $this->baseUrl    = rtrim(config('services.boldsign.base_url'), '/');
-        $this->apiKey     = config('services.boldsign.api_key');
+        $this->baseUrl = rtrim(config('services.boldsign.base_url'), '/');
+        $this->apiKey = config('services.boldsign.api_key');
         $this->templateId = config('services.boldsign.template_id');
     }
 
     public function createDocumentFromTemplate(array $data): array
     {
         $response = Http::withHeaders([
-            'X-API-KEY'    => $this->apiKey,
-            'Accept'       => 'application/json',
+            'X-API-KEY' => $this->apiKey,
+            'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ])->post("{$this->baseUrl}/v1/template/send?templateId={$this->templateId}", [
-            'title'   => "Pinpoint Investment Warrant — {$data['company_name']}",
+            'title' => "Pinpoint Investment Warrant — {$data['company_name']}",
             'message' => 'Please sign the Success Fee and Confidentiality Agreement to begin your PARAGON audit.',
-            'roles'   => [
+            'roles' => [
                 [
-                    'roleIndex'   => 1,
-                    'signerName'  => $data['name'],
+                    'roleIndex' => 1,
+                    'signerName' => $data['name'],
                     'signerEmail' => $data['email'],
-                    'signerType'  => 'Signer',
+                    'signerType' => 'Signer',
                     'existingFormFields' => [
                         ['id' => 'founder_name',  'value' => $data['founder_name'],      'isReadOnly' => true],
                         ['id' => 'company_name',  'value' => $data['company_name'],      'isReadOnly' => true],
                         ['id' => 'tier_selected', 'value' => $data['tier_selected'],     'isReadOnly' => true],
-                        ['id' => 'amount_paid',   'value' => '$' . $data['amount_paid'], 'isReadOnly' => true],
+                        ['id' => 'amount_paid',   'value' => '$'.$data['amount_paid'], 'isReadOnly' => true],
                         ['id' => 'date',          'value' => $data['date'],              'isReadOnly' => true],
                     ],
                 ],
             ],
             'enableSigningOrder' => false,
-            'reminderSettings'   => [
+            'reminderSettings' => [
                 'enableAutoReminder' => true,
-                'reminderDays'       => 2,
-                'reminderCount'      => 3,
+                'reminderDays' => 2,
+                'reminderCount' => 3,
             ],
         ]);
 
         if (! $response->successful()) {
             Log::error('BoldSign createDocumentFromTemplate failed', [
                 'status' => $response->status(),
-                'body'   => $response->body(),
-                'email'  => $data['email'],
+                'body' => $response->body(),
+                'email' => $data['email'],
             ]);
-            throw new \RuntimeException('BoldSign API error: ' . $response->body());
+            throw new \RuntimeException('BoldSign API error: '.$response->body());
         }
 
         return [
             'document_id' => $response->json('documentId'),
-            'status'      => 'sent',
+            'status' => 'sent',
         ];
     }
 
@@ -79,24 +81,24 @@ class BoldSignService
     {
         $response = Http::withHeaders([
             'X-API-KEY' => $this->apiKey,
-            'Accept'    => 'application/json',
+            'Accept' => 'application/json',
         ])->get("{$this->baseUrl}/v1/document/getEmbeddedSignLink", [
-            'documentId'  => $documentId,
+            'documentId' => $documentId,
             'signerEmail' => $signerEmail,
             'redirectUrl' => route('onboarding.complete'),
         ]);
 
         if (! $response->successful()) {
             Log::error('BoldSign getEmbeddedSignUrl failed', [
-                'status'     => $response->status(),
-                'body'       => $response->body(),
+                'status' => $response->status(),
+                'body' => $response->body(),
                 'documentId' => $documentId,
             ]);
-            throw new \RuntimeException('BoldSign embed URL error: ' . $response->body());
+            throw new \RuntimeException('BoldSign embed URL error: '.$response->body());
         }
 
         return [
-            'url'        => $response->json('signLink'),
+            'url' => $response->json('signLink'),
             'expires_at' => now()->addMinutes(30),
         ];
     }
@@ -110,6 +112,7 @@ class BoldSignService
             Log::critical('BOLDSIGN_WEBHOOK_SECRET is not configured. All webhooks will be rejected. Set this value immediately.', [
                 'ip' => $request->ip(),
             ]);
+
             return false;
         }
 
@@ -119,6 +122,7 @@ class BoldSignService
 
         if (empty($header)) {
             Log::warning('BoldSign webhook missing signature header', ['ip' => $request->ip()]);
+
             return false;
         }
 
@@ -127,18 +131,25 @@ class BoldSignService
 
         foreach (explode(',', $header) as $part) {
             $parts = explode('=', trim($part), 2);
-            if (count($parts) !== 2) continue;
+            if (count($parts) !== 2) {
+                continue;
+            }
             [$key, $value] = array_map('trim', $parts);
-            if ($key === 't')  $timestamp = $value;
-            if ($key === 's0') $signature = $value;
+            if ($key === 't') {
+                $timestamp = $value;
+            }
+            if ($key === 's0') {
+                $signature = $value;
+            }
         }
 
         if (! $timestamp || ! $signature) {
             Log::warning('BoldSign webhook: could not parse signature header', ['header' => $header]);
+
             return false;
         }
 
-        $payload  = $request->getContent();
+        $payload = $request->getContent();
         $expected = hash_hmac('sha256', "{$timestamp}.{$payload}", $secret);
 
         return hash_equals($expected, $signature);
@@ -146,15 +157,15 @@ class BoldSignService
 
     public function handleWebhook(Request $request): void
     {
-        $payload   = json_decode($request->getContent(), true) ?? [];
+        $payload = json_decode($request->getContent(), true) ?? [];
         $eventType = $payload['event']['eventType'] ?? ($payload['event'] ?? 'unknown');
         $documentId = $payload['data']['documentId'] ?? null;
 
         Log::info('BoldSign webhook received', [
-            'eventType'  => $eventType,
+            'eventType' => $eventType,
             'documentId' => $documentId,
-            'ip'         => $request->ip(),
-            'timestamp'  => now()->toISOString(),
+            'ip' => $request->ip(),
+            'timestamp' => now()->toISOString(),
         ]);
 
         if (! $this->verifyWebhookSignature($request)) {
@@ -163,15 +174,15 @@ class BoldSignService
 
         match ($eventType) {
             // This agreement has one signer. Signed arrives before BoldSign generates the final PDF.
-            'Signed'    => $this->handleDocumentSigned($payload, downloadFinalPdf: false),
+            'Signed' => $this->handleDocumentSigned($payload, downloadFinalPdf: false),
             'Completed' => $this->handleDocumentSigned($payload, downloadFinalPdf: true),
-            'Declined'  => $this->handleDocumentDeclined($payload),
-            'Revoked'   => $this->handleDocumentRevoked($payload),
-            default     => Log::info('BoldSign unhandled event', ['eventType' => $eventType]),
+            'Declined' => $this->handleDocumentDeclined($payload),
+            'Revoked' => $this->handleDocumentRevoked($payload),
+            default => Log::info('BoldSign unhandled event', ['eventType' => $eventType]),
         };
     }
 
-    public function downloadSignedDocument(string $documentId): string|null
+    public function downloadSignedDocument(string $documentId): ?string
     {
         try {
             $response = Http::withHeaders([
@@ -181,19 +192,20 @@ class BoldSignService
             ]);
 
             if ($response->successful()) {
-                $path = 'signatures/piw_' . $documentId . '.pdf';
+                $path = 'signatures/piw_'.$documentId.'.pdf';
                 Storage::disk('local')->put($path, $response->body());
+
                 return $path;
             }
 
             Log::warning('BoldSign downloadSignedDocument: non-200 response', [
-                'status'     => $response->status(),
+                'status' => $response->status(),
                 'documentId' => $documentId,
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to download signed PDF', [
                 'documentId' => $documentId,
-                'error'      => $e->getMessage(),
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -213,7 +225,7 @@ class BoldSignService
         try {
             $response = Http::withHeaders([
                 'X-API-KEY' => $this->apiKey,
-                'Accept'    => 'application/json',
+                'Accept' => 'application/json',
             ])->get("{$this->baseUrl}/v1/document/properties", [
                 'documentId' => $signature->boldsign_document_id,
             ]);
@@ -221,7 +233,7 @@ class BoldSignService
             if (! $response->successful()) {
                 Log::warning('BoldSign document-status check failed', [
                     'documentId' => $signature->boldsign_document_id,
-                    'status'     => $response->status(),
+                    'status' => $response->status(),
                 ]);
 
                 return false;
@@ -240,7 +252,7 @@ class BoldSignService
         } catch (\Throwable $exception) {
             Log::warning('BoldSign document-status check failed', [
                 'documentId' => $signature->boldsign_document_id,
-                'error'      => $exception->getMessage(),
+                'error' => $exception->getMessage(),
             ]);
 
             return false;
@@ -255,6 +267,7 @@ class BoldSignService
 
         if (! $documentId) {
             Log::warning('BoldSign signing event missing documentId', ['payload' => $payload]);
+
             return;
         }
 
@@ -262,6 +275,7 @@ class BoldSignService
 
         if (! $signature) {
             Log::warning('BoldSign signing event: no Signature record found', ['documentId' => $documentId]);
+
             return;
         }
 
@@ -271,7 +285,7 @@ class BoldSignService
         $justSigned = ! $signature->isSigned();
         if ($justSigned) {
             $signature->update([
-                'status'    => 'signed',
+                'status' => 'signed',
                 'signed_at' => now(),
             ]);
 
@@ -298,12 +312,12 @@ class BoldSignService
         // The token is validated in FounderAuthController::showSetup() and setup().
         $setupToken = Str::random(64);
         Cache::put(
-            'founder_setup_token_' . $signature->signer_email,
+            'founder_setup_token_'.$signature->signer_email,
             $setupToken,
             now()->addHours(48)
         );
 
-        $setupUrl = route('founder.setup') . '?token=' . $setupToken . '&email=' . urlencode($signature->signer_email);
+        $setupUrl = route('founder.setup').'?token='.$setupToken.'&email='.urlencode($signature->signer_email);
 
         // Send consolidated signature completion email containing the setup link
         Mail::to($signature->signer_email)
@@ -313,16 +327,16 @@ class BoldSignService
             ->queue(new SignatureAdminNotificationMail($signature, $tierLabel));
 
         Log::info('BoldSign document signed, PDF stored, consolidated setup email dispatched', [
-            'documentId'   => $documentId,
+            'documentId' => $documentId,
             'signer_email' => $signature->signer_email,
-            'pdf_path'     => $pdfPath,
+            'pdf_path' => $pdfPath,
         ]);
     }
 
     private function handleDocumentDeclined(array $payload): void
     {
         $documentId = $payload['data']['documentId'] ?? null;
-        $signature  = Signature::query()->where('boldsign_document_id', $documentId)->first();
+        $signature = Signature::query()->where('boldsign_document_id', $documentId)->first();
 
         if ($signature) {
             $signature->update(['status' => 'declined']);
@@ -334,7 +348,7 @@ class BoldSignService
     private function handleDocumentRevoked(array $payload): void
     {
         $documentId = $payload['data']['documentId'] ?? null;
-        $signature  = Signature::query()->where('boldsign_document_id', $documentId)->first();
+        $signature = Signature::query()->where('boldsign_document_id', $documentId)->first();
 
         if ($signature) {
             $signature->update(['status' => 'revoked']);

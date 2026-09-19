@@ -13,6 +13,7 @@ use App\Notifications\DealflowAdminNotification;
 use App\Notifications\FounderDiligenceRequestedNotification;
 use App\Notifications\InvestorDiligenceResponseReadyNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class DiligenceWorkflowService
 {
@@ -30,12 +31,20 @@ class DiligenceWorkflowService
             $interest = InvestorInterest::query()
                 ->where('investor_id', $investor->id)
                 ->where('profile_id', $profile->id)
+                ->where('type', 'founder_call')
+                ->whereNotNull('completed_at')
                 ->first();
+
+            if (! $interest) {
+                throw ValidationException::withMessages([
+                    'subject' => 'Post-introduction diligence is only available after a completed founder introduction coordinated by Pinpoint.',
+                ]);
+            }
 
             $diligence = DiligenceRequest::create([
                 'investor_id' => $investor->id,
                 'profile_id' => $profile->id,
-                'interest_id' => $interest?->id,
+                'interest_id' => $interest->id,
                 'category' => $data['category'] ?? 'general_clarification',
                 'subject' => $data['subject'],
                 'request_details' => $data['request_details'],

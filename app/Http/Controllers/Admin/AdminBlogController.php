@@ -22,18 +22,18 @@ class AdminBlogController extends Controller
                 ->orWhere('category', 'like', "%{$search}%")
             ))
             ->when($status === 'published', fn ($q) => $q->where('is_published', true))
-            ->when($status === 'draft',     fn ($q) => $q->where('is_published', false))
+            ->when($status === 'draft', fn ($q) => $q->where('is_published', false))
             ->orderByDesc('created_at')
             ->paginate(15)
             ->withQueryString();
 
         return Inertia::render('Admin/Blog/Index', [
-            'posts'   => $posts,
+            'posts' => $posts,
             'filters' => ['search' => $search, 'status' => $status],
-            'totals'  => [
-                'all'       => BlogPost::count(),
+            'totals' => [
+                'all' => BlogPost::count(),
                 'published' => BlogPost::where('is_published', true)->count(),
-                'draft'     => BlogPost::where('is_published', false)->count(),
+                'draft' => BlogPost::where('is_published', false)->count(),
             ],
         ]);
     }
@@ -46,16 +46,16 @@ class AdminBlogController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'title'       => ['required', 'string', 'max:255'],
-            'excerpt'     => ['required', 'string', 'max:500'],
-            'body'        => ['required', 'string'],
+            'title' => ['required', 'string', 'max:255'],
+            'excerpt' => ['required', 'string', 'max:500'],
+            'body' => ['required', 'string'],
             'cover_image' => ['nullable', 'url', 'max:500'],
             'author_name' => ['required', 'string', 'max:100'],
-            'category'    => ['nullable', 'string', 'max:100'],
-            'is_published'=> ['boolean'],
+            'category' => ['nullable', 'string', 'max:100'],
+            'is_published' => ['boolean'],
         ]);
 
-        $data['slug']         = BlogPost::generateSlug($data['title']);
+        $data['slug'] = BlogPost::generateSlug($data['title']);
         $data['published_at'] = ($data['is_published'] ?? false) ? now() : null;
 
         BlogPost::create($data);
@@ -71,13 +71,13 @@ class AdminBlogController extends Controller
     public function update(Request $request, BlogPost $post): RedirectResponse
     {
         $data = $request->validate([
-            'title'       => ['required', 'string', 'max:255'],
-            'excerpt'     => ['required', 'string', 'max:500'],
-            'body'        => ['required', 'string'],
+            'title' => ['required', 'string', 'max:255'],
+            'excerpt' => ['required', 'string', 'max:500'],
+            'body' => ['required', 'string'],
             'cover_image' => ['nullable', 'url', 'max:500'],
             'author_name' => ['required', 'string', 'max:100'],
-            'category'    => ['nullable', 'string', 'max:100'],
-            'is_published'=> ['boolean'],
+            'category' => ['nullable', 'string', 'max:100'],
+            'is_published' => ['boolean'],
         ]);
 
         // Regenerate slug only if title changed
@@ -104,6 +104,7 @@ class AdminBlogController extends Controller
         ]);
 
         $msg = $nowPublishing ? "'{$post->title}' published." : "'{$post->title}' moved to drafts.";
+
         return back()->with('success', $msg);
     }
 
@@ -111,6 +112,7 @@ class AdminBlogController extends Controller
     {
         $title = $post->title;
         $post->delete();
+
         return back()->with('success', "'{$title}' deleted.");
     }
 }

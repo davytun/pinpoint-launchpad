@@ -26,9 +26,9 @@ class Payment extends Model
     ];
 
     protected $casts = [
-        'paid_at'           => 'datetime',
-        'tier_base_amount'  => 'integer',
-        'total_amount'      => 'integer',
+        'paid_at' => 'datetime',
+        'tier_base_amount' => 'integer',
+        'total_amount' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -49,10 +49,10 @@ class Payment extends Model
     public static function getTierLabel(?string $tier): string
     {
         return match ($tier) {
-            'foundation'    => 'Concept / Pre-Seed',
-            'growth'        => 'Seed / Early Traction',
+            'foundation' => 'Concept / Pre-Seed',
+            'growth' => 'Seed / Early Traction',
             'institutional' => 'Seed+ / Growth',
-            default         => ucfirst((string) $tier),
+            default => ucfirst((string) $tier),
         };
     }
 
@@ -82,8 +82,8 @@ class Payment extends Model
         $resolvedIp = $ip ?? (app()->runningInConsole() ? null : (request()->ip() ?? null));
 
         $this->logs()->create([
-            'event'      => $event,
-            'metadata'   => $metadata ?: null,
+            'event' => $event,
+            'metadata' => $metadata ?: null,
             'ip_address' => $resolvedIp,
         ]);
     }

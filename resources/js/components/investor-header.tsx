@@ -31,7 +31,7 @@ interface CustomPageProps extends PageProps {
     };
 }
 
-export function InvestorHeader({ activeTab = 'dashboard' }: { activeTab?: 'dashboard' | 'spotlight' | 'interests' | 'data-rooms' | 'diligence' }) {
+export function InvestorHeader({ activeTab = 'spotlight' }: { activeTab?: 'spotlight' | 'interests' | 'data-rooms' | 'diligence' | 'kyc' | 'notifications' }) {
     const page = usePage<CustomPageProps>();
     const unreadNotifications = page.props.platform_unread_notifications?.investor ?? 0;
     const recentNotifications = page.props.platform_recent_notifications?.investor ?? [];

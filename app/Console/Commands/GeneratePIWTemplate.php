@@ -14,11 +14,11 @@ class GeneratePIWTemplate extends Command
     public function handle(): void
     {
         $pdf = Pdf::loadView('documents.piw', [
-            'founder_name'  => '{{t:founder_name;r:y;ro:y;}}',
-            'company_name'  => '{{t:company_name;r:y;ro:y;}}',
+            'founder_name' => '{{t:founder_name;r:y;ro:y;}}',
+            'company_name' => '{{t:company_name;r:y;ro:y;}}',
             'tier_selected' => '{{t:tier_selected;r:y;ro:y;}}',
-            'amount_paid'   => '{{t:amount_paid;r:y;ro:y;}}',
-            'date'          => '{{t:date;r:y;ro:y;}}',
+            'amount_paid' => '{{t:amount_paid;r:y;ro:y;}}',
+            'date' => '{{t:date;r:y;ro:y;}}',
         ]);
 
         $pdf->setPaper('A4', 'portrait');
@@ -26,7 +26,7 @@ class GeneratePIWTemplate extends Command
         $path = storage_path('app/piw-template.pdf');
         $pdf->save($path);
 
-        $this->info('PIW template generated at: ' . $path);
+        $this->info('PIW template generated at: '.$path);
         $this->info('Upload this PDF to BoldSign as your template document.');
     }
 }

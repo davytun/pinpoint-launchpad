@@ -6,7 +6,6 @@ use App\Models\FounderProfile;
 use App\Models\Investor;
 use App\Models\InvestorDataRoomGrant;
 use App\Models\InvestorInterest;
-use App\Models\InvestorKycSubmission;
 use App\Models\SpotlightEntry;
 use App\Models\User;
 use App\Notifications\DealflowAdminNotification;
@@ -232,12 +231,12 @@ test('Security 8: Unauthorized Admin roles (analyst, compliance) cannot finalize
         'status' => 'pending',
     ]);
 
-    // Analyst attempt
+    // Analyst attempt (wrong desk → redirected home)
     $this->actingAs($analyst)
         ->patch(route('admin.dealflow.interests.update', $interest), ['status' => 'approved'])
-        ->assertForbidden();
+        ->assertRedirect(route('admin.founder.dashboard'));
 
-    // Compliance attempt
+    // Compliance attempt (investor desk allowed, dealflow role-gated)
     $this->actingAs($compliance)
         ->patch(route('admin.dealflow.interests.update', $interest), ['status' => 'approved'])
         ->assertForbidden();

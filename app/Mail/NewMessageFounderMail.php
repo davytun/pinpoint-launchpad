@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Str;
 
 class NewMessageFounderMail extends Mailable
 {
@@ -31,14 +32,14 @@ class NewMessageFounderMail extends Mailable
         return new Content(
             view: 'emails.messages.founder-notification',
             with: [
-                'founder_name'    => $this->founder->full_name,
+                'founder_name' => $this->founder->full_name,
                 'message_preview' => $this->message->body
-                    ? \Illuminate\Support\Str::limit($this->message->body, 150)
+                    ? Str::limit($this->message->body, 150)
                     : null,
-                'has_attachment'      => $this->message->has_attachment,
+                'has_attachment' => $this->message->has_attachment,
                 'attachment_filename' => $this->message->attachment_filename,
-                'dashboard_url'       => url('/founder/messages'),
-                'recipient_email'     => $this->founder->email,
+                'dashboard_url' => url('/founder/messages'),
+                'recipient_email' => $this->founder->email,
             ],
         );
     }

@@ -646,13 +646,6 @@ export default function AdminDashboard({
                             />
                         </div>
                     )}
-
-                    {/* ── Support ── */}
-                    {user_role === 'support' && (
-                        <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-                            <MetricCard label="Unread Messages" value={metrics.my_open_messages ?? 0} icon={MessageSquare} href="/admin/founder/messages" />
-                        </div>
-                    )}
                 </div>
             </div>
         </AdminLayout>

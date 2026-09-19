@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { ExternalLink, TrendingDown, TrendingUp } from 'lucide-react';
+import { TrendingDown, TrendingUp } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from 'recharts';
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
@@ -140,23 +140,6 @@ export default function AdminRevenue({ metrics, currency }: PageProps) {
 
                 {/* ── Main Scrollable Content ─────────────────────────────────── */}
                 <div className="min-h-0 flex-1 overflow-auto bg-[#F9F9FB] p-6">
-                    {/* Paystack reminder */}
-                    <div className="mb-6 flex items-center gap-3 rounded-xl border border-[#3A54A5]/20 bg-[#3A54A5]/5 px-5 py-3 shadow-xs">
-                        <ExternalLink className="size-4 shrink-0 text-[#3A54A5]" />
-                        <p className="text-[12px] font-medium text-zinc-600">
-                            View full transaction history, refunds, and customer details on your{' '}
-                            <a
-                                href="https://dashboard.paystack.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-semibold text-[#3A54A5] transition-colors hover:underline"
-                            >
-                                Paystack dashboard
-                            </a>
-                            .
-                        </p>
-                    </div>
-
                     {/* Charts row */}
                     <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
                         {/* 6-month trend */}

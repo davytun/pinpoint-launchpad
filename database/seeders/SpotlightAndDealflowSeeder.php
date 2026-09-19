@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\AuditAssignment;
-use App\Models\AuditLog;
 use App\Models\DiagnosticSession;
 use App\Models\Founder;
 use App\Models\FounderDocument;
@@ -36,41 +35,41 @@ class SpotlightAndDealflowSeeder extends Seeder
             $h3 = $highlights[2] ?? 'Exceptional founder pedigree';
             $h4 = $highlights[3] ?? 'Clear path to profitability';
 
-            $streamContent = "BT\n" .
-                "/F1 22 Tf\n" .
-                "50 720 Td\n" .
-                "(" . addcslashes($title, "()") . " - Pitch Deck) Tj\n" .
-                "/F1 13 Tf\n" .
-                "0 -35 Td\n" .
-                "(" . addcslashes($tagline, "()") . ") Tj\n" .
-                "0 -25 Td\n" .
-                "(Sector: " . addcslashes($sector, "()") . " | Target Raise: " . addcslashes($raise, "()") . ") Tj\n" .
-                "0 -40 Td\n" .
-                "/F1 15 Tf\n" .
-                "(Key Investment Highlights:) Tj\n" .
-                "/F1 12 Tf\n" .
-                "0 -25 Td\n" .
-                "(- 1. " . addcslashes($h1, "()") . ") Tj\n" .
-                "0 -22 Td\n" .
-                "(- 2. " . addcslashes($h2, "()") . ") Tj\n" .
-                "0 -22 Td\n" .
-                "(- 3. " . addcslashes($h3, "()") . ") Tj\n" .
-                "0 -22 Td\n" .
-                "(- 4. " . addcslashes($h4, "()") . ") Tj\n" .
-                "0 -45 Td\n" .
-                "/F1 10 Tf\n" .
-                "(Confidential Document - Pinpoint Venture Launchpad Verified PARAGON Audit) Tj\n" .
-                "ET";
+            $streamContent = "BT\n".
+                "/F1 22 Tf\n".
+                "50 720 Td\n".
+                '('.addcslashes($title, '()')." - Pitch Deck) Tj\n".
+                "/F1 13 Tf\n".
+                "0 -35 Td\n".
+                '('.addcslashes($tagline, '()').") Tj\n".
+                "0 -25 Td\n".
+                '(Sector: '.addcslashes($sector, '()').' | Target Raise: '.addcslashes($raise, '()').") Tj\n".
+                "0 -40 Td\n".
+                "/F1 15 Tf\n".
+                "(Key Investment Highlights:) Tj\n".
+                "/F1 12 Tf\n".
+                "0 -25 Td\n".
+                '(- 1. '.addcslashes($h1, '()').") Tj\n".
+                "0 -22 Td\n".
+                '(- 2. '.addcslashes($h2, '()').") Tj\n".
+                "0 -22 Td\n".
+                '(- 3. '.addcslashes($h3, '()').") Tj\n".
+                "0 -22 Td\n".
+                '(- 4. '.addcslashes($h4, '()').") Tj\n".
+                "0 -45 Td\n".
+                "/F1 10 Tf\n".
+                "(Confidential Document - Pinpoint Venture Launchpad Verified PARAGON Audit) Tj\n".
+                'ET';
 
             $streamLen = strlen($streamContent);
 
-            return "%PDF-1.4\n" .
-                "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n" .
-                "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n" .
-                "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n" .
-                "4 0 obj\n<< /Length {$streamLen} >>\nstream\n{$streamContent}\nendstream\nendobj\n" .
-                "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n" .
-                "xref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000244 00000 n \n0000000350 00000 n \n" .
+            return "%PDF-1.4\n".
+                "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n".
+                "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n".
+                "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj\n".
+                "4 0 obj\n<< /Length {$streamLen} >>\nstream\n{$streamContent}\nendstream\nendobj\n".
+                "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n".
+                "xref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000244 00000 n \n0000000350 00000 n \n".
                 "trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n450\n%%EOF";
         };
 

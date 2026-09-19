@@ -33,6 +33,7 @@ class PlatformAnnouncementNotification extends Notification implements ShouldQue
     public function toMail(object $notifiable): MailMessage
     {
         $mail = (new MailMessage)->subject($this->announcement->title)->line($this->announcement->body);
+
         return $this->announcement->destination_url ? $mail->action('View update', $this->announcement->destination_url) : $mail;
     }
 

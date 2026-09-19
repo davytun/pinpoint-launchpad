@@ -27,7 +27,7 @@ class FounderSpotlightController extends Controller
             'pitch_decks' => $founder->documents()
                 ->where(function ($q) {
                     $q->where('category', 'pitch_deck')
-                      ->orWhere('visibility', 'spotlight');
+                        ->orWhere('visibility', 'spotlight');
                 })
                 ->latest()
                 ->get(['id', 'original_filename', 'is_reviewed', 'created_at']),

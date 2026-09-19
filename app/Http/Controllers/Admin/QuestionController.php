@@ -31,9 +31,9 @@ class QuestionController extends Controller
     {
         $validated = $request->validate([
             'question_text' => ['required', 'string'],
-            'sub_text'      => ['nullable', 'string'],
-            'points'        => ['required', 'integer', 'min:1', 'max:20'],
-            'is_active'     => ['required', 'boolean'],
+            'sub_text' => ['nullable', 'string'],
+            'points' => ['required', 'integer', 'min:1', 'max:20'],
+            'is_active' => ['required', 'boolean'],
         ]);
 
         $question->update($validated);

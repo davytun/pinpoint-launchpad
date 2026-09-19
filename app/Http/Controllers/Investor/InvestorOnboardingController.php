@@ -66,7 +66,7 @@ class InvestorOnboardingController extends Controller
         try {
             Investor::where('account_status', Investor::ACCOUNT_STATUS_ACTIVE)
                 ->whereKeyNot($investor->id)
-                ->each(fn (Investor $recipient) => $recipient->notify(new InvestorJoinedNotification()));
+                ->each(fn (Investor $recipient) => $recipient->notify(new InvestorJoinedNotification));
         } catch (\Throwable) {
             // Notification queue failure should not crash onboarding
         }

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Setting;
+use Illuminate\Database\Seeder;
 
 class SettingsSeeder extends Seeder
 {
@@ -11,7 +11,7 @@ class SettingsSeeder extends Seeder
     {
         $defaults = [
             'diagnostic_cooldown_days' => '30',
-            'diagnostic_version'       => '1',
+            'diagnostic_version' => '1',
         ];
 
         foreach ($defaults as $key => $value) {

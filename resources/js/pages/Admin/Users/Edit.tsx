@@ -67,7 +67,6 @@ export default function AdminUsersEdit({ member, is_self }: PageProps) {
                             <option value="compliance">Compliance — Investor desk</option>
                             <option value="investor_relations">Investor Relations — Investor desk</option>
                             <option value="superadmin">Super Admin — Platform</option>
-                            {member.role === 'support' && <option value="support">Support (retired)</option>}
                         </select>
                         {is_self && <p className="mt-1 text-xs font-semibold text-amber-600">You cannot change your own role.</p>}
                         {errors.role && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.role}</p>}

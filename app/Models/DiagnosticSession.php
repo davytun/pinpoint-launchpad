@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class DiagnosticSession extends Model
 {
@@ -27,10 +27,10 @@ class DiagnosticSession extends Model
     ];
 
     protected $casts = [
-        'answers'       => 'array',
+        'answers' => 'array',
         'pillar_scores' => 'array',
         'cooldown_until' => 'datetime',
-        'completed_at'  => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     public function scopeByEmail(Builder $query, string $email): Builder
@@ -55,11 +55,11 @@ class DiagnosticSession extends Model
     public function getScoreBandLabel(): string
     {
         return match ($this->score_band) {
-            'low'      => 'Not Ready',
-            'mid_low'  => 'Early Stage',
+            'low' => 'Not Ready',
+            'mid_low' => 'Early Stage',
             'mid_high' => 'Getting Closer',
-            'high'     => 'Investor Ready',
-            default    => 'Unknown',
+            'high' => 'Investor Ready',
+            default => 'Unknown',
         };
     }
 
@@ -67,6 +67,7 @@ class DiagnosticSession extends Model
     {
         $scores = $this->pillar_scores;
         asort($scores);
+
         return ucfirst((string) array_key_first($scores));
     }
 
@@ -75,6 +76,7 @@ class DiagnosticSession extends Model
         $scores = $this->pillar_scores;
         arsort($scores);
         $top = array_slice(array_keys($scores), 0, 2);
+
         return implode(' and ', array_map('ucfirst', $top));
     }
 }

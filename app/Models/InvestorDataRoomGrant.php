@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class InvestorDataRoomGrant extends Model
 {
     use HasUlids;
+
     protected $fillable = ['investor_id', 'profile_id', 'granted_by_founder', 'granted_at', 'revoked_at'];
 
     protected function casts(): array
@@ -16,9 +17,23 @@ class InvestorDataRoomGrant extends Model
         return ['granted_at' => 'datetime', 'revoked_at' => 'datetime'];
     }
 
-    public function investor(): BelongsTo { return $this->belongsTo(Investor::class); }
-    public function profile(): BelongsTo { return $this->belongsTo(FounderProfile::class, 'profile_id'); }
-    public function grantor(): BelongsTo { return $this->belongsTo(Founder::class, 'granted_by_founder'); }
+    public function investor(): BelongsTo
+    {
+        return $this->belongsTo(Investor::class);
+    }
 
-    public function isActive(): bool { return $this->revoked_at === null; }
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(FounderProfile::class, 'profile_id');
+    }
+
+    public function grantor(): BelongsTo
+    {
+        return $this->belongsTo(Founder::class, 'granted_by_founder');
+    }
+
+    public function isActive(): bool
+    {
+        return $this->revoked_at === null;
+    }
 }

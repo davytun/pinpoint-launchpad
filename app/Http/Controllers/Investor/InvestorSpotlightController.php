@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Investor;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
+use App\Models\FounderProfile;
 use App\Models\SpotlightEntry;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class InvestorSpotlightController extends Controller
             ->get()
             ->map(fn (SpotlightEntry $entry) => $this->entryCard($entry));
 
-        $categories = \App\Models\FounderProfile::whereNotNull('sector')
+        $categories = FounderProfile::whereNotNull('sector')
             ->where('sector', '!=', '')
             ->distinct()
             ->orderBy('sector')

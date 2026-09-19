@@ -37,10 +37,25 @@ class InvestorInterest extends Model
         ];
     }
 
-    public function investor(): BelongsTo { return $this->belongsTo(Investor::class); }
-    public function profile(): BelongsTo { return $this->belongsTo(FounderProfile::class, 'profile_id'); }
-    public function reviewer(): BelongsTo { return $this->belongsTo(Founder::class, 'reviewed_by_founder'); }
-    public function diligenceRequests(): HasMany { return $this->hasMany(DiligenceRequest::class, 'interest_id'); }
+    public function investor(): BelongsTo
+    {
+        return $this->belongsTo(Investor::class);
+    }
+
+    public function profile(): BelongsTo
+    {
+        return $this->belongsTo(FounderProfile::class, 'profile_id');
+    }
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(Founder::class, 'reviewed_by_founder');
+    }
+
+    public function diligenceRequests(): HasMany
+    {
+        return $this->hasMany(DiligenceRequest::class, 'interest_id');
+    }
 
     public function isFounderCall(): bool
     {
@@ -142,6 +157,7 @@ class InvestorInterest extends Model
             if ($this->founder_decision === 'approved') {
                 return 'Founder Coordination in Progress';
             }
+
             return 'Pinpoint Reviewing';
         }
 
@@ -155,6 +171,7 @@ class InvestorInterest extends Model
             if ($this->status === 'approved' || $this->founder_decision === 'approved') {
                 return 'Approved';
             }
+
             return 'Pinpoint Reviewing';
         }
 

@@ -250,7 +250,9 @@ Route::prefix('diagnostic')->name('diagnostic.')->group(function () {
     Route::get('/email-gate', [DiagnosticController::class, 'emailGate'])->name('email-gate');
     Route::post('/capture-email', [DiagnosticController::class, 'captureEmail'])->name('capture-email')->middleware('throttle:5,1');
     Route::get('/result', [DiagnosticController::class, 'result'])->name('result');
-    Route::get('/result/{id}', [DiagnosticController::class, 'viewById'])->name('view');
+    Route::get('/result/{id}', [DiagnosticController::class, 'viewById'])
+        ->middleware('signed')
+        ->name('view');
     Route::post('/send-checklist', [DiagnosticController::class, 'sendChecklist'])->name('send-checklist')->middleware('throttle:3,5');
     Route::get('/blocked', [DiagnosticController::class, 'blocked'])->name('blocked');
 });
@@ -386,10 +388,13 @@ Route::prefix('verify')->name('verify.')->group(function () {
 
 // Tester guide PDF — token-protected, no auth required
 Route::get('/tester-guide', function () {
-    $token = request('token');
-    if ($token !== env('TESTER_GUIDE_TOKEN', 'pinpoint-beta-2026')) {
+    $expected = (string) env('TESTER_GUIDE_TOKEN', '');
+    $token = (string) request('token', '');
+
+    if ($expected === '' || $token === '' || ! hash_equals($expected, $token)) {
         abort(403);
     }
+
     $pdf = Pdf::loadView('pdfs.tester-guide')
         ->setPaper('a4', 'portrait');
 

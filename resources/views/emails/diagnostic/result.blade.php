@@ -91,7 +91,7 @@
   </div>
   @else
   <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
-    <a href="{{ route('diagnostic.view', $session->id) }}" class="cta-button" style="background-color: #6B7280;">
+    <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('diagnostic.view', now()->addDays(30), ['id' => $session->id]) }}" class="cta-button" style="background-color: #6B7280;">
       View Your Results
     </a>
   </div>

@@ -100,7 +100,9 @@ test('the secure agreement link establishes the paid founder session once', func
         return true;
     });
 
-    $this->get($agreementMail->agreementUrl)
+    // Invite link is one-shot: consume token, establish session, land on confirm-details.
+    $this->followingRedirects()
+        ->get($agreementMail->agreementUrl)
         ->assertOk()
         ->assertInertia(fn ($page) => $page->component('Onboarding/ConfirmDetails'));
 

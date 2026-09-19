@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Models\InvestorInterest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use App\Models\InvestorInterest;
 use Illuminate\Notifications\Notification;
 
 class InvestorInterestDecisionNotification extends Notification implements ShouldQueue

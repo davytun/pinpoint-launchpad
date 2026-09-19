@@ -2,16 +2,16 @@
 
 namespace App\Providers;
 
-use App\Models\Payment;
 use App\Models\Founder;
 use App\Models\Investor;
+use App\Models\Payment;
 use App\Observers\PaymentObserver;
 use App\Services\BoldSignService;
 use App\Services\DocumentService;
 use App\Services\MessageService;
 use App\Services\PaystackService;
 use App\Services\ScoringService;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -41,21 +41,21 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Resolve password reset URL conflict between different auth guards
-        \Illuminate\Auth\Notifications\ResetPassword::createUrlUsing(function ($notifiable, string $token) {
+        ResetPassword::createUrlUsing(function ($notifiable, string $token) {
             if ($notifiable instanceof Founder) {
                 return route('founder.password.reset', [
                     'token' => $token,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);
             }
-            
+
             if ($notifiable instanceof Investor) {
                 return route('investor.password.reset', [
                     'token' => $token,
                     'email' => $notifiable->getEmailForPasswordReset(),
                 ]);
             }
-            
+
             return route('password.reset', [
                 'token' => $token,
                 'email' => $notifiable->getEmailForPasswordReset(),

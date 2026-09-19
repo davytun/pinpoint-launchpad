@@ -1,7 +1,7 @@
 import { InvestorHeader } from '@/components/investor-header';
-import { PinpointLogo } from '@/components/pinpoint-logo';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Clock3, Lock, MessageSquare, XCircle } from 'lucide-react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { CheckCircle2, Clock3, Lock, MessageSquare, XCircle } from 'lucide-react';
+import { FormEvent, useState } from 'react';
 
 interface DiligenceRequest {
     id: string;
@@ -24,12 +24,147 @@ interface DiligenceRequest {
     };
 }
 
+interface EligibleProfile {
+    slug: string;
+    company_name: string;
+    sector?: string | null;
+}
+
+const CATEGORIES = [
+    { value: 'financial', label: 'Financial' },
+    { value: 'operational', label: 'Operational' },
+    { value: 'legal_governance', label: 'Legal / Governance' },
+    { value: 'product_market', label: 'Product / Market' },
+    { value: 'document_request', label: 'Document request' },
+    { value: 'general_clarification', label: 'General clarification' },
+] as const;
+
 function formatDate(iso?: string | null): string {
     if (!iso) return '—';
     return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' });
 }
 
-export default function DiligenceIndex({ diligence_requests }: { diligence_requests: DiligenceRequest[] }) {
+function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
+    const [slug, setSlug] = useState(profiles[0]?.slug ?? '');
+    const form = useForm({
+        category: 'general_clarification' as (typeof CATEGORIES)[number]['value'],
+        subject: '',
+        request_details: '',
+        data_room_required: false,
+    });
+
+    function submit(e: FormEvent) {
+        e.preventDefault();
+        if (!slug) return;
+        form.post(route('investor.diligence.store', slug), {
+            onSuccess: () => form.reset('subject', 'request_details', 'data_room_required'),
+        });
+    }
+
+    if (profiles.length === 0) {
+        return null;
+    }
+
+    const inputClass =
+        'w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 shadow-2xs focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none';
+
+    return (
+        <form onSubmit={submit} className="mb-8 rounded-3xl border border-white/80 bg-white p-6 shadow-[0_15px_40px_rgba(33,56,120,0.06)] sm:p-8">
+            <h2 className="text-lg font-bold text-zinc-950">Submit a diligence inquiry</h2>
+            <p className="mt-1 text-sm text-zinc-500">
+                Available after a completed founder introduction. Pinpoint IR coordinates the response — never a direct founder DM.
+            </p>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-500 uppercase">Startup</label>
+                    <select value={slug} onChange={(e) => setSlug(e.target.value)} className={inputClass} required>
+                        {profiles.map((p) => (
+                            <option key={p.slug} value={p.slug}>
+                                {p.company_name}
+                                {p.sector ? ` · ${p.sector}` : ''}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div>
+                    <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-500 uppercase">Category</label>
+                    <select
+                        value={form.data.category}
+                        onChange={(e) => form.setData('category', e.target.value as typeof form.data.category)}
+                        className={inputClass}
+                        required
+                    >
+                        {CATEGORIES.map((c) => (
+                            <option key={c.value} value={c.value}>
+                                {c.label}
+                            </option>
+                        ))}
+                    </select>
+                    {form.errors.category && <p className="mt-1 text-xs font-semibold text-rose-600">{form.errors.category}</p>}
+                </div>
+            </div>
+
+            <div className="mt-4">
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-500 uppercase">Subject</label>
+                <input
+                    type="text"
+                    value={form.data.subject}
+                    onChange={(e) => form.setData('subject', e.target.value)}
+                    maxLength={255}
+                    className={inputClass}
+                    placeholder="e.g. Clarification on Q3 gross margins"
+                    required
+                />
+                {form.errors.subject && <p className="mt-1 text-xs font-semibold text-rose-600">{form.errors.subject}</p>}
+            </div>
+
+            <div className="mt-4">
+                <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-500 uppercase">Request details</label>
+                <textarea
+                    value={form.data.request_details}
+                    onChange={(e) => form.setData('request_details', e.target.value)}
+                    rows={4}
+                    maxLength={2000}
+                    className={inputClass}
+                    placeholder="What should Pinpoint IR ask the founder to clarify?"
+                    required
+                />
+                {form.errors.request_details && (
+                    <p className="mt-1 text-xs font-semibold text-rose-600">{form.errors.request_details}</p>
+                )}
+            </div>
+
+            <label className="mt-4 flex items-center gap-2 text-sm text-zinc-700">
+                <input
+                    type="checkbox"
+                    checked={form.data.data_room_required}
+                    onChange={(e) => form.setData('data_room_required', e.target.checked)}
+                    className="rounded border-zinc-300"
+                />
+                This inquiry may require data room materials
+            </label>
+
+            <div className="mt-5 flex justify-end">
+                <button
+                    type="submit"
+                    disabled={form.processing || !slug}
+                    className="rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#2D4182] disabled:opacity-50"
+                >
+                    {form.processing ? 'Submitting…' : 'Submit to Pinpoint IR'}
+                </button>
+            </div>
+        </form>
+    );
+}
+
+export default function DiligenceIndex({
+    diligence_requests,
+    eligible_profiles = [],
+}: {
+    diligence_requests: DiligenceRequest[];
+    eligible_profiles?: EligibleProfile[];
+}) {
     return (
         <main className="min-h-screen bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
             <Head title="Post-Introduction Diligence — Pinpoint Investment Network" />
@@ -45,20 +180,25 @@ export default function DiligenceIndex({ diligence_requests }: { diligence_reque
                     </p>
                 </div>
 
+                <DiligenceSubmitForm profiles={eligible_profiles} />
+
                 {diligence_requests.length === 0 ? (
                     <div className="rounded-3xl border border-white/80 bg-white p-12 text-center shadow-[0_15px_40px_rgba(33,56,120,0.06)]">
                         <MessageSquare className="mx-auto mb-3 size-12 text-zinc-300" />
                         <h2 className="text-lg font-bold text-zinc-900">No diligence inquiries submitted yet</h2>
                         <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500">
-                            After completing an introductory call or reviewing a venture on Spotlight, you can submit specific diligence queries to
-                            Pinpoint IR.
+                            {eligible_profiles.length > 0
+                                ? 'Use the form above to submit your first post-introduction inquiry to Pinpoint IR.'
+                                : 'Diligence opens after Pinpoint marks a founder introduction as completed. Track call status under Interests.'}
                         </p>
-                        <Link
-                            href={route('investor.interests.index')}
-                            className="mt-6 inline-flex rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#2D4182]"
-                        >
-                            View Active Engagements
-                        </Link>
+                        {eligible_profiles.length === 0 && (
+                            <Link
+                                href={route('investor.interests.index')}
+                                className="mt-6 inline-flex rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#2D4182]"
+                            >
+                                View Active Engagements
+                            </Link>
+                        )}
                     </div>
                 ) : (
                     <div className="grid gap-5">
@@ -114,13 +254,11 @@ export default function DiligenceIndex({ diligence_requests }: { diligence_reque
                                         </div>
                                     </div>
 
-                                    {/* Request details */}
                                     <div className="mt-4 rounded-2xl bg-zinc-50 p-4 text-sm text-zinc-700">
                                         <p className="mb-1 text-xs font-bold tracking-wider text-zinc-400 uppercase">Your Inquiry:</p>
                                         <p className="whitespace-pre-wrap">{req.request_details}</p>
                                     </div>
 
-                                    {/* Approved Response */}
                                     {req.investor_visible_response && (
                                         <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5">
                                             <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-wider text-emerald-800 uppercase">
@@ -133,7 +271,6 @@ export default function DiligenceIndex({ diligence_requests }: { diligence_reque
                                         </div>
                                     )}
 
-                                    {/* Action footer */}
                                     <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
                                         <p className="text-xs text-zinc-500">Coordinated securely via Pinpoint Investor Relations.</p>
                                         <Link

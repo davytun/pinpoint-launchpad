@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Founder;
 use App\Models\Message;
 use App\Models\MessageThread;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -53,16 +54,16 @@ class MessageService
         }
 
         $storedName = null;
-        $path       = null;
+        $path = null;
 
         if ($attachment !== null) {
             $this->validateAttachment($attachment);
 
-            $storedName = Str::uuid() . '.' . $attachment->getClientOriginalExtension();
-            $path       = 'message-attachments/' . $thread->id . '/' . $storedName;
+            $storedName = Str::uuid().'.'.$attachment->getClientOriginalExtension();
+            $path = 'message-attachments/'.$thread->id.'/'.$storedName;
 
             Storage::disk('local')->putFileAs(
-                'message-attachments/' . $thread->id,
+                'message-attachments/'.$thread->id,
                 $attachment,
                 $storedName
             );
@@ -71,16 +72,16 @@ class MessageService
         $cleanBody = $body !== null ? Str::limit(strip_tags(trim($body)), 2000) : null;
 
         $message = Message::create([
-            'thread_id'               => $thread->id,
-            'sender_type'             => $senderType,
-            'sender_id'               => $senderId,
-            'body'                    => $cleanBody,
-            'has_attachment'          => $attachment !== null,
-            'attachment_filename'     => $attachment?->getClientOriginalName(),
-            'attachment_stored_name'  => $storedName,
-            'attachment_path'         => $path,
-            'attachment_mime_type'    => $attachment?->getMimeType(),
-            'attachment_size'         => $attachment?->getSize(),
+            'thread_id' => $thread->id,
+            'sender_type' => $senderType,
+            'sender_id' => $senderId,
+            'body' => $cleanBody,
+            'has_attachment' => $attachment !== null,
+            'attachment_filename' => $attachment?->getClientOriginalName(),
+            'attachment_stored_name' => $storedName,
+            'attachment_path' => $path,
+            'attachment_mime_type' => $attachment?->getMimeType(),
+            'attachment_size' => $attachment?->getSize(),
         ]);
 
         $thread->update(['last_message_at' => now()]);
@@ -96,14 +97,14 @@ class MessageService
 
     public function validateAttachment(UploadedFile $file): void
     {
-        if (!\in_array($file->getMimeType(), self::ALLOWED_MIMES)) {
+        if (! \in_array($file->getMimeType(), self::ALLOWED_MIMES)) {
             throw ValidationException::withMessages([
                 'attachment' => 'This file type is not allowed.',
             ]);
         }
 
         $extension = strtolower($file->getClientOriginalExtension());
-        if (!\in_array($extension, self::ALLOWED_EXTENSIONS)) {
+        if (! \in_array($extension, self::ALLOWED_EXTENSIONS)) {
             throw ValidationException::withMessages([
                 'attachment' => 'This file extension is not permitted.',
             ]);
@@ -118,12 +119,13 @@ class MessageService
 
     public function downloadAttachment(Message $message): StreamedResponse
     {
-        if (!$message->has_attachment || !$message->attachment_path) {
+        if (! $message->has_attachment || ! $message->attachment_path) {
             abort(404);
         }
 
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk('local');
+
         return $disk->download(
             $message->attachment_path,
             $message->attachment_filename

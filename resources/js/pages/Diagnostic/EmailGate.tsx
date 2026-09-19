@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Loader2, Lock } from 'lucide-react';
 
 export default function EmailGate() {
-    const { flash } = usePage<{ flash: { error?: string } }>().props;
+    const { flash } = usePage<{ flash: { error?: string; success?: string; info?: string } }>().props;
     const form = useForm({
         email: '',
         name: '',
@@ -107,11 +107,31 @@ export default function EmailGate() {
 
                                 {/* Bottom — email form */}
                                 <div className="border-t border-zinc-100 bg-zinc-50/50 px-8 pt-7 pb-8">
+                                    {flash?.success && (
+                                        <div
+                                            role="status"
+                                            className="mb-6 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+                                        >
+                                            {flash.success}
+                                        </div>
+                                    )}
+                                    {flash?.info && (
+                                        <div
+                                            role="status"
+                                            className="mb-6 rounded-xl border border-[#3A54A5]/20 bg-[#3A54A5]/8 px-4 py-3 text-sm font-medium text-[#2D4182]"
+                                        >
+                                            {flash.info}
+                                        </div>
+                                    )}
                                     {flash?.error && (
                                         <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
                                             {flash.error}
                                         </div>
                                     )}
+                                    <p className="mb-5 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-[12px] leading-relaxed text-zinc-600">
+                                        After you unlock, your full PARAGON report is emailed to you and shown on the next page. Check your inbox
+                                        (and spam folder) if you do not see it within a few minutes.
+                                    </p>
                                     <form onSubmit={submit} noValidate className="flex flex-col gap-4">
                                         <div className="flex flex-col gap-1.5">
                                             <Label htmlFor="name" className="text-[9px] font-black tracking-[0.22em] text-zinc-500 uppercase">
@@ -171,7 +191,7 @@ export default function EmailGate() {
                                                 {form.processing ? (
                                                     <>
                                                         <Loader2 className="size-4 animate-spin" />
-                                                        Unlocking…
+                                                        Sending report…
                                                     </>
                                                 ) : (
                                                     <>

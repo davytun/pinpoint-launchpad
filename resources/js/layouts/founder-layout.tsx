@@ -3,10 +3,10 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
-import GlobalLoader from '@/components/GlobalLoader';
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useNotificationPolling } from '@/hooks/use-notification-polling';
 import { cn } from '@/lib/utils';
 
 interface FounderLayoutProps {
@@ -112,12 +112,21 @@ function FounderNotifications({
     align?: 'center' | 'end' | 'start';
 }) {
     function markAsRead(notification: FounderNotification) {
+        const visit = () => {
+            if (notification.data.destination_url) {
+                router.visit(notification.data.destination_url);
+            }
+        };
+
         if (!notification.read_at) {
-            router.patch(route('founder.notifications.read', notification.id), {}, { preserveScroll: true });
+            router.patch(route('founder.notifications.read', notification.id), {}, {
+                preserveScroll: true,
+                onSuccess: visit,
+            });
+            return;
         }
-        if (notification.data.destination_url) {
-            router.get(notification.data.destination_url);
-        }
+
+        visit();
     }
 
     return (
@@ -149,15 +158,20 @@ function FounderNotifications({
             <DropdownMenuContent align={align} side={side} sideOffset={12} className="w-80 overflow-hidden rounded-2xl border-zinc-200 p-0 shadow-xl">
                 <div className="flex items-center justify-between border-b border-zinc-100 bg-zinc-50/50 px-4 py-3">
                     <span className="text-sm font-semibold text-zinc-900">Notifications</span>
-                    {unreadCount > 0 && (
-                        <button
-                            type="button"
-                            onClick={() => router.patch(route('founder.notifications.read-all'), {}, { preserveScroll: true })}
-                            className="text-[11px] font-semibold text-[#3A54A5] hover:underline"
-                        >
-                            Mark all as read
-                        </button>
-                    )}
+                    <div className="flex items-center gap-3">
+                        {unreadCount > 0 && (
+                            <button
+                                type="button"
+                                onClick={() => router.patch(route('founder.notifications.read-all'), {}, { preserveScroll: true })}
+                                className="text-[11px] font-semibold text-[#3A54A5] hover:underline"
+                            >
+                                Mark all as read
+                            </button>
+                        )}
+                        <Link href={route('founder.notifications.index')} className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-900 hover:underline">
+                            View all
+                        </Link>
+                    </div>
                 </div>
                 {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -394,6 +408,8 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
     const recentNotifications =
         usePage<{ platform_recent_notifications?: { founder?: FounderNotification[] } }>().props.platform_recent_notifications?.founder ?? [];
 
+    useNotificationPolling(true);
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [collapsed, setCollapsed] = useState<boolean>(() => {
         try {
@@ -455,8 +471,6 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
 
     return (
         <div className="flex h-screen max-h-screen flex-col gap-3.5 overflow-hidden bg-[#F4F4F6] p-3 text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white lg:flex-row lg:p-3.5">
-            <GlobalLoader />
-
             {/* ── Desktop Sidebar ── */}
             <aside
                 className={cn(

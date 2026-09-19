@@ -53,6 +53,33 @@ class InvestorInterestDecisionNotification extends Notification implements Shoul
      */
     public function toArray(object $notifiable): array
     {
-        return ['type' => 'investor_interest_decision', 'interest_id' => $this->interest->id, 'profile_id' => $this->interest->profile_id, 'status' => $this->status, 'data_room_granted' => $this->dataRoomGranted];
+        $company = $this->interest->profile->founder?->company_name ?? 'the startup';
+        $accepted = $this->status === 'approved';
+
+        if ($this->dataRoomGranted) {
+            return [
+                'type' => 'investor_interest_decision',
+                'title' => 'Data room access granted',
+                'body' => "Pinpoint granted you secure data room access for {$company}.",
+                'destination_url' => route('investor.data-rooms.show', $this->interest->profile->slug),
+                'interest_id' => $this->interest->id,
+                'profile_id' => $this->interest->profile_id,
+                'status' => $this->status,
+                'data_room_granted' => true,
+            ];
+        }
+
+        return [
+            'type' => 'investor_interest_decision',
+            'title' => $accepted ? 'Request approved' : 'Request not approved',
+            'body' => $accepted
+                ? "Your engagement request for {$company} was approved. Pinpoint is coordinating next steps."
+                : "Your engagement request for {$company} could not be approved at this time.",
+            'destination_url' => route('investor.interests.index'),
+            'interest_id' => $this->interest->id,
+            'profile_id' => $this->interest->profile_id,
+            'status' => $this->status,
+            'data_room_granted' => false,
+        ];
     }
 }

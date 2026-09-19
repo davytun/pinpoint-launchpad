@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Investor;
 
 use App\Http\Controllers\Controller;
+use App\Support\NotificationPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -12,7 +13,22 @@ class NotificationController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('Notifications/Index', ['notifications' => Auth::guard('investor')->user()->notifications()->latest()->paginate(25), 'read_all_url' => route('investor.notifications.read-all'), 'read_url_template' => route('investor.notifications.read', '__notification__')]);
+        $investor = Auth::guard('investor')->user();
+        $paginator = $investor->notifications()->latest()->paginate(25);
+
+        return Inertia::render('Notifications/Index', [
+            'audience' => 'investor',
+            'notifications' => [
+                'data' => NotificationPresenter::collection($paginator->getCollection()),
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+            'unread_count' => $investor->unreadNotifications()->count(),
+            'read_all_url' => route('investor.notifications.read-all'),
+            'read_url_template' => route('investor.notifications.read', ['notification' => '__notification__']),
+        ]);
     }
 
     public function read(string $notification): RedirectResponse

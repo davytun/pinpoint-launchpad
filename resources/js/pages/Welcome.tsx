@@ -15,6 +15,7 @@ import ParagonModel from '@/components/landing/paragon-model';
 import PiaTeaser from '@/components/landing/pia-teaser';
 import ProgramsPricing from '@/components/landing/programs-pricing';
 import WhyPinpoint from '@/components/landing/why-pinpoint';
+import { useEffect } from 'react';
 
 interface BlogPostItem {
     title: string;
@@ -28,6 +29,22 @@ interface BlogPostItem {
 }
 
 export default function Welcome({ latest_posts = [] }: { latest_posts?: BlogPostItem[] }) {
+    useEffect(() => {
+        const hash = window.location.hash.replace('#', '');
+        if (!hash) return;
+
+        const scrollToHash = () => {
+            const el = document.getElementById(hash);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        };
+
+        // Wait a tick for sections to mount
+        const t = window.setTimeout(scrollToHash, 80);
+        return () => window.clearTimeout(t);
+    }, []);
+
     return (
         <>
             <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900">

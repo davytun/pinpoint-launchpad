@@ -52,8 +52,17 @@ class IntroductionCompletedNotification extends Notification implements ShouldQu
      */
     public function toArray(object $notifiable): array
     {
+        $company = $this->interest->profile->founder?->company_name ?? 'the startup';
+        $investorName = $this->interest->investor?->profile?->full_name ?? 'the investor';
+        $isFounder = $notifiable instanceof Founder;
+
         return [
             'type' => 'introduction_completed',
+            'title' => 'Introduction call completed',
+            'body' => $isFounder
+                ? "Your introductory conversation with {$investorName} has been marked as completed."
+                : "Your introductory conversation with {$company} has been marked as completed.",
+            'destination_url' => $isFounder ? route('founder.dashboard') : route('investor.interests.index'),
             'interest_id' => $this->interest->id,
             'profile_id' => $this->interest->profile_id,
             'completed_at' => $this->interest->completed_at?->toISOString(),

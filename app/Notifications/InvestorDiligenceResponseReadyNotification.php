@@ -46,8 +46,13 @@ class InvestorDiligenceResponseReadyNotification extends Notification implements
      */
     public function toArray(object $notifiable): array
     {
+        $company = $this->diligenceRequest->profile?->founder?->company_name ?? 'the startup';
+
         return [
             'type' => 'investor_diligence_response_ready',
+            'title' => 'Diligence response available',
+            'body' => "Pinpoint released a verified response for {$company}: {$this->diligenceRequest->subject}",
+            'destination_url' => route('investor.diligence.index'),
             'diligence_request_id' => $this->diligenceRequest->id,
             'profile_id' => $this->diligenceRequest->profile_id,
             'subject' => $this->diligenceRequest->subject,

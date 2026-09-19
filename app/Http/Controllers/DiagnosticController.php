@@ -40,7 +40,7 @@ class DiagnosticController extends Controller
             return redirect()->route('diagnostic.email-gate');
         }
 
-        // If full session already completed, send to results
+        // If full session already completed, send to results (cooldown still applies for new attempts)
         if ($request->session()->has('diagnostic_session_id')) {
             return redirect()->route('diagnostic.result');
         }
@@ -234,7 +234,8 @@ class DiagnosticController extends Controller
         // 3. Always send admin notification
         Mail::to(config('mail.admin_address'))->queue(new DiagnosticResultAdminMail($session));
 
-        return redirect()->route('diagnostic.result');
+        return redirect()->route('diagnostic.result')
+            ->with('success', 'Your PARAGON report has been sent to '.$email.'. You can also review it on this page.');
     }
 
     public function result(Request $request): Response|RedirectResponse
@@ -269,20 +270,35 @@ class DiagnosticController extends Controller
 
         /** @var ScoringService $scorer */
         $scorer = app(ScoringService::class);
-        $result = $scorer->calculate($flatAnswers, $stage);
+        $result = $flatAnswers !== []
+            ? $scorer->calculate($flatAnswers, $stage)
+            : ['hard_flags' => [], 'weakest_dimensions' => [], 'network_strands' => ['commercial' => 0, 'capital' => 0]];
+
+        $scoreBand = $session->score_band ?? 'mid_high';
+        $pillarScores = is_array($session->pillar_scores) ? $session->pillar_scores : [
+            'potential' => 0,
+            'agility' => 0,
+            'risk' => 0,
+            'alignment' => 0,
+            'governance' => 0,
+            'operations' => 0,
+            'network' => 0,
+        ];
 
         return Inertia::render('Diagnostic/Result', [
-            'score' => $session->score,
-            'score_band' => $session->score_band,
-            'pillar_scores' => $session->pillar_scores,
+            'score' => (int) ($session->score ?? 0),
+            'score_band' => $scoreBand,
+            'pillar_scores' => $pillarScores,
             'score_band_label' => $session->getScoreBandLabel(),
-            'score_band_message' => self::BAND_MESSAGES[$session->score_band],
-            'next_action' => $this->nextAction($session->score_band),
-            'completed_at' => $session->completed_at->toIso8601String(),
+            'score_band_message' => self::BAND_MESSAGES[$scoreBand] ?? self::BAND_MESSAGES['mid_high'],
+            'next_action' => $this->nextAction($scoreBand),
+            'completed_at' => $session->completed_at?->toIso8601String() ?? now()->toIso8601String(),
             'describe_you' => $session->describe_you,
             'hard_flags' => $result['hard_flags'] ?? [],
             'weakest_dimensions' => $result['weakest_dimensions'] ?? [],
             'network_strands' => $result['network_strands'] ?? ['commercial' => 0, 'capital' => 0],
+            'report_email' => $session->email,
+            'email_notice' => $request->session()->get('success'),
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\NotificationPresenter;
 use App\Support\Seo;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
@@ -51,7 +52,7 @@ class HandleInertiaRequests extends Middleware
                     ? Auth::guard('founder')->user()->only(['id', 'email', 'full_name', 'company_name', 'avatar'])
                     : null,
                 'investor' => Auth::guard('investor')->check()
-                    ? Auth::guard('investor')->user()->only(['id', 'email', 'account_status'])
+                    ? Auth::guard('investor')->user()->only(['id', 'email', 'account_status', 'kyc_status'])
                     : null,
             ],
             'flash' => [
@@ -66,16 +67,26 @@ class HandleInertiaRequests extends Middleware
                 ? (int) (Auth::guard('founder')->user()->messageThread?->founder_unread_count ?? 0)
                 : null,
             'platform_unread_notifications' => [
-                'admin' => Auth::guard('web')->user()?->unreadNotifications()->count() ?? 0,
-                'founder' => Auth::guard('founder')->user()?->unreadNotifications()->count() ?? 0,
-                'investor' => Auth::guard('investor')->user()?->unreadNotifications()->count() ?? 0,
+                'admin' => Auth::guard('web')->check()
+                    ? (Auth::guard('web')->user()->unreadNotifications()->count() ?? 0)
+                    : 0,
+                'founder' => Auth::guard('founder')->check()
+                    ? (Auth::guard('founder')->user()->unreadNotifications()->count() ?? 0)
+                    : 0,
+                'investor' => Auth::guard('investor')->check()
+                    ? (Auth::guard('investor')->user()->unreadNotifications()->count() ?? 0)
+                    : 0,
             ],
             'platform_recent_notifications' => [
-                'founder' => Auth::guard('founder')->user()
-                    ? Auth::guard('founder')->user()->notifications()->latest()->take(5)->get()
+                'founder' => Auth::guard('founder')->check()
+                    ? NotificationPresenter::collection(
+                        Auth::guard('founder')->user()->notifications()->latest()->take(5)->get()
+                    )
                     : [],
-                'investor' => Auth::guard('investor')->user()
-                    ? Auth::guard('investor')->user()->notifications()->latest()->take(5)->get()
+                'investor' => Auth::guard('investor')->check()
+                    ? NotificationPresenter::collection(
+                        Auth::guard('investor')->user()->notifications()->latest()->take(5)->get()
+                    )
                     : [],
             ],
             'csrf_token' => csrf_token(),

@@ -88,9 +88,12 @@ test('complete cross-portal investor lifecycle with strict KYC gating, startup i
     expect($investor->kyc_status)->toBe(Investor::KYC_STATUS_NOT_SUBMITTED)
         ->and($investor->hasApprovedKyc())->toBeFalse();
 
-    // Spotlight is blocked for not_submitted investor
-    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.index'))->assertRedirect(route('investor.kyc.create'));
-    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.show', $profileA->slug))->assertRedirect(route('investor.kyc.create'));
+    // Spotlight catalogue is browsable (restricted actions stay gated)
+    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.index'))->assertOk();
+    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.show', $profileA->slug))->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('entry.can_submit_interest', false)
+            ->where('entry.can_view_pitch_deck', false));
 
     // ─────────────────────────────────────────────────────────────────────────
     // STEP 2: Initial KYC Submission (KYC = pending)
@@ -102,9 +105,9 @@ test('complete cross-portal investor lifecycle with strict KYC gating, startup i
 
     expect($investor->fresh()->kyc_status)->toBe(Investor::KYC_STATUS_PENDING);
 
-    // Spotlight remains blocked for pending investor
-    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.index'))->assertRedirect(route('investor.kyc.create'));
-    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.show', $profileA->slug))->assertRedirect(route('investor.kyc.create'));
+    // Spotlight remains browsable while KYC is pending
+    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.index'))->assertOk();
+    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.show', $profileA->slug))->assertOk();
 
     // Duplicate submission while pending is rejected
     $this->actingAs($investor, 'investor')->post(route('investor.kyc.store'), [
@@ -124,8 +127,8 @@ test('complete cross-portal investor lifecycle with strict KYC gating, startup i
         ->and($submission1->fresh()->status)->toBe(InvestorKycSubmission::STATUS_REJECTED)
         ->and($submission1->fresh()->review_notes)->toBe('Passport scan is blurry and corners are cropped.');
 
-    // Spotlight remains blocked for rejected investor
-    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.index'))->assertRedirect(route('investor.kyc.create'));
+    // Spotlight remains browsable after rejection
+    $this->actingAs($investor, 'investor')->get(route('investor.spotlight.index'))->assertOk();
 
     // ─────────────────────────────────────────────────────────────────────────
     // STEP 4: Investor Resubmission (KYC = pending)

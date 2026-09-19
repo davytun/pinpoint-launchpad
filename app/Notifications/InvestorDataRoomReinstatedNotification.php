@@ -38,8 +38,13 @@ class InvestorDataRoomReinstatedNotification extends Notification implements Sho
      */
     public function toArray(object $notifiable): array
     {
+        $company = $this->grant->profile->founder?->company_name ?? 'this startup';
+
         return [
             'type' => 'data_room_access_reinstated',
+            'title' => 'Data room access restored',
+            'body' => "Your data room access for {$company} has been reinstated.",
+            'destination_url' => route('investor.data-rooms.index'),
             'grant_id' => $this->grant->id,
             'profile_id' => $this->grant->profile_id,
         ];

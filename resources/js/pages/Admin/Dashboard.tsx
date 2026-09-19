@@ -54,6 +54,12 @@ interface Metrics {
     high_scorers?: number;
     needs_info_count?: number;
     my_assigned?: number;
+    pending_kyc?: number;
+    approved_kyc?: number;
+    rejected_kyc?: number;
+    active_investors?: number;
+    pending_interests?: number;
+    scheduled_founder_calls?: number;
     total_revenue?: number;
     revenue_by_currency?: { NGN: number; USD: number };
     revenue_this_month?: number;
@@ -64,7 +70,7 @@ interface Metrics {
 }
 
 interface ActivityItem {
-    type: 'diagnostic' | 'payment' | 'message';
+    type: 'diagnostic' | 'payment' | 'message' | 'kyc' | 'interest';
     description: string;
     time: string;
     email: string | null;
@@ -361,11 +367,15 @@ const activityDotColor: Record<string, string> = {
     diagnostic: 'bg-zinc-600',
     payment: 'bg-zinc-900',
     message: 'bg-zinc-400',
+    kyc: 'bg-amber-500',
+    interest: 'bg-[#3A54A5]',
 };
 const activityTypeLabel: Record<string, string> = {
     diagnostic: 'Diagnostic',
     payment: 'Payment',
     message: 'Message',
+    kyc: 'KYC',
+    interest: 'Dealflow',
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -389,6 +399,11 @@ export default function AdminDashboard({
 }: PageProps) {
     const isSuperAdmin = user_role === 'superadmin';
     const isAnalyst = user_role === 'analyst';
+    const isCompliance = user_role === 'compliance';
+    const isInvestorRelations = user_role === 'investor_relations';
+    const showFounderMetrics = desk === 'founder' || desk === 'platform';
+    const showInvestorMetrics = desk === 'investors' || desk === 'platform';
+    const showPlatformFinance = desk === 'platform' && isSuperAdmin;
     const deskHome =
         desk === 'founder' ? '/admin/founder' : desk === 'investors' ? '/admin/investors' : '/admin';
     const deskLabel =
@@ -496,130 +511,68 @@ export default function AdminDashboard({
                         </div>
                     )}
 
-                    {/* ── Superadmin ── */}
-                    {isSuperAdmin && (
-                        <>
+                    {/* ── Investor desk metrics ── */}
+                    {showInvestorMetrics && (isSuperAdmin || isCompliance || isInvestorRelations) && (
+                        <div className="mb-10">
+                            {desk === 'platform' && (
+                                <div className="mb-4 flex items-center gap-2">
+                                    <h2 className="text-[13px] font-bold tracking-wider text-zinc-900 uppercase">Investor desk</h2>
+                                </div>
+                            )}
                             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
                                 <MetricCard
-                                    label={date_range === 'all' ? 'Total Founders' : 'New Founders'}
-                                    value={metrics.total_founders ?? 0}
+                                    label="Active Investors"
+                                    value={metrics.active_investors ?? 0}
                                     icon={Users}
-                                    href="/admin/founder/founders"
+                                    href="/admin/investors/accounts"
                                     variant="blue"
                                 />
                                 <MetricCard
-                                    label="Revenue collected"
-                                    value={fmtCurrency(metrics.revenue_by_currency?.NGN ?? 0, 'NGN')}
-                                    subValue={`USD: ${fmtCurrency(metrics.revenue_by_currency?.USD ?? 0, 'USD')}`}
-                                    icon={DollarSign}
-                                    href="/admin/revenue"
-                                    variant="emerald"
-                                />
-                                <MetricCard
-                                    label="Active Audits"
-                                    value={metrics.active_audits ?? 0}
-                                    icon={Activity}
-                                    href="/admin/founder/founders?status=in_progress"
+                                    label="Pending KYC"
+                                    value={metrics.pending_kyc ?? 0}
+                                    icon={AlertTriangle}
+                                    pulse={(metrics.pending_kyc ?? 0) > 0}
+                                    href="/admin/investors/accounts?kyc_status=pending"
                                     variant="amber"
                                 />
                                 <MetricCard
-                                    label="Needs Info"
-                                    value={metrics.needs_info_count ?? 0}
-                                    icon={AlertTriangle}
-                                    pulse={(metrics.needs_info_count ?? 0) > 0}
-                                    href="/admin/founder/founders?status=needs_info"
+                                    label="Approved KYC"
+                                    value={metrics.approved_kyc ?? 0}
+                                    icon={Activity}
+                                    href="/admin/investors/accounts?kyc_status=approved"
+                                    variant="emerald"
+                                />
+                                <MetricCard
+                                    label="Pending Dealflow"
+                                    value={metrics.pending_interests ?? 0}
+                                    icon={Filter}
+                                    href="/admin/investors/dealflow/interests?status=pending"
                                     variant="purple"
                                 />
                             </div>
-
-                            {/* Charts & Activity (Masonry-style Columns) */}
-                            <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                                {/* Left Column: Charts and Activity */}
-                                <div className="flex flex-col gap-6 lg:col-span-2">
-                                    {(metrics.monthly_revenue?.length ?? 0) > 0 && (
-                                        <RevenueAreaChart data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
-                                    )}
-
-                                    <div className="min-w-0">
-                                        <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-4">
-                                            <span className="text-[15px] font-semibold text-zinc-900">Recent Activity</span>
-                                        </div>
-
-                                        {recent_activity.length === 0 ? (
-                                            <div className="rounded-[20px] border border-zinc-200/60 bg-white p-10 text-center text-sm font-medium text-zinc-500 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
-                                                No recent activity.
-                                            </div>
-                                        ) : (
-                                            <div className="overflow-hidden rounded-[20px] border border-zinc-200/60 bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
-                                                {[...recent_activity]
-                                                    .reverse()
-                                                    .slice(0, 6)
-                                                    .map((item, i) => (
-                                                        <div
-                                                            key={i}
-                                                            className="flex items-start gap-4 border-b border-zinc-100 p-4 transition-colors last:border-0 hover:bg-zinc-50/50 sm:p-5"
-                                                        >
-                                                            <span
-                                                                className={`mt-1 h-2 w-2 shrink-0 rounded-full shadow-xs ${activityDotColor[item.type] ?? 'bg-zinc-400'}`}
-                                                            />
-                                                            <div className="min-w-0 flex-1">
-                                                                <div className="flex flex-wrap items-center gap-x-2">
-                                                                    <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
-                                                                        {activityTypeLabel[item.type]}
-                                                                    </span>
-                                                                    <p className="truncate text-[13.5px] font-semibold text-zinc-900">
-                                                                        {item.description}
-                                                                    </p>
-                                                                </div>
-                                                                {item.email && (
-                                                                    <p className="mt-1 truncate text-xs font-medium text-zinc-500">{item.email}</p>
-                                                                )}
-                                                            </div>
-                                                            <span className="shrink-0 text-[11px] font-medium text-zinc-400">{item.time}</span>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        )}
-                                    </div>
+                            {(isSuperAdmin || isInvestorRelations) && (
+                                <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                                    <MetricCard
+                                        label="Scheduled Calls"
+                                        value={metrics.scheduled_founder_calls ?? 0}
+                                        icon={MessageSquare}
+                                        href="/admin/investors/dealflow/interests?call_status=scheduled"
+                                        variant="emerald"
+                                    />
+                                    <MetricCard
+                                        label="Rejected KYC"
+                                        value={metrics.rejected_kyc ?? 0}
+                                        icon={AlertCircle}
+                                        href="/admin/investors/accounts?kyc_status=rejected"
+                                        variant="gray"
+                                    />
                                 </div>
-
-                                {/* Right Column: Widgets */}
-                                <div className="flex flex-col gap-6">
-                                    {(metrics.audit_breakdown?.length ?? 0) > 0 && <AuditDonut data={metrics.audit_breakdown!} />}
-
-                                    {/* Revenue by tier */}
-                                    {metrics.revenue_by_tier && (
-                                        <div>
-                                            <div className="mb-4 flex items-center gap-4 border-b border-zinc-100 pb-4">
-                                                <span className="text-[15px] font-semibold text-zinc-900">Revenue by Tier</span>
-                                            </div>
-                                            <div className="grid grid-cols-1 gap-3">
-                                                {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
-                                                    <div
-                                                        key={tier}
-                                                        className="relative h-20 w-full overflow-hidden rounded-2xl bg-white p-4 shadow-xs ring-1 ring-zinc-200/50"
-                                                    >
-                                                        <div className="flex items-center justify-between">
-                                                            <p className="text-[13px] font-semibold text-zinc-500 capitalize">{tier}</p>
-                                                            <CreditCard className="size-3.5 text-zinc-300" />
-                                                        </div>
-                                                        <p className="mt-2 text-xl font-bold tracking-tight text-zinc-900">
-                                                            {fmtCurrency(metrics.revenue_by_tier![tier])}
-                                                        </p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Funnel Metrics */}
-                                    {metrics.funnel && <FunnelChart data={metrics.funnel} />}
-                                </div>
-                            </div>
-                        </>
+                            )}
+                        </div>
                     )}
-                    {/* ── Analyst ── */}
-                    {isAnalyst && (
+
+                    {/* ── Founder desk metrics (analyst) ── */}
+                    {showFounderMetrics && isAnalyst && (
                         <div className="mb-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
                             <MetricCard label="My Assigned" value={metrics.my_assigned ?? 0} icon={Users} href="/admin/founder/founders" variant="blue" />
                             <MetricCard
@@ -644,6 +597,137 @@ export default function AdminDashboard({
                                 href="/admin/founder/messages"
                                 variant="purple"
                             />
+                        </div>
+                    )}
+
+                    {/* ── Founder desk metrics (superadmin on founder/platform) ── */}
+                    {showFounderMetrics && isSuperAdmin && (
+                        <div className="mb-10">
+                            {desk === 'platform' && (
+                                <div className="mb-4 flex items-center gap-2">
+                                    <h2 className="text-[13px] font-bold tracking-wider text-zinc-900 uppercase">Founder desk</h2>
+                                </div>
+                            )}
+                            <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                                <MetricCard
+                                    label={date_range === 'all' ? 'Total Founders' : 'New Founders'}
+                                    value={metrics.total_founders ?? 0}
+                                    icon={Users}
+                                    href="/admin/founder/founders"
+                                    variant="blue"
+                                />
+                                <MetricCard
+                                    label="Active Audits"
+                                    value={metrics.active_audits ?? 0}
+                                    icon={Activity}
+                                    href="/admin/founder/founders?status=in_progress"
+                                    variant="amber"
+                                />
+                                <MetricCard
+                                    label="Needs Info"
+                                    value={metrics.needs_info_count ?? 0}
+                                    icon={AlertTriangle}
+                                    pulse={(metrics.needs_info_count ?? 0) > 0}
+                                    href="/admin/founder/founders?status=needs_info"
+                                    variant="purple"
+                                />
+                                <MetricCard
+                                    label="Unread Messages"
+                                    value={metrics.my_open_messages ?? 0}
+                                    icon={MessageSquare}
+                                    href="/admin/founder/messages"
+                                    variant="gray"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── Platform finance (superadmin platform desk only) ── */}
+                    {showPlatformFinance && (
+                        <>
+                            <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                                <MetricCard
+                                    label="Revenue collected"
+                                    value={fmtCurrency(metrics.revenue_by_currency?.NGN ?? 0, 'NGN')}
+                                    subValue={`USD: ${fmtCurrency(metrics.revenue_by_currency?.USD ?? 0, 'USD')}`}
+                                    icon={DollarSign}
+                                    href="/admin/revenue"
+                                    variant="emerald"
+                                />
+                            </div>
+
+                            <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                                <div className="flex flex-col gap-6 lg:col-span-2">
+                                    {(metrics.monthly_revenue?.length ?? 0) > 0 && (
+                                        <RevenueAreaChart data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
+                                    )}
+                                </div>
+                                <div className="flex flex-col gap-6">
+                                    {(metrics.audit_breakdown?.length ?? 0) > 0 && <AuditDonut data={metrics.audit_breakdown!} />}
+                                    {metrics.revenue_by_tier && (
+                                        <div>
+                                            <div className="mb-4 flex items-center gap-4 border-b border-zinc-100 pb-4">
+                                                <span className="text-[15px] font-semibold text-zinc-900">Revenue by Tier</span>
+                                            </div>
+                                            <div className="grid grid-cols-1 gap-3">
+                                                {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
+                                                    <div
+                                                        key={tier}
+                                                        className="relative h-20 w-full overflow-hidden rounded-2xl bg-white p-4 shadow-xs ring-1 ring-zinc-200/50"
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <p className="text-[13px] font-semibold text-zinc-500 capitalize">{tier}</p>
+                                                            <CreditCard className="size-3.5 text-zinc-300" />
+                                                        </div>
+                                                        <p className="mt-2 text-xl font-bold tracking-tight text-zinc-900">
+                                                            {fmtCurrency(metrics.revenue_by_tier![tier])}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {metrics.funnel && <FunnelChart data={metrics.funnel} />}
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* ── Recent activity (founder + investor desks) ── */}
+                    {(desk === 'founder' || desk === 'investors' || desk === 'platform') && (
+                        <div className="min-w-0">
+                            <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-4">
+                                <span className="text-[15px] font-semibold text-zinc-900">Recent Activity</span>
+                            </div>
+
+                            {recent_activity.length === 0 ? (
+                                <div className="rounded-[20px] border border-zinc-200/60 bg-white p-10 text-center text-sm font-medium text-zinc-500 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+                                    No recent activity for this desk yet.
+                                </div>
+                            ) : (
+                                <div className="overflow-hidden rounded-[20px] border border-zinc-200/60 bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+                                    {recent_activity.slice(0, 8).map((item, i) => (
+                                        <div
+                                            key={i}
+                                            className="flex items-start gap-4 border-b border-zinc-100 p-4 transition-colors last:border-0 hover:bg-zinc-50/50 sm:p-5"
+                                        >
+                                            <span
+                                                className={`mt-1 h-2 w-2 shrink-0 rounded-full shadow-xs ${activityDotColor[item.type] ?? 'bg-zinc-400'}`}
+                                            />
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex flex-wrap items-center gap-x-2">
+                                                    <span className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
+                                                        {activityTypeLabel[item.type] ?? item.type}
+                                                    </span>
+                                                    <p className="truncate text-[13.5px] font-semibold text-zinc-900">{item.description}</p>
+                                                </div>
+                                                {item.email && <p className="mt-1 truncate text-xs font-medium text-zinc-500">{item.email}</p>}
+                                            </div>
+                                            <span className="shrink-0 text-[11px] font-medium text-zinc-400">{item.time}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

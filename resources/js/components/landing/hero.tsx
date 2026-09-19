@@ -1,11 +1,11 @@
 import { SlidingButton } from '@/components/ui/sliding-button';
-import { Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 
 interface HeroProps {
     title?: string;
     description?: string;
     ctaPrimaryText?: string;
-    ctaPrimaryRoute?: string;
+    ctaPrimaryHref?: string;
     ctaSecondaryText?: string;
     ctaSecondaryHref?: string;
 }
@@ -13,7 +13,7 @@ interface HeroProps {
 export default function Hero({
     title = 'Prove your startup is ready for investment.',
     ctaPrimaryText = 'Start Self-Scan',
-    ctaPrimaryRoute = 'diagnostic.index',
+    ctaPrimaryHref = '/diagnostic',
     ctaSecondaryText = 'For investors',
     ctaSecondaryHref = '/investor',
 }: HeroProps) {
@@ -35,11 +35,13 @@ export default function Hero({
             </p>
 
             <div className="mt-10 flex w-full max-w-xl flex-col items-stretch justify-center gap-3 px-4 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-4 sm:px-0">
-                <Link href={route(ctaPrimaryRoute)} className="inline-flex w-full justify-center sm:w-auto">
-                    <SlidingButton type="button" className="w-full min-w-0 sm:w-fit sm:min-w-[280px]">
-                        {ctaPrimaryText}
-                    </SlidingButton>
-                </Link>
+                <SlidingButton
+                    type="button"
+                    className="w-full min-w-0 sm:w-fit sm:min-w-[280px]"
+                    onClick={() => router.visit(ctaPrimaryHref)}
+                >
+                    {ctaPrimaryText}
+                </SlidingButton>
                 <a
                     href={ctaSecondaryHref}
                     className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-[#3A54A5]/30 bg-white/50 px-6 text-sm font-semibold text-[#3A54A5] backdrop-blur-sm transition-colors hover:border-[#3A54A5] hover:bg-white hover:text-[#2D4182] sm:h-16 sm:w-auto sm:rounded-2xl sm:px-8 sm:text-base"

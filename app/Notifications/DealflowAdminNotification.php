@@ -68,8 +68,34 @@ class DealflowAdminNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
+        $company = $this->diligenceRequest?->profile?->founder?->company_name
+            ?? $this->interest?->profile?->founder?->company_name
+            ?? $this->grant?->profile?->founder?->company_name
+            ?? 'a startup';
+
+        $investor = $this->diligenceRequest?->investor?->profile?->full_name
+            ?? $this->interest?->investor?->profile?->full_name
+            ?? $this->grant?->investor?->profile?->full_name
+            ?? 'an investor';
+
+        [$title, $body, $url] = match ($this->event) {
+            'interest_submitted' => ['New investor interest', "{$investor} submitted an interest request for {$company}.", route('admin.dealflow.interests.index')],
+            'founder_authorized', 'founder_responded' => ['Founder authorization received', "{$company} authorized {$investor}'s request. Admin action required.", route('admin.dealflow.interests.index')],
+            'founder_declined' => ['Founder declined request', "{$company} declined {$investor}'s investor request.", route('admin.dealflow.interests.index')],
+            'data_room_granted' => ['Data room access granted', "Data room access for {$investor} at {$company} was granted.", route('admin.dealflow.data-rooms.index')],
+            'access_revoked' => ['Data room access revoked', "Data room access for {$investor} at {$company} was revoked.", route('admin.dealflow.data-rooms.index')],
+            'introduction_scheduled' => ['Founder call scheduled', "Introductory call between {$investor} and {$company} was scheduled.", route('admin.dealflow.interests.index')],
+            'introduction_completed' => ['Founder call completed', "Introductory call between {$investor} and {$company} was marked completed.", route('admin.dealflow.interests.index')],
+            'diligence_submitted' => ['New diligence request', "{$investor} submitted a diligence inquiry for {$company}.", route('admin.dealflow.diligence.index')],
+            'diligence_founder_responded' => ['Founder diligence response', "{$company} submitted a diligence response for {$investor}. Review required.", route('admin.dealflow.diligence.index')],
+            default => ['Dealflow update', "{$company}: {$this->decision} for {$investor}.", route('admin.dealflow.interests.index')],
+        };
+
         return [
             'type' => 'dealflow_'.$this->event,
+            'title' => $title,
+            'body' => $body,
+            'destination_url' => $url,
             'interest_id' => $this->interest?->id,
             'profile_id' => $this->interest?->profile_id ?? $this->grant?->profile_id ?? $this->diligenceRequest?->profile_id,
             'grant_id' => $this->grant?->id,

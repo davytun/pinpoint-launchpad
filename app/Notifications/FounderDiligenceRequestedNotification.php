@@ -48,8 +48,13 @@ class FounderDiligenceRequestedNotification extends Notification implements Shou
      */
     public function toArray(object $notifiable): array
     {
+        $category = str_replace('_', ' ', ucfirst($this->diligenceRequest->category));
+
         return [
             'type' => 'founder_diligence_requested',
+            'title' => 'Diligence response required',
+            'body' => "Pinpoint IR requested clarification ({$category}): {$this->diligenceRequest->subject}",
+            'destination_url' => route('founder.diligence.index'),
             'diligence_request_id' => $this->diligenceRequest->id,
             'profile_id' => $this->diligenceRequest->profile_id,
             'category' => $this->diligenceRequest->category,

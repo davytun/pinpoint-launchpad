@@ -36,11 +36,17 @@ class InvestorInterestReceivedNotification extends Notification implements Shoul
 
     public function toArray(object $notifiable): array
     {
+        $investorName = $this->interest->investor->profile->full_name ?? 'An investor';
+        $requestType = ucwords(str_replace('_', ' ', $this->interest->type));
+
         return [
+            'type' => 'investor_interest_received',
+            'title' => 'New investor engagement request',
+            'body' => "{$investorName} requested {$requestType}. Review and respond in your dashboard.",
+            'destination_url' => route('founder.dashboard'),
             'interest_id' => $this->interest->id,
             'investor_id' => $this->interest->investor_id,
             'profile_id' => $this->interest->profile_id,
-            'type' => 'investor_interest_received',
         ];
     }
 }

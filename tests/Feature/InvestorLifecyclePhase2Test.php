@@ -78,22 +78,29 @@ function setupLiveSpotlightStartup(): array
     return [$founder, $profile, $pitchDeck, $vdrDoc];
 }
 
-test('spotlight discovery is gated to KYC-approved investors only', function () {
+test('spotlight catalogue is browsable before KYC approval; protected pitch deck actions stay gated', function () {
     Storage::fake('local');
     [$founder, $profile, $pitchDeck] = setupLiveSpotlightStartup();
 
     $unapprovedInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_PENDING]);
     $approvedInvestor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
 
-    // 1. Unapproved investor is redirected to KYC page
-    $this->actingAs($unapprovedInvestor, 'investor')->get(route('investor.spotlight.index'))->assertRedirect(route('investor.kyc.create'));
-    $this->actingAs($unapprovedInvestor, 'investor')->get(route('investor.spotlight.show', $profile->slug))->assertRedirect(route('investor.kyc.create'));
+    // 1. Unapproved investor can browse Spotlight (read-only)
+    $this->actingAs($unapprovedInvestor, 'investor')->get(route('investor.spotlight.index'))->assertOk();
+    $this->actingAs($unapprovedInvestor, 'investor')->get(route('investor.spotlight.show', $profile->slug))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('entry.can_submit_interest', false)
+            ->where('entry.can_view_pitch_deck', false));
+
+    // Pitch deck preview remains gated
+    $previewUrl = URL::temporarySignedRoute('investor.spotlight.pitch-deck.preview', now()->addMinutes(10), ['slug' => $profile->slug]);
+    $this->actingAs($unapprovedInvestor, 'investor')->get($previewUrl)->assertRedirect(route('investor.kyc.create'));
 
     // 2. Approved investor can view Spotlight and preview/download pitch deck
     $this->actingAs($approvedInvestor, 'investor')->get(route('investor.spotlight.index'))->assertOk();
     $this->actingAs($approvedInvestor, 'investor')->get(route('investor.spotlight.show', $profile->slug))->assertOk();
 
-    $previewUrl = URL::temporarySignedRoute('investor.spotlight.pitch-deck.preview', now()->addMinutes(10), ['slug' => $profile->slug]);
     $this->actingAs($approvedInvestor, 'investor')->get($previewUrl)->assertOk()->assertStreamedContent('NovaPay Pitch Deck');
 
     $downloadUrl = URL::temporarySignedRoute('investor.spotlight.pitch-deck', now()->addMinutes(10), ['slug' => $profile->slug]);

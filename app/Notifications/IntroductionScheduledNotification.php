@@ -63,8 +63,18 @@ class IntroductionScheduledNotification extends Notification implements ShouldQu
      */
     public function toArray(object $notifiable): array
     {
+        $company = $this->interest->profile->founder?->company_name ?? 'the startup';
+        $investorName = $this->interest->investor?->profile?->full_name ?? 'the investor';
+        $scheduledTime = $this->interest->scheduled_at?->format('M j, Y g:i A') ?? 'a coordinated time';
+        $isFounder = $notifiable instanceof Founder;
+
         return [
             'type' => 'introduction_scheduled',
+            'title' => 'Founder call scheduled',
+            'body' => $isFounder
+                ? "Your call with {$investorName} is scheduled for {$scheduledTime}."
+                : "Your call with {$company} is scheduled for {$scheduledTime}.",
+            'destination_url' => $isFounder ? route('founder.dashboard') : route('investor.interests.index'),
             'interest_id' => $this->interest->id,
             'profile_id' => $this->interest->profile_id,
             'scheduled_at' => $this->interest->scheduled_at?->toISOString(),

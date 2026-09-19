@@ -88,9 +88,15 @@ class AdminDashboardController extends Controller
         }
 
         if ($showInvestors && ($user->isSuperAdmin() || $user->isCompliance() || $user->isInvestorRelations())) {
-            $metrics['pending_kyc'] = Investor::where('kyc_status', 'pending')->count();
+            $metrics['pending_kyc'] = Investor::where('kyc_status', Investor::KYC_STATUS_PENDING)->count();
+            $metrics['approved_kyc'] = Investor::where('kyc_status', Investor::KYC_STATUS_APPROVED)->count();
+            $metrics['rejected_kyc'] = Investor::where('kyc_status', Investor::KYC_STATUS_REJECTED)->count();
             $metrics['active_investors'] = Investor::where('account_status', Investor::ACCOUNT_STATUS_ACTIVE)->count();
             $metrics['pending_interests'] = InvestorInterest::where('status', 'pending')->count();
+            $metrics['scheduled_founder_calls'] = InvestorInterest::where('type', 'founder_call')
+                ->whereNotNull('scheduled_at')
+                ->whereNull('completed_at')
+                ->count();
         }
 
         if ($showPlatform && $user->canAccessFinancials()) {
@@ -231,7 +237,7 @@ class AdminDashboardController extends Controller
         }
 
         $recentActivity = match ($desk) {
-            'investors' => [],
+            'investors' => $this->getInvestorDeskActivity($user),
             'founder' => $this->getRecentActivity($user),
             default => $user->isSuperAdmin() ? $this->getRecentActivity($user) : [],
         };
@@ -330,6 +336,52 @@ class AdminDashboardController extends Controller
         ];
     }
 
+    private function getInvestorDeskActivity($user): array
+    {
+        if (! ($user->isSuperAdmin() || $user->isCompliance() || $user->isInvestorRelations())) {
+            return [];
+        }
+
+        $activity = [];
+
+        if ($user->isSuperAdmin() || $user->isCompliance()) {
+            Investor::query()
+                ->with('profile')
+                ->whereIn('kyc_status', [Investor::KYC_STATUS_PENDING, Investor::KYC_STATUS_APPROVED, Investor::KYC_STATUS_REJECTED])
+                ->latest('updated_at')
+                ->limit(8)
+                ->get()
+                ->each(function (Investor $investor) use (&$activity) {
+                    $activity[] = [
+                        'type' => 'kyc',
+                        'description' => 'KYC '.$investor->kyc_status.' — '.($investor->profile?->full_name ?? $investor->email),
+                        'time' => $investor->updated_at?->diffForHumans() ?? '',
+                        'email' => $investor->email,
+                    ];
+                });
+        }
+
+        if ($user->isSuperAdmin() || $user->isInvestorRelations()) {
+            InvestorInterest::query()
+                ->with(['investor.profile', 'profile.founder'])
+                ->latest()
+                ->limit(8)
+                ->get()
+                ->each(function (InvestorInterest $interest) use (&$activity) {
+                    $company = $interest->profile?->founder?->company_name ?? 'a startup';
+                    $investorName = $interest->investor?->profile?->full_name ?? 'Investor';
+                    $activity[] = [
+                        'type' => 'interest',
+                        'description' => "{$investorName} · {$interest->type} · {$company} ({$interest->status})",
+                        'time' => $interest->created_at?->diffForHumans() ?? '',
+                        'email' => $interest->investor?->email,
+                    ];
+                });
+        }
+
+        return array_slice($activity, 0, 12);
+    }
+
     private function getRecentActivity($user): array
     {
         $activity = [];
@@ -371,21 +423,44 @@ class AdminDashboardController extends Controller
                 ];
             }
         } else {
-            // Analyst: only their assigned founders' activity
+            // Analyst: assigned founders' audit status + recent thread activity
             $assignedFounderIds = AuditAssignment::where('analyst_id', $user->id)->pluck('founder_id');
-            $messages = MessageThread::whereIn('founder_id', $assignedFounderIds)
-                ->where('admin_unread_count', '>', 0)
+
+            Founder::query()
+                ->with(['payment', 'messageThread'])
+                ->whereIn('id', $assignedFounderIds)
+                ->latest('updated_at')
+                ->limit(8)
+                ->get()
+                ->each(function (Founder $founder) use (&$activity) {
+                    $status = $founder->payment?->audit_status ?? 'unpaid';
+                    $activity[] = [
+                        'type' => 'message',
+                        'description' => ($founder->company_name ?: $founder->full_name).' — audit '.$status,
+                        'time' => $founder->updated_at?->diffForHumans() ?? '',
+                        'email' => $founder->email,
+                    ];
+                });
+
+            MessageThread::query()
+                ->with('founder:id,email,company_name,full_name')
+                ->whereIn('founder_id', $assignedFounderIds)
+                ->whereNotNull('last_message_at')
                 ->latest('last_message_at')
-                ->limit(10)
-                ->get();
-            foreach ($messages as $t) {
-                $activity[] = [
-                    'type' => 'message',
-                    'description' => 'Unread message from assigned founder',
-                    'time' => $t->last_message_at?->diffForHumans(),
-                    'email' => null,
-                ];
-            }
+                ->limit(8)
+                ->get()
+                ->each(function (MessageThread $thread) use (&$activity) {
+                    $label = $thread->admin_unread_count > 0
+                        ? 'Unread message from '.($thread->founder?->company_name ?? 'assigned founder')
+                        : 'Recent message with '.($thread->founder?->company_name ?? 'assigned founder');
+
+                    $activity[] = [
+                        'type' => 'message',
+                        'description' => $label,
+                        'time' => $thread->last_message_at?->diffForHumans() ?? '',
+                        'email' => $thread->founder?->email,
+                    ];
+                });
         }
 
         // Sort by most recent first (they're already roughly sorted but mixed)

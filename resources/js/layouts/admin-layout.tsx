@@ -3,8 +3,8 @@ import { Link, router, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { ReactNode, useEffect, useState } from 'react';
 
-import GlobalLoader from '@/components/GlobalLoader';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useNotificationPolling } from '@/hooks/use-notification-polling';
 import { cn } from '@/lib/utils';
 
 type AdminRole = 'superadmin' | 'analyst' | 'support' | 'compliance' | 'investor_relations';
@@ -546,6 +546,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const unreadNotifications = platform_unread_notifications?.admin ?? 0;
     const desk = resolveDesk(currentUrl, role);
 
+    useNotificationPolling(Boolean(user));
+
     const isSuperAdmin = role === 'superadmin';
     const isAnalyst = role === 'analyst';
     const isCompliance = role === 'compliance';
@@ -638,7 +640,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
     return (
         <div className="flex h-screen max-h-screen flex-col gap-3.5 overflow-hidden bg-[#F4F4F6] p-3 text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white lg:flex-row lg:p-3.5">
-            <GlobalLoader />
             <aside
                 className={cn(
                     'no-scrollbar hidden h-full max-h-full shrink-0 flex-col justify-between overflow-hidden py-2 transition-all duration-200 ease-in-out select-none lg:flex',

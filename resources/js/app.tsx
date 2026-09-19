@@ -31,7 +31,12 @@ createInertiaApp({
             </App>,
         );
     },
-    progress: false,
+    progress: {
+        delay: 150,
+        color: '#3A54A5',
+        includeCSS: true,
+        showSpinner: false,
+    },
 });
 
 initializeTheme();

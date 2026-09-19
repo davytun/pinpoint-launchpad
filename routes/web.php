@@ -277,8 +277,8 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::get('/dashboard', fn () => redirect()->route('investor.spotlight.index'))->middleware('auth.investor')->name('dashboard');
     Route::get('/kyc', [InvestorKycController::class, 'create'])->middleware('auth.investor')->name('kyc.create');
     Route::post('/kyc', [InvestorKycController::class, 'store'])->middleware('auth.investor')->name('kyc.store');
-    Route::get('/spotlight', [InvestorSpotlightController::class, 'index'])->middleware(['auth.investor', 'kyc.approved'])->name('spotlight.index');
-    Route::get('/spotlight/{slug}', [InvestorSpotlightController::class, 'show'])->middleware(['auth.investor', 'kyc.approved'])->name('spotlight.show');
+    Route::get('/spotlight', [InvestorSpotlightController::class, 'index'])->middleware(['auth.investor'])->name('spotlight.index');
+    Route::get('/spotlight/{slug}', [InvestorSpotlightController::class, 'show'])->middleware(['auth.investor'])->name('spotlight.show');
     Route::get('/spotlight/{slug}/pitch-deck/preview', [InvestorSpotlightController::class, 'previewPitchDeck'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('spotlight.pitch-deck.preview');
     Route::get('/spotlight/{slug}/pitch-deck', [InvestorSpotlightController::class, 'downloadPitchDeck'])->middleware(['auth.investor', 'kyc.approved', 'signed'])->name('spotlight.pitch-deck');
     Route::post('/spotlight/{slug}/interest', [InvestorInterestController::class, 'store'])->middleware(['auth.investor', 'kyc.approved'])->name('interests.store');
@@ -353,6 +353,7 @@ Route::prefix('founder')->name('founder.')->group(function () {
 
     // Protected dashboard routes
     Route::middleware(['auth.founder', 'founder.session'])->group(function () {
+        Route::get('/notifications', [App\Http\Controllers\Founder\NotificationController::class, 'index'])->name('notifications.index');
         Route::patch('/notifications/read-all', [App\Http\Controllers\Founder\NotificationController::class, 'readAll'])->name('notifications.read-all');
         Route::patch('/notifications/{notification}/read', [App\Http\Controllers\Founder\NotificationController::class, 'read'])->name('notifications.read');
         Route::get('/dashboard', [FounderDashboardController::class, 'index'])->name('dashboard');

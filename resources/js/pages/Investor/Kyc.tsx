@@ -152,11 +152,22 @@ export default function Kyc({
                                         </p>
                                     </div>
                                 ) : isPending ? (
-                                    <div className="mt-8 flex items-start gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
-                                        <Clock3 className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-                                        <p className="text-sm leading-relaxed">
-                                            A document is already in review. To keep the decision clear and secure, new uploads are unavailable until
-                                            the review is complete.
+                                    <div className="mt-8 space-y-4">
+                                        <div className="flex items-start gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
+                                            <Clock3 className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+                                            <p className="text-sm leading-relaxed">
+                                                A document is already in review. To keep the decision clear and secure, new uploads are unavailable until
+                                                the review is complete.
+                                            </p>
+                                        </div>
+                                        <a
+                                            href={route('investor.spotlight.index')}
+                                            className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#3A54A5] px-5 text-sm font-bold text-white transition hover:bg-[#2D4182] sm:w-auto"
+                                        >
+                                            Browse Spotlight while you wait
+                                        </a>
+                                        <p className="text-xs text-zinc-500">
+                                            You can review listed startups now. Expressing interest, diligence requests, data rooms, and pitch decks unlock after approval.
                                         </p>
                                     </div>
                                 ) : (

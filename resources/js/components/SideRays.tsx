@@ -91,6 +91,7 @@ const SideRays = ({
         const initializeWebGL = async () => {
             if (!containerRef.current) return;
 
+            try {
             await new Promise<void>((resolve) => setTimeout(resolve, 10));
 
             if (!containerRef.current) return;
@@ -244,9 +245,15 @@ void main() {
                 uniformsRef.current = null;
                 meshRef.current = null;
             };
+            } catch {
+                // WebGL unavailable — leave background blank rather than crashing the page
+                rendererRef.current = null;
+                uniformsRef.current = null;
+                meshRef.current = null;
+            }
         };
 
-        initializeWebGL();
+        void initializeWebGL();
 
         return () => {
             if (cleanupFunctionRef.current) {

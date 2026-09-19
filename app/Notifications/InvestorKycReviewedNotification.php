@@ -57,15 +57,21 @@ class InvestorKycReviewedNotification extends Notification implements ShouldQueu
      */
     public function toArray(object $notifiable): array
     {
+        $approved = $this->status === 'approved';
+        $body = $approved
+            ? 'Your protected investor access is now available.'
+            : 'Review the compliance note and upload a replacement document.';
+        $url = url('/investor/'.($approved ? 'spotlight' : 'kyc'));
+
         return [
             'type' => 'investor_kyc_reviewed',
             'status' => $this->status,
-            'title' => $this->status === 'approved' ? 'KYC approved' : 'KYC needs attention',
-            'message' => $this->status === 'approved'
-                ? 'Your protected investor access is now available.'
-                : 'Review the compliance note and upload a replacement document.',
+            'title' => $approved ? 'KYC approved' : 'KYC needs attention',
+            'body' => $body,
+            'message' => $body,
+            'destination_url' => $url,
+            'action_url' => $url,
             'review_notes' => $this->reviewNotes,
-            'action_url' => url('/investor/'.($this->status === 'approved' ? 'spotlight' : 'kyc')),
         ];
     }
 }

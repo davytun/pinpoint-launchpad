@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Support\NotificationPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -12,7 +13,22 @@ class NotificationController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('Notifications/Index', ['notifications' => Auth::guard('web')->user()->notifications()->latest()->paginate(25), 'read_all_url' => route('admin.notifications.read-all'), 'read_url_template' => route('admin.notifications.read', '__notification__')]);
+        $user = Auth::guard('web')->user();
+        $paginator = $user->notifications()->latest()->paginate(25);
+
+        return Inertia::render('Notifications/Index', [
+            'audience' => 'admin',
+            'notifications' => [
+                'data' => NotificationPresenter::collection($paginator->getCollection()),
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+            ],
+            'unread_count' => $user->unreadNotifications()->count(),
+            'read_all_url' => route('admin.notifications.read-all'),
+            'read_url_template' => route('admin.notifications.read', ['notification' => '__notification__']),
+        ]);
     }
 
     public function read(string $notification): RedirectResponse

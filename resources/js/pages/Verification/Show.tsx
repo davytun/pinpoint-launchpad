@@ -113,13 +113,13 @@ function diligenceRows(tier?: string | null) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function VerificationShow({
-    company_name,
+    company_name = 'Verified Company',
     sector,
     batch,
     overall_score,
     radar_data,
     analyst_summary,
-    badges,
+    badges = [],
     tier,
     verified_at,
     expires_at,
@@ -127,9 +127,10 @@ export default function VerificationShow({
     is_sample = false,
 }: PageProps) {
     const color = scoreColor(overall_score);
+    const safeBadges = Array.isArray(badges) ? badges : [];
     const radarItems = PILLAR_KEYS.map((k) => ({
         subject: PILLAR_LABELS[k],
-        value: radar_data?.[k] ?? 0,
+        value: Number(radar_data?.[k] ?? 0),
     }));
     const rows = diligenceRows(tier);
     const showExpiryWarning = !is_sample && days_until_expiry != null && days_until_expiry <= 14;
@@ -250,8 +251,8 @@ export default function VerificationShow({
                                     </span>
                                     <span className="mb-1 text-xl font-semibold text-zinc-400">/ 100</span>
                                 </div>
-                                <div className="flex items-center justify-center pt-2">
-                                    <ResponsiveContainer width="100%" height={200}>
+                                <div className="flex h-[200px] w-full items-center justify-center pt-2">
+                                    <ResponsiveContainer width="100%" height={200} minWidth={0}>
                                         <RadarChart data={radarItems} outerRadius="62%" margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
                                             <PolarGrid stroke="#E2E8F0" />
                                             <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748B', fontSize: 9, fontWeight: 600 }} />
@@ -284,9 +285,9 @@ export default function VerificationShow({
                                     )}
                                 </div>
 
-                                {badges.length > 0 && (
+                                {safeBadges.length > 0 && (
                                     <div className="flex flex-wrap gap-1.5 pt-2">
-                                        {badges.map((badge) => (
+                                        {safeBadges.map((badge) => (
                                             <span
                                                 key={badge.badge_type}
                                                 className="border-zinc-250/70 text-zinc-650 animate-fade-in rounded-lg border bg-white px-3 py-1 text-xs font-bold shadow-xs"

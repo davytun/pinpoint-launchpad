@@ -81,7 +81,17 @@ export default function FounderLogin({ flash }: PageProps) {
                         <h1 className="font-display mb-1.5 text-center text-[22px] leading-tight font-extrabold tracking-tight text-zinc-950">
                             Welcome Back
                         </h1>
-                        <p className="text-zinc-555 mb-8 text-center text-[13px] leading-relaxed font-medium">Sign in to your founder dashboard.</p>
+                        <p className="mb-8 text-center text-[13px] leading-relaxed font-medium text-zinc-500">
+                            Sign in with the founder credentials from your setup invite email.
+                        </p>
+
+                        <p className="mb-6 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-center text-[12px] leading-relaxed text-zinc-600">
+                            Staff / admin accounts use{' '}
+                            <a href="/admin/login" className="font-bold text-[#3A54A5] underline underline-offset-2 hover:text-[#2D4182]">
+                                /admin/login
+                            </a>
+                            , not this page.
+                        </p>
 
                         {/* Flash messages */}
                         {flash?.info && (

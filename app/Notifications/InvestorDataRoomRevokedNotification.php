@@ -45,6 +45,15 @@ class InvestorDataRoomRevokedNotification extends Notification implements Should
      */
     public function toArray(object $notifiable): array
     {
-        return ['type' => 'data_room_access_revoked', 'grant_id' => $this->grant->id, 'profile_id' => $this->grant->profile_id];
+        $company = $this->grant->profile->founder?->company_name ?? 'this startup';
+
+        return [
+            'type' => 'data_room_access_revoked',
+            'title' => 'Data room access revoked',
+            'body' => "Your data room access for {$company} is no longer active.",
+            'destination_url' => route('investor.interests.index'),
+            'grant_id' => $this->grant->id,
+            'profile_id' => $this->grant->profile_id,
+        ];
     }
 }

@@ -28,6 +28,8 @@ interface PageProps {
     hard_flags?: string[];
     weakest_dimensions?: string[];
     network_strands?: { commercial: number; capital: number };
+    report_email?: string | null;
+    email_notice?: string | null;
 }
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
@@ -212,8 +214,19 @@ export default function DiagnosticResult({
     hard_flags = [],
     weakest_dimensions = [],
     network_strands = { commercial: 0, capital: 0 },
+    report_email,
+    email_notice,
 }: PageProps) {
     const meta = BAND_META[score_band] ?? BAND_META.mid_high;
+    const safePillars: PillarScores = {
+        potential: pillar_scores?.potential ?? 0,
+        agility: pillar_scores?.agility ?? 0,
+        risk: pillar_scores?.risk ?? 0,
+        alignment: pillar_scores?.alignment ?? 0,
+        governance: pillar_scores?.governance ?? 0,
+        operations: pillar_scores?.operations ?? 0,
+        network: pillar_scores?.network ?? 0,
+    };
     const [checklistClicked, setChecklistClicked] = useState(false);
     const [checklistLoading, setChecklistLoading] = useState(false);
     const [checklistError, setChecklistError] = useState(false);
@@ -283,7 +296,7 @@ export default function DiagnosticResult({
     // Build Recharts data
     const radarData = PILLAR_KEYS.map((k) => ({
         subject: PILLAR_LABELS[k],
-        value: pillar_scores[k],
+        value: safePillars[k],
     }));
 
     return (
@@ -292,6 +305,16 @@ export default function DiagnosticResult({
 
             <DiagnosticLayout glowColor={meta.color}>
                 <div className="mx-auto max-w-4xl px-4 pt-8 pb-24 sm:px-8">
+                    {(email_notice || report_email) && (
+                        <div
+                            role="status"
+                            className="mb-6 rounded-xl border border-emerald-500/25 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+                        >
+                            {email_notice ??
+                                `Your PARAGON report has been sent to ${report_email}. Check your inbox (and spam folder) if it is not there yet.`}
+                        </div>
+                    )}
+
                     {/* Heading */}
                     <FadeUp delay={0.05} className="mb-10">
                         <h1 className="font-display text-3xl font-extrabold tracking-tight text-zinc-950 sm:text-4xl">
@@ -565,11 +588,11 @@ export default function DiagnosticResult({
                                                             {PILLAR_LABELS[key]}
                                                         </h4>
                                                         <p className="mt-0.5 text-[9px] font-extrabold tracking-wider text-zinc-400 uppercase">
-                                                            {pillar_scores[key] === 100
+                                                            {safePillars[key] === 100
                                                                 ? 'Verified'
-                                                                : pillar_scores[key] >= 80
+                                                                : safePillars[key] >= 80
                                                                   ? 'Excellent'
-                                                                  : pillar_scores[key] >= 50
+                                                                  : safePillars[key] >= 50
                                                                     ? 'Stable'
                                                                     : 'Review'}
                                                         </p>
@@ -597,12 +620,12 @@ export default function DiagnosticResult({
                                                             strokeDasharray={miniCircumference}
                                                             initial={{ strokeDashoffset: miniCircumference }}
                                                             animate={{
-                                                                strokeDashoffset: miniCircumference - (pillar_scores[key] / 100) * miniCircumference,
+                                                                strokeDashoffset: miniCircumference - (safePillars[key] / 100) * miniCircumference,
                                                             }}
                                                             transition={{ duration: 1.0, delay: 0.3 + i * 0.06, ease: 'easeOut' }}
                                                         />
                                                     </svg>
-                                                    <div className="absolute text-[8px] font-black text-zinc-700">{pillar_scores[key]}%</div>
+                                                    <div className="absolute text-[8px] font-black text-zinc-700">{safePillars[key]}%</div>
                                                 </div>
                                             </div>
                                         );

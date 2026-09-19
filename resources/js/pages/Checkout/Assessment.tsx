@@ -1,7 +1,7 @@
 import { router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, BarChart3, Check, Crosshair, Layout, Shield, Users } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
 import PrivacyConsent from '@/components/privacy-consent';
@@ -537,12 +537,6 @@ function ApplicationForm() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Assessment() {
-    const applyRef = useRef<HTMLDivElement>(null);
-
-    function scrollToApply() {
-        applyRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
     return (
         <>
             <div className="relative min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-950 selection:text-white">
@@ -561,14 +555,13 @@ export default function Assessment() {
                             <a href="/diagnostic" className="text-zinc-555 hidden text-xs font-bold transition hover:text-zinc-950 md:block">
                                 Take the free Self-Scan
                             </a>
-                            <button
-                                type="button"
-                                onClick={scrollToApply}
+                            <a
+                                href="#apply"
                                 className="inline-flex h-9 cursor-pointer items-center justify-center rounded-full bg-zinc-950 px-5 text-xs font-bold whitespace-nowrap text-white transition hover:bg-zinc-800 active:scale-[0.98]"
                             >
                                 <span className="hidden sm:inline">Apply for an assessment</span>
                                 <span className="sm:hidden">Apply</span>
-                            </button>
+                            </a>
                         </div>
                     </header>
                 </div>
@@ -596,13 +589,12 @@ export default function Assessment() {
                                 </FadeUp>
                                 <FadeUp delay={0.14}>
                                     <div className="mt-10 inline-flex flex-col gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={scrollToApply}
+                                        <a
+                                            href="#apply"
                                             className="inline-flex h-12 w-full min-w-55 cursor-pointer items-center justify-center gap-2 rounded-full bg-zinc-950 px-8 text-sm font-bold text-white transition hover:bg-zinc-800 active:scale-[0.98] sm:w-auto"
                                         >
                                             Apply for an assessment <ArrowRight className="h-4 w-4" />
-                                        </button>
+                                        </a>
                                         <p className="text-xs font-medium text-zinc-400">
                                             Not sure yet?{' '}
                                             <a
@@ -811,9 +803,8 @@ export default function Assessment() {
                                         <div className="mt-8">
                                             <div className="border-zinc-150 my-6 border-t" />
                                             <p className="mb-4 text-[9px] font-bold tracking-widest text-zinc-400 uppercase">{tier.meta}</p>
-                                            <button
-                                                type="button"
-                                                onClick={scrollToApply}
+                                            <a
+                                                href="#apply"
                                                 className={cn(
                                                     'group flex h-11 w-full cursor-pointer items-center justify-center rounded-xl text-xs font-bold transition-all duration-200 active:scale-[0.98]',
                                                     tier.featured
@@ -822,7 +813,7 @@ export default function Assessment() {
                                                 )}
                                             >
                                                 Select plan
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                 </FadeUp>
@@ -855,7 +846,7 @@ export default function Assessment() {
                 </section>
 
                 {/* ── Application Form Section ── */}
-                <section id="apply" ref={applyRef} className="border-t border-zinc-200/50 bg-white py-24">
+                <section id="apply" className="border-t border-zinc-200/50 bg-white py-24 scroll-mt-24">
                     <div className="mx-auto max-w-5xl px-6 md:px-8">
                         <FadeUp>
                             <div className="mx-auto mb-14 max-w-2xl text-center">

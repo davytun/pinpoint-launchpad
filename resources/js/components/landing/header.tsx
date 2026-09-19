@@ -6,38 +6,51 @@ import { useEffect, useState } from 'react';
 const NAV_ITEMS = [
     { label: 'How it works', id: 'blueprint' },
     { label: 'PARAGON', id: 'paragon-model' },
-    { label: 'Assessment', id: '', href: '/assessment' },
+    { label: 'Assessment', href: '/assessment' },
     { label: 'Pricing', id: 'pricing' },
     { label: 'FAQ', id: 'faq' },
-    { label: 'Blog', id: '', href: '/blog' },
-];
+    { label: 'Blog', href: '/blog' },
+] as const;
 
 export default function Header() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [isHome, setIsHome] = useState(true);
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
+        setIsHome(window.location.pathname === '/' || window.location.pathname === '');
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleScrollTo = (id: string) => {
+    const sectionHref = (id: string) => (isHome ? `#${id}` : `/#${id}`);
+
+    const handleSectionNav = (id: string) => {
         setMobileOpen(false);
-        const el = document.getElementById(id);
-        if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        if (isHome) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            return;
         }
+
+        window.location.href = `/#${id}`;
     };
 
     return (
         <div className="fixed top-4 left-1/2 z-50 w-full max-w-6xl -translate-x-1/2 px-4 font-sans">
             <header
-                className={`flex h-15 w-full items-center justify-between rounded-full border border-white/80 bg-white/30 px-6 py-2 backdrop-blur-md transition-all duration-300 md:h-16 ${scrolled ? 'border-white bg-white/50 shadow-[0_12px_40px_rgba(58,84,165,0.06)]' : 'shadow-[0_4px_20px_rgba(58,84,165,0.02)]'
-                    }`}
+                className={`flex h-15 w-full items-center justify-between rounded-full border border-white/80 bg-white/30 px-6 py-2 backdrop-blur-md transition-all duration-300 md:h-16 ${
+                    scrolled
+                        ? 'border-white bg-white/50 shadow-[0_12px_40px_rgba(58,84,165,0.06)]'
+                        : 'shadow-[0_4px_20px_rgba(58,84,165,0.02)]'
+                }`}
             >
                 {/* Logo */}
                 <a href="/" className="flex shrink-0 items-center gap-2">
@@ -47,7 +60,7 @@ export default function Header() {
                 {/* Desktop Nav Items with sliding background capsule */}
                 <div className="hidden shrink-0 items-center gap-1.5 lg:flex" onMouseLeave={() => setHoveredIndex(null)}>
                     {NAV_ITEMS.map((item, idx) =>
-                        item.href ? (
+                        'href' in item && item.href ? (
                             <a
                                 key={item.label}
                                 href={item.href}
@@ -64,11 +77,16 @@ export default function Header() {
                                 <span className="relative z-10 whitespace-nowrap">{item.label}</span>
                             </a>
                         ) : (
-                            <button
-                                key={item.id}
-                                type="button"
+                            <a
+                                key={'id' in item ? item.id : item.label}
+                                href={sectionHref('id' in item ? item.id : '')}
                                 onMouseEnter={() => setHoveredIndex(idx)}
-                                onClick={() => handleScrollTo(item.id)}
+                                onClick={(e) => {
+                                    if (isHome && 'id' in item) {
+                                        e.preventDefault();
+                                        handleSectionNav(item.id);
+                                    }
+                                }}
                                 className="text-zinc-650 relative cursor-pointer rounded-full px-4 py-1.5 text-[14.5px] font-semibold tracking-wide whitespace-nowrap transition-colors outline-none hover:text-zinc-950"
                             >
                                 {hoveredIndex === idx && (
@@ -79,7 +97,7 @@ export default function Header() {
                                     />
                                 )}
                                 <span className="relative z-10 whitespace-nowrap">{item.label}</span>
-                            </button>
+                            </a>
                         ),
                     )}
                 </div>
@@ -121,7 +139,7 @@ export default function Header() {
             {mobileOpen && (
                 <div className="animate-in slide-in-from-top-2 absolute top-16 right-4 left-4 flex flex-col gap-4 rounded-3xl border border-zinc-200/50 bg-white/95 px-6 py-6 shadow-xl backdrop-blur-lg duration-200 md:hidden">
                     {NAV_ITEMS.map((item) =>
-                        item.href ? (
+                        'href' in item && item.href ? (
                             <a
                                 key={item.label}
                                 href={item.href}
@@ -130,14 +148,21 @@ export default function Header() {
                                 {item.label}
                             </a>
                         ) : (
-                            <button
-                                key={item.id}
-                                type="button"
-                                onClick={() => handleScrollTo(item.id)}
+                            <a
+                                key={'id' in item ? item.id : item.label}
+                                href={sectionHref('id' in item ? item.id : '')}
+                                onClick={(e) => {
+                                    if (isHome && 'id' in item) {
+                                        e.preventDefault();
+                                        handleSectionNav(item.id);
+                                    } else {
+                                        setMobileOpen(false);
+                                    }
+                                }}
                                 className="text-zinc-650 border-b border-zinc-100 py-1.5 text-left text-sm font-semibold hover:text-[#3A54A5]"
                             >
                                 {item.label}
-                            </button>
+                            </a>
                         ),
                     )}
                     <div className="flex flex-col gap-3 pt-2">

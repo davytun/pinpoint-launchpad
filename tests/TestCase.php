@@ -17,6 +17,9 @@ abstract class TestCase extends BaseTestCase
 
         // Disable CSRF token validation for all HTTP tests
         $this->withoutMiddleware(ValidateCsrfToken::class);
+
+        // Avoid requiring a fresh Vite build for every newly added Inertia page
+        $this->withoutVite();
     }
 
     /**

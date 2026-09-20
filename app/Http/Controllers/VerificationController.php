@@ -25,7 +25,7 @@ class VerificationController extends Controller
                 'operations' => 88,
                 'network' => 90,
             ],
-            'analyst_summary' => 'SampleUnicorn AI demonstrates exceptional Agility and Operations metrics. Their proprietary LLM-orchestration layer has 18 months of IP-protection runway. We have verified their Cap Table as Clean with 85% founder retention. The primary growth lever is their 4.2x LTV/CAC ratio, verified via 6 months of historical Stripe data.',
+            'analyst_summary' => 'Strong execution and clean ownership. Cap table reconciles; IP assignments are on file. The growth case rests on a verified 4.2× LTV/CAC from six months of Stripe history — not a deck claim. Main open question is concentration in the top three customers.',
             'badges' => [
                 ['badge_type' => 'legal',          'label' => 'LEGAL: VERIFIED',          'is_verified' => true],
                 ['badge_type' => 'financial',      'label' => 'FINANCING: VERIFIED',       'is_verified' => true],

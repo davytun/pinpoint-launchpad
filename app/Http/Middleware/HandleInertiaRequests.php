@@ -66,6 +66,21 @@ class HandleInertiaRequests extends Middleware
             'unread_messages_count' => Auth::guard('founder')->check()
                 ? (int) (Auth::guard('founder')->user()->messageThread?->founder_unread_count ?? 0)
                 : null,
+            'founder_portal' => (function () {
+                if (! Auth::guard('founder')->check()) {
+                    return null;
+                }
+
+                $founder = Auth::guard('founder')->user();
+                $profile = $founder->profile;
+
+                return [
+                    'spotlight_ready' => $profile !== null,
+                    'pending_diligence_count' => $profile
+                        ? (int) $profile->diligenceRequests()->where('status', 'waiting_for_founder')->count()
+                        : 0,
+                ];
+            })(),
             'platform_unread_notifications' => [
                 'admin' => Auth::guard('web')->check()
                     ? (Auth::guard('web')->user()->unreadNotifications()->count() ?? 0)

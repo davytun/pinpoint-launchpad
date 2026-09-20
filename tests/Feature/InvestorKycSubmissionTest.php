@@ -89,7 +89,7 @@ test('an approved investor cannot submit replacement KYC documents', function ()
         ->and(InvestorKycSubmission::count())->toBe(1);
 });
 
-test('an approved investor is redirected from KYC to the investor spotlight', function () {
+test('an approved investor is redirected from KYC to the investor home', function () {
     $investor = investorForKycSubmission([
         'kyc_status' => Investor::KYC_STATUS_APPROVED,
         'kyc_approved_at' => now(),
@@ -97,5 +97,35 @@ test('an approved investor is redirected from KYC to the investor spotlight', fu
 
     $this->actingAs($investor, 'investor')
         ->get(route('investor.kyc.create'))
-        ->assertRedirect(route('investor.spotlight.index'));
+        ->assertRedirect(route('investor.dashboard'));
+});
+
+test('investor home shows KYC next step for not_submitted accounts', function () {
+    $investor = investorForKycSubmission([
+        'kyc_status' => Investor::KYC_STATUS_NOT_SUBMITTED,
+    ]);
+
+    $this->actingAs($investor, 'investor')
+        ->get(route('investor.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Investor/Dashboard')
+            ->where('investor.kyc_status', Investor::KYC_STATUS_NOT_SUBMITTED)
+            ->where('next_step.cta_route', 'investor.kyc.create')
+            ->where('investor.can_access_protected', false));
+});
+
+test('approved investor home points to Spotlight when there is no open work', function () {
+    $investor = investorForKycSubmission([
+        'kyc_status' => Investor::KYC_STATUS_APPROVED,
+        'kyc_approved_at' => now(),
+    ]);
+
+    $this->actingAs($investor, 'investor')
+        ->get(route('investor.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Investor/Dashboard')
+            ->where('investor.can_access_protected', true)
+            ->where('next_step.cta_route', 'investor.spotlight.index'));
 });

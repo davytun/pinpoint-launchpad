@@ -30,6 +30,7 @@ use App\Http\Controllers\Founder\FounderDocumentController;
 use App\Http\Controllers\Founder\FounderMessageController;
 use App\Http\Controllers\Founder\FounderSpotlightController;
 use App\Http\Controllers\Investor\InvestorAuthController;
+use App\Http\Controllers\Investor\InvestorDashboardController;
 use App\Http\Controllers\Investor\InvestorDataRoomController;
 use App\Http\Controllers\Investor\InvestorInterestController;
 use App\Http\Controllers\Investor\InvestorKycController;
@@ -131,6 +132,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
         Route::middleware('require.role:superadmin,analyst')->group(function () {
+            // Offline PIA payment requests — founder money path lives on this desk
+            Route::get('/pia-requests', [PiaApplicationController::class, 'index'])->name('founder.pia-requests.index');
+            Route::patch('/pia-requests/{application}/contacted', [PiaApplicationController::class, 'markContacted'])->name('founder.pia-requests.contacted');
+
             Route::get('/founders', [AdminFounderController::class, 'index'])->name('founders.index');
             Route::get('/founders/{founder}', [AdminFounderController::class, 'show'])->name('founders.show');
             Route::post('/founders/{founder}/assign', [AdminFounderController::class, 'assign'])->middleware('require.role:superadmin')->name('founders.assign');
@@ -151,6 +156,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::patch('/badges/{badge}', [AdminProfileController::class, 'updateBadge'])->name('badge.update');
             });
         });
+
+        Route::post('/pia-requests/{application}/payment-received', [PiaApplicationController::class, 'confirmPaymentReceived'])
+            ->middleware('require.role:superadmin')
+            ->name('founder.pia-requests.payment-received');
 
         Route::prefix('questions')->name('questions.')->middleware('require.role:superadmin,analyst')->group(function () {
             Route::get('/', [AdminQuestionController::class, 'index'])->name('index');

@@ -357,6 +357,22 @@ Last updated: 2026-09-16
 **Pattern notes:**
 Voice: founder-direct, not generic SaaS. Structure: Hero → product → problem → Self-Scan → Assessment → how it works → PARAGON → what you get → investor bridge → verified → pricing → FAQ → final CTA → email-only contact. Do not invent benchmark comparisons. Radar chart is illustrative example only. Contact on homepage is mailto only — no full form.
 
+### Sample verification dossier (`/verify/sample-unicorn`)
+
+Files: resources/js/pages/Verification/Show.tsx
+Last updated: 2026-09-20
+
+| Property | Class |
+| --- | --- |
+| Background | Quiet `#f3f5f9` wash — no SideRays, no glass mega-cards |
+| Layout | Single narrow column (`max-w-3xl`); company + score as one header composition |
+| Signature | PARAGON 7-cell score strip (letters P–N), not radar widgets |
+| Type | `font-display` company/score; `font-mono` meta labels |
+| Accent | `#3A54A5` score + links only |
+| Anti-patterns | No pill clusters, portal lock chips, dual cards, or full-width CTA banners |
+
+**Pattern notes:**
+Reads as an analyst memo, not a SaaS certificate. Materials are a plain locked table. Portal join is a text link.
 ### Investor Landing Page (`/investor`)
 
 Files: resources/js/pages/Investor/Landing.tsx, resources/js/components/investor-landing/*
@@ -376,3 +392,19 @@ Last updated: 2026-09-16
 
 **Pattern notes:**
 Signature is the dark diligence-desk hero with live-feeling Spotlight score panel. Prefer spines, timelines, and Is/Is-not splits over glass card grids. Investor CTA stays settings-driven. No magnetic hover, no return promises.
+
+### Founder desk overview (`/admin/founder`)
+
+File: resources/js/pages/Admin/Dashboard.tsx (`FounderDeskHome`)
+Last updated: 2026-09-20
+
+| Property | Class |
+| --- | --- |
+| Layout | Dashboard: header → 4 KPI tiles → 3+2 widget grid (pay queue + activity) |
+| Icons | Iconify Solar `*-linear` in muted `bg-zinc-50` wells (not rainbow Lucide chips) |
+| Panels | `rounded-2xl border border-zinc-100 bg-white shadow-sm` |
+| Accent | `#3A54A5` for pay queue header well + waiting badge |
+| Anti-patterns | No Lucide icons; no colored ping-on-every-card soup; don't flatten into a memo page |
+
+**Pattern notes:**
+Must still read as a dashboard (KPIs + panels). Waiting-to-pay is the primary widget. Solar icons stay quiet zinc until hover.

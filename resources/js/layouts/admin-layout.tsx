@@ -355,6 +355,14 @@ function SidebarContent({
                                     onClick={onNav}
                                 />
                                 <NavItem
+                                    href="/admin/founder/pia-requests"
+                                    icon="solar:card-send-linear"
+                                    label="PIA Requests"
+                                    active={isActive('/admin/founder/pia-requests')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                                <NavItem
                                     href="/admin/founder/messages"
                                     icon="solar:inbox-linear"
                                     label="Messages"

@@ -57,7 +57,31 @@ test('the founder dashboard exposes the current Spotlight feature status', funct
 
     $response->assertOk();
 
-    expect($response->viewData('page')['props']['spotlight_featured'])->toBeTrue();
+    expect($response->viewData('page')['props']['spotlight_featured'])->toBeTrue()
+        ->and($response->viewData('page')['props']['spotlight_ready'])->toBeTrue();
+});
+
+test('spotlight edit redirects to the dashboard when the founder profile is not ready yet', function () {
+    $founder = Founder::factory()->create();
+
+    $this->actingAs($founder, 'founder')
+        ->get(route('founder.spotlight.edit'))
+        ->assertRedirect(route('founder.dashboard'))
+        ->assertSessionHas('info');
+});
+
+test('the founder dashboard does not invent demo scores when no diagnostic is linked', function () {
+    $founder = Founder::factory()->create();
+
+    $this->actingAs($founder, 'founder')
+        ->get(route('founder.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Founder/Dashboard')
+            ->where('score', null)
+            ->where('spotlight_ready', false)
+            ->where('has_diagnostic', false)
+            ->where('tier_features', []));
 });
 
 test('compliance cannot manage Spotlight publishing', function () {

@@ -46,10 +46,14 @@ class PiaApplicationController extends Controller
                 'created_at' => $application->created_at->toIso8601String(),
             ]);
 
+        $desk = str_starts_with($request->path(), 'admin/founder') ? 'founder' : 'platform';
+
         return Inertia::render('Admin/PiaRequests/Index', [
             'applications' => $applications,
             'activeStatus' => in_array($status, ['pending', 'contacted', 'converted'], true) ? $status : 'all',
             'tierAmounts' => self::TIER_AMOUNTS,
+            'desk' => $desk,
+            'can_record_payment' => $request->user()?->isSuperAdmin() ?? false,
         ]);
     }
 

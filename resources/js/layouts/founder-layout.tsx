@@ -231,6 +231,8 @@ function SidebarContent({
     unreadMessages,
     unreadNotifications,
     recentNotifications,
+    pendingDiligence,
+    spotlightReady,
     isActive,
     collapsed,
     toggleCollapse,
@@ -241,6 +243,8 @@ function SidebarContent({
     unreadMessages: number;
     unreadNotifications: number;
     recentNotifications: FounderNotification[];
+    pendingDiligence: number;
+    spotlightReady: boolean;
     isActive: (path: string) => boolean;
     collapsed: boolean;
     toggleCollapse: () => void;
@@ -328,6 +332,7 @@ function SidebarContent({
                             active={isActive('/founder/diligence')}
                             collapsed={collapsed}
                             onClick={onNav}
+                            badge={pendingDiligence}
                         />
 
                         <NavItem
@@ -342,14 +347,34 @@ function SidebarContent({
 
                         <FounderNotifications notifications={recentNotifications} unreadCount={unreadNotifications} collapsed={collapsed} />
 
-                        <NavItem
-                            href={route('founder.spotlight.edit')}
-                            icon="solar:crown-star-linear"
-                            label="Spotlight Profile"
-                            active={isActive('/founder/spotlight')}
-                            collapsed={collapsed}
-                            onClick={onNav}
-                        />
+                        {spotlightReady ? (
+                            <NavItem
+                                href={route('founder.spotlight.edit')}
+                                icon="solar:crown-star-linear"
+                                label="Spotlight Profile"
+                                active={isActive('/founder/spotlight')}
+                                collapsed={collapsed}
+                                onClick={onNav}
+                            />
+                        ) : (
+                            <Tooltip delayDuration={150}>
+                                <TooltipTrigger asChild>
+                                    <div
+                                        className={cn(
+                                            'flex cursor-not-allowed items-center text-zinc-400',
+                                            collapsed ? 'mx-auto h-10 w-10 justify-center rounded-xl' : 'gap-3.5 rounded-xl px-4 py-2.5 text-[14px]',
+                                        )}
+                                        aria-disabled="true"
+                                    >
+                                        <Icon icon="solar:lock-linear" className="size-5 shrink-0" />
+                                        {!collapsed && <span className="flex-1 truncate tracking-tight">Spotlight Profile</span>}
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="right" sideOffset={12} className="max-w-[220px] text-xs font-medium">
+                                    Unlocks when your PARAGON audit is complete
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
                     </nav>
                 </div>
 
@@ -405,8 +430,13 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
     const { url } = usePage();
     const unreadNotifications = usePage<{ platform_unread_notifications?: { founder?: number } }>().props.platform_unread_notifications?.founder ?? 0;
     const unreadMessages = usePage<{ unread_messages_count?: number }>().props.unread_messages_count ?? 0;
+    const founderPortal = usePage<{
+        founder_portal?: { spotlight_ready?: boolean; pending_diligence_count?: number } | null;
+    }>().props.founder_portal;
     const recentNotifications =
         usePage<{ platform_recent_notifications?: { founder?: FounderNotification[] } }>().props.platform_recent_notifications?.founder ?? [];
+    const spotlightReady = founderPortal?.spotlight_ready ?? false;
+    const pendingDiligence = founderPortal?.pending_diligence_count ?? 0;
 
     useNotificationPolling(true);
 
@@ -463,6 +493,8 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
         unreadMessages,
         unreadNotifications,
         recentNotifications,
+        pendingDiligence,
+        spotlightReady,
         isActive,
         collapsed,
         toggleCollapse,

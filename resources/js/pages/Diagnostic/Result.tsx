@@ -281,7 +281,7 @@ export default function DiagnosticResult({
         primaryBtnText = 'Choose your audit tier';
         primaryBtnHref = '/checkout';
         secondaryBtnText = 'How the assessment works';
-        secondaryBtnHref = '/#about';
+        secondaryBtnHref = '/#blueprint';
     } else if (score >= 50 || (score >= 40 && hasFlags)) {
         ctaTitle = 'Close enough that the gaps are worth closing properly.';
         ctaCopy =

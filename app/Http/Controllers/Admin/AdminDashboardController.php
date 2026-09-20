@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditAssignment;
 use App\Models\DiagnosticSession;
 use App\Models\Founder;
+use App\Models\FounderProfile;
 use App\Models\Investor;
 use App\Models\InvestorInterest;
 use App\Models\Message;
 use App\Models\MessageThread;
 use App\Models\Payment;
+use App\Models\PiaApplication;
+use App\Models\SpotlightEntry;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -130,6 +133,21 @@ class AdminDashboardController extends Controller
         $systemAlerts = [];
 
         if ($showFounder) {
+            $pendingPiaCount = PiaApplication::query()
+                ->whereIn('status', ['pending', 'contacted'])
+                ->count();
+            if ($pendingPiaCount > 0) {
+                $needsAttention[] = [
+                    'id' => 'pending_pia',
+                    'title' => 'PIA payment requests',
+                    'description' => 'Founders waiting for payment confirmation.',
+                    'count' => $pendingPiaCount,
+                    'action_url' => $desk === 'founder' ? '/admin/founder/pia-requests?status=pending' : '/admin/pia-requests?status=pending',
+                    'icon' => 'solar:card-send-bold-duotone',
+                    'color' => 'amber',
+                ];
+            }
+
             $unreadMessagesCount = $user->adminUnreadMessagesCount();
             if ($unreadMessagesCount > 0) {
                 $needsAttention[] = [
@@ -242,15 +260,77 @@ class AdminDashboardController extends Controller
             default => $user->isSuperAdmin() ? $this->getRecentActivity($user) : [],
         };
 
+        // Dealflow handoff strip is investor-desk context only — not on Founder desk.
+        $dealflowHandoff = null;
+        if (
+            ($desk === 'platform' && $user->isSuperAdmin())
+            || ($desk === 'investors' && ($user->isSuperAdmin() || $user->isInvestorRelations()))
+        ) {
+            $dealflowHandoff = $this->dealflowHandoff();
+        }
+
+        $pendingPiaRequests = [];
+        if ($desk === 'founder' && $user->canManageAudit()) {
+            $pendingPiaRequests = PiaApplication::query()
+                ->whereIn('status', ['pending', 'contacted'])
+                ->latest()
+                ->limit(8)
+                ->get()
+                ->map(fn (PiaApplication $application) => [
+                    'id' => $application->id,
+                    'name' => $application->name,
+                    'email' => $application->email,
+                    'company' => $application->company,
+                    'selected_tier' => $application->selected_tier,
+                    'status' => $application->status,
+                    'created_at' => $application->created_at?->diffForHumans(),
+                ])
+                ->all();
+        }
+
         return Inertia::render('Admin/Dashboard', [
             'metrics' => $metrics,
             'recent_activity' => $recentActivity,
             'needs_attention' => $needsAttention,
             'system_alerts' => $systemAlerts,
+            'dealflow_handoff' => $dealflowHandoff,
+            'pending_pia_requests' => $pendingPiaRequests,
             'user_role' => $user->role,
             'date_range' => $dateRange,
             'desk' => $desk,
         ]);
+    }
+
+    /**
+     * Founder audit → Spotlight publish → investor dealflow bridge counts.
+     *
+     * @return array{audit_complete: int, ready_to_publish: int, published: int, pending_interests: int}
+     */
+    private function dealflowHandoff(): array
+    {
+        $readyToPublish = FounderProfile::query()
+            ->where('is_public', true)
+            ->whereNotNull('verified_at')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->whereNotNull('spotlight_one_liner')
+            ->where('spotlight_one_liner', '!=', '')
+            ->whereNotNull('spotlight_summary')
+            ->where('spotlight_summary', '!=', '')
+            ->whereDoesntHave('spotlightEntry', fn ($query) => $query->whereNotNull('published_at'))
+            ->whereHas(
+                'founder.documents',
+                fn ($query) => $query->where('visibility', 'spotlight')->where('is_reviewed', true)
+            )
+            ->count();
+
+        return [
+            'audit_complete' => Payment::where('audit_status', 'complete')->count(),
+            'ready_to_publish' => $readyToPublish,
+            'published' => SpotlightEntry::whereNotNull('published_at')->count(),
+            'pending_interests' => InvestorInterest::where('status', 'pending')->count(),
+        ];
     }
 
     public function revenue(): Response

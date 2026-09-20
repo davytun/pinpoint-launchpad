@@ -13,8 +13,17 @@ export default function EmailGate() {
         role: '',
     });
 
-    function submit(e: React.FormEvent) {
+    function submit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        // Uncontrolled fields + FormData so browser autofill is included.
+        // Inertia's transform() returns void — do not chain .post() on it.
+        const fd = new FormData(e.currentTarget);
+        const payload = {
+            name: String(fd.get('name') ?? '').trim(),
+            role: String(fd.get('role') ?? '').trim(),
+            email: String(fd.get('email') ?? '').trim(),
+        };
+        form.transform(() => payload);
         form.post(route('diagnostic.capture-email'));
     }
 
@@ -139,11 +148,12 @@ export default function EmailGate() {
                                             </Label>
                                             <input
                                                 id="name"
+                                                name="name"
                                                 type="text"
+                                                required
                                                 autoComplete="name"
                                                 placeholder="Jane Doe"
-                                                value={form.data.name}
-                                                onChange={(e) => form.setData('name', e.target.value)}
+                                                defaultValue=""
                                                 className="h-12 w-full rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 transition-all duration-200 outline-none placeholder:text-zinc-400 focus:border-[#3A54A5] focus:ring-2 focus:ring-[#3A54A5]/10"
                                             />
                                             {form.errors.name && <p className="text-xs text-rose-500">{form.errors.name}</p>}
@@ -155,10 +165,12 @@ export default function EmailGate() {
                                             </Label>
                                             <input
                                                 id="role"
+                                                name="role"
                                                 type="text"
+                                                required
+                                                autoComplete="organization-title"
                                                 placeholder="Founder & CEO"
-                                                value={form.data.role}
-                                                onChange={(e) => form.setData('role', e.target.value)}
+                                                defaultValue=""
                                                 className="h-12 w-full rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 transition-all duration-200 outline-none placeholder:text-zinc-400 focus:border-[#3A54A5] focus:ring-2 focus:ring-[#3A54A5]/10"
                                             />
                                             {form.errors.role && <p className="text-xs text-rose-500">{form.errors.role}</p>}
@@ -170,11 +182,12 @@ export default function EmailGate() {
                                             </Label>
                                             <input
                                                 id="email"
+                                                name="email"
                                                 type="email"
+                                                required
                                                 autoComplete="email"
                                                 placeholder="founder@startup.com"
-                                                value={form.data.email}
-                                                onChange={(e) => form.setData('email', e.target.value)}
+                                                defaultValue=""
                                                 className="h-12 w-full rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 transition-all duration-200 outline-none placeholder:text-zinc-400 focus:border-[#3A54A5] focus:ring-2 focus:ring-[#3A54A5]/10"
                                             />
                                             {form.errors.email && <p className="text-xs text-rose-500">{form.errors.email}</p>}
@@ -184,8 +197,8 @@ export default function EmailGate() {
 
                                         <button
                                             type="submit"
-                                            disabled={form.processing || !form.data.email.trim() || !form.data.name.trim() || !form.data.role.trim()}
-                                            className="group relative mt-2 flex w-full items-center justify-center gap-2 rounded-md border border-white/5 bg-[#3A54A5] px-5 py-4 text-xs font-bold tracking-[0.2em] text-white uppercase shadow-none transition-all duration-200 hover:bg-[#2D4182] disabled:cursor-not-allowed disabled:opacity-50"
+                                            disabled={form.processing}
+                                            className="group relative mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-md border border-white/5 bg-[#3A54A5] px-5 py-4 text-xs font-bold tracking-[0.2em] text-white uppercase shadow-none transition-all duration-200 hover:bg-[#2D4182] disabled:cursor-not-allowed disabled:opacity-50"
                                         >
                                             <span className="relative z-10 flex items-center gap-2">
                                                 {form.processing ? (

@@ -12,10 +12,15 @@ use Inertia\Response;
 
 class FounderSpotlightController extends Controller
 {
-    public function edit(): Response
+    public function edit(): Response|RedirectResponse
     {
         $founder = Auth::guard('founder')->user()->load('profile');
-        abort_unless($founder->profile, 404);
+
+        if (! $founder->profile) {
+            return redirect()
+                ->route('founder.dashboard')
+                ->with('info', 'Your Spotlight profile unlocks after the PARAGON audit is complete.');
+        }
 
         return Inertia::render('Founder/Spotlight', [
             'founder' => $founder->only(['id', 'full_name', 'company_name', 'email']),

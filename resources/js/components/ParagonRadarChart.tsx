@@ -1,7 +1,17 @@
 import { ChartConfig, ChartContainer } from '@/components/ui/chart';
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip, TooltipProps } from 'recharts';
 
-const pillars = [
+export type RadarPillarScores = {
+    potential?: number | null;
+    agility?: number | null;
+    risk?: number | null;
+    alignment?: number | null;
+    governance?: number | null;
+    operations?: number | null;
+    network?: number | null;
+};
+
+const DEMO_PILLARS = [
     { pillar: 'Potential', score: 91 },
     { pillar: 'Agility', score: 78 },
     { pillar: 'Risk', score: 74 },
@@ -11,9 +21,19 @@ const pillars = [
     { pillar: 'Network', score: 79 },
 ];
 
+const PILLAR_ORDER: { key: keyof RadarPillarScores; label: string }[] = [
+    { key: 'potential', label: 'Potential' },
+    { key: 'agility', label: 'Agility' },
+    { key: 'risk', label: 'Risk' },
+    { key: 'alignment', label: 'Alignment' },
+    { key: 'governance', label: 'Governance' },
+    { key: 'operations', label: 'Operations' },
+    { key: 'network', label: 'Network' },
+];
+
 const chartConfig = {
     score: {
-        label: 'Example profile',
+        label: 'PARAGON score',
         color: '#3A54A5',
     },
 } satisfies ChartConfig;
@@ -55,12 +75,31 @@ function AxisTick({ x, y, payload, cx, cy }: { x?: number; y?: number; cx?: numb
     );
 }
 
-export function ParagonRadarChart() {
+function buildPillars(scores?: RadarPillarScores | null) {
+    if (!scores) return DEMO_PILLARS;
+
+    return PILLAR_ORDER.map(({ key, label }) => ({
+        pillar: label,
+        score: Math.round(Number(scores[key] ?? 0)),
+    }));
+}
+
+interface ParagonRadarChartProps {
+    scores?: RadarPillarScores | null;
+    /** When true (default if no scores), show marketing demo caption */
+    illustrative?: boolean;
+}
+
+export function ParagonRadarChart({ scores = null, illustrative }: ParagonRadarChartProps) {
+    const hasRealScores = scores != null && PILLAR_ORDER.some(({ key }) => scores[key] != null);
+    const data = hasRealScores ? buildPillars(scores) : DEMO_PILLARS;
+    const showIllustrative = illustrative ?? !hasRealScores;
+
     return (
         <div className="w-full">
             <ChartContainer config={chartConfig} className="mx-auto h-[320px] w-full max-w-[400px] md:h-[400px] md:max-w-none">
                 <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={pillars} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
+                    <RadarChart data={data} margin={{ top: 10, right: 10, bottom: 10, left: 10 }} outerRadius="62%">
                         <PolarGrid stroke="rgba(9, 9, 11, 0.08)" strokeDasharray="3 3" />
                         <PolarAngleAxis dataKey="pillar" tick={(props) => <AxisTick {...props} />} stroke="transparent" />
                         <Tooltip content={<CustomTooltip />} cursor={false} />
@@ -77,7 +116,9 @@ export function ParagonRadarChart() {
                     </RadarChart>
                 </ResponsiveContainer>
             </ChartContainer>
-            <p className="mt-2 text-center text-[11px] font-medium tracking-wide text-zinc-400">Illustrative profile shape</p>
+            <p className="mt-2 text-center text-[11px] font-medium tracking-wide text-zinc-400">
+                {showIllustrative ? 'Illustrative profile shape' : 'Your Self-Scan pillar scores'}
+            </p>
         </div>
     );
 }

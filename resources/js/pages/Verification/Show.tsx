@@ -1,12 +1,7 @@
+import { PinpointLogo } from '@/components/pinpoint-logo';
 import { Head } from '@inertiajs/react';
-import { motion } from 'framer-motion';
-import { Clock, FileText, Lock, Shield } from 'lucide-react';
+import { useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } from 'recharts';
-
-import SideRays from '@/components/SideRays';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Badge {
     badge_type: string;
@@ -44,73 +39,60 @@ interface PageProps {
     slug: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+const PILLARS = [
+    { key: 'potential', letter: 'P', name: 'Potential' },
+    { key: 'agility', letter: 'A', name: 'Agility' },
+    { key: 'risk', letter: 'R', name: 'Risk' },
+    { key: 'alignment', letter: 'A', name: 'Alignment' },
+    { key: 'governance', letter: 'G', name: 'Governance' },
+    { key: 'operations', letter: 'O', name: 'Operations' },
+    { key: 'network', letter: 'N', name: 'Network' },
+] as const;
 
-const PILLAR_KEYS = ['potential', 'agility', 'risk', 'alignment', 'governance', 'operations', 'network'];
-const PILLAR_LABELS: Record<string, string> = {
-    potential: 'Potential',
-    agility: 'Agility',
-    risk: 'Risk',
-    alignment: 'Alignment',
-    governance: 'Governance',
-    operations: 'Operations',
-    network: 'Network',
-};
-
-// ─── Count-up ─────────────────────────────────────────────────────────────────
-
-function CountUp({ target, duration = 1200 }: { target: number; duration?: number }) {
-    const [value, setValue] = useState(0);
-    const raf = useRef<number>(0);
-    const startTs = useRef<number>(0);
+function CountUp({ target }: { target: number }) {
+    const reduceMotion = useReducedMotion();
+    const [value, setValue] = useState(reduceMotion ? target : 0);
+    const raf = useRef(0);
 
     useEffect(() => {
-        startTs.current = performance.now();
-        function tick(now: number) {
-            const elapsed = now - startTs.current;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            setValue(Math.round(eased * target));
-            if (progress < 1) raf.current = requestAnimationFrame(tick);
+        if (reduceMotion) {
+            setValue(target);
+            return;
         }
+        const start = performance.now();
+        const tick = (now: number) => {
+            const t = Math.min((now - start) / 900, 1);
+            setValue(Math.round((1 - (1 - t) ** 3) * target));
+            if (t < 1) raf.current = requestAnimationFrame(tick);
+        };
         raf.current = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(raf.current);
-    }, [target, duration]);
+    }, [target, reduceMotion]);
 
     return <>{value}</>;
 }
 
-// ─── Score colour ─────────────────────────────────────────────────────────────
-
-function scoreColor(score?: number | null): string {
-    if (score == null) return '#64748B';
-    if (score > 85) return '#10B981';
-    if (score >= 65) return '#3A54A5';
-    return '#F59E0B';
-}
-
-// ─── Diligence rows by tier ───────────────────────────────────────────────────
-
 function diligenceRows(tier?: string | null) {
     const base = [
-        { name: 'PARAGON Assessment Report', level: 'Analyst Certified' },
-        { name: 'Radar Chart — Detailed Breakdown', level: 'Verified via Diagnostic Engine' },
+        { name: 'PARAGON assessment report', note: 'Full written findings' },
+        { name: 'Pillar score annex', note: 'How each dimension was scored' },
     ];
     const growth = [
-        { name: 'Financial Stress-Test Results', level: 'Verified via Bank/Stripe Data' },
-        { name: 'Cap Table Certification', level: 'Tier 2 Audit Complete' },
+        { name: 'Financial stress test', note: 'Cash, burn, runway evidence' },
+        { name: 'Cap table certification', note: 'Ownership reconciliation' },
     ];
     const institutional = [
-        { name: 'Unit Economics & LTV Model', level: 'Verified via Stripe API' },
-        { name: 'Articles of Incorporation / IP Assignment', level: 'Legal Counsel Certified' },
+        { name: 'Unit economics model', note: 'LTV / CAC and payback' },
+        { name: 'IP and incorporation file', note: 'Chain of title reviewed' },
     ];
-
     if (tier === 'institutional') return [...base, ...growth, ...institutional];
     if (tier === 'growth') return [...base, ...growth];
     return base;
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+function cleanBadge(label: string) {
+    return label.replace(/:/g, ' ·').replace(/\s+/g, ' ').trim();
+}
 
 export default function VerificationShow({
     company_name = 'Verified Company',
@@ -126,223 +108,154 @@ export default function VerificationShow({
     days_until_expiry,
     is_sample = false,
 }: PageProps) {
-    const color = scoreColor(overall_score);
-    const safeBadges = Array.isArray(badges) ? badges : [];
-    const radarItems = PILLAR_KEYS.map((k) => ({
-        subject: PILLAR_LABELS[k],
-        value: Number(radar_data?.[k] ?? 0),
-    }));
     const rows = diligenceRows(tier);
+    const safeBadges = Array.isArray(badges) ? badges : [];
     const showExpiryWarning = !is_sample && days_until_expiry != null && days_until_expiry <= 14;
-
-    const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
+    const meta = [batch, sector, tier ? `${tier} grade` : null].filter(Boolean).join('  ·  ');
 
     return (
         <>
-            <Head title={`${company_name} — Pinpoint Verified`} />
+            <Head title={`${company_name} — Pinpoint`} />
 
-            <div className="relative min-h-screen overflow-x-hidden bg-[#f4f7fc] font-sans text-zinc-900 antialiased">
-                {/* ── Background SideRays ── */}
-                <div className="pointer-events-none fixed inset-0 z-0">
-                    <SideRays
-                        rayColor1="#3A54A5"
-                        rayColor2="#93C5FD"
-                        origin="top-left"
-                        speed={1.8}
-                        intensity={1.2}
-                        spread={2}
-                        tilt={0}
-                        saturation={1.5}
-                        blend={0.35}
-                        falloff={2.3}
-                        opacity={0.25}
-                    />
-                </div>
-
-                {/* Ambient top glow */}
+            <div className="relative min-h-screen bg-[#f3f5f9] text-[#1c2438]">
+                {/* Quiet paper wash — no glass cards, no ray circus */}
                 <div
-                    className="pointer-events-none fixed inset-x-0 top-0 z-0 h-100 opacity-10"
+                    className="pointer-events-none absolute inset-0"
                     style={{
-                        background: 'radial-gradient(circle at top, #3A54A5, transparent 70%)',
+                        background:
+                            'radial-gradient(ellipse 80% 50% at 10% -10%, rgba(58,84,165,0.09), transparent 55%), radial-gradient(ellipse 60% 40% at 100% 0%, rgba(58,84,165,0.05), transparent 50%)',
                     }}
                 />
 
-                <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 lg:px-8">
-                    {/* 30-day transition banner */}
-                    <div className="animate-fade-in mb-6 rounded-xl border border-[#3A54A5]/25 bg-[#eef2ff] p-5 text-sm text-[#3A54A5] shadow-xs">
-                        <div className="flex items-start gap-4">
-                            <Shield className="mt-0.5 size-6 shrink-0 text-[#3A54A5]" />
-                            <div>
-                                <h3 className="text-base font-extrabold text-zinc-950">Important Notice: Moving to Secure Access</h3>
-                                <p className="mt-1 text-zinc-700">
-                                    Pinpoint is transitioning to a secure Investor Portal. Public verification pages are now deprecated. To continue
-                                    reviewing detailed PARAGON reports and data rooms, please create your verified investor account.
-                                </p>
-                                <a
-                                    href="/investor"
-                                    className="mt-4 inline-block rounded-xl bg-[#3A54A5] px-5 py-2.5 font-bold text-white shadow-sm transition hover:bg-[#2D4182]"
-                                >
-                                    Join Pinpoint Investor Network
-                                </a>
-                            </div>
-                        </div>
+                <div className="relative mx-auto max-w-3xl px-5 pt-10 pb-20 sm:px-8">
+                    {/* Masthead */}
+                    <div className="mb-14 flex items-start justify-between gap-6">
+                        <a href="/" className="opacity-90 transition hover:opacity-100">
+                            <PinpointLogo height={20} variant="dark" />
+                        </a>
+                        <a
+                            href="/investor"
+                            className="pt-0.5 text-[12px] font-medium text-[#3A54A5] underline decoration-[#3A54A5]/30 underline-offset-4 transition hover:decoration-[#3A54A5]"
+                        >
+                            Investor portal
+                        </a>
                     </div>
 
-                    {/* Sample banner */}
-                    {is_sample && (
-                        <div className="animate-fade-in mb-6 rounded-xl border border-amber-500/25 bg-amber-50 py-2.5 text-center text-sm font-semibold text-amber-700 shadow-xs">
-                            SAMPLE PROFILE — This is a demonstration of the Pinpoint verification page.
-                        </div>
-                    )}
+                    {/* One composition: company + score */}
+                    <header className="relative mb-12 border-b border-[#1c2438]/12 pb-10">
+                        {is_sample && (
+                            <p className="mb-5 font-mono text-[11px] tracking-[0.2em] text-[#3A54A5]/80 uppercase">
+                                Sample — demonstration only
+                            </p>
+                        )}
 
-                    {/* Expiry warning */}
-                    {showExpiryWarning && (
-                        <div className="animate-fade-in mb-6 rounded-xl border border-amber-500/25 bg-amber-50 py-2.5 text-center text-sm font-semibold text-amber-700 shadow-xs">
-                            This verification expires in {days_until_expiry} day{days_until_expiry !== 1 ? 's' : ''}. Renewal required.
-                        </div>
-                    )}
+                        <p className="font-mono text-[11px] tracking-[0.14em] text-[#5a6578] uppercase">
+                            Pinpoint verification
+                            {verified_at ? ` · ${verified_at}` : ''}
+                        </p>
 
-                    {/* Single Master Certificate Card */}
-                    <motion.div
-                        className="animate-fade-in min-w-0 space-y-8 overflow-hidden rounded-[2.5rem] border border-zinc-200/80 bg-white p-6 shadow-[0_12px_45px_rgba(0,0,0,0.02)] sm:p-10"
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, ease }}
-                    >
-                        {/* ── Header Section ── */}
-                        <div className="flex flex-col gap-6 border-b border-zinc-100 pb-8 md:flex-row md:items-start md:justify-between">
-                            <div className="space-y-3.5">
-                                {/* Verification Badge */}
-                                <div className="border-emerald-250 inline-flex items-center gap-1.5 rounded-full border bg-emerald-50 px-3 py-1 text-[11px] font-bold tracking-wide text-emerald-700 uppercase shadow-xs">
-                                    <Shield className="text-emerald-650 size-3.5" />
-                                    Pinpoint Certified: {tier ? tier.toUpperCase() : 'INSTITUTIONAL'} Grade
-                                </div>
-
-                                <h1 className="text-4xl leading-none font-extrabold tracking-tight text-zinc-950">{company_name}</h1>
-
-                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold tracking-wider text-zinc-500 uppercase">
-                                    <span>{batch ?? 'Spring 2026'}</span>
-                                    {sector && (
-                                        <>
-                                            <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
-                                            <span>{sector}</span>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col items-start gap-1 md:items-end md:text-right">
-                                <span className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">Verification Status</span>
-                                <span className="text-emerald-650 mt-0.5 rounded-md border border-emerald-200/50 bg-emerald-50/50 px-2 py-0.5 text-xs font-extrabold">
-                                    Active
-                                </span>
-                                {verified_at && <span className="mt-1 text-[11px] font-semibold text-zinc-500">Verified On {verified_at}</span>}
-                            </div>
-                        </div>
-
-                        {/* ── Score & Executive Summary Panel ── */}
-                        <div className="grid gap-8 lg:grid-cols-3">
-                            {/* Left: PARAGON Score */}
-                            <div className="min-w-0 space-y-4 overflow-hidden">
-                                <p className="text-xs font-bold tracking-[0.28em] text-zinc-400 uppercase">PARAGON Score</p>
-                                <div className="flex items-end gap-1 leading-none">
-                                    <span className="text-6xl leading-none font-black" style={{ color }}>
-                                        {overall_score != null ? <CountUp target={overall_score} /> : '—'}
-                                    </span>
-                                    <span className="mb-1 text-xl font-semibold text-zinc-400">/ 100</span>
-                                </div>
-                                <div className="flex h-[200px] w-full items-center justify-center pt-2">
-                                    <ResponsiveContainer width="100%" height={200} minWidth={0}>
-                                        <RadarChart data={radarItems} outerRadius="62%" margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-                                            <PolarGrid stroke="#E2E8F0" />
-                                            <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748B', fontSize: 9, fontWeight: 600 }} />
-                                            <Radar dataKey="value" stroke={color} fill={`${color}25`} strokeWidth={2} dot={{ fill: color, r: 3 }} />
-                                        </RadarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-
-                            {/* Right: Executive Summary */}
-                            <div className="flex flex-col justify-between space-y-4 lg:col-span-2">
-                                <div className="space-y-3">
-                                    <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
-                                        <p className="text-xs font-bold tracking-[0.28em] text-zinc-400 uppercase">ANALYST EXECUTIVE SUMMARY</p>
-                                        <span className="text-zinc-450 flex items-center gap-1 text-[11px] font-semibold">
-                                            <Clock className="size-3" />
-                                            Timestamped &amp; Analyst-Signed
-                                        </span>
-                                    </div>
-
-                                    {analyst_summary ? (
-                                        <p className="text-[14px] leading-relaxed font-semibold text-zinc-700">{analyst_summary}</p>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200/60 bg-zinc-50/50 p-6 py-8 text-center shadow-xs">
-                                            <Shield className="mb-2 size-6 animate-pulse text-zinc-300" />
-                                            <p className="max-w-xs text-xs leading-relaxed font-bold text-zinc-500">
-                                                The official analyst evaluation summary will be published here upon audit completion.
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {safeBadges.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5 pt-2">
-                                        {safeBadges.map((badge) => (
-                                            <span
-                                                key={badge.badge_type}
-                                                className="border-zinc-250/70 text-zinc-650 animate-fade-in rounded-lg border bg-white px-3 py-1 text-xs font-bold shadow-xs"
-                                            >
-                                                {badge.label}
-                                            </span>
-                                        ))}
-                                    </div>
+                        <div className="mt-4 flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+                            <div className="min-w-0 flex-1">
+                                <h1 className="font-display text-[2.35rem] leading-[1.05] font-semibold tracking-[-0.03em] text-[#141b2d] sm:text-5xl">
+                                    {company_name}
+                                </h1>
+                                {meta && <p className="mt-3 text-[14px] text-[#5a6578]">{meta}</p>}
+                                {showExpiryWarning && (
+                                    <p className="mt-2 text-[13px] font-medium text-[#9a5b12]">
+                                        Expires in {days_until_expiry} day{days_until_expiry !== 1 ? 's' : ''}.
+                                    </p>
                                 )}
                             </div>
-                        </div>
 
-                        {/* Divider */}
-                        <div className="h-px bg-zinc-100" />
-
-                        {/* ── Diligence Assets Checklist Section ── */}
-                        <div className="space-y-5">
-                            <div className="flex flex-col gap-4 pb-1 sm:flex-row sm:items-center sm:justify-between">
-                                <div>
-                                    <h2 className="text-lg font-extrabold tracking-tight text-zinc-950">Verified Diligence Assets</h2>
-                                    <p className="mt-0.5 text-[13px] font-semibold text-zinc-500">
-                                        Access verified financial audits and diagnostic reports through the Investor Portal.
-                                    </p>
-                                </div>
+                            <div className="shrink-0 sm:text-right">
+                                <p className="font-mono text-[10px] tracking-[0.22em] text-[#5a6578] uppercase">Score</p>
+                                <p className="font-display mt-1 text-[4.5rem] leading-none font-semibold tracking-[-0.04em] text-[#3A54A5] sm:text-[5.5rem]">
+                                    {overall_score != null ? <CountUp target={overall_score} /> : '—'}
+                                    <span className="ml-1 text-2xl font-medium text-[#8b95a8]">/100</span>
+                                </p>
                             </div>
+                        </div>
+                    </header>
 
-                            <div className="divide-y divide-zinc-100">
-                                {rows.map((row, i) => (
-                                    <div key={i} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200/80 bg-zinc-50 text-zinc-400">
-                                                <FileText className="size-5" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-[14px] leading-snug font-bold text-zinc-900">{row.name}</h3>
-                                                <p className="mt-0.5 text-[11px] font-semibold text-zinc-500">{row.level}</p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-zinc-50 px-3 py-1.5 text-xs font-bold text-zinc-400 select-none">
-                                                <Lock className="size-3.5" /> Portal Only
-                                            </span>
-                                        </div>
+                    {/* PARAGON strip — the one signature, not a chart widget */}
+                    <section className="mb-12" aria-label="PARAGON pillars">
+                        <p className="mb-4 font-mono text-[10px] tracking-[0.22em] text-[#5a6578] uppercase">PARAGON</p>
+                        <div className="grid grid-cols-7 gap-px overflow-hidden rounded-sm bg-[#1c2438]/10">
+                            {PILLARS.map(({ key, letter, name }) => {
+                                const score = Number(radar_data?.[key] ?? 0);
+                                return (
+                                    <div key={key} className="bg-[#f3f5f9] px-1 py-3 text-center sm:px-2 sm:py-4">
+                                        <p className="font-display text-lg font-semibold text-[#141b2d] sm:text-xl">
+                                            {radar_data?.[key] != null ? Math.round(score) : '—'}
+                                        </p>
+                                        <p className="mt-1 font-mono text-[10px] tracking-widest text-[#3A54A5]">{letter}</p>
+                                        <p className="mt-0.5 hidden text-[9px] text-[#8b95a8] sm:block">{name}</p>
                                     </div>
-                                ))}
-                            </div>
+                                );
+                            })}
                         </div>
-                    </motion.div>
+                    </section>
 
-                    {/* ── Footer ── */}
-                    <div className="animate-fade-in mt-10 border-t border-zinc-200 pt-8 text-center">
-                        <p className="text-zinc-555 text-sm font-semibold">This verification is valid for 90 days.</p>
-                        {expires_at && <p className="text-zinc-555 text-sm font-semibold">Next scheduled audit: {expires_at}</p>}
-                    </div>
+                    {/* Analyst note — prose, not a card */}
+                    <section className="mb-14">
+                        <p className="mb-3 font-mono text-[10px] tracking-[0.22em] text-[#5a6578] uppercase">Analyst note</p>
+                        {analyst_summary ? (
+                            <p className="max-w-2xl text-[17px] leading-[1.65] text-[#2a3348]">{analyst_summary}</p>
+                        ) : (
+                            <p className="text-[15px] text-[#5a6578]">Findings will appear here when the audit is complete.</p>
+                        )}
+
+                        {safeBadges.length > 0 && (
+                            <p className="mt-6 max-w-2xl text-[13px] leading-relaxed text-[#5a6578]">
+                                Checked:{' '}
+                                {safeBadges.map((b, i) => (
+                                    <span key={b.badge_type}>
+                                        {i > 0 && ' · '}
+                                        <span className="text-[#2a3348]">{cleanBadge(b.label)}</span>
+                                    </span>
+                                ))}
+                            </p>
+                        )}
+                    </section>
+
+                    {/* Locked materials — table, not portal pills */}
+                    <section className="mb-14">
+                        <div className="mb-4 flex items-baseline justify-between gap-4">
+                            <p className="font-mono text-[10px] tracking-[0.22em] text-[#5a6578] uppercase">Materials</p>
+                            <p className="text-[12px] text-[#8b95a8]">Available after portal access</p>
+                        </div>
+                        <ul className="border-t border-[#1c2438]/12">
+                            {rows.map((row) => (
+                                <li
+                                    key={row.name}
+                                    className="grid grid-cols-[1fr_auto] items-baseline gap-4 border-b border-[#1c2438]/10 py-3.5 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto]"
+                                >
+                                    <span className="text-[14px] font-medium text-[#141b2d]">{row.name}</span>
+                                    <span className="hidden text-[13px] text-[#5a6578] sm:block">{row.note}</span>
+                                    <span className="font-mono text-[11px] tracking-wide text-[#8b95a8]">Locked</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+
+                    {/* Quiet close — not a marketing banner */}
+                    <section className="border-t border-[#1c2438]/12 pt-8">
+                        <p className="max-w-md text-[14px] leading-relaxed text-[#5a6578]">
+                            Public verification pages are retired. Detailed reports and data rooms live in the Investor Portal.
+                        </p>
+                        <a
+                            href="/investor"
+                            className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[#3A54A5] transition hover:text-[#2D4182]"
+                        >
+                            Create an investor account
+                            <span aria-hidden>→</span>
+                        </a>
+                        <p className="mt-10 text-[12px] text-[#8b95a8]">
+                            Valid 90 days
+                            {expires_at ? ` · Next audit ${expires_at}` : ''}
+                            {is_sample ? ' · Not a live listing' : ''}
+                        </p>
+                    </section>
                 </div>
             </div>
         </>

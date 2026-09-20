@@ -210,9 +210,9 @@ class CheckoutController extends Controller
         if ($application->wasRecentlyCreated) {
             try {
                 Mail::to(config('mail.admin_address', config('mail.from.address')))
-                    ->send(new PiaApplicationAdminMail($application));
+                    ->queue(new PiaApplicationAdminMail($application));
             } catch (\Throwable $e) {
-                Log::error('Failed to send diagnostic PIA request notification', [
+                Log::error('Failed to queue diagnostic PIA request notification', [
                     'application_id' => $application->id,
                     'error' => $e->getMessage(),
                 ]);
@@ -253,9 +253,9 @@ class CheckoutController extends Controller
 
         try {
             $adminEmail = config('mail.admin_address', config('mail.from.address'));
-            Mail::to($adminEmail)->send(new PiaApplicationAdminMail($application));
+            Mail::to($adminEmail)->queue(new PiaApplicationAdminMail($application));
         } catch (\Throwable $e) {
-            Log::error('Failed to send PIA application admin notification', [
+            Log::error('Failed to queue PIA application admin notification', [
                 'application_id' => $application->id,
                 'error' => $e->getMessage(),
             ]);

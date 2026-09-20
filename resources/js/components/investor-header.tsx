@@ -39,7 +39,7 @@ interface CustomPageProps extends PageProps {
 export function InvestorHeader({
     activeTab = 'spotlight',
 }: {
-    activeTab?: 'spotlight' | 'interests' | 'data-rooms' | 'diligence' | 'kyc' | 'notifications';
+    activeTab?: 'home' | 'spotlight' | 'interests' | 'data-rooms' | 'diligence' | 'kyc' | 'notifications';
 }) {
     const page = usePage<CustomPageProps>();
     const unreadNotifications = page.props.platform_unread_notifications?.investor ?? 0;
@@ -88,10 +88,21 @@ export function InvestorHeader({
             )}
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center gap-10">
-                    <Link href={route('investor.spotlight.index')} className="transition-opacity hover:opacity-80">
+                    <Link href={route('investor.dashboard')} className="transition-opacity hover:opacity-80">
                         <PinpointLogo height={24} />
                     </Link>
                     <nav className="hidden items-center gap-1.5 md:flex">
+                        <Link
+                            href={route('investor.dashboard')}
+                            className={cn(
+                                'rounded-lg px-3 py-2 text-[13px] transition-colors',
+                                activeTab === 'home'
+                                    ? 'bg-zinc-100 font-semibold text-zinc-950'
+                                    : 'font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-950',
+                            )}
+                        >
+                            Home
+                        </Link>
                         <Link
                             href={route('investor.spotlight.index')}
                             className={cn(

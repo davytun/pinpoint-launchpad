@@ -172,13 +172,16 @@ class FounderDashboardController extends Controller
             'payment' => $founder->payment ? [
                 'tier' => $founder->payment->tier,
                 'total_amount' => $founder->payment->total_amount,
+                'currency' => $founder->payment->currency ?? 'NGN',
                 'paid_at' => $founder->payment->paid_at?->toISOString(),
             ] : null,
             'signature' => $founder->signature ? [
                 'status' => $founder->signature->status,
                 'signed_at' => $founder->signature->signed_at?->toISOString(),
             ] : null,
+            'spotlight_ready' => $founder->profile !== null,
             'spotlight_featured' => $founder->profile?->is_featured_in_spotlight ?? false,
+            'has_diagnostic' => $founder->diagnostic_session_id !== null && $founder->score !== null,
             'investor_interests' => $investorInterests,
             'pending_diligence_count' => $pendingDiligenceCount,
         ]);

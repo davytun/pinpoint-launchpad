@@ -70,7 +70,11 @@ test('superadmin dashboard generates accurate action-required workflows with val
             ->where('needs_attention.0.action_url', '/admin/founder/messages')
             ->where('needs_attention.1.action_url', '/admin/investors/accounts?kyc_status=pending')
             ->where('needs_attention.2.action_url', '/admin/investors/dealflow/interests?status=pending')
-            ->where('needs_attention.3.action_url', '/admin/founder/founders?status=pending'));
+            ->where('needs_attention.3.action_url', '/admin/founder/founders?status=pending')
+            ->where('dealflow_handoff.pending_interests', 1)
+            ->has('dealflow_handoff.audit_complete')
+            ->has('dealflow_handoff.ready_to_publish')
+            ->has('dealflow_handoff.published'));
 
     $this->actingAs($superadmin)
         ->get(route('admin.revenue', ['currency' => 'NGN']))

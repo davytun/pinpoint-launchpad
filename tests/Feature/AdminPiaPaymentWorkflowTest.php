@@ -33,7 +33,7 @@ test('a superadmin can confirm an offline PIA payment and send the agreement han
     ]);
 
     $this->actingAs($admin)
-        ->post(route('admin.pia-requests.payment-received', $application), ['amount' => 2090000, 'currency' => 'NGN'])
+        ->post(route('admin.founder.pia-requests.payment-received', $application), ['amount' => 2090000, 'currency' => 'NGN'])
         ->assertRedirect();
 
     $payment = Payment::query()->sole();
@@ -45,6 +45,42 @@ test('a superadmin can confirm an offline PIA payment and send the agreement han
 
     expect($application->fresh()->status)->toBe('converted');
     Mail::assertSent(PiaAgreementInviteMail::class, fn (PiaAgreementInviteMail $mail) => $mail->hasTo('founder@example.test'));
+});
+
+test('founder desk surfaces open PIA requests for analysts and superadmins', function () {
+    $analyst = User::factory()->create(['role' => 'analyst']);
+    $superadmin = User::factory()->create(['role' => 'superadmin']);
+
+    PiaApplication::create([
+        'name' => 'Ada Founder',
+        'email' => 'ada@startup.test',
+        'company' => 'Startup Co',
+        'country' => 'Nigeria',
+        'stage' => 'seed',
+        'raise_target' => '$100k-$500k',
+        'source' => 'diagnostic_tier_selection',
+        'selected_tier' => 'foundation',
+        'status' => 'pending',
+    ]);
+
+    $this->actingAs($analyst)
+        ->get(route('admin.founder.pia-requests.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Admin/PiaRequests/Index')
+            ->where('desk', 'founder')
+            ->where('can_record_payment', false)
+            ->has('applications.data', 1));
+
+    $this->actingAs($superadmin)
+        ->get(route('admin.founder.dashboard'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('Admin/Dashboard')
+            ->where('desk', 'founder')
+            ->has('pending_pia_requests', 1)
+            ->where('pending_pia_requests.0.company', 'Startup Co')
+            ->where('dealflow_handoff', null));
 });
 
 test('only a superadmin can record offline payment', function () {
@@ -60,7 +96,7 @@ test('only a superadmin can record offline payment', function () {
     ]);
 
     $this->actingAs($analyst)
-        ->post(route('admin.pia-requests.payment-received', $application), ['amount' => 2090000, 'currency' => 'NGN'])
+        ->post(route('admin.founder.pia-requests.payment-received', $application), ['amount' => 2090000, 'currency' => 'NGN'])
         ->assertForbidden();
 });
 

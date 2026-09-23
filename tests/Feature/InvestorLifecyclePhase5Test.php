@@ -82,7 +82,7 @@ test('complete cross-portal investor lifecycle with strict KYC gating, startup i
         'terms_agreed' => true,
         'aml_confirmed' => true,
     ]);
-    $regResponse->assertRedirect(route('investor.dashboard'));
+    $regResponse->assertRedirect(route('investor.spotlight.index'));
 
     $investor = Investor::where('email', 'alexander.vance@venture.com')->firstOrFail();
     expect($investor->kyc_status)->toBe(Investor::KYC_STATUS_NOT_SUBMITTED)

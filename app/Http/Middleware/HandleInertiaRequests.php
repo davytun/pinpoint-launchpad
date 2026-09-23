@@ -59,6 +59,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
                 'info' => $request->session()->get('info'),
+                'agreement_url' => $request->session()->get('agreement_url'),
             ],
             'admin_unread_messages' => ($admin = Auth::guard('web')->user())?->canAccessFounderAdmin()
                 ? $admin->adminUnreadMessagesCount()

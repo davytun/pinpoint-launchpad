@@ -414,10 +414,15 @@ function InterestDrawer({
                                     <Icon icon="solar:close-circle-bold" className="size-3.5 text-rose-600" />
                                     <span>Declined by Founder</span>
                                 </span>
-                            ) : (
+                            ) : interest.status === 'pending' ? (
                                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700">
                                     <Icon icon="solar:clock-circle-bold" className="size-3.5 text-amber-600" />
                                     <span>Awaiting Founder Response</span>
+                                </span>
+                            ) : (
+                                <span className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 text-[11px] font-bold text-zinc-600">
+                                    <Icon icon="solar:info-circle-bold" className="size-3.5 text-zinc-500" />
+                                    <span>Not recorded</span>
                                 </span>
                             )}
                         </div>
@@ -426,7 +431,9 @@ function InterestDrawer({
                                 ? 'The founder has authorized Pinpoint to finalize and execute this engagement.'
                                 : interest.founder_decision === 'declined'
                                   ? 'The founder declined willingness to proceed with this request.'
-                                  : 'Pinpoint has requested authorization from the founder via the Founder Portal.'}
+                                  : interest.status === 'pending'
+                                    ? 'Pinpoint has requested authorization from the founder via the Founder Portal.'
+                                    : 'Founder authorization was not recorded for this engagement.'}
                         </p>
                     </div>
 

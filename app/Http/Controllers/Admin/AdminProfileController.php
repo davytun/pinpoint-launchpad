@@ -18,7 +18,7 @@ class AdminProfileController extends Controller
     {
         $user = Auth::user();
 
-        $query = FounderProfile::with(['founder:id,full_name,company_name,email'])
+        $query = FounderProfile::with(['founder:id,full_name,company_name,email', 'spotlightEntry'])
             ->withCount(['badges as verified_badges_count' => fn ($q) => $q->where('is_verified', true)]);
 
         if ($user->isAnalyst()) {
@@ -37,6 +37,7 @@ class AdminProfileController extends Controller
                 'overall_score' => $p->overall_score,
                 'is_public' => $p->is_public,
                 'is_live' => $p->isLive(),
+                'is_published' => $p->spotlightEntry?->published_at !== null,
                 'is_expired' => $p->isExpired(),
                 'verified_badges_count' => $p->verified_badges_count,
                 'verified_at' => $p->verified_at?->format('d M Y'),
@@ -58,6 +59,7 @@ class AdminProfileController extends Controller
             'founder:id,full_name,company_name,email',
             'badges',
             'investorInterests.investor.profile',
+            'spotlightEntry',
         ]);
 
         $diagnosticSession = null;
@@ -98,6 +100,7 @@ class AdminProfileController extends Controller
                 'id' => $profile->id,
                 'slug' => $profile->slug,
                 'is_public' => $profile->is_public,
+                'is_published' => $profile->spotlightEntry?->published_at !== null,
                 'overall_score' => $overallScore,
                 'radar_data' => $radarData,
                 'analyst_summary' => $profile->analyst_summary,

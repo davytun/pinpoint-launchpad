@@ -1,10 +1,13 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AdminLayout from '@/layouts/admin-layout';
+import { cn } from '@/lib/utils';
 
 type Tier = 'foundation' | 'growth' | 'institutional';
 type Currency = 'NGN' | 'USD';
+type Status = 'pending' | 'contacted' | 'converted';
 
 interface Application {
     id: number;
@@ -16,14 +19,24 @@ interface Application {
     raise_target: string;
     message: string | null;
     selected_tier: Tier | null;
-    status: 'pending' | 'contacted' | 'converted';
+    status: Status;
     source: string;
     created_at: string;
+    agreement_url?: string | null;
+}
+
+interface PaginatedApplications {
+    data: Application[];
+    current_page: number;
+    last_page: number;
+    prev_page_url: string | null;
+    next_page_url: string | null;
 }
 
 interface PageProps {
-    applications: { data: Application[] };
-    activeStatus: 'all' | Application['status'];
+    applications: PaginatedApplications;
+    activeStatus: 'all' | Status;
+    statusCounts: Record<'all' | Status, number>;
     tierAmounts: Record<Currency, Record<Tier, number>>;
     desk?: 'platform' | 'founder';
     can_record_payment?: boolean;
@@ -35,15 +48,72 @@ const tierLabels: Record<Tier, string> = {
     institutional: 'Institutional',
 };
 
+const statusLabel: Record<Status, string> = {
+    pending: 'New',
+    contacted: 'Waiting',
+    converted: 'Paid',
+};
+
+const filterTabs: { key: 'all' | Status; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'pending', label: 'New' },
+    { key: 'contacted', label: 'Waiting' },
+    { key: 'converted', label: 'Paid' },
+];
+
+function formatMoney(amount: number, currency: Currency) {
+    return new Intl.NumberFormat(currency === 'NGN' ? 'en-NG' : 'en-US', {
+        style: 'currency',
+        currency,
+        maximumFractionDigits: 0,
+    }).format(amount);
+}
+
+function formatDate(iso: string) {
+    return new Date(iso).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    });
+}
+
+function currencyFor(application: Application): Currency {
+    return application.country.trim().toLowerCase() === 'nigeria' ? 'NGN' : 'USD';
+}
+
 export default function PiaRequestsIndex({
     applications,
     activeStatus,
+    statusCounts,
     tierAmounts,
     desk = 'platform',
     can_record_payment = false,
 }: PageProps) {
+    const { flash } = usePage<{
+        flash: { success?: string; error?: string; info?: string; agreement_url?: string | null };
+    }>().props;
     const [submitting, setSubmitting] = useState<number | null>(null);
+    const [confirming, setConfirming] = useState<Application | null>(null);
+    const [confirmTier, setConfirmTier] = useState<Tier | ''>('');
+    const [copied, setCopied] = useState(false);
+
     const basePath = desk === 'founder' ? '/admin/founder/pia-requests' : '/admin/pia-requests';
+    const openCount = (statusCounts.pending ?? 0) + (statusCounts.contacted ?? 0);
+
+    async function copyAgreementLink(url: string) {
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // ignore — user can still select the text
+        }
+    }
+
+    function resendAgreement(application: Application) {
+        setSubmitting(application.id);
+        router.post(`${basePath}/${application.id}/resend-agreement`, {}, { preserveScroll: true, onFinish: () => setSubmitting(null) });
+    }
 
     function setStatus(status: string) {
         router.get(basePath, status === 'all' ? {} : { status }, { preserveState: true, replace: true });
@@ -54,116 +124,363 @@ export default function PiaRequestsIndex({
         router.patch(`${basePath}/${application.id}/contacted`, {}, { preserveScroll: true, onFinish: () => setSubmitting(null) });
     }
 
-    function recordPayment(application: Application, currency: Currency) {
-        if (!application.selected_tier || !can_record_payment) return;
+    function saveTier(application: Application, tier: Tier) {
         setSubmitting(application.id);
-        router.post(
-            `${basePath}/${application.id}/payment-received`,
-            { currency, amount: tierAmounts[currency][application.selected_tier] },
+        router.patch(
+            `${basePath}/${application.id}/tier`,
+            { selected_tier: tier },
             { preserveScroll: true, onFinish: () => setSubmitting(null) },
         );
     }
 
+    function openConfirm(application: Application) {
+        setConfirmTier(application.selected_tier ?? '');
+        setConfirming(application);
+    }
+
+    function submitPayment() {
+        if (!confirming || !can_record_payment) return;
+        const tier = (confirmTier || confirming.selected_tier) as Tier | null;
+        if (!tier) return;
+
+        const currency = currencyFor(confirming);
+        setSubmitting(confirming.id);
+        router.post(
+            `${basePath}/${confirming.id}/payment-received`,
+            {
+                currency,
+                amount: tierAmounts[currency][tier],
+                selected_tier: tier,
+            },
+            {
+                preserveScroll: true,
+                onFinish: () => {
+                    setSubmitting(null);
+                    setConfirming(null);
+                },
+            },
+        );
+    }
+
+    const emptyCopy =
+        activeStatus === 'pending'
+            ? 'No new requests right now.'
+            : activeStatus === 'contacted'
+              ? 'Nobody is waiting on payment.'
+              : activeStatus === 'converted'
+                ? 'No paid requests yet.'
+                : 'No payment requests yet.';
+
     return (
         <AdminLayout>
-            <Head title="PIA Requests" />
-            <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-                <div className="flex flex-wrap items-end justify-between gap-4">
-                    <div>
-                        <p className="text-xs font-bold tracking-[0.16em] text-[#3A54A5] uppercase">Founder pipeline</p>
-                        <h1 className="mt-1 text-2xl font-bold tracking-tight text-zinc-950">PIA requests</h1>
-                        <p className="mt-1 max-w-2xl text-sm text-zinc-500">
-                            Founders who requested a PARAGON Investment Assessment and are waiting for payment confirmation.
-                        </p>
-                    </div>
-                    <div className="flex rounded-xl border border-zinc-200 bg-white p-1">
-                        {['all', 'pending', 'contacted', 'converted'].map((status) => (
-                            <button
-                                key={status}
-                                type="button"
-                                onClick={() => setStatus(status)}
-                                className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize ${activeStatus === status ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:bg-zinc-100'}`}
-                            >
-                                {status}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+            <Head title="Payment requests" />
 
-                <div className="mt-7 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
-                    {applications.data.length === 0 ? (
-                        <div className="p-12 text-center text-sm text-zinc-500">No PIA requests in this view.</div>
-                    ) : (
-                        <div className="divide-y divide-zinc-100">
-                            {applications.data.map((application) => {
-                                const currency: Currency = application.country.trim().toLowerCase() === 'nigeria' ? 'NGN' : 'USD';
-                                const busy = submitting === application.id;
-                                return (
-                                    <article key={application.id} className="p-5 sm:p-6">
-                                        <div className="flex flex-wrap items-start justify-between gap-4">
-                                            <div>
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <h2 className="font-semibold text-zinc-950">{application.company}</h2>
+            <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_16px_36px_rgba(33,56,120,0.06)]">
+                <div className="no-scrollbar flex-1 overflow-y-auto px-6 py-7 sm:px-8 lg:px-10">
+                    <div className="flex flex-wrap items-end justify-between gap-4 border-b border-zinc-200 pb-5">
+                        <div>
+                            <h1 className="text-[1.5rem] font-semibold tracking-tight text-zinc-950">Payment requests</h1>
+                            <p className="mt-1 text-[13px] text-zinc-500">
+                                {openCount} open · reach out, wait for payment, then confirm
+                            </p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-5">
+                            {filterTabs.map((tab) => (
+                                <button
+                                    key={tab.key}
+                                    type="button"
+                                    onClick={() => setStatus(tab.key)}
+                                    className={cn(
+                                        'border-b-2 pb-1 text-[13px] font-medium transition-colors',
+                                        activeStatus === tab.key
+                                            ? 'border-[#3A54A5] text-zinc-950'
+                                            : 'border-transparent text-zinc-500 hover:text-zinc-800',
+                                    )}
+                                >
+                                    {tab.label}
+                                    <span className="ml-1.5 tabular-nums text-zinc-400">{statusCounts[tab.key] ?? 0}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {(flash.success || flash.error || flash.info || flash.agreement_url) && (
+                        <div
+                            className={cn(
+                                'mt-5 space-y-2 border-l-2 px-3 py-2 text-[13px]',
+                                flash.error && 'border-rose-500 bg-rose-50/60 text-rose-800',
+                                flash.success && !flash.error && 'border-emerald-500 bg-emerald-50/60 text-emerald-800',
+                                flash.info && !flash.success && !flash.error && 'border-sky-500 bg-sky-50/60 text-sky-800',
+                                !flash.success && !flash.error && !flash.info && flash.agreement_url && 'border-[#3A54A5] bg-[#3A54A5]/5 text-zinc-800',
+                            )}
+                        >
+                            {(flash.success || flash.error || flash.info) && (
+                                <p className="font-medium">{flash.success ?? flash.error ?? flash.info}</p>
+                            )}
+                            {flash.agreement_url && (
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <code className="max-w-full truncate rounded-lg bg-white/80 px-2 py-1 text-[12px] text-zinc-700">
+                                        {flash.agreement_url}
+                                    </code>
+                                    <button
+                                        type="button"
+                                        onClick={() => copyAgreementLink(flash.agreement_url!)}
+                                        className="rounded-lg bg-zinc-900 px-2.5 py-1 text-[12px] font-semibold text-white hover:bg-zinc-800"
+                                    >
+                                        {copied ? 'Copied' : 'Copy link'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <div className="mt-5 overflow-x-auto">
+                        {applications.data.length === 0 ? (
+                            <p className="py-16 text-center text-[13px] text-zinc-500">{emptyCopy}</p>
+                        ) : (
+                            <table className="w-full min-w-[760px] border-collapse text-left">
+                                <thead>
+                                    <tr className="border-b border-zinc-200">
+                                        <th className="px-3 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-zinc-400 uppercase">
+                                            Company
+                                        </th>
+                                        <th className="px-3 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-zinc-400 uppercase">
+                                            Plan
+                                        </th>
+                                        <th className="px-3 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-zinc-400 uppercase">
+                                            Status
+                                        </th>
+                                        <th className="px-3 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-zinc-400 uppercase">
+                                            Date
+                                        </th>
+                                        <th className="px-3 py-2.5 text-right text-[10px] font-semibold tracking-[0.12em] text-zinc-400 uppercase">
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {applications.data.map((application) => {
+                                        const currency = currencyFor(application);
+                                        const busy = submitting === application.id;
+                                        const amount =
+                                            application.selected_tier != null
+                                                ? formatMoney(tierAmounts[currency][application.selected_tier], currency)
+                                                : null;
+
+                                        return (
+                                            <tr key={application.id} className="border-b border-zinc-100 hover:bg-zinc-50/60">
+                                                <td className="px-3 py-3.5 align-middle">
+                                                    <p className="text-[14px] font-semibold text-zinc-950">{application.company}</p>
+                                                    <p className="mt-0.5 truncate text-[12px] text-zinc-500">
+                                                        {application.name} · {application.email}
+                                                    </p>
+                                                </td>
+                                                <td className="px-3 py-3.5 align-middle">
+                                                    {application.selected_tier ? (
+                                                        <div>
+                                                            <p className="text-[13px] font-medium text-zinc-900">
+                                                                {tierLabels[application.selected_tier]}
+                                                            </p>
+                                                            {amount && (
+                                                                <p className="mt-0.5 text-[12px] tabular-nums text-zinc-500">
+                                                                    {amount}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    ) : application.status !== 'converted' ? (
+                                                        <div className="flex flex-col gap-1">
+                                                            {(['foundation', 'growth', 'institutional'] as Tier[]).map((tier) => (
+                                                                <button
+                                                                    key={tier}
+                                                                    type="button"
+                                                                    disabled={busy}
+                                                                    onClick={() => saveTier(application, tier)}
+                                                                    className="rounded-lg px-2 py-1 text-left text-[12px] font-medium text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 disabled:opacity-50"
+                                                                >
+                                                                    {tierLabels[tier]}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-[13px] text-zinc-400">—</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-3 py-3.5 align-middle">
                                                     <span
-                                                        className={`rounded-full px-2.5 py-1 text-[11px] font-bold capitalize ${application.status === 'converted' ? 'bg-emerald-100 text-emerald-700' : application.status === 'contacted' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}
+                                                        className={cn(
+                                                            'text-[13px] font-medium',
+                                                            application.status === 'converted' && 'text-emerald-700',
+                                                            application.status === 'contacted' && 'text-[#3A54A5]',
+                                                            application.status === 'pending' && 'text-amber-700',
+                                                        )}
                                                     >
-                                                        {application.status}
+                                                        {statusLabel[application.status]}
                                                     </span>
-                                                </div>
-                                                <p className="mt-1 text-sm text-zinc-600">
-                                                    {application.name} · {application.email}
-                                                </p>
-                                                <p className="mt-1 text-xs text-zinc-400">
-                                                    {application.country} · {application.stage} · Raising {application.raise_target}
-                                                </p>
-                                            </div>
-                                            <div className="text-right text-xs text-zinc-500">
-                                                <p>{new Date(application.created_at).toLocaleDateString()}</p>
-                                                <p className="mt-1 capitalize">{application.source.replace(/_/g, ' ')}</p>
-                                            </div>
-                                        </div>
-                                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-zinc-50 p-3">
-                                            <div className="text-sm text-zinc-700">
-                                                <span className="font-semibold">Tier:</span>{' '}
-                                                {application.selected_tier
-                                                    ? tierLabels[application.selected_tier]
-                                                    : 'Not selected (direct PIA enquiry)'}{' '}
-                                                {application.message && <span className="ml-2 text-zinc-500">{application.message}</span>}
-                                            </div>
-                                            {application.status !== 'converted' && (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {application.status === 'pending' && (
-                                                        <button
-                                                            type="button"
-                                                            disabled={busy}
-                                                            onClick={() => markContacted(application)}
-                                                            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 disabled:opacity-50"
-                                                        >
-                                                            Mark contacted
-                                                        </button>
-                                                    )}
-                                                    {can_record_payment && application.selected_tier && (
-                                                        <button
-                                                            type="button"
-                                                            disabled={busy}
-                                                            onClick={() => recordPayment(application, currency)}
-                                                            className="rounded-lg bg-[#3A54A5] px-3 py-2 text-xs font-semibold text-white hover:bg-[#2D4182] disabled:opacity-50"
-                                                        >
-                                                            {busy
-                                                                ? 'Recording…'
-                                                                : `Record ${currency === 'NGN' ? '₦' : '$'}${tierAmounts[currency][application.selected_tier].toLocaleString()} received`}
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </article>
-                                );
-                            })}
+                                                </td>
+                                                <td className="px-3 py-3.5 align-middle text-[13px] text-zinc-500">
+                                                    {formatDate(application.created_at)}
+                                                </td>
+                                                <td className="px-3 py-3.5 align-middle text-right">
+                                                    <div className="inline-flex items-center justify-end gap-2">
+                                                        {application.status === 'pending' && (
+                                                            <button
+                                                                type="button"
+                                                                disabled={busy}
+                                                                onClick={() => markContacted(application)}
+                                                                className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                                                            >
+                                                                {busy ? 'Saving…' : 'Mark contacted'}
+                                                            </button>
+                                                        )}
+                                                        {application.status !== 'converted' && can_record_payment && (
+                                                            <button
+                                                                type="button"
+                                                                disabled={busy || !application.selected_tier}
+                                                                onClick={() => openConfirm(application)}
+                                                                className="rounded-lg bg-[#3A54A5] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[#2D4182] disabled:opacity-40"
+                                                                title={
+                                                                    !application.selected_tier
+                                                                        ? 'Choose a plan first'
+                                                                        : undefined
+                                                                }
+                                                            >
+                                                                Confirm payment
+                                                            </button>
+                                                        )}
+                                                        {application.status !== 'converted' && (
+                                                            <a
+                                                                href={`mailto:${application.email}?subject=${encodeURIComponent(`Pinpoint payment — ${application.company}`)}`}
+                                                                className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-800"
+                                                            >
+                                                                Email
+                                                            </a>
+                                                        )}
+                                                        {application.status === 'converted' && (
+                                                            <div className="inline-flex items-center gap-2">
+                                                                {application.agreement_url && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => copyAgreementLink(application.agreement_url!)}
+                                                                        className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-zinc-700 hover:bg-zinc-50"
+                                                                    >
+                                                                        Copy link
+                                                                    </button>
+                                                                )}
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={busy}
+                                                                    onClick={() => resendAgreement(application)}
+                                                                    className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#3A54A5] hover:bg-[#3A54A5]/5 disabled:opacity-50"
+                                                                >
+                                                                    {busy ? 'Sending…' : 'Resend email'}
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+
+                    {applications.last_page > 1 && (
+                        <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-4">
+                            <button
+                                type="button"
+                                disabled={!applications.prev_page_url}
+                                onClick={() => applications.prev_page_url && router.get(applications.prev_page_url)}
+                                className="text-[13px] font-medium text-zinc-600 hover:text-zinc-900 disabled:opacity-40"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-[12px] text-zinc-400">
+                                Page {applications.current_page} of {applications.last_page}
+                            </span>
+                            <button
+                                type="button"
+                                disabled={!applications.next_page_url}
+                                onClick={() => applications.next_page_url && router.get(applications.next_page_url)}
+                                className="text-[13px] font-medium text-zinc-600 hover:text-zinc-900 disabled:opacity-40"
+                            >
+                                Next
+                            </button>
                         </div>
                     )}
                 </div>
             </div>
+
+            <Dialog open={confirming != null} onOpenChange={(open) => !open && setConfirming(null)}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Confirm payment?</DialogTitle>
+                        <DialogDescription>
+                            This marks {confirming?.company} as paid and emails {confirming?.email} a link to sign and continue.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {confirming && (
+                        <div className="space-y-3">
+                            <div>
+                                <p className="mb-2 text-[12px] font-medium text-zinc-500">Plan</p>
+                                <div className="overflow-hidden rounded-xl border border-zinc-200">
+                                    {(['foundation', 'growth', 'institutional'] as Tier[]).map((tier, index) => {
+                                        const selected = confirmTier === tier;
+                                        const amountLabel = formatMoney(
+                                            tierAmounts[currencyFor(confirming)][tier],
+                                            currencyFor(confirming),
+                                        );
+                                        return (
+                                            <button
+                                                key={tier}
+                                                type="button"
+                                                onClick={() => setConfirmTier(tier)}
+                                                className={cn(
+                                                    'flex w-full items-center justify-between px-3.5 py-2.5 text-left text-[13px] transition-colors',
+                                                    index > 0 && 'border-t border-zinc-100',
+                                                    selected
+                                                        ? 'bg-[#3A54A5] font-semibold text-white'
+                                                        : 'bg-white text-zinc-700 hover:bg-zinc-50',
+                                                )}
+                                            >
+                                                <span>{tierLabels[tier]}</span>
+                                                <span className={cn('tabular-nums', selected ? 'text-white/90' : 'text-zinc-500')}>
+                                                    {amountLabel}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            {confirmTier && (
+                                <p className="text-[14px] font-semibold text-zinc-950">
+                                    Amount: {formatMoney(tierAmounts[currencyFor(confirming)][confirmTier], currencyFor(confirming))}
+                                </p>
+                            )}
+                        </div>
+                    )}
+
+                    <DialogFooter className="gap-2 sm:gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setConfirming(null)}
+                            className="rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-[13px] font-semibold text-zinc-700 hover:bg-zinc-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            disabled={!confirmTier || submitting === confirming?.id}
+                            onClick={submitPayment}
+                            className="rounded-xl bg-[#3A54A5] px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-[#2D4182] disabled:opacity-50"
+                        >
+                            {submitting === confirming?.id ? 'Confirming…' : 'Confirm payment'}
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AdminLayout>
     );
 }

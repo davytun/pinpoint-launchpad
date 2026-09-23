@@ -69,7 +69,7 @@ test('founder desk surfaces open PIA requests for analysts and superadmins', fun
         ->assertInertia(fn ($page) => $page
             ->component('Admin/PiaRequests/Index')
             ->where('desk', 'founder')
-            ->where('can_record_payment', false)
+            ->where('can_record_payment', true)
             ->has('applications.data', 1));
 
     $this->actingAs($superadmin)
@@ -78,13 +78,26 @@ test('founder desk surfaces open PIA requests for analysts and superadmins', fun
         ->assertInertia(fn ($page) => $page
             ->component('Admin/Dashboard')
             ->where('desk', 'founder')
-            ->has('pending_pia_requests', 1)
-            ->where('pending_pia_requests.0.company', 'Startup Co')
-            ->where('dealflow_handoff', null));
+            ->where('metrics.pending_pia_count', 1)
+            ->where('dealflow_handoff', null)
+            ->has('needs_attention', 1)
+            ->where('needs_attention.0.id', 'pending_pia'));
 });
 
-test('only a superadmin can record offline payment', function () {
+test('an analyst on the founder desk can record offline payment', function () {
+    Mail::fake();
+
     $analyst = User::factory()->create(['role' => 'analyst']);
+    DiagnosticSession::create([
+        'email' => 'founder@example.test',
+        'name' => 'Test Founder',
+        'company_name' => 'Test Company',
+        'country' => 'Nigeria',
+        'answers' => [],
+        'score' => 84,
+        'score_band' => 'high',
+        'pillar_scores' => [],
+    ]);
     $application = PiaApplication::create([
         'name' => 'Test Founder',
         'email' => 'founder@example.test',
@@ -93,11 +106,15 @@ test('only a superadmin can record offline payment', function () {
         'stage' => 'seed',
         'raise_target' => '$100k-$500k',
         'selected_tier' => 'growth',
+        'status' => 'contacted',
     ]);
 
     $this->actingAs($analyst)
         ->post(route('admin.founder.pia-requests.payment-received', $application), ['amount' => 2090000, 'currency' => 'NGN'])
-        ->assertForbidden();
+        ->assertRedirect();
+
+    expect($application->fresh()->status)->toBe('converted');
+    Mail::assertSent(PiaAgreementInviteMail::class);
 });
 
 test('the secure agreement link establishes the paid founder session once', function () {

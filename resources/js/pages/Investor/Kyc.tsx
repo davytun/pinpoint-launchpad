@@ -53,7 +53,7 @@ export default function Kyc({
     return (
         <>
             <Head title="KYC Verification" />
-            <div className="relative min-h-screen overflow-hidden bg-[#f4f7ff] text-zinc-900 selection:bg-[#3A54A5]/10">
+            <div className="relative min-h-screen overflow-x-hidden bg-[#f4f7ff] text-zinc-900 selection:bg-[#3A54A5]/10">
                 <div className="pointer-events-none fixed inset-0 opacity-40">
                     <SideRays
                         rayColor1="#3A54A5"

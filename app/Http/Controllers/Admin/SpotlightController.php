@@ -176,7 +176,23 @@ class SpotlightController extends Controller
             if ($shouldPublish) {
                 abort_unless($profile->isLive(), 422, 'Only PARAGON-complete, live profiles can be published to Spotlight.');
                 abort_unless($profile->spotlight_one_liner && $profile->spotlight_summary, 422, 'Founder Spotlight content is incomplete.');
-                abort_unless($profile->founder->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->exists(), 422, 'A reviewed pitch deck is required before publishing.');
+
+                $placeholderCopy = [
+                    'What your venture builds and solves, in one compelling sentence...',
+                    'Describe the company, market opportunity, business model, and milestones achieved...',
+                ];
+                abort_if(
+                    in_array(trim((string) $profile->spotlight_one_liner), $placeholderCopy, true)
+                        || in_array(trim((string) $profile->spotlight_summary), $placeholderCopy, true),
+                    422,
+                    'Replace placeholder Spotlight copy with the real one-liner and summary before publishing.'
+                );
+
+                abort_unless(
+                    $profile->founder->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->where('mime_type', 'application/pdf')->exists(),
+                    422,
+                    'A reviewed PDF pitch deck is required before publishing.'
+                );
             }
 
             $entry = SpotlightEntry::updateOrCreate(['profile_id' => $profile->id], [

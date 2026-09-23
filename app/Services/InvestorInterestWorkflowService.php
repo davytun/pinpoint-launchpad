@@ -24,6 +24,26 @@ class InvestorInterestWorkflowService
     public function submit(Investor $investor, FounderProfile $profile, array $data, ?string $ipAddress, ?string $userAgent): InvestorInterest
     {
         return DB::transaction(function () use ($investor, $profile, $data, $ipAddress, $userAgent) {
+            $interest = InvestorInterest::query()
+                ->where('investor_id', $investor->id)
+                ->where('profile_id', $profile->id)
+                ->first();
+
+            // Already founder-authorized and waiting on IR — do not wipe the decision.
+            if ($interest && $interest->founder_decision === 'approved' && $interest->status === 'pending') {
+                return $interest;
+            }
+
+            // Still awaiting founder — allow type/message updates without resetting the queue.
+            if ($interest && $interest->isAwaitingFounder()) {
+                $interest->update([
+                    'type' => $data['type'] ?? $interest->type,
+                    'message' => array_key_exists('message', $data) ? $data['message'] : $interest->message,
+                ]);
+
+                return $interest->fresh();
+            }
+
             $interest = InvestorInterest::updateOrCreate(
                 ['investor_id' => $investor->id, 'profile_id' => $profile->id],
                 array_merge($data, [

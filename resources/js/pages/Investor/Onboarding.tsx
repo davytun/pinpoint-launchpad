@@ -38,7 +38,7 @@ export default function Onboarding() {
     return (
         <>
             <Head title="Investor onboarding" />
-            <div className="relative min-h-screen overflow-hidden bg-[#f4f7ff] text-zinc-900">
+            <div className="relative min-h-screen overflow-x-hidden bg-[#f4f7ff] text-zinc-900">
                 <div className="pointer-events-none fixed inset-0 opacity-35">
                     <SideRays
                         rayColor1="#3A54A5"

@@ -18,7 +18,7 @@ class InvestorOnboardingController extends Controller
     public function create(): Response|RedirectResponse
     {
         if (Auth::guard('investor')->check()) {
-            return redirect()->route('investor.dashboard');
+            return redirect()->route('investor.spotlight.index');
         }
 
         return Inertia::render('Investor/Onboarding');
@@ -71,7 +71,7 @@ class InvestorOnboardingController extends Controller
             // Notification queue failure should not crash onboarding
         }
 
-        return redirect()->route('investor.dashboard')
+        return redirect()->route('investor.spotlight.index')
             ->with('success', 'Your account has been created successfully. Please complete KYC to unlock full access.');
     }
 }

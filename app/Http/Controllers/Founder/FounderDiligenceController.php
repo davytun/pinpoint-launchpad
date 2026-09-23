@@ -17,33 +17,39 @@ class FounderDiligenceController extends Controller
     public function index(): Response
     {
         /** @var Founder $founder */
-        $founder = Auth::guard('founder')->user();
-        $profile = $founder->profile;
+        $founder = Auth::guard('founder')->user()->load('profile:id,founder_id');
 
-        $requests = $profile
-            ? $profile->diligenceRequests()
-                ->whereIn('status', ['waiting_for_founder', 'founder_responded', 'resolved', 'under_review', 'submitted'])
+        $diligenceRequests = $founder->profile
+            ? $founder->profile->diligenceRequests()
+                ->whereIn('status', ['waiting_for_founder', 'founder_responded', 'resolved', 'declined'])
                 ->latest()
                 ->get()
-                ->map(function ($req) {
-                    return [
-                        'id' => $req->id,
-                        'category' => $req->category,
-                        'subject' => $req->subject,
-                        'request_details' => $req->request_details,
-                        'admin_instructions_for_founder' => $req->admin_instructions_for_founder,
-                        'founder_notes_to_admin' => $req->founder_notes_to_admin,
-                        'status' => $req->status,
-                        'founder_facing_status' => $req->getFounderFacingStatus(),
-                        'created_at' => $req->created_at->toISOString(),
-                        'founder_responded_at' => $req->founder_responded_at?->toISOString(),
-                        'resolved_at' => $req->resolved_at?->toISOString(),
-                    ];
-                })
-            : collect();
+                ->map(fn (DiligenceRequest $request) => [
+                    'id' => $request->id,
+                    'category' => $request->category,
+                    'subject' => $request->subject,
+                    'request_details' => $request->request_details,
+                    'admin_instructions_for_founder' => $request->admin_instructions_for_founder,
+                    'founder_notes_to_admin' => $request->founder_notes_to_admin,
+                    'status' => $request->status,
+                    'founder_facing_status' => $request->getFounderFacingStatus(),
+                    'created_at' => $request->created_at?->toISOString(),
+                    'founder_responded_at' => $request->founder_responded_at?->toISOString(),
+                    'resolved_at' => $request->resolved_at?->toISOString(),
+                ])
+                ->values()
+                ->all()
+            : [];
 
         return Inertia::render('Founder/Diligence/Index', [
-            'diligence_requests' => $requests,
+            'founder' => [
+                'id' => $founder->id,
+                'email' => $founder->email,
+                'full_name' => $founder->full_name,
+                'company_name' => $founder->company_name,
+                'avatar' => $founder->avatar,
+            ],
+            'diligence_requests' => $diligenceRequests,
         ]);
     }
 
@@ -67,6 +73,8 @@ class FounderDiligenceController extends Controller
             $request->userAgent()
         );
 
-        return back()->with('success', 'Your response has been securely submitted to Pinpoint Investor Relations for review.');
+        return redirect()
+            ->route('founder.diligence.index')
+            ->with('success', 'Response submitted to Pinpoint.');
     }
 }

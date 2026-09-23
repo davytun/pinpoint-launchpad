@@ -1,5 +1,4 @@
-import { Head, router } from '@inertiajs/react';
-import { ArrowRight, CheckCircle2, Clock, MessageSquare, ShieldCheck, XCircle } from 'lucide-react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 import FounderLayout from '@/layouts/founder-layout';
@@ -21,22 +20,42 @@ interface DiligenceRequest {
 
 function formatDate(iso?: string | null): string {
     if (!iso) return '—';
-    return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' });
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export default function FounderDiligenceIndex({ diligence_requests }: { diligence_requests: DiligenceRequest[] }) {
+function categoryLabel(value: string) {
+    return value.replaceAll('_', ' ');
+}
+
+function statusTone(status: string): 'action' | 'wait' | 'ok' | 'bad' {
+    if (status === 'waiting_for_founder' || status === 'submitted') return 'action';
+    if (status === 'founder_responded') return 'wait';
+    if (status === 'resolved') return 'ok';
+    if (status === 'declined') return 'bad';
+    return 'wait';
+}
+
+export default function FounderDiligenceIndex({
+    founder,
+    diligence_requests,
+}: {
+    founder: { id?: string; email: string; full_name?: string | null; company_name?: string | null; avatar?: string | null };
+    diligence_requests: DiligenceRequest[];
+}) {
+    const { flash } = usePage<{ flash?: { success?: string } }>().props;
     const [activeReq, setActiveReq] = useState<DiligenceRequest | null>(null);
     const [responseContent, setResponseContent] = useState('');
     const [submitting, setSubmitting] = useState(false);
+
+    const awaiting = diligence_requests.filter((r) => r.status === 'waiting_for_founder' || r.status === 'submitted');
+    const other = diligence_requests.filter((r) => r.status !== 'waiting_for_founder' && r.status !== 'submitted');
 
     const openModal = (req: DiligenceRequest) => {
         setActiveReq(req);
         setResponseContent(req.founder_notes_to_admin || '');
     };
 
-    const closeModal = () => {
-        setActiveReq(null);
-    };
+    const closeModal = () => setActiveReq(null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,6 +66,7 @@ export default function FounderDiligenceIndex({ diligence_requests }: { diligenc
             route('founder.diligence.respond', activeReq.id),
             { founder_notes_to_admin: responseContent },
             {
+                preserveScroll: true,
                 onSuccess: () => {
                     setSubmitting(false);
                     closeModal();
@@ -57,171 +77,169 @@ export default function FounderDiligenceIndex({ diligence_requests }: { diligenc
     };
 
     return (
-        <FounderLayout>
-            <Head title="Pinpoint Information Requests — Founder Portal" />
+        <FounderLayout founder={founder}>
+            <Head title="Diligence — Pinpoint" />
 
-            <div className="space-y-8 pb-16">
-                {/* Header */}
-                <div>
-                    <div className="flex items-center gap-2 text-xs font-semibold tracking-wider text-[#3A54A5] uppercase">
-                        <ShieldCheck className="size-4" />
-                        Mediated Diligence Channel
-                    </div>
-                    <h1 className="mt-1 text-2xl font-bold text-zinc-950 sm:text-3xl">Pinpoint Information Requests</h1>
-                    <p className="mt-2 max-w-2xl text-sm text-zinc-600">
-                        When verified investors currently engaged with your startup have specific follow-up inquiries, Pinpoint Investor Relations
-                        coordinates the request here. Your responses are provided securely to Pinpoint for review.
+            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden">
+                <header className="shrink-0 pb-6">
+                    <h1 className="font-display text-[1.75rem] font-bold tracking-tight text-zinc-950 sm:text-[2rem]">
+                        Diligence
+                    </h1>
+                    <p className="mt-1.5 text-[14px] text-zinc-500">
+                        Questions from Pinpoint after an investor introduction.
                     </p>
-                </div>
+                </header>
 
-                {diligence_requests.length === 0 ? (
-                    <div className="rounded-2xl border border-zinc-200 bg-white p-12 text-center shadow-xs">
-                        <MessageSquare className="mx-auto mb-3 size-12 text-zinc-300" />
-                        <h2 className="text-lg font-bold text-zinc-900">No pending diligence requests</h2>
-                        <p className="mx-auto mt-1 max-w-md text-sm text-zinc-500">
-                            When an investor submits a diligence question following an introduction, Pinpoint IR will notify you to provide input
-                            here.
+                <div className="no-scrollbar min-h-0 flex-1 space-y-8 overflow-y-auto pb-10">
+                    {flash?.success && (
+                        <p role="status" className="text-[14px] font-medium text-emerald-700">
+                            {flash.success}
                         </p>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {diligence_requests.map((req) => {
-                            const isPending = req.status === 'waiting_for_founder' || req.status === 'submitted';
-                            const isResponded = req.status === 'founder_responded';
-                            const isResolved = req.status === 'resolved';
+                    )}
 
-                            return (
-                                <div
-                                    key={req.id}
-                                    className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs transition hover:border-zinc-300"
-                                >
-                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="rounded-md bg-zinc-100 px-2.5 py-0.5 text-xs font-bold tracking-wider text-zinc-700 uppercase">
-                                                    {req.category.replace('_', ' ')}
-                                                </span>
-                                                <span className="text-xs text-zinc-400">Received {formatDate(req.created_at)}</span>
-                                            </div>
-                                            <h2 className="mt-2 text-lg font-bold text-zinc-950">{req.subject}</h2>
-                                        </div>
-
-                                        <span
-                                            className={cn(
-                                                'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold',
-                                                isPending
-                                                    ? 'border border-amber-200 bg-amber-50 text-amber-800'
-                                                    : isResponded
-                                                      ? 'border border-blue-200 bg-blue-50 text-blue-800'
-                                                      : isResolved
-                                                        ? 'border border-emerald-200 bg-emerald-50 text-emerald-800'
-                                                        : 'bg-zinc-100 text-zinc-700',
-                                            )}
-                                        >
-                                            {isPending && <Clock className="size-3.5" />}
-                                            {isResponded && <CheckCircle2 className="size-3.5 text-blue-600" />}
-                                            {isResolved && <CheckCircle2 className="size-3.5 text-emerald-600" />}
-                                            {req.founder_facing_status}
-                                        </span>
-                                    </div>
-
-                                    {/* Request Inquiry */}
-                                    <div className="mt-4 rounded-xl bg-zinc-50 p-4 text-sm text-zinc-700">
-                                        <p className="mb-1 text-xs font-bold tracking-wider text-zinc-400 uppercase">Inquiry from Pinpoint IR:</p>
-                                        <p className="whitespace-pre-wrap">{req.request_details}</p>
-                                    </div>
-
-                                    {/* Admin instructions */}
-                                    {req.admin_instructions_for_founder && (
-                                        <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-sm text-blue-950">
-                                            <p className="mb-1 text-xs font-bold tracking-wider text-blue-800 uppercase">Pinpoint IR Guidance:</p>
-                                            <p className="whitespace-pre-wrap">{req.admin_instructions_for_founder}</p>
-                                        </div>
-                                    )}
-
-                                    {/* Founder submitted response */}
-                                    {req.founder_notes_to_admin && (
-                                        <div className="mt-3 rounded-xl border border-zinc-200 bg-zinc-50/50 p-4 text-sm text-zinc-800">
-                                            <p className="mb-1 text-xs font-bold tracking-wider text-zinc-500 uppercase">
-                                                Your Response to Pinpoint IR (Submitted {formatDate(req.founder_responded_at)}):
+                    {diligence_requests.length === 0 ? (
+                        <div className="border-t border-zinc-200 pt-8">
+                            <p className="text-[15px] text-zinc-600">No requests yet.</p>
+                            <p className="mt-1.5 max-w-md text-[13px] leading-relaxed text-zinc-500">
+                                When Pinpoint needs input after a founder call, it shows up here.
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            {awaiting.length > 0 && (
+                                <section className="space-y-6">
+                                    {awaiting.map((req) => (
+                                        <div key={req.id}>
+                                            <p className="text-[13px] text-zinc-500">Needs your response</p>
+                                            <h2 className="mt-1 text-[1.25rem] font-semibold tracking-tight text-zinc-950">
+                                                {req.subject}
+                                            </h2>
+                                            <p className="mt-1 text-[13px] text-zinc-500">
+                                                {categoryLabel(req.category)}
+                                                <span className="mx-1.5 text-zinc-300">·</span>
+                                                {formatDate(req.created_at)}
                                             </p>
-                                            <p className="whitespace-pre-wrap">{req.founder_notes_to_admin}</p>
+                                            <p className="mt-3 max-w-xl text-[14px] leading-relaxed whitespace-pre-wrap text-zinc-600">
+                                                {req.request_details}
+                                            </p>
+                                            {req.admin_instructions_for_founder && (
+                                                <p className="mt-3 max-w-xl text-[13px] leading-relaxed text-zinc-500">
+                                                    Pinpoint note: {req.admin_instructions_for_founder}
+                                                </p>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => openModal(req)}
+                                                className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#3A54A5] px-5 text-[13px] font-semibold text-white hover:bg-[#2D4182]"
+                                            >
+                                                Respond
+                                            </button>
                                         </div>
-                                    )}
+                                    ))}
+                                </section>
+                            )}
 
-                                    {/* Actions */}
-                                    <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-4">
-                                        <p className="text-xs text-zinc-400">All responses are reviewed by Pinpoint IR prior to investor release.</p>
-                                        <button
-                                            type="button"
-                                            onClick={() => openModal(req)}
-                                            className="inline-flex items-center gap-1.5 rounded-xl bg-[#3A54A5] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#2D4182]"
-                                        >
-                                            {req.founder_notes_to_admin ? 'Update Response' : 'Submit Response to Pinpoint'}
-                                            <ArrowRight className="size-3.5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
+                            {other.length > 0 && (
+                                <section>
+                                    <h2 className="text-[15px] font-semibold text-zinc-950">
+                                        {awaiting.length > 0 ? 'Earlier' : 'Requests'}
+                                    </h2>
+                                    <ul className="mt-4 divide-y divide-zinc-100 border-t border-zinc-100">
+                                        {other.map((req) => {
+                                            const tone = statusTone(req.status);
+                                            return (
+                                                <li key={req.id} className="py-4">
+                                                    <div className="flex items-baseline justify-between gap-3">
+                                                        <h3 className="min-w-0 truncate text-[14px] font-semibold text-zinc-950">
+                                                            {req.subject}
+                                                        </h3>
+                                                        <span
+                                                            className={cn(
+                                                                'shrink-0 text-[12px] font-semibold',
+                                                                tone === 'ok' && 'text-emerald-700',
+                                                                tone === 'bad' && 'text-rose-700',
+                                                                tone === 'wait' && 'text-[#3A54A5]',
+                                                                tone === 'action' && 'text-amber-700',
+                                                            )}
+                                                        >
+                                                            {req.founder_facing_status}
+                                                        </span>
+                                                    </div>
+                                                    <p className="mt-1 text-[12px] text-zinc-400">
+                                                        {categoryLabel(req.category)} · {formatDate(req.created_at)}
+                                                    </p>
+                                                    {req.founder_notes_to_admin && (
+                                                        <p className="mt-2 max-w-xl text-[13px] leading-snug text-zinc-600">
+                                                            Your reply: {req.founder_notes_to_admin}
+                                                        </p>
+                                                    )}
+                                                    {(req.status === 'founder_responded' || req.status === 'waiting_for_founder') && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => openModal(req)}
+                                                            className="mt-3 text-[13px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
+                                                        >
+                                                            {req.founder_notes_to_admin ? 'Update reply' : 'Respond'}
+                                                        </button>
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </section>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
 
-            {/* Response Modal */}
             {activeReq && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-                    <div className="w-full max-w-2xl space-y-5 rounded-3xl bg-white p-6 shadow-2xl">
-                        <div className="flex items-start justify-between border-b border-zinc-100 pb-3">
-                            <div>
-                                <span className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-bold text-zinc-700 uppercase">
-                                    {activeReq.category.replace('_', ' ')}
-                                </span>
-                                <h2 className="mt-1 text-xl font-bold text-zinc-950">{activeReq.subject}</h2>
+                <div className="fixed inset-0 z-50 flex items-end justify-center bg-zinc-950/40 p-4 sm:items-center">
+                    <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl sm:p-6">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                                <p className="text-[12px] text-zinc-400">{categoryLabel(activeReq.category)}</p>
+                                <h2 className="mt-0.5 text-[1.125rem] font-semibold text-zinc-950">{activeReq.subject}</h2>
                             </div>
-                            <button onClick={closeModal} className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700">
-                                <XCircle className="size-5" />
+                            <button
+                                type="button"
+                                onClick={closeModal}
+                                className="rounded-lg px-2 py-1 text-[13px] text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
+                            >
+                                Close
                             </button>
                         </div>
 
-                        <div className="rounded-xl bg-zinc-50 p-4 text-xs text-zinc-700">
-                            <p className="mb-1 font-bold text-zinc-500">Inquiry Details:</p>
-                            <p>{activeReq.request_details}</p>
-                        </div>
+                        <p className="mt-4 text-[13px] leading-relaxed whitespace-pre-wrap text-zinc-600">
+                            {activeReq.request_details}
+                        </p>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-700 uppercase">
-                                    Your Response to Pinpoint Investor Relations:
-                                </label>
+                        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+                            <label className="block text-[13px] font-medium text-zinc-700">
+                                Your reply to Pinpoint
                                 <textarea
                                     rows={5}
                                     required
                                     value={responseContent}
                                     onChange={(e) => setResponseContent(e.target.value)}
-                                    placeholder="Provide the requested details, explanation, or reference documents in your Data Room..."
-                                    className="w-full rounded-xl border border-zinc-300 p-3.5 text-sm text-zinc-900 focus:border-[#3A54A5] focus:outline-hidden"
+                                    placeholder="Details Pinpoint can use when responding to the investor…"
+                                    className="mt-1.5 w-full resize-none border border-zinc-200 bg-white px-3 py-2.5 text-[14px] text-zinc-900 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 focus:outline-none"
                                 />
-                                <p className="mt-1.5 text-xs text-zinc-500">
-                                    Confidential. This response is submitted to Pinpoint IR and will be reviewed before any information is formatted
-                                    for the investor.
-                                </p>
-                            </div>
-
-                            <div className="flex items-center justify-end gap-3 pt-2">
+                            </label>
+                            <div className="flex justify-end gap-2">
                                 <button
                                     type="button"
                                     onClick={closeModal}
-                                    className="rounded-xl px-4 py-2 text-xs font-semibold text-zinc-600 hover:bg-zinc-100"
+                                    className="rounded-xl px-4 py-2 text-[13px] font-medium text-zinc-600 hover:bg-zinc-100"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={submitting || !responseContent.trim()}
-                                    className="rounded-xl bg-[#3A54A5] px-5 py-2 text-xs font-bold text-white transition hover:bg-[#2D4182] disabled:opacity-50"
+                                    className="rounded-xl bg-[#3A54A5] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#2D4182] disabled:opacity-50"
                                 >
-                                    Submit Response to Pinpoint
+                                    {submitting ? 'Sending…' : 'Submit'}
                                 </button>
                             </div>
                         </form>

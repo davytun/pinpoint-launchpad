@@ -9,14 +9,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useNotificationPolling } from '@/hooks/use-notification-polling';
 import { cn } from '@/lib/utils';
 
+type FounderIdentity = {
+    id?: number | string;
+    full_name?: string | null;
+    company_name?: string | null;
+    email?: string;
+};
+
 interface FounderLayoutProps {
     children: ReactNode;
-    founder: {
-        id?: number | string;
-        full_name?: string | null;
-        company_name?: string | null;
-        email?: string;
-    };
+    founder?: FounderIdentity | null;
 }
 
 type FounderNotification = {
@@ -239,7 +241,7 @@ function SidebarContent({
     logout,
     onNav,
 }: {
-    founder: FounderLayoutProps['founder'];
+    founder: FounderIdentity;
     unreadMessages: number;
     unreadNotifications: number;
     recentNotifications: FounderNotification[];
@@ -251,13 +253,15 @@ function SidebarContent({
     logout: () => void;
     onNav?: () => void;
 }) {
-    const initials = founder?.full_name
+    const displayName = founder.full_name?.trim() || 'Founder';
+    const displayMeta = founder.company_name?.trim() || founder.email || '';
+    const initials = founder.full_name?.trim()
         ? founder.full_name
-              .split(' ')
-              .map((n) => n[0])
-              .join('')
-              .toUpperCase()
-              .slice(0, 2)
+            .split(' ')
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2)
         : 'F';
 
     return (
@@ -391,8 +395,8 @@ function SidebarContent({
                                 </button>
                             </TooltipTrigger>
                             <TooltipContent side="right" sideOffset={12} className="flex flex-col gap-0.5">
-                                <p className="text-xs font-bold">{founder.full_name ?? 'Founder'}</p>
-                                <p className="text-[10px] text-zinc-400">{founder.company_name ?? founder.email}</p>
+                                <p className="text-xs font-bold">{displayName}</p>
+                                {displayMeta ? <p className="text-[10px] text-zinc-400">{displayMeta}</p> : null}
                                 <p className="mt-1 text-[10px] font-semibold text-red-400">Click to Sign Out</p>
                             </TooltipContent>
                         </Tooltip>
@@ -404,11 +408,13 @@ function SidebarContent({
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <p className="truncate text-[13.5px] leading-tight font-semibold text-zinc-950">
-                                        {founder.full_name ?? 'Founder'}
+                                        {displayName}
                                     </p>
-                                    <p className="mt-0.5 truncate text-[11px] leading-none font-medium text-zinc-400">
-                                        {founder.company_name ?? founder.email}
-                                    </p>
+                                    {displayMeta ? (
+                                        <p className="mt-0.5 truncate text-[11px] leading-none font-medium text-zinc-400">
+                                            {displayMeta}
+                                        </p>
+                                    ) : null}
                                 </div>
                             </div>
                             <button
@@ -427,14 +433,19 @@ function SidebarContent({
 }
 
 export default function FounderLayout({ children, founder }: FounderLayoutProps) {
-    const { url } = usePage();
-    const unreadNotifications = usePage<{ platform_unread_notifications?: { founder?: number } }>().props.platform_unread_notifications?.founder ?? 0;
-    const unreadMessages = usePage<{ unread_messages_count?: number }>().props.unread_messages_count ?? 0;
-    const founderPortal = usePage<{
+    const page = usePage<{
+        auth?: { founder?: FounderIdentity | null };
+        unread_messages_count?: number;
         founder_portal?: { spotlight_ready?: boolean; pending_diligence_count?: number } | null;
-    }>().props.founder_portal;
-    const recentNotifications =
-        usePage<{ platform_recent_notifications?: { founder?: FounderNotification[] } }>().props.platform_recent_notifications?.founder ?? [];
+        platform_unread_notifications?: { founder?: number };
+        platform_recent_notifications?: { founder?: FounderNotification[] };
+    }>();
+    const { url } = page;
+    const resolvedFounder: FounderIdentity = founder ?? page.props.auth?.founder ?? {};
+    const unreadNotifications = page.props.platform_unread_notifications?.founder ?? 0;
+    const unreadMessages = page.props.unread_messages_count ?? 0;
+    const founderPortal = page.props.founder_portal;
+    const recentNotifications = page.props.platform_recent_notifications?.founder ?? [];
     const spotlightReady = founderPortal?.spotlight_ready ?? false;
     const pendingDiligence = founderPortal?.pending_diligence_count ?? 0;
 
@@ -489,7 +500,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
     }
 
     const sidebarProps = {
-        founder,
+        founder: resolvedFounder,
         unreadMessages,
         unreadNotifications,
         recentNotifications,
@@ -541,7 +552,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
                 <FounderNotifications notifications={recentNotifications} unreadCount={unreadNotifications} collapsed side="bottom" align="end" />
             </header>
 
-            {/* ── Main Canvas Content Region (Strictly h-full, zero outer scroll) ─── */}
+            {/* ── Main canvas. The page scrolls when content is taller than the screen. ─── */}
             <main className="relative flex h-full max-h-full min-w-0 flex-1 flex-col">
                 {/* ── Expand Sidebar Button (Floating on Left Edge) ── */}
                 {collapsed && (
@@ -562,7 +573,7 @@ export default function FounderLayout({ children, founder }: FounderLayoutProps)
                     </div>
                 )}
 
-                <div className="no-scrollbar relative flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-[24px] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.03)] lg:p-8">
+                <div className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-y-auto rounded-[24px] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.03)] lg:p-8">
                     {children}
                 </div>
             </main>

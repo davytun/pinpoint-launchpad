@@ -12,7 +12,20 @@ const NAV_ITEMS = [
     { label: 'Blog', href: '/blog' },
 ] as const;
 
-export default function Header() {
+const DEFAULT_CTA = {
+    label: 'Start Self-Scan',
+    href: '/diagnostic',
+};
+
+interface HeaderProps {
+    cta?: {
+        label: string;
+        href: string;
+    };
+}
+
+export default function Header({ cta = DEFAULT_CTA }: HeaderProps) {
+    const dense = cta.label.length > 18;
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -44,12 +57,10 @@ export default function Header() {
     };
 
     return (
-        <div className="fixed top-4 left-1/2 z-50 w-full max-w-6xl -translate-x-1/2 px-4 font-sans">
+        <div className={`fixed top-4 left-1/2 z-50 w-full -translate-x-1/2 px-4 font-sans ${dense ? 'max-w-7xl' : 'max-w-6xl'}`}>
             <header
                 className={`flex h-15 w-full items-center justify-between rounded-full border border-white/80 bg-white/30 px-6 py-2 backdrop-blur-md transition-all duration-300 md:h-16 ${
-                    scrolled
-                        ? 'border-white bg-white/50 shadow-[0_12px_40px_rgba(58,84,165,0.06)]'
-                        : 'shadow-[0_4px_20px_rgba(58,84,165,0.02)]'
+                    scrolled ? 'border-white bg-white/50 shadow-[0_12px_40px_rgba(58,84,165,0.06)]' : 'shadow-[0_4px_20px_rgba(58,84,165,0.02)]'
                 }`}
             >
                 {/* Logo */}
@@ -58,14 +69,14 @@ export default function Header() {
                 </a>
 
                 {/* Desktop Nav Items with sliding background capsule */}
-                <div className="hidden shrink-0 items-center gap-1.5 lg:flex" onMouseLeave={() => setHoveredIndex(null)}>
+                <div className={`hidden shrink-0 items-center lg:flex ${dense ? 'gap-0.5' : 'gap-1.5'}`} onMouseLeave={() => setHoveredIndex(null)}>
                     {NAV_ITEMS.map((item, idx) =>
                         'href' in item && item.href ? (
                             <a
                                 key={item.label}
                                 href={item.href}
                                 onMouseEnter={() => setHoveredIndex(idx)}
-                                className="text-zinc-650 relative cursor-pointer rounded-full px-4 py-1.5 text-[14.5px] font-semibold tracking-wide whitespace-nowrap transition-colors outline-none hover:text-zinc-950"
+                                className={`text-zinc-650 relative cursor-pointer rounded-full py-1.5 font-semibold tracking-wide whitespace-nowrap transition-colors outline-none hover:text-zinc-950 ${dense ? 'px-2.5 text-[13px] xl:px-3.5 xl:text-[14px]' : 'px-4 text-[14.5px]'}`}
                             >
                                 {hoveredIndex === idx && (
                                     <motion.span
@@ -87,7 +98,7 @@ export default function Header() {
                                         handleSectionNav(item.id);
                                     }
                                 }}
-                                className="text-zinc-650 relative cursor-pointer rounded-full px-4 py-1.5 text-[14.5px] font-semibold tracking-wide whitespace-nowrap transition-colors outline-none hover:text-zinc-950"
+                                className={`text-zinc-650 relative cursor-pointer rounded-full py-1.5 font-semibold tracking-wide whitespace-nowrap transition-colors outline-none hover:text-zinc-950 ${dense ? 'px-2.5 text-[13px] xl:px-3.5 xl:text-[14px]' : 'px-4 text-[14.5px]'}`}
                             >
                                 {hoveredIndex === idx && (
                                     <motion.span
@@ -103,24 +114,24 @@ export default function Header() {
                 </div>
 
                 {/* Desktop Actions */}
-                <div className="hidden shrink-0 items-center gap-3 md:flex">
+                <div className={`hidden shrink-0 items-center md:flex ${dense ? 'gap-2' : 'gap-3'}`}>
                     <a
                         href="/investor"
-                        className="text-[14.5px] font-bold tracking-wide whitespace-nowrap text-zinc-600 transition-colors hover:text-zinc-950"
+                        className={`font-bold tracking-wide whitespace-nowrap text-zinc-600 transition-colors hover:text-zinc-950 ${dense ? 'text-[13px] xl:text-[14.5px]' : 'text-[14.5px]'}`}
                     >
                         For Investors
                     </a>
                     <a
                         href="/founder/login"
-                        className="hidden text-[14.5px] font-bold tracking-wide whitespace-nowrap text-zinc-500 transition-colors hover:text-zinc-950 xl:inline"
+                        className={`hidden font-bold tracking-wide whitespace-nowrap text-zinc-500 transition-colors hover:text-zinc-950 xl:inline ${dense ? 'text-[13px] xl:text-[14.5px]' : 'text-[14.5px]'}`}
                     >
                         Founder Portal
                     </a>
                     <a
-                        href="/diagnostic"
-                        className="inline-flex h-10 items-center justify-center rounded-full bg-[#3A54A5] px-5 text-[14px] font-bold tracking-wide whitespace-nowrap text-white transition-all duration-200 hover:bg-[#2D4182] active:scale-[0.98]"
+                        href={cta.href}
+                        className={`inline-flex h-10 items-center justify-center rounded-full bg-[#3A54A5] font-bold tracking-wide whitespace-nowrap text-white transition-all duration-200 hover:bg-[#2D4182] active:scale-[0.98] ${dense ? 'px-4 text-[13px] xl:px-5 xl:text-[14px]' : 'px-5 text-[14px]'}`}
                     >
-                        Start Self-Scan
+                        {cta.label}
                     </a>
                 </div>
 
@@ -179,10 +190,11 @@ export default function Header() {
                             Founder Portal
                         </a>
                         <a
-                            href="/diagnostic"
+                            href={cta.href}
+                            onClick={() => setMobileOpen(false)}
                             className="rounded-full bg-[#3A54A5] py-2.5 text-center text-sm font-bold text-white shadow-xs hover:bg-[#2D4182]"
                         >
-                            Start Self-Scan
+                            {cta.label}
                         </a>
                     </div>
                 </div>

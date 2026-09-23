@@ -30,7 +30,6 @@ use App\Http\Controllers\Founder\FounderDocumentController;
 use App\Http\Controllers\Founder\FounderMessageController;
 use App\Http\Controllers\Founder\FounderSpotlightController;
 use App\Http\Controllers\Investor\InvestorAuthController;
-use App\Http\Controllers\Investor\InvestorDashboardController;
 use App\Http\Controllers\Investor\InvestorDataRoomController;
 use App\Http\Controllers\Investor\InvestorInterestController;
 use App\Http\Controllers\Investor\InvestorKycController;
@@ -91,7 +90,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['require.role:superadmin', 'admin.side:central'])->group(function () {
         Route::get('/pia-requests', [PiaApplicationController::class, 'index'])->name('pia-requests.index');
         Route::patch('/pia-requests/{application}/contacted', [PiaApplicationController::class, 'markContacted'])->name('pia-requests.contacted');
+        Route::patch('/pia-requests/{application}/tier', [PiaApplicationController::class, 'updateTier'])->name('pia-requests.tier');
         Route::post('/pia-requests/{application}/payment-received', [PiaApplicationController::class, 'confirmPaymentReceived'])->name('pia-requests.payment-received');
+        Route::post('/pia-requests/{application}/resend-agreement', [PiaApplicationController::class, 'resendAgreement'])->name('pia-requests.resend-agreement');
 
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
         Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
@@ -135,6 +136,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // Offline PIA payment requests — founder money path lives on this desk
             Route::get('/pia-requests', [PiaApplicationController::class, 'index'])->name('founder.pia-requests.index');
             Route::patch('/pia-requests/{application}/contacted', [PiaApplicationController::class, 'markContacted'])->name('founder.pia-requests.contacted');
+            Route::patch('/pia-requests/{application}/tier', [PiaApplicationController::class, 'updateTier'])->name('founder.pia-requests.tier');
+            Route::post('/pia-requests/{application}/payment-received', [PiaApplicationController::class, 'confirmPaymentReceived'])
+                ->name('founder.pia-requests.payment-received');
+            Route::post('/pia-requests/{application}/resend-agreement', [PiaApplicationController::class, 'resendAgreement'])
+                ->name('founder.pia-requests.resend-agreement');
 
             Route::get('/founders', [AdminFounderController::class, 'index'])->name('founders.index');
             Route::get('/founders/{founder}', [AdminFounderController::class, 'show'])->name('founders.show');
@@ -156,10 +162,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::patch('/badges/{badge}', [AdminProfileController::class, 'updateBadge'])->name('badge.update');
             });
         });
-
-        Route::post('/pia-requests/{application}/payment-received', [PiaApplicationController::class, 'confirmPaymentReceived'])
-            ->middleware('require.role:superadmin')
-            ->name('founder.pia-requests.payment-received');
 
         Route::prefix('questions')->name('questions.')->middleware('require.role:superadmin,analyst')->group(function () {
             Route::get('/', [AdminQuestionController::class, 'index'])->name('index');
@@ -283,7 +285,6 @@ Route::prefix('investor')->name('investor.')->group(function () {
     Route::post('/forgot-password', [InvestorAuthController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:3,1');
     Route::get('/reset-password/{token}', [InvestorAuthController::class, 'showResetPassword'])->name('password.reset');
     Route::post('/reset-password', [InvestorAuthController::class, 'resetPassword'])->name('password.update')->middleware('throttle:3,1');
-    Route::get('/dashboard', fn () => redirect()->route('investor.spotlight.index'))->middleware('auth.investor')->name('dashboard');
     Route::get('/kyc', [InvestorKycController::class, 'create'])->middleware('auth.investor')->name('kyc.create');
     Route::post('/kyc', [InvestorKycController::class, 'store'])->middleware('auth.investor')->name('kyc.store');
     Route::get('/spotlight', [InvestorSpotlightController::class, 'index'])->middleware(['auth.investor'])->name('spotlight.index');

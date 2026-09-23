@@ -177,6 +177,7 @@ class AdminFounderController extends Controller
             'payment',
             'signature',
             'profile.badges',
+            'profile.spotlightEntry',
             'documents',
             'auditAssignment.analyst',
         ]);
@@ -250,8 +251,9 @@ class AdminFounderController extends Controller
             'thread_messages' => $messages,
             'profile' => $founder->profile ? [
                 'id' => $founder->profile->id,
-                'is_live' => $founder->profile->is_live,
+                'is_live' => $founder->profile->isLive(),
                 'is_public' => $founder->profile->is_public,
+                'is_published' => $founder->profile->spotlightEntry?->published_at !== null,
                 'slug' => $founder->profile->slug,
             ] : null,
             'assignment' => $founder->auditAssignment ? [

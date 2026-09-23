@@ -138,26 +138,6 @@ Last updated: 2026-08-15
 **Pattern notes:**
 Compliance work remains a conventional table. Document access is a quiet text link, while approve and reject stay clearly labeled and visually distinct.
 
-### Investor Access Dashboard
-
-File: resources/js/pages/Investor/Dashboard.tsx
-Last updated: 2026-08-15
-
-| Property | Class |
-| --- | --- |
-| Background | `bg-[#f4f7ff]` |
-| Border | `border border-white/80` main panel, `border-[#3A54A5]/12` access panel |
-| Border radius | `rounded-2xl` panels, `rounded-xl` action and icon holders |
-| Text â€” primary | `text-zinc-950` / `text-zinc-900` |
-| Text â€” secondary | `text-zinc-600` |
-| Spacing | `p-7 sm:p-9` primary panel, `gap-7` between panels |
-| Hover state | `hover:bg-[#2D4182]` primary action |
-| Shadow | `shadow-[0_20px_55px_rgba(33,56,120,0.10)]` primary panel |
-| Accent usage | `#3A54A5` for status icon, access labels, and forward action |
-
-**Pattern notes:**
-The investor home states the exact verification outcome in one central panel and puts the longer-term access model in a quieter supporting panel. Use a semantic `Badge` for the KYC state and an `Alert` only when a compliance note requires attention. Do not expose unavailable dealflow as a fake navigation target.
-
 ### Founder Spotlight Preparation
 
 File: resources/js/pages/Founder/Spotlight.tsx
@@ -181,22 +161,20 @@ Founder publishing preparation uses one editable surface and one operational-sta
 ### Investor Spotlight
 
 Files: resources/js/pages/Investor/Spotlight/Index.tsx, resources/js/pages/Investor/Spotlight/Show.tsx
-Last updated: 2026-08-22
+Last updated: 2026-09-21
 
 | Property | Class |
 | --- | --- |
-| Background | `bg-[#f4f7ff]` with `bg-white` content surfaces |
-| Border | `border border-white/80` primary surfaces, `border-[#3A54A5]/12` protected-document panel |
-| Border radius | `rounded-2xl` cards and sections, `rounded-xl` actions |
+| Background | `bg-stone-50` page; `bg-white` materials / form surfaces |
+| Border | `border-zinc-200` section rules and panels |
 | Text — primary | `text-zinc-950` |
-| Text — secondary | `text-zinc-600` |
-| Spacing | `p-6` listing cards, `p-7 sm:p-10` detail surface |
-| Hover state | `hover:-translate-y-0.5` listing cards, `hover:bg-[#2D4182]` primary action |
-| Shadow | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` listing cards |
-| Accent usage | `#3A54A5` for PARAGON status, verified markers, and document download |
+| Text — secondary | `text-zinc-600` / `text-zinc-500` |
+| Accent | `#3A54A5` engage CTA and radar |
+| Materials | PDF only gets inline preview; non-PDF is a compact download row |
+| Status | Existing interest is a slim top strip, not a second “Next step” block |
 
 **Pattern notes:**
-Spotlight feels editorial rather than like a generic deal grid. Each startup leads with a factual one-liner; detailed content and the pitch deck are visually separated as progressively protected access. The detail page pairs verified signals with a restrained PARAGON radar and always includes a text equivalent for assistive technology. An approved PDF preview stays inside the protected-document panel; non-PDF decks retain a secure download action, and pre-KYC investors see a direct lock explanation instead of a disabled-looking control.
+Hide placeholder founder copy (`One-liner pending…`). Don’t render portraits as pitch decks. Engagement form appears only when no active request.
 
 ### Admin Spotlight Management
 
@@ -221,22 +199,17 @@ Staff publishing is a conventional readiness table. Reviewed deck status must be
 ### Investor Interest Workflow
 
 Files: resources/js/pages/Investor/Spotlight/Show.tsx, resources/js/pages/Investor/Interests.tsx, resources/js/pages/Investor/DataRooms/Show.tsx
-Last updated: 2026-08-22
+Last updated: 2026-09-21
 
 | Property | Class |
 | --- | --- |
-| Background | `bg-[#f4f7ff]` page canvas; `bg-white` workflow surfaces |
-| Border | `border border-white/80` primary sections; `border-[#3A54A5]/12` for protected-access context |
-| Border radius | `rounded-2xl` workflow sections; `rounded-xl` controls and inline status panels |
-| Text — primary | `text-zinc-950` / `text-zinc-900` |
-| Text — secondary | `text-zinc-600` / `text-zinc-500` |
-| Spacing | `p-6 sm:p-8` sections; `gap-5` within forms and requests |
-| Hover state | `hover:bg-[#2D4182]` submit action; `hover:underline` for contextual links |
-| Shadow | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` workflow surfaces |
-| Accent usage | `#3A54A5` marks mediated action, secure access, and the single next step |
+| Interests list | Flat `divide-y` list on `bg-stone-50` — no shadow cards |
+| Status | Plain text (`text-emerald-700` / `text-zinc-600` / `text-rose-700`), short labels |
+| Copy | Hide placeholder one-liners; type as `Data room` not uppercase pills |
+| Actions | Inline text links only when actionable (open data room, join meeting) |
 
 **Pattern notes:**
-Interest uses a type-first choice followed by an optional concise message. Clearly separate a general interest approval from a data-room grant, and never show a document-access action unless the approved request type is `data_room_access`.
+Interest uses a type-first choice followed by an optional concise message. Never show a document-access action unless the grant is active.
 
 ### Admin Dealflow Access Log
 
@@ -398,13 +371,69 @@ Signature is the dark diligence-desk hero with live-feeling Spotlight score pane
 File: resources/js/pages/Admin/Dashboard.tsx (`FounderDeskHome`)
 Last updated: 2026-09-20
 
-| Property | Class |
+| Property | Class / source |
 | --- | --- |
-| Layout | Dashboard: header → 4 KPI tiles → 3+2 widget grid (pay queue + activity) |
-| Icons | Iconify Solar `*-linear` in muted `bg-zinc-50` wells (not rainbow Lucide chips) |
-| Panels | `rounded-2xl border border-zinc-100 bg-white shadow-sm` |
-| Accent | `#3A54A5` for pay queue header well + waiting badge |
-| Anti-patterns | No Lucide icons; no colored ping-on-every-card soup; don't flatten into a memo page |
+| Canvas | Ref 1 — `bg-[#F4F6FA]` behind content |
+| Card shell | Ref 2 — `DeskCard` soft white cards |
+| Header | Plain greeting + single CTA “View founders” (no duplicate payment chip) |
+| KPI row | Everyday labels: Assigned / In progress / Waiting on founder / New messages |
+| Chart | shadcn `AreaChart` — started vs finished over 6 months (`engagement_trend`) |
+| Status list | Not started / In progress / Waiting on founder / Paused / Finished |
+| Side rail | “Things to handle” + “What’s been happening” |
+| Copy | Plain English for staff — avoid “audit / PIA / pipeline” jargon on this page |
+| Icons | Iconify Solar `*-linear` only |
 
 **Pattern notes:**
-Must still read as a dashboard (KPIs + panels). Waiting-to-pay is the primary widget. Solar icons stay quiet zinc until hover.
+Overview monitors work and money. Payments waiting appear once under Things to handle. Full payment list stays on `/admin/founder/pia-requests` — **operational table**, not stacked cards (same admin list pattern as Profiles/Founders).
+
+### Founder auth (setup / login / password)
+
+Files: `resources/js/pages/Founder/Auth/{Setup,Login,ForgotPassword,ResetPassword}.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+| --- | --- |
+| Layout | `DiagnosticLayout` + left-aligned column `max-w-[420px]` (same as post-sign confirming) |
+| Card | **None** — no glass panel, no floating `rounded-[2.5rem]` shell |
+| Badges / steppers | **None** — no “Final Step”, progress dots, or portal pills |
+| Text — primary | `font-display text-[1.75rem] font-bold text-zinc-950` |
+| Text — secondary | `text-[15px] text-zinc-600` |
+| Labels | Sentence case `text-[13px] font-medium text-zinc-700` (never all-caps tracking) |
+| Inputs | `rounded-xl border-zinc-200 bg-white` — focus `border-[#3A54A5]` only |
+| CTA | `min-h-12 rounded-xl bg-[#3A54A5] text-[14px] font-semibold` — sentence case, no uppercase tracking |
+| Accent | `#3A54A5` / hover `#2D4182` |
+
+**Pattern notes:**
+Founder auth is a plain form after the agreement — brand, one headline, one sentence, fields, one button. Match `Onboarding/Verifying.tsx` composition. Do not reintroduce glass cards or badge chrome.
+
+### Founder workspace dashboard
+
+File: `resources/js/pages/Founder/Dashboard.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+| --- | --- |
+| Composition | Status desk — one job per band; self-scan below |
+| Authorization | No tinted card. Ask first (`Authorize data room access?`), firm + name, then Decline/Authorize under the copy — not stretched across the row |
+| Status band | Shown only when nothing awaits authorization (or analyst `needs_info`) |
+| Earlier requests | Quiet list after; no mediation sermon |
+| Accent | `#3A54A5` primary actions |
+
+**Pattern notes:**
+Never stack “needs authorization” copy twice. Buttons live on the request row. Do not reintroduce shortcut cards or empty investor placeholders.
+
+### Founder documents
+
+File: `resources/js/pages/Founder/Documents/Index.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+| --- | --- |
+| Title | `Documents` — not “Vault” |
+| Upload | Dashed dropzone only (interaction surface) — no outer card |
+| List | Flat divided list; text actions Download / Delete |
+| Empty | One line: “Nothing here yet.” |
+| Accent | `#3A54A5` upload CTA |
+
+**Pattern notes:**
+Same status-desk language as the founder dashboard. No uppercase section chrome, no nested white cards.

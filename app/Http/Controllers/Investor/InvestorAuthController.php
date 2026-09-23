@@ -19,7 +19,7 @@ class InvestorAuthController extends Controller
     public function showLogin(): Response|RedirectResponse
     {
         if (Auth::guard('investor')->check()) {
-            return redirect()->route('investor.dashboard');
+            return redirect()->route('investor.spotlight.index');
         }
 
         return Inertia::render('Investor/Auth/Login', [
@@ -53,7 +53,7 @@ class InvestorAuthController extends Controller
         $request->session()->regenerate();
         $investor->update(['last_login_at' => now()]);
 
-        return redirect()->intended(route('investor.dashboard'));
+        return redirect()->intended(route('investor.spotlight.index'));
     }
 
     public function logout(Request $request): RedirectResponse
@@ -68,7 +68,7 @@ class InvestorAuthController extends Controller
     public function showForgotPassword(): Response|RedirectResponse
     {
         if (Auth::guard('investor')->check()) {
-            return redirect()->route('investor.dashboard');
+            return redirect()->route('investor.spotlight.index');
         }
 
         return Inertia::render('Investor/Auth/ForgotPassword');

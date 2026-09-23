@@ -52,6 +52,16 @@ class InvestorSpotlightController extends Controller
         $investor = Auth::guard('investor')->user();
         $pitchDeck = $entry->profile->founder->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->latest()->first();
 
+        $existingInterest = $investor->interests()
+            ->where('profile_id', $entry->profile_id)
+            ->latest()
+            ->first();
+
+        $isImageDeck = $pitchDeck && str_starts_with((string) $pitchDeck->mime_type, 'image/');
+        $isPdfDeck = $pitchDeck?->mime_type === 'application/pdf';
+        // Only PDFs get an inline preview; images/other files are download-only.
+        $canPreviewDeck = $investor->hasApprovedKyc() && $isPdfDeck;
+
         return Inertia::render('Investor/Spotlight/Show', [
             'entry' => array_merge($this->entryCard($entry), [
                 'summary' => $entry->profile->spotlight_summary,
@@ -60,8 +70,9 @@ class InvestorSpotlightController extends Controller
                 'pitch_deck' => $pitchDeck ? [
                     'original_filename' => $pitchDeck->original_filename,
                     'mime_type' => $pitchDeck->mime_type,
-                    'can_preview' => $pitchDeck->mime_type === 'application/pdf' && $investor->hasApprovedKyc(),
-                    'preview_url' => $pitchDeck->mime_type === 'application/pdf' && $investor->hasApprovedKyc()
+                    'kind' => $isPdfDeck ? 'pdf' : ($isImageDeck ? 'image' : 'file'),
+                    'can_preview' => $canPreviewDeck,
+                    'preview_url' => $canPreviewDeck
                         ? $this->temporaryDocumentUrl('investor.spotlight.pitch-deck.preview', $entry->profile->slug)
                         : null,
                     'download_url' => $investor->hasApprovedKyc()
@@ -70,6 +81,14 @@ class InvestorSpotlightController extends Controller
                 ] : null,
                 'can_view_pitch_deck' => $investor->hasApprovedKyc(),
                 'can_submit_interest' => $investor->canAccessProtectedInvestorContent(),
+                'existing_interest' => $existingInterest ? [
+                    'type' => $existingInterest->type,
+                    'status' => $existingInterest->status,
+                    'founder_decision' => $existingInterest->founder_decision,
+                    'investor_facing_status' => $existingInterest->getInvestorFacingStatus(
+                        $investor->dataRoomGrants()->where('profile_id', $entry->profile_id)->whereNull('revoked_at')->first()
+                    ),
+                ] : null,
             ]),
         ]);
     }
@@ -136,7 +155,7 @@ class InvestorSpotlightController extends Controller
             'spotlight_one_liner' => $profile->spotlight_one_liner,
             'sector' => $profile->sector ?? 'General Tech',
             'batch' => $profile->batch ?? 'Active Syndicate',
-            'overall_score' => $profile->overall_score ?? 89,
+            'overall_score' => $profile->overall_score,
             'radar_data' => $profile->radar_data,
             'verified_badges_count' => $profile->badges->where('is_verified', true)->count(),
             'badges' => $profile->badges->where('is_verified', true)->values()->map(fn ($b) => [

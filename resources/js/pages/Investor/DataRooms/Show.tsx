@@ -123,9 +123,6 @@ export default function DataRoomShow({ company_name, documents }: { company_name
                         </div>
                     )}
                 </div>
-                <p className="border-t border-zinc-200 pt-5 text-xs leading-5 text-zinc-500">
-                    Downloads are recorded for founder and Pinpoint oversight. Links expire automatically for your protection.
-                </p>
             </section>
         </main>
     );

@@ -23,7 +23,7 @@ class InvestorKycController extends Controller
         $investor = $request->user('investor');
 
         if ($investor->hasApprovedKyc()) {
-            return redirect()->route('investor.dashboard');
+            return redirect()->route('investor.spotlight.index');
         }
 
         return Inertia::render('Investor/Kyc', ['investor' => $investor->load('profile', 'kycSubmissions')]);

@@ -29,6 +29,7 @@ interface PageProps {
         full_name?: string | null;
         company_name?: string | null;
     };
+    assigned_analyst?: { id: number; name: string } | null;
 }
 
 function formatDateLabel(dateStr: string): string {
@@ -42,7 +43,11 @@ function formatDateLabel(dateStr: string): string {
     return msgDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export default function FounderMessages({ messages: initialMessages, founder }: PageProps) {
+export default function FounderMessages({
+    messages: initialMessages,
+    founder,
+    assigned_analyst = null,
+}: PageProps) {
     const threadRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -162,23 +167,18 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
 
     return (
         <FounderLayout founder={founder}>
-            <Head title="Founder Workspace — Analyst Engagement" />
+            <Head title="Messages — Pinpoint" />
 
             <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden">
-                {/* ── Header ── */}
                 <div className="mb-4 flex shrink-0 items-center justify-between border-b border-zinc-100 pb-4">
                     <div>
-                        <div className="flex items-center gap-2">
-                            <h1 className="text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
-                                Analyst Engagement Channel
-                            </h1>
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                                <span>Active Stream</span>
-                            </span>
-                        </div>
-                        <p className="mt-0.5 text-xs text-zinc-400">
-                            Direct line to your assigned Lead Analyst team for PARAGON audit coordination and diligence inquiries.
+                        <h1 className="font-display text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
+                            Messages
+                        </h1>
+                        <p className="mt-1 text-[13px] text-zinc-500">
+                            {assigned_analyst
+                                ? `With your analyst, ${assigned_analyst.name}.`
+                                : 'Message Pinpoint. An analyst will reply once assigned.'}
                         </p>
                     </div>
                 </div>
@@ -190,7 +190,11 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                         {messages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-20 text-center text-zinc-400">
                                 <Icon icon="solar:chat-round-dots-linear" className="mb-2 size-8 text-zinc-300" />
-                                <p className="text-xs">No messages yet. Send an inquiry or update to your analyst lead.</p>
+                                <p className="text-xs">
+                                    {assigned_analyst
+                                        ? `No messages yet. Say hello to ${assigned_analyst.name}.`
+                                        : 'No messages yet. Write Pinpoint anytime.'}
+                                </p>
                             </div>
                         ) : (
                             renderedMessages.map((item, index) => {
@@ -290,7 +294,11 @@ export default function FounderMessages({ messages: initialMessages, founder }: 
                             <textarea
                                 value={body}
                                 onChange={(e) => setBody(e.target.value)}
-                                placeholder="Write an audit inquiry or response to your analyst lead..."
+                                placeholder={
+                                    assigned_analyst
+                                        ? `Message ${assigned_analyst.name}…`
+                                        : 'Message Pinpoint…'
+                                }
                                 rows={2}
                                 className="w-full resize-none rounded-xl border border-zinc-200 bg-[#FAFBFD] p-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
                                 onKeyDown={(e) => {

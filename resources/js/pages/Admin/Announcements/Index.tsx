@@ -1,7 +1,8 @@
 import AdminLayout from '@/layouts/admin-layout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 
 export default function Announcements() {
+    const flash = usePage().props.flash as { success?: string; error?: string } | undefined;
     const form = useForm({ type: 'fundraise', audience: 'active_investors', title: '', body: '', destination_url: '' });
     return (
         <AdminLayout>
@@ -10,10 +11,18 @@ export default function Announcements() {
                 <div className="max-w-3xl">
                     <p className="text-xs font-bold tracking-[0.14em] text-[#3A54A5] uppercase">Communications</p>
                     <h1 className="mt-2 text-2xl font-black text-zinc-950">Publish announcement</h1>
+                    {flash?.success && (
+                        <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+                            {flash.success} The form has been cleared.
+                        </p>
+                    )}
                     <form
                         onSubmit={(event) => {
                             event.preventDefault();
-                            form.post(route('admin.announcements.store'));
+                            form.post(route('admin.announcements.store'), {
+                                preserveScroll: true,
+                                onSuccess: () => form.reset('title', 'body', 'destination_url'),
+                            });
                         }}
                         className="mt-7 flex flex-col gap-5 rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs"
                     >

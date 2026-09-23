@@ -89,7 +89,7 @@ test('an approved investor cannot submit replacement KYC documents', function ()
         ->and(InvestorKycSubmission::count())->toBe(1);
 });
 
-test('an approved investor is redirected from KYC to the investor home', function () {
+test('an approved investor is redirected from KYC to Spotlight', function () {
     $investor = investorForKycSubmission([
         'kyc_status' => Investor::KYC_STATUS_APPROVED,
         'kyc_approved_at' => now(),
@@ -97,35 +97,28 @@ test('an approved investor is redirected from KYC to the investor home', functio
 
     $this->actingAs($investor, 'investor')
         ->get(route('investor.kyc.create'))
-        ->assertRedirect(route('investor.dashboard'));
+        ->assertRedirect(route('investor.spotlight.index'));
 });
 
-test('investor home shows KYC next step for not_submitted accounts', function () {
+test('unapproved investor can open Spotlight with KYC still incomplete', function () {
     $investor = investorForKycSubmission([
         'kyc_status' => Investor::KYC_STATUS_NOT_SUBMITTED,
     ]);
 
     $this->actingAs($investor, 'investor')
-        ->get(route('investor.dashboard'))
+        ->get(route('investor.spotlight.index'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('Investor/Dashboard')
-            ->where('investor.kyc_status', Investor::KYC_STATUS_NOT_SUBMITTED)
-            ->where('next_step.cta_route', 'investor.kyc.create')
-            ->where('investor.can_access_protected', false));
+        ->assertInertia(fn ($page) => $page->component('Investor/Spotlight/Index'));
 });
 
-test('approved investor home points to Spotlight when there is no open work', function () {
+test('approved investor lands on Spotlight after authentication routes', function () {
     $investor = investorForKycSubmission([
         'kyc_status' => Investor::KYC_STATUS_APPROVED,
         'kyc_approved_at' => now(),
     ]);
 
     $this->actingAs($investor, 'investor')
-        ->get(route('investor.dashboard'))
+        ->get(route('investor.spotlight.index'))
         ->assertOk()
-        ->assertInertia(fn ($page) => $page
-            ->component('Investor/Dashboard')
-            ->where('investor.can_access_protected', true)
-            ->where('next_step.cta_route', 'investor.spotlight.index'));
+        ->assertInertia(fn ($page) => $page->component('Investor/Spotlight/Index'));
 });

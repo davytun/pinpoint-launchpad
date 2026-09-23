@@ -74,6 +74,10 @@ class InvestorInterest extends Model
 
     public function isAwaitingFounder(): bool
     {
+        if ($this->status !== 'pending') {
+            return false;
+        }
+
         return $this->founder_decision === null || $this->founder_decision === 'pending';
     }
 

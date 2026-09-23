@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Check, Loader2, Lock, Percent, RefreshCw, ShieldCheck, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Loader2, Lock, Percent, RefreshCw, ShieldCheck, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
@@ -38,23 +38,22 @@ const TRUST = [
     {
         icon: <ShieldCheck className="size-[14px] text-emerald-600" />,
         title: 'Why sign now?',
-        body: 'Protects your trade secrets and confirms 100% credit toward the success fee.',
+        body: 'Locks in your terms and keeps your company details private while we start the work.',
     },
     {
         icon: <Percent className="size-[14px] text-[#3A54A5]" />,
         title: 'The 2% Rule',
-        body: 'A standard advisory warrant aligning our team as your external Series A department.',
+        body: 'A standard advisory warrant — we only win when you raise.',
     },
     {
         icon: <Lock className="size-[14px] text-zinc-400" />,
-        title: 'Secure & Compliant',
-        body: 'Encrypted via BoldSign — SOC 2 Type II and eIDAS certified.',
+        title: 'Signed online, kept safe',
+        body: 'You sign in this browser. We keep a copy; you get one by email.',
     },
 ] as const;
 
 export default function OnboardingSign({ embed_url, signer_email, tier_label, document_id }: PageProps) {
     const [loaded, setLoaded] = useState(false);
-    const [complete, setComplete] = useState(false);
     const [declined, setDeclined] = useState(false);
     const [error, setError] = useState(false);
 
@@ -64,8 +63,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
             if (!d) return;
             const action = typeof d === 'string' ? d : (d.action ?? d.event ?? '');
             if (action === 'onDocumentSigned' || action === 'documentSigned') {
-                setComplete(true);
-                setTimeout(() => router.visit('/onboarding/complete'), 1200);
+                router.visit('/onboarding/complete');
             }
             if (action === 'onDocumentDeclined' || action === 'documentDeclined') {
                 setDeclined(true);
@@ -123,30 +121,6 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                             </button>
                         </FadeUp>
-                    </motion.div>
-                )}
-
-                {/* ── Signed overlay ── */}
-                {complete && (
-                    <motion.div
-                        className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-white/95 backdrop-blur-xl"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.5, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.45, ease }}
-                            className="flex h-16 w-16 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50"
-                            style={{ boxShadow: '0 0 48px rgba(16,185,129,0.18)' }}
-                        >
-                            <Check className="text-emerald-650 size-8" strokeWidth={3} />
-                        </motion.div>
-                        <div className="text-center">
-                            <p className="font-display text-lg font-bold text-zinc-950">Agreement Signed</p>
-                            <p className="mt-1 text-[12px] text-zinc-500">Confirming your signature…</p>
-                        </div>
                     </motion.div>
                 )}
 
@@ -267,7 +241,7 @@ export default function OnboardingSign({ embed_url, signer_email, tier_label, do
                             <span className="text-zinc-550 text-[10px] font-semibold tracking-[0.22em] uppercase">Pinpoint Investment Warrant</span>
                             <div className="flex items-center gap-1.5 text-[9px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
                                 <Lock className="size-2.5 text-zinc-400" />
-                                <span>BoldSign · SOC 2</span>
+                                <span>Private signing session</span>
                             </div>
                         </div>
 

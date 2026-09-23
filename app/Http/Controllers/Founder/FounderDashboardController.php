@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Founder;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Founder\ReviewInvestorInterestRequest;
+use App\Models\DiligenceRequest;
 use App\Models\Founder;
+use App\Models\FounderProfile;
+use App\Models\InvestorDataRoomGrant;
 use App\Models\InvestorInterest;
 use App\Services\InvestorInterestWorkflowService;
 use Illuminate\Http\RedirectResponse;
@@ -23,6 +26,7 @@ class FounderDashboardController extends Controller
             'payment:id,tier,total_amount,paid_at,audit_status',
             'signature:id,status,signed_at',
             'profile:id,founder_id,slug,is_public,is_featured_in_spotlight,verified_at,expires_at',
+            'auditAssignment.analyst:id,name,email',
         ]);
 
         $pillarScores = Cache::remember(
@@ -105,15 +109,31 @@ class FounderDashboardController extends Controller
         $auditStatus = $founder->payment?->audit_status ?? 'pending';
         $tier = $founder->tier;
 
-        $dataRoomGrants = $founder->profile
-            ? $founder->profile->investorDataRoomGrants()
+        $profileIds = $founder->profile?->id
+            ? [$founder->profile->id]
+            : [];
+
+        // Fallback: resolve by founder_id in case the HasOne profile load is empty
+        // but interests/diligence still point at a profile for this founder.
+        if ($profileIds === []) {
+            $profileIds = FounderProfile::query()
+                ->where('founder_id', $founder->id)
+                ->pluck('id')
+                ->all();
+        }
+
+        $dataRoomGrants = $profileIds === []
+            ? collect()
+            : InvestorDataRoomGrant::query()
+                ->whereIn('profile_id', $profileIds)
                 ->whereNull('revoked_at')
                 ->get()
-                ->keyBy('investor_id')
-            : collect();
+                ->keyBy('investor_id');
 
-        $investorInterests = $founder->profile
-            ? $founder->profile->investorInterests()
+        $investorInterests = $profileIds === []
+            ? []
+            : InvestorInterest::query()
+                ->whereIn('profile_id', $profileIds)
                 ->with('investor.profile')
                 ->orderBy('created_at', 'desc')
                 ->get()
@@ -144,12 +164,16 @@ class FounderDashboardController extends Controller
                         'created_at' => $interest->created_at->toISOString(),
                     ];
                 })
-                ->toArray()
-            : [];
+                ->toArray();
 
-        $pendingDiligenceCount = $founder->profile
-            ? $founder->profile->diligenceRequests()->where('status', 'waiting_for_founder')->count()
-            : 0;
+        $pendingDiligenceCount = $profileIds === []
+            ? 0
+            : DiligenceRequest::query()
+                ->whereIn('profile_id', $profileIds)
+                ->where('status', 'waiting_for_founder')
+                ->count();
+
+        $assignedAnalyst = $founder->assignedAnalyst();
 
         return Inertia::render('Founder/Dashboard', [
             'founder' => [
@@ -184,6 +208,12 @@ class FounderDashboardController extends Controller
             'has_diagnostic' => $founder->diagnostic_session_id !== null && $founder->score !== null,
             'investor_interests' => $investorInterests,
             'pending_diligence_count' => $pendingDiligenceCount,
+            'assigned_analyst' => $assignedAnalyst
+                ? [
+                    'id' => $assignedAnalyst->id,
+                    'name' => $assignedAnalyst->name,
+                ]
+                : null,
         ]);
     }
 

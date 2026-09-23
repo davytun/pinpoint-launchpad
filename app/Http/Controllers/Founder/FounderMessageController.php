@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Mail\NewMessageAdminMail;
 use App\Models\Founder;
 use App\Models\Message;
+use App\Models\User;
+use App\Notifications\FounderMessageReceivedNotification;
 use App\Services\MessageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,6 +26,7 @@ class FounderMessageController extends Controller
     {
         /** @var Founder $founder */
         $founder = Auth::guard('founder')->user();
+        $founder->load('auditAssignment.analyst:id,name,email');
         $thread = $this->messageService->getOrCreateThread($founder);
 
         $this->messageService->markThreadRead($thread, 'founder');
@@ -45,11 +48,19 @@ class FounderMessageController extends Controller
                 'is_from_founder' => $msg->isFromFounder(),
             ]);
 
+        $analyst = $founder->assignedAnalyst();
+
         return Inertia::render('Founder/Messages/Index', [
             'messages' => $messages,
             'thread_id' => $thread->id,
             'founder_name' => $founder->full_name,
             'unread_count' => 0,
+            'assigned_analyst' => $analyst
+                ? [
+                    'id' => $analyst->id,
+                    'name' => $analyst->name,
+                ]
+                : null,
             'founder' => [
                 'id' => $founder->id,
                 'email' => $founder->email,
@@ -89,6 +100,10 @@ class FounderMessageController extends Controller
         Mail::to(config('mail.admin_address'))->queue(
             new NewMessageAdminMail($founder, $message, $thread)
         );
+
+        User::query()
+            ->whereIn('role', ['superadmin', 'analyst', 'compliance', 'investor_relations'])
+            ->each(fn (User $staff) => $staff->notify(new FounderMessageReceivedNotification($founder, $message, $thread)));
 
         return back()->with('success', 'Message sent.');
     }

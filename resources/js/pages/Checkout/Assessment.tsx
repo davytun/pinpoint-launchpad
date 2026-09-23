@@ -3,9 +3,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, BarChart3, Check, Crosshair, Layout, Shield, Users } from 'lucide-react';
 import { useState } from 'react';
 
-import { PinpointLogo } from '@/components/pinpoint-logo';
-import PrivacyConsent from '@/components/privacy-consent';
 import { CountrySelect } from '@/components/country-select';
+import Footer from '@/components/landing/footer';
+import Header from '@/components/landing/header';
+import PrivacyConsent from '@/components/privacy-consent';
 import { cn } from '@/lib/utils';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -539,35 +540,16 @@ function ApplicationForm() {
 export default function Assessment() {
     return (
         <>
-            <div className="relative min-h-screen bg-white font-sans text-zinc-900 selection:bg-zinc-950 selection:text-white">
+            <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-[#f1f4ff] via-[#f5f8ff] to-white font-sans text-zinc-900 selection:bg-zinc-950 selection:text-white">
                 {/* Ambient background rays matching standard site rays */}
                 <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
                     <div className="bg-radial-to-b absolute top-0 left-1/2 h-200 w-full max-w-7xl -translate-x-1/2 from-[#3A54A5]/4 to-transparent opacity-80 blur-3xl" />
                 </div>
 
-                {/* ── Sticky Nav (Light Mode) ── */}
-                <div className="sticky top-4 z-50 mx-auto max-w-5xl px-4">
-                    <header className="flex h-14 w-full items-center justify-between rounded-full border border-zinc-200/80 bg-white/70 px-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] backdrop-blur-md">
-                        <a href="/" className="flex shrink-0 items-center">
-                            <PinpointLogo height={20} variant="dark" />
-                        </a>
-                        <div className="flex items-center gap-5">
-                            <a href="/diagnostic" className="text-zinc-555 hidden text-xs font-bold transition hover:text-zinc-950 md:block">
-                                Take the free Self-Scan
-                            </a>
-                            <a
-                                href="#apply"
-                                className="inline-flex h-9 cursor-pointer items-center justify-center rounded-full bg-zinc-950 px-5 text-xs font-bold whitespace-nowrap text-white transition hover:bg-zinc-800 active:scale-[0.98]"
-                            >
-                                <span className="hidden sm:inline">Apply for an assessment</span>
-                                <span className="sm:hidden">Apply</span>
-                            </a>
-                        </div>
-                    </header>
-                </div>
+                <Header cta={{ label: 'Apply for an assessment', href: '#apply' }} />
 
                 {/* ── Hero Section ── */}
-                <section className="pt-20 pb-24 md:pt-28 md:pb-32">
+                <section className="pt-28 pb-24 md:pt-36 md:pb-32">
                     <div className="mx-auto max-w-5xl px-6 md:px-8">
                         <div className="grid items-start gap-12 lg:grid-cols-[1.4fr_1fr]">
                             {/* Left Side: Headline & Intro */}
@@ -846,7 +828,7 @@ export default function Assessment() {
                 </section>
 
                 {/* ── Application Form Section ── */}
-                <section id="apply" className="border-t border-zinc-200/50 bg-white py-24 scroll-mt-24">
+                <section id="apply" className="scroll-mt-24 border-t border-zinc-200/50 bg-white py-24">
                     <div className="mx-auto max-w-5xl px-6 md:px-8">
                         <FadeUp>
                             <div className="mx-auto mb-14 max-w-2xl text-center">
@@ -868,16 +850,11 @@ export default function Assessment() {
                     </div>
                 </section>
 
-                {/* ── Footer ── */}
-                <footer className="border-t border-zinc-200/50 bg-zinc-50 py-12">
-                    <div className="mx-auto max-w-5xl px-6 text-center">
-                        <p className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Pinpoint Launchpad</p>
-                        <p className="mx-auto mt-3 max-w-xl text-[11px] leading-relaxed font-medium text-zinc-400/80">
-                            The PIA is an investment-readiness assessment. It is not an audit, not a legal opinion, and not investment advice.
-                            Findings rest on the evidence made available within the assessment window.
-                        </p>
-                    </div>
-                </footer>
+                <p className="mx-auto max-w-xl px-6 pb-10 text-center text-[11px] leading-relaxed font-medium text-zinc-400">
+                    The PIA is an investment-readiness assessment. It is not an audit, not a legal opinion, and not investment advice. Findings rest
+                    on the evidence made available within the assessment window.
+                </p>
+                <Footer />
             </div>
         </>
     );

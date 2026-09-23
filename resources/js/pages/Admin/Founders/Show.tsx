@@ -65,7 +65,7 @@ interface PageProps {
     documents: DocumentItem[];
     message_thread: { id: number; total_messages: number; unread_count: number } | null;
     thread_messages?: MessageItem[];
-    profile: { id: string; is_live: boolean; is_public: boolean; slug: string } | null;
+    profile: { id: string; is_live: boolean; is_public: boolean; is_published: boolean; slug: string } | null;
     assignment: { analyst_id: number; analyst_name: string | null; assigned_at: string | null; notes: string | null } | null;
     analysts: Analyst[];
     user_role: 'superadmin' | 'analyst' | 'support' | 'investor_relations';
@@ -270,7 +270,7 @@ export default function AdminFoundersShow({
                             )}
                         </button>
 
-                        {profile && (
+                        {profile?.is_published && (
                             <a
                                 href={`/investor/spotlight/${profile.slug}`}
                                 target="_blank"
@@ -746,9 +746,33 @@ export default function AdminFoundersShow({
                                                     <h3 className="text-sm font-bold text-zinc-950">Investor Spotlight Syndicate</h3>
                                                     <p className="text-[11px] text-zinc-400">Public profile indexed for accredited investor syndication.</p>
                                                 </div>
-                                                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                                                    <span>{profile.is_live ? 'Live on Syndicate' : profile.is_public ? 'Public Dossier' : 'Draft'}</span>
+                                                <span
+                                                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+                                                        profile.is_published
+                                                            ? 'border-emerald-200/80 bg-emerald-50 text-emerald-700'
+                                                            : profile.is_live
+                                                              ? 'border-amber-200/80 bg-amber-50 text-amber-800'
+                                                              : 'border-zinc-200/80 bg-zinc-50 text-zinc-600'
+                                                    }`}
+                                                >
+                                                    <span
+                                                        className={`h-1.5 w-1.5 rounded-full ${
+                                                            profile.is_published
+                                                                ? 'bg-emerald-600'
+                                                                : profile.is_live
+                                                                  ? 'bg-amber-500'
+                                                                  : 'bg-zinc-400'
+                                                        }`}
+                                                    />
+                                                    <span>
+                                                        {profile.is_published
+                                                            ? 'Live on Syndicate'
+                                                            : profile.is_live
+                                                              ? 'Ready — not published'
+                                                              : profile.is_public
+                                                                ? 'Public Dossier'
+                                                                : 'Draft'}
+                                                    </span>
                                                 </span>
                                             </div>
 
@@ -762,27 +786,48 @@ export default function AdminFoundersShow({
 
                                                 <div className="flex items-center justify-between py-1.5">
                                                     <span className="text-zinc-400">Syndicate Spotlight URL</span>
+                                                    {profile.is_published ? (
+                                                        <a
+                                                            href={`/investor/spotlight/${profile.slug}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-1 text-[11px] font-semibold text-zinc-900 underline hover:text-zinc-600"
+                                                        >
+                                                            <span>/investor/spotlight/{profile.slug}</span>
+                                                            <Icon icon="solar:arrow-right-up-linear" className="size-3" />
+                                                        </a>
+                                                    ) : (
+                                                        <span className="font-mono text-[11px] text-zinc-400">
+                                                            /investor/spotlight/{profile.slug}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {!profile.is_published && (
+                                                <p className="mt-3 text-[11.5px] leading-relaxed text-zinc-500">
+                                                    This dossier is not live for investors yet. Publish it from Investor Desk → Spotlight.
+                                                </p>
+                                            )}
+
+                                            <div className="mt-5 flex gap-2.5">
+                                                {profile.is_published ? (
                                                     <a
                                                         href={`/investor/spotlight/${profile.slug}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="flex items-center gap-1 text-[11px] font-semibold text-zinc-900 underline hover:text-zinc-600"
+                                                        className="flex-1 rounded-xl border border-zinc-200 bg-white py-2 text-center text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                                                     >
-                                                        <span>/investor/spotlight/{profile.slug}</span>
-                                                        <Icon icon="solar:arrow-right-up-linear" className="size-3" />
+                                                        View Public Page
                                                     </a>
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-5 flex gap-2.5">
-                                                <a
-                                                    href={`/investor/spotlight/${profile.slug}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex-1 rounded-xl border border-zinc-200 bg-white py-2 text-center text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
-                                                >
-                                                    View Public Page
-                                                </a>
+                                                ) : (
+                                                    <Link
+                                                        href="/admin/investors/spotlight"
+                                                        className="flex-1 rounded-xl border border-zinc-200 bg-white py-2 text-center text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+                                                    >
+                                                        Open Spotlight Desk
+                                                    </Link>
+                                                )}
                                                 <Link
                                                     href={`/admin/founder/profiles/${profile.id}`}
                                                     className="flex-1 rounded-xl bg-zinc-950 py-2 text-center text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-zinc-800"

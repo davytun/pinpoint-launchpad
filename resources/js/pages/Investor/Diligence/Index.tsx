@@ -1,6 +1,7 @@
 import { InvestorHeader } from '@/components/investor-header';
+import { cn } from '@/lib/utils';
+import { Icon } from '@iconify/react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { CheckCircle2, Clock3, Lock, MessageSquare, XCircle } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 
 interface DiligenceRequest {
@@ -41,7 +42,21 @@ const CATEGORIES = [
 
 function formatDate(iso?: string | null): string {
     if (!iso) return '—';
-    return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' });
+    return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function categoryLabel(value: string) {
+    return CATEGORIES.find((c) => c.value === value)?.label ?? value.replaceAll('_', ' ');
+}
+
+function statusTone(status: string): 'ok' | 'wait' | 'bad' {
+    if (status === 'resolved' || status.toLowerCase().includes('ready') || status.toLowerCase().includes('answered')) {
+        return 'ok';
+    }
+    if (status === 'declined' || status.toLowerCase().includes('declined')) {
+        return 'bad';
+    }
+    return 'wait';
 }
 
 function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
@@ -65,20 +80,18 @@ function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
         return null;
     }
 
-    const inputClass =
-        'w-full rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 shadow-2xs focus:border-[#3A54A5]/50 focus:ring-2 focus:ring-[#3A54A5]/10 focus:outline-none';
+    const field =
+        'mt-1.5 w-full border border-zinc-200 bg-white px-3 py-2.5 text-[14px] text-zinc-900 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 focus:outline-none';
 
     return (
-        <form onSubmit={submit} className="mb-8 rounded-3xl border border-white/80 bg-white p-6 shadow-[0_15px_40px_rgba(33,56,120,0.06)] sm:p-8">
-            <h2 className="text-lg font-bold text-zinc-950">Submit a diligence inquiry</h2>
-            <p className="mt-1 text-sm text-zinc-500">
-                Available after a completed founder introduction. Pinpoint IR coordinates the response — never a direct founder DM.
-            </p>
+        <form onSubmit={submit} className="mb-10 border-b border-zinc-200 pb-10">
+            <h2 className="text-[15px] font-semibold text-zinc-950">New inquiry</h2>
+            <p className="mt-1 text-[13px] text-zinc-500">After a completed founder call. Pinpoint coordinates the answer.</p>
 
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                <div>
-                    <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-500 uppercase">Startup</label>
-                    <select value={slug} onChange={(e) => setSlug(e.target.value)} className={inputClass} required>
+                <label className="block text-[13px] font-medium text-zinc-700">
+                    Startup
+                    <select value={slug} onChange={(e) => setSlug(e.target.value)} className={field} required>
                         {profiles.map((p) => (
                             <option key={p.slug} value={p.slug}>
                                 {p.company_name}
@@ -86,13 +99,13 @@ function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
                             </option>
                         ))}
                     </select>
-                </div>
-                <div>
-                    <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-500 uppercase">Category</label>
+                </label>
+                <label className="block text-[13px] font-medium text-zinc-700">
+                    Category
                     <select
                         value={form.data.category}
                         onChange={(e) => form.setData('category', e.target.value as typeof form.data.category)}
-                        className={inputClass}
+                        className={field}
                         required
                     >
                         {CATEGORIES.map((c) => (
@@ -101,59 +114,56 @@ function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
                             </option>
                         ))}
                     </select>
-                    {form.errors.category && <p className="mt-1 text-xs font-semibold text-rose-600">{form.errors.category}</p>}
-                </div>
+                </label>
             </div>
 
-            <div className="mt-4">
-                <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-500 uppercase">Subject</label>
+            <label className="mt-4 block text-[13px] font-medium text-zinc-700">
+                Subject
                 <input
                     type="text"
                     value={form.data.subject}
                     onChange={(e) => form.setData('subject', e.target.value)}
                     maxLength={255}
-                    className={inputClass}
+                    className={field}
                     placeholder="e.g. Clarification on Q3 gross margins"
                     required
                 />
-                {form.errors.subject && <p className="mt-1 text-xs font-semibold text-rose-600">{form.errors.subject}</p>}
-            </div>
+                {form.errors.subject && <p className="mt-1 text-[12px] text-rose-600">{form.errors.subject}</p>}
+            </label>
 
-            <div className="mt-4">
-                <label className="mb-1.5 block text-xs font-bold tracking-wider text-zinc-500 uppercase">Request details</label>
+            <label className="mt-4 block text-[13px] font-medium text-zinc-700">
+                Details
                 <textarea
                     value={form.data.request_details}
                     onChange={(e) => form.setData('request_details', e.target.value)}
-                    rows={4}
+                    rows={3}
                     maxLength={2000}
-                    className={inputClass}
-                    placeholder="What should Pinpoint IR ask the founder to clarify?"
+                    className={cn(field, 'resize-none')}
+                    placeholder="What should Pinpoint ask the founder?"
                     required
                 />
                 {form.errors.request_details && (
-                    <p className="mt-1 text-xs font-semibold text-rose-600">{form.errors.request_details}</p>
+                    <p className="mt-1 text-[12px] text-rose-600">{form.errors.request_details}</p>
                 )}
-            </div>
+            </label>
 
-            <label className="mt-4 flex items-center gap-2 text-sm text-zinc-700">
+            <label className="mt-4 flex items-center gap-2 text-[13px] text-zinc-700">
                 <input
                     type="checkbox"
                     checked={form.data.data_room_required}
                     onChange={(e) => form.setData('data_room_required', e.target.checked)}
                     className="rounded border-zinc-300"
                 />
-                This inquiry may require data room materials
+                May need data room materials
             </label>
 
-            <div className="mt-5 flex justify-end">
-                <button
-                    type="submit"
-                    disabled={form.processing || !slug}
-                    className="rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#2D4182] disabled:opacity-50"
-                >
-                    {form.processing ? 'Submitting…' : 'Submit to Pinpoint IR'}
-                </button>
-            </div>
+            <button
+                type="submit"
+                disabled={form.processing || !slug}
+                className="mt-5 inline-flex min-h-10 items-center rounded-lg bg-[#3A54A5] px-4 text-[13px] font-semibold text-white hover:bg-[#2D4182] disabled:opacity-50"
+            >
+                {form.processing ? 'Submitting…' : 'Submit inquiry'}
+            </button>
         </form>
     );
 }
@@ -166,124 +176,94 @@ export default function DiligenceIndex({
     eligible_profiles?: EligibleProfile[];
 }) {
     return (
-        <main className="min-h-screen bg-[#F4F4F6] text-zinc-900 antialiased selection:bg-zinc-900 selection:text-white">
-            <Head title="Post-Introduction Diligence — Pinpoint Investment Network" />
+        <main className="min-h-screen bg-stone-50 text-zinc-900 antialiased">
+            <Head title="Diligence — Pinpoint" />
             <InvestorHeader activeTab="diligence" />
 
-            <section className="mx-auto max-w-6xl px-4 pt-8 pb-24 sm:px-6 lg:px-8">
-                <div className="mb-8">
-                    <h1 className="mt-4 text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl">
-                        Post-Introduction Diligence
-                    </h1>
-                    <p className="mt-2 text-sm text-zinc-500">
-                        Track the status and approved responses for your post-call inquiries coordinated by Pinpoint Investor Relations.
-                    </p>
-                </div>
+            <section className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+                <header className="mb-6">
+                    <h1 className="font-display text-[1.75rem] font-bold tracking-tight text-zinc-950">Diligence</h1>
+                    <p className="mt-1 text-[14px] text-zinc-500">Post-call inquiries mediated by Pinpoint.</p>
+                </header>
 
                 <DiligenceSubmitForm profiles={eligible_profiles} />
 
                 {diligence_requests.length === 0 ? (
-                    <div className="rounded-3xl border border-white/80 bg-white p-12 text-center shadow-[0_15px_40px_rgba(33,56,120,0.06)]">
-                        <MessageSquare className="mx-auto mb-3 size-12 text-zinc-300" />
-                        <h2 className="text-lg font-bold text-zinc-900">No diligence inquiries submitted yet</h2>
-                        <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500">
+                    <div className="border-t border-zinc-200 pt-8">
+                        <p className="text-[15px] text-zinc-600">No inquiries yet.</p>
+                        <p className="mt-1.5 max-w-md text-[13px] leading-relaxed text-zinc-500">
                             {eligible_profiles.length > 0
-                                ? 'Use the form above to submit your first post-introduction inquiry to Pinpoint IR.'
-                                : 'Diligence opens after Pinpoint marks a founder introduction as completed. Track call status under Interests.'}
+                                ? 'Use the form above after a completed founder introduction.'
+                                : 'Opens after Pinpoint marks a founder call as completed.'}
                         </p>
                         {eligible_profiles.length === 0 && (
                             <Link
                                 href={route('investor.interests.index')}
-                                className="mt-6 inline-flex rounded-xl bg-[#3A54A5] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#2D4182]"
+                                className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
                             >
-                                View Active Engagements
+                                My Interests
+                                <Icon icon="solar:arrow-right-linear" className="size-3.5" />
                             </Link>
                         )}
                     </div>
                 ) : (
-                    <div className="grid gap-5">
+                    <ul className="divide-y divide-zinc-200 border-t border-zinc-200">
                         {diligence_requests.map((req) => {
-                            const isResolved = req.status === 'resolved';
-                            const isDeclined = req.status === 'declined';
+                            const tone = statusTone(req.status);
+                            const company = req.profile.founder?.company_name ?? 'Startup';
 
                             return (
-                                <article
-                                    key={req.id}
-                                    className="rounded-3xl border border-white/80 bg-white p-7 shadow-[0_15px_40px_rgba(33,56,120,0.06)] transition hover:shadow-[0_20px_50px_rgba(33,56,120,0.09)]"
-                                >
-                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                                        <div>
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <span className="rounded-md bg-zinc-100 px-2.5 py-0.5 text-xs font-bold tracking-wider text-zinc-700 uppercase">
-                                                    {req.category.replace('_', ' ')}
-                                                </span>
-                                                {req.data_room_required && (
-                                                    <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
-                                                        <Lock className="size-3" />
-                                                        Data Room Required
-                                                    </span>
-                                                )}
-                                                <span className="text-xs text-zinc-400">Submitted {formatDate(req.created_at)}</span>
-                                            </div>
-
-                                            <h2 className="mt-3 text-xl font-extrabold text-zinc-950">{req.subject}</h2>
-                                            <p className="mt-0.5 text-sm font-semibold text-indigo-900">
-                                                Startup: {req.profile.founder?.company_name || 'PIN Startup'}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex items-center gap-2">
-                                            <span
-                                                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold ${
-                                                    isResolved
-                                                        ? 'border border-emerald-200 bg-emerald-50 text-emerald-700'
-                                                        : isDeclined
-                                                          ? 'border border-red-200 bg-red-50 text-red-700'
-                                                          : 'border border-blue-200 bg-blue-50 text-blue-700'
-                                                }`}
-                                            >
-                                                {isResolved ? (
-                                                    <CheckCircle2 className="size-3.5" />
-                                                ) : isDeclined ? (
-                                                    <XCircle className="size-3.5" />
-                                                ) : (
-                                                    <Clock3 className="size-3.5" />
-                                                )}
-                                                {req.investor_facing_status}
-                                            </span>
-                                        </div>
+                                <li key={req.id} className="py-4">
+                                    <div className="flex items-baseline justify-between gap-3">
+                                        <h2 className="min-w-0 truncate text-[15px] font-semibold text-zinc-950">
+                                            {req.subject}
+                                        </h2>
+                                        <span
+                                            className={cn(
+                                                'shrink-0 text-[12px] font-semibold',
+                                                tone === 'ok' && 'text-emerald-700',
+                                                tone === 'bad' && 'text-rose-700',
+                                                tone === 'wait' && 'text-[#3A54A5]',
+                                            )}
+                                        >
+                                            {req.investor_facing_status}
+                                        </span>
                                     </div>
 
-                                    <div className="mt-4 rounded-2xl bg-zinc-50 p-4 text-sm text-zinc-700">
-                                        <p className="mb-1 text-xs font-bold tracking-wider text-zinc-400 uppercase">Your Inquiry:</p>
-                                        <p className="whitespace-pre-wrap">{req.request_details}</p>
-                                    </div>
+                                    <p className="mt-1 text-[12px] text-zinc-400">
+                                        {company}
+                                        <span className="mx-1.5 text-zinc-300">·</span>
+                                        {categoryLabel(req.category)}
+                                        <span className="mx-1.5 text-zinc-300">·</span>
+                                        {formatDate(req.created_at)}
+                                        {req.data_room_required ? ' · Needs data room' : ''}
+                                    </p>
+
+                                    <p className="mt-2 text-[13px] leading-snug whitespace-pre-wrap text-zinc-600">
+                                        {req.request_details}
+                                    </p>
 
                                     {req.investor_visible_response && (
-                                        <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5">
-                                            <div className="mb-2 flex items-center gap-2 text-xs font-bold tracking-wider text-emerald-800 uppercase">
-                                                <CheckCircle2 className="size-4 text-emerald-600" />
-                                                Pinpoint Investor Relations Verified Response:
-                                            </div>
-                                            <p className="text-sm leading-relaxed whitespace-pre-wrap text-zinc-800">
+                                        <div className="mt-3 border-l-2 border-emerald-500 pl-3">
+                                            <p className="text-[12px] font-semibold text-emerald-800">Pinpoint response</p>
+                                            <p className="mt-1 text-[13px] leading-relaxed whitespace-pre-wrap text-zinc-700">
                                                 {req.investor_visible_response}
                                             </p>
                                         </div>
                                     )}
 
-                                    <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
-                                        <p className="text-xs text-zinc-500">Coordinated securely via Pinpoint Investor Relations.</p>
+                                    <div className="mt-3">
                                         <Link
                                             href={route('investor.spotlight.show', req.profile.slug)}
-                                            className="text-xs font-bold text-[#3A54A5] hover:underline"
+                                            className="text-[13px] font-medium text-zinc-400 hover:text-zinc-700"
                                         >
-                                            View Startup Profile →
+                                            Spotlight
                                         </Link>
                                     </div>
-                                </article>
+                                </li>
                             );
                         })}
-                    </div>
+                    </ul>
                 )}
             </section>
         </main>

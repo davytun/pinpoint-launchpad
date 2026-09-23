@@ -30,7 +30,7 @@ test('investor registers successfully with a complete profile and initial not_su
 
     $response = $this->post(route('investor.onboarding.store'), $payload);
 
-    $response->assertRedirect(route('investor.dashboard'));
+    $response->assertRedirect(route('investor.spotlight.index'));
     $response->assertSessionHas('success');
 
     $investor = Investor::where('email', 'sarah.connor@example.com')->first();
@@ -79,7 +79,7 @@ test('corporate investor registers successfully with company name', function () 
 
     $response = $this->post(route('investor.onboarding.store'), $payload);
 
-    $response->assertRedirect(route('investor.dashboard'));
+    $response->assertRedirect(route('investor.spotlight.index'));
 
     $investor = Investor::where('email', 'john@apexventures.com')->first();
     expect($investor)->not->toBeNull()
@@ -271,7 +271,7 @@ test('rejected investor can still login, view rejection reason, and resubmit a r
         'email' => 'rejected.investor@example.com',
         'password' => 'ValidPassword123!',
     ]);
-    $loginResponse->assertRedirect(route('investor.dashboard'));
+    $loginResponse->assertRedirect(route('investor.spotlight.index'));
     expect(Auth::guard('investor')->check())->toBeTrue();
 
     // 2. Rejected investor visits KYC page to view rejection details

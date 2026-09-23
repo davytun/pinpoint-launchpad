@@ -106,6 +106,30 @@ test('notification presenter normalizes legacy message and action_url fields', f
         ->and($presented['data']['destination_url'])->toBe('/investor/kyc');
 });
 
+test('a founder message appears in admin and compliance alerts', function () {
+    $founder = Founder::factory()->create(['company_name' => 'Northwind']);
+    $superadmin = User::factory()->create(['role' => 'superadmin']);
+    $compliance = User::factory()->create(['role' => 'compliance']);
+
+    $this->actingAs($founder, 'founder')->post(route('founder.messages.store'), [
+        'body' => 'We uploaded the cap table.',
+    ])->assertRedirect();
+
+    $this->actingAs($superadmin)
+        ->get(route('admin.notifications.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('notifications.data.0.data.title', 'Message from Northwind')
+            ->where('notifications.data.0.data.body', 'We uploaded the cap table.'));
+
+    $this->actingAs($compliance)
+        ->get(route('admin.notifications.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('notifications.data.0.data.title', 'Message from Northwind')
+            ->where('notifications.data.0.data.body', 'We uploaded the cap table.'));
+});
+
 test('investor relations can publish an announcement to active investors', function () {
     Notification::fake();
     $staff = User::factory()->create(['role' => 'investor_relations']);

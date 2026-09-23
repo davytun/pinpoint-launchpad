@@ -72,37 +72,21 @@ export function InvestorHeader({
         router.patch(route('investor.notifications.read-all'), {}, { preserveScroll: true });
     }
 
+    const kycCopy =
+        kycStatus === 'pending'
+            ? 'Identity verification is pending. You can browse Spotlight, but interest, diligence, data rooms, and pitch decks stay locked until approval.'
+            : kycStatus === 'rejected'
+              ? 'Identity verification was not approved. Update your documents to unlock protected investor actions.'
+              : 'Complete identity verification to unlock interest, diligence, data rooms, and pitch decks.';
+
     return (
         <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/80 backdrop-blur-xl">
-            {kycRestricted && (
-                <div className="border-b border-amber-200/80 bg-amber-50 px-4 py-2.5 text-center text-[12px] font-medium text-amber-900 sm:px-6">
-                    {kycStatus === 'pending'
-                        ? 'Identity verification is pending. You can browse Spotlight, but interest, diligence, data rooms, and pitch decks stay locked until approval.'
-                        : kycStatus === 'rejected'
-                          ? 'Identity verification was not approved. Update your documents to unlock protected investor actions.'
-                          : 'Complete identity verification to unlock interest, diligence, data rooms, and pitch decks.'}{' '}
-                    <Link href={route('investor.kyc.create')} className="font-bold underline underline-offset-2 hover:text-amber-950">
-                        {kycStatus === 'pending' ? 'View status' : 'Verify identity'}
-                    </Link>
-                </div>
-            )}
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center gap-10">
-                    <Link href={route('investor.dashboard')} className="transition-opacity hover:opacity-80">
+                    <Link href={route('investor.spotlight.index')} className="transition-opacity hover:opacity-80">
                         <PinpointLogo height={24} />
                     </Link>
                     <nav className="hidden items-center gap-1.5 md:flex">
-                        <Link
-                            href={route('investor.dashboard')}
-                            className={cn(
-                                'rounded-lg px-3 py-2 text-[13px] transition-colors',
-                                activeTab === 'home'
-                                    ? 'bg-zinc-100 font-semibold text-zinc-950'
-                                    : 'font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-950',
-                            )}
-                        >
-                            Home
-                        </Link>
                         <Link
                             href={route('investor.spotlight.index')}
                             className={cn(
@@ -258,6 +242,20 @@ export function InvestorHeader({
                     </button>
                 </div>
             </div>
+
+            {kycRestricted && (
+                <div className="border-t border-amber-200/70 bg-amber-50/90">
+                    <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-2.5 text-center text-[12px] font-medium text-amber-900 sm:justify-between sm:px-6 lg:px-8 sm:text-left">
+                        <p className="max-w-3xl leading-snug">{kycCopy}</p>
+                        <Link
+                            href={route('investor.kyc.create')}
+                            className="shrink-0 font-bold underline underline-offset-2 hover:text-amber-950"
+                        >
+                            {kycStatus === 'pending' ? 'View status' : 'Verify identity'}
+                        </Link>
+                    </div>
+                </div>
+            )}
         </header>
     );
 }

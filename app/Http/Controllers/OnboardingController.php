@@ -212,32 +212,33 @@ class OnboardingController extends Controller
 
         $signature->refresh();
 
-        $payment = $signature->payment;
-
-        $setupUrl = null;
+        // Once BoldSign confirms, skip the celebration page and continue the flow.
         if ($signature->isSigned()) {
             $founder = Founder::query()->where('email', $signature->signer_email)->first();
-            if (! $founder || ! $founder->hasSetupAccount()) {
-                $setupToken = Cache::get('founder_setup_token_'.$signature->signer_email);
-                if (! $setupToken) {
-                    $setupToken = Str::random(64);
-                    Cache::put(
-                        'founder_setup_token_'.$signature->signer_email,
-                        $setupToken,
-                        now()->addHours(48)
-                    );
-                }
-                $setupUrl = route('founder.setup').'?token='.$setupToken.'&email='.urlencode($signature->signer_email);
+
+            if ($founder?->hasSetupAccount()) {
+                return redirect()->route('founder.login');
             }
+
+            $setupToken = Cache::get('founder_setup_token_'.$signature->signer_email);
+            if (! $setupToken) {
+                $setupToken = Str::random(64);
+                Cache::put(
+                    'founder_setup_token_'.$signature->signer_email,
+                    $setupToken,
+                    now()->addHours(48)
+                );
+            }
+
+            return redirect()->route('founder.setup', [
+                'token' => $setupToken,
+                'email' => $signature->signer_email,
+            ]);
         }
 
         return Inertia::render('Onboarding/Verifying', [
-            'signature_verified' => $signature->isSigned(),
+            'signature_verified' => false,
             'signer_email' => $signature->signer_email,
-            'tier_label' => ($payment ? $payment->tier_label : 'Concept / Pre-Seed').' Audit',
-            'amount_paid' => ($payment && strtoupper($payment->currency) === 'NGN' ? '₦' : '$').number_format($payment?->total_amount ?? 0).($payment && strtoupper($payment->currency) === 'NGN' ? ' NGN' : ' USD'),
-            'signed_at' => $signature->signed_at?->format('M j, Y, g:i A') ?? now()->format('M j, Y, g:i A'),
-            'setup_url' => $setupUrl,
         ]);
     }
 

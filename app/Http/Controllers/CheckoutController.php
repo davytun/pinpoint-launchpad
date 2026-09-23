@@ -201,7 +201,7 @@ class CheckoutController extends Controller
                 'country' => $diagnosticSession->country ?: 'Not provided',
                 'stage' => $stage,
                 'raise_target' => $diagnosticSession->looking_to_raise ?: 'Not provided',
-                'message' => 'Selected PIA tier: '.$validated['tier'].'.',
+                'message' => null,
                 'selected_tier' => $validated['tier'],
                 'status' => 'pending',
             ],

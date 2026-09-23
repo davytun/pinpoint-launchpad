@@ -1,4 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { type ReactNode } from 'react';
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, XAxis } from 'recharts';
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart';
@@ -26,6 +27,13 @@ interface AuditBreakdownItem {
     label: string;
     value: number;
     color: string;
+    status?: string;
+}
+
+interface EngagementTrendPoint {
+    month: string;
+    started: number;
+    finished: number;
 }
 
 interface FunnelMetrics {
@@ -65,6 +73,8 @@ interface Metrics {
     monthly_revenue?: MonthlyRevenue[];
     audit_breakdown?: AuditBreakdownItem[];
     funnel?: FunnelMetrics;
+    pending_pia_count?: number;
+    engagement_trend?: EngagementTrendPoint[];
 }
 
 interface ActivityItem {
@@ -353,41 +363,205 @@ const activityTypeLabel: Record<string, string> = {
     interest: 'Dealflow',
 };
 
+function DeskCard({ children, className }: { children: ReactNode; className?: string }) {
+    // Ref 2 — Mondays card shell
+    return (
+        <div
+            className={cn(
+                'overflow-hidden rounded-xl border border-zinc-200/70 bg-white shadow-[0_4px_24px_-8px_rgba(15,23,42,0.08)]',
+                className,
+            )}
+        >
+            {children}
+        </div>
+    );
+}
+
+function StatusPill({
+    children,
+    tone = 'zinc',
+}: {
+    children: ReactNode;
+    tone?: 'zinc' | 'amber' | 'blue' | 'emerald';
+}) {
+    // Ref 2 pills + Ref 4 quiet badge language
+    const tones = {
+        zinc: 'bg-zinc-100 text-zinc-700',
+        amber: 'bg-amber-50 text-amber-700',
+        blue: 'bg-[#3A54A5]/10 text-[#3A54A5]',
+        emerald: 'bg-emerald-50 text-emerald-700',
+    };
+    return (
+        <span className={cn('inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize', tones[tone])}>
+            {children}
+        </span>
+    );
+}
+
+function greetingForNow(date = new Date()) {
+    const h = date.getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+}
+
+function formatDeskDate(date = new Date()) {
+    return date.toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+    });
+}
+
+const engagementChartConfig = {
+    finished: {
+        label: 'Finished',
+        color: '#3A54A5',
+    },
+    started: {
+        label: 'Started',
+        color: '#94A3B8',
+    },
+} satisfies ChartConfig;
+
+function EngagementAreaChart({ data }: { data: EngagementTrendPoint[] }) {
+    const finishedThisSpan = data.reduce((sum, row) => sum + row.finished, 0);
+
+    return (
+        <div className="min-w-0">
+            <div className="mb-1 flex items-end justify-between gap-3">
+                <div>
+                    <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">Finished this period</p>
+                    <p className="mt-1 text-[28px] font-semibold tracking-tight text-zinc-950 tabular-nums">
+                        {finishedThisSpan}
+                    </p>
+                </div>
+                <div className="flex items-center gap-3 pb-1 text-[11px] font-medium text-zinc-500">
+                    <span className="inline-flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-[#3A54A5]" />
+                        Finished
+                    </span>
+                    <span className="inline-flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-slate-400" />
+                        Started
+                    </span>
+                </div>
+            </div>
+            <ChartContainer config={engagementChartConfig} className="h-[200px] w-full">
+                <AreaChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
+                    <defs>
+                        <linearGradient id="engFinished" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#3A54A5" stopOpacity={0.28} />
+                            <stop offset="95%" stopColor="#3A54A5" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="engStarted" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#94A3B8" stopOpacity={0.2} />
+                            <stop offset="95%" stopColor="#94A3B8" stopOpacity={0} />
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E4E4E7" opacity={0.55} />
+                    <XAxis
+                        dataKey="month"
+                        tick={{ fill: '#A1A1AA', fontSize: 11 }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickMargin={10}
+                    />
+                    <ChartTooltip
+                        content={
+                            <ChartTooltipContent
+                                formatter={(value, name) => (
+                                    <span className="font-medium tabular-nums">
+                                        {Number(value)} {String(name) === 'finished' ? 'finished' : 'started'}
+                                    </span>
+                                )}
+                            />
+                        }
+                    />
+                    <Area
+                        type="monotone"
+                        dataKey="started"
+                        stroke="#94A3B8"
+                        strokeWidth={2}
+                        fill="url(#engStarted)"
+                        fillOpacity={1}
+                    />
+                    <Area
+                        type="monotone"
+                        dataKey="finished"
+                        stroke="#3A54A5"
+                        strokeWidth={2.25}
+                        fill="url(#engFinished)"
+                        fillOpacity={1}
+                    />
+                </AreaChart>
+            </ChartContainer>
+        </div>
+    );
+}
+
 function FounderDeskHome({
     metrics,
-    pending_pia_requests,
+    needs_attention,
     recent_activity,
     isAnalyst,
+    isSuperAdmin,
 }: {
     metrics: Metrics;
-    pending_pia_requests: PendingPiaRequest[];
+    needs_attention: NeedsAttentionItem[];
     recent_activity: ActivityItem[];
     isAnalyst: boolean;
     isSuperAdmin: boolean;
 }) {
+    const showFinance = isSuperAdmin && (metrics.revenue_by_currency != null || metrics.revenue_this_month != null);
+    const breakdown = metrics.audit_breakdown ?? [];
+    const trend = metrics.engagement_trend ?? [];
+    const finishedNow = metrics.complete_audits ?? breakdown.find((b) => b.status === 'complete')?.value ?? 0;
+
+    const attentionCopy: Record<string, { title: string; description: string }> = {
+        pending_pia: {
+            title: 'Payments waiting to confirm',
+            description: 'Open the payment requests list and finish the next step.',
+        },
+        unread_messages: {
+            title: 'Unread messages',
+            description: 'Founders are waiting for a reply.',
+        },
+        pending_audits: {
+            title: 'Ready to start',
+            description: 'New founders who have not been started yet.',
+        },
+    };
+
+    const attentionIcon: Record<string, string> = {
+        pending_pia: 'solar:card-send-linear',
+        unread_messages: 'solar:letter-unread-linear',
+        pending_audits: 'solar:document-add-linear',
+    };
+
     const stats = isAnalyst
         ? [
               {
-                  label: 'My assigned',
+                  label: 'Assigned to you',
                   value: metrics.my_assigned ?? 0,
                   href: '/admin/founder/founders',
                   icon: 'solar:users-group-rounded-linear',
               },
               {
-                  label: 'Active audits',
+                  label: 'In progress',
                   value: metrics.active_audits ?? 0,
                   href: '/admin/founder/founders?status=in_progress',
                   icon: 'solar:play-circle-linear',
               },
               {
-                  label: 'Needs info',
+                  label: 'Waiting on founder',
                   value: metrics.needs_info_count ?? 0,
                   href: '/admin/founder/founders?status=needs_info',
                   icon: 'solar:danger-circle-linear',
                   pulse: (metrics.needs_info_count ?? 0) > 0,
               },
               {
-                  label: 'Unread messages',
+                  label: 'New messages',
                   value: metrics.my_open_messages ?? 0,
                   href: '/admin/founder/messages',
                   icon: 'solar:inbox-linear',
@@ -396,26 +570,26 @@ function FounderDeskHome({
           ]
         : [
               {
-                  label: 'Total founders',
+                  label: 'Founders',
                   value: metrics.total_founders ?? 0,
                   href: '/admin/founder/founders',
                   icon: 'solar:users-group-rounded-linear',
               },
               {
-                  label: 'Active audits',
+                  label: 'In progress',
                   value: metrics.active_audits ?? 0,
                   href: '/admin/founder/founders?status=in_progress',
                   icon: 'solar:play-circle-linear',
               },
               {
-                  label: 'Needs info',
+                  label: 'Waiting on founder',
                   value: metrics.needs_info_count ?? 0,
                   href: '/admin/founder/founders?status=needs_info',
                   icon: 'solar:danger-circle-linear',
                   pulse: (metrics.needs_info_count ?? 0) > 0,
               },
               {
-                  label: 'Unread messages',
+                  label: 'New messages',
                   value: metrics.my_open_messages ?? 0,
                   href: '/admin/founder/messages',
                   icon: 'solar:inbox-linear',
@@ -423,156 +597,261 @@ function FounderDeskHome({
               },
           ];
 
-    const waitingCount = pending_pia_requests.length;
+    const today = new Date();
 
     return (
-        <div>
-            {/* Dashboard header */}
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-6">
+            <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl">Overview</h1>
-                    <p className="mt-1.5 text-[14px] font-medium text-zinc-500">
-                        {isAnalyst ? 'Your assigned engagements' : 'Founder desk overview'}
+                    <p className="text-[12px] font-medium text-zinc-500">{formatDeskDate(today)}</p>
+                    <h1 className="mt-1 text-[1.75rem] leading-tight font-semibold tracking-tight text-zinc-950 sm:text-[2rem]">
+                        {greetingForNow(today)}
+                    </h1>
+                    <p className="mt-1 text-[14px] font-medium text-zinc-500">
+                        {isAnalyst
+                            ? 'A quick look at the founders on your list'
+                            : 'A quick look across the founder desk'}
                     </p>
                 </div>
-                {waitingCount > 0 && (
-                    <Link
-                        href="/admin/founder/pia-requests?status=pending"
-                        className="inline-flex items-center gap-2 rounded-xl border border-[#3A54A5]/20 bg-[#3A54A5]/6 px-3.5 py-2 text-[12px] font-semibold text-[#3A54A5] transition-colors hover:bg-[#3A54A5]/10"
-                    >
-                        <SolarIcon name="solar:card-send-linear" className="size-3.5" />
-                        {waitingCount} waiting to pay
-                    </Link>
-                )}
+                <Link
+                    href="/admin/founder/founders"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#3A54A5] px-3.5 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors hover:bg-[#2D4182]"
+                >
+                    <SolarIcon name="solar:users-group-rounded-linear" className="size-3.5 text-white" />
+                    View founders
+                </Link>
             </div>
 
-            {/* KPI row */}
-            <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
                 {stats.map((stat) => (
-                    <Link
-                        key={stat.label}
-                        href={stat.href}
-                        className="group rounded-2xl border border-zinc-100 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:p-5"
-                    >
-                        <div className="flex items-start justify-between gap-2">
-                            <span className="text-[11px] font-bold tracking-wider text-zinc-500 uppercase">{stat.label}</span>
-                            <div className="flex items-center gap-2">
-                                {stat.pulse && (
-                                    <span className="relative flex h-2 w-2">
-                                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3A54A5] opacity-50" />
-                                        <span className="relative inline-flex h-2 w-2 rounded-full bg-[#3A54A5]" />
+                    <Link key={stat.label} href={stat.href} className="block">
+                        <DeskCard className="h-full transition-shadow hover:shadow-[0_8px_28px_-10px_rgba(15,23,42,0.12)]">
+                            <div className="p-4 sm:p-5">
+                                <div className="flex items-start justify-between gap-2">
+                                    <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
+                                        {stat.label}
                                     </span>
-                                )}
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-50 text-zinc-500 transition-colors group-hover:bg-[#3A54A5]/8 group-hover:text-[#3A54A5]">
-                                    <SolarIcon name={stat.icon} className="size-4" />
+                                    <div className="flex items-center gap-1.5">
+                                        {stat.pulse && (
+                                            <span className="relative flex h-1.5 w-1.5">
+                                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3A54A5] opacity-50" />
+                                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#3A54A5]" />
+                                            </span>
+                                        )}
+                                        <div className="flex size-8 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-500">
+                                            <SolarIcon name={stat.icon} className="size-3.5" />
+                                        </div>
+                                    </div>
                                 </div>
+                                <p className="mt-4 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                    {stat.value}
+                                </p>
                             </div>
-                        </div>
-                        <p className="mt-3 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">
-                            {stat.value}
-                        </p>
+                        </DeskCard>
                     </Link>
                 ))}
             </div>
 
-            {/* Main widgets */}
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
-                {/* Waiting to pay — primary widget */}
-                <section className="overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm xl:col-span-3">
-                    <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4">
-                        <div className="flex items-center gap-2.5">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3A54A5]/8 text-[#3A54A5]">
-                                <SolarIcon name="solar:card-send-linear" className="size-4" />
-                            </div>
-                            <div>
-                                <h2 className="text-[14px] font-semibold text-zinc-950">Waiting to pay</h2>
-                                <p className="text-[12px] text-zinc-500">PIA requests from checkout</p>
-                            </div>
+            {showFinance && (
+                <DeskCard>
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4">
+                        <div>
+                            <h2 className="text-[15px] font-semibold text-zinc-950">Money collected</h2>
+                            <p className="mt-0.5 text-[12px] text-zinc-500">What founders have paid so far</p>
                         </div>
                         <Link
-                            href="/admin/founder/pia-requests"
-                            className="text-[12px] font-semibold text-[#3A54A5] hover:underline"
+                            href="/admin/revenue"
+                            className="rounded-lg bg-zinc-100 px-3 py-1.5 text-[12px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-200/80"
                         >
-                            View all
+                            See payments
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-3">
+                        <div>
+                            <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">This month</p>
+                            <p className="mt-2 text-[22px] font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                {fmtCurrency(metrics.revenue_this_month ?? 0)}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">In naira</p>
+                            <p className="mt-2 text-[22px] font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                {fmtCurrency(metrics.revenue_by_currency?.NGN ?? 0, 'NGN')}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">In dollars</p>
+                            <p className="mt-2 text-[22px] font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                {fmtCurrency(metrics.revenue_by_currency?.USD ?? 0, 'USD')}
+                            </p>
+                        </div>
+                    </div>
+                    {metrics.revenue_by_tier && (
+                        <div className="flex flex-wrap gap-2 border-t border-zinc-100 px-5 py-4">
+                            {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
+                                <StatusPill key={tier} tone="zinc">
+                                    {tier}: {fmtCurrency(metrics.revenue_by_tier![tier])}
+                                </StatusPill>
+                            ))}
+                        </div>
+                    )}
+                </DeskCard>
+            )}
+
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-5 xl:gap-5">
+                <DeskCard className="xl:col-span-3">
+                    <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4">
+                        <div>
+                            <h2 className="text-[15px] font-semibold text-zinc-950">Where founders stand</h2>
+                            <p className="mt-0.5 text-[12px] text-zinc-500">
+                                {isAnalyst
+                                    ? 'How work is moving for the people on your list'
+                                    : 'Started vs finished over the last six months'}
+                            </p>
+                        </div>
+                        <Link
+                            href="/admin/founder/founders"
+                            className="rounded-lg bg-zinc-100 px-3 py-1.5 text-[12px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-200/80"
+                        >
+                            See all
                         </Link>
                     </div>
 
-                    {pending_pia_requests.length === 0 ? (
-                        <div className="px-5 py-12 text-center">
-                            <SolarIcon name="solar:card-linear" className="mx-auto size-8 text-zinc-300" />
-                            <p className="mt-3 text-[13px] font-medium text-zinc-500">No open payment requests</p>
+                    <div className="space-y-5 p-5">
+                        {trend.length > 0 ? (
+                            <EngagementAreaChart data={trend} />
+                        ) : (
+                            <div className="rounded-xl bg-[#F8F9FC] px-4 py-10 text-center text-[13px] text-zinc-500">
+                                Chart data will show here once founders start moving through.
+                            </div>
+                        )}
+
+                        <div className="flex items-center justify-between gap-3 border-t border-zinc-100 pt-4">
+                            <p className="text-[12px] font-medium text-zinc-500">
+                                {finishedNow} finished right now · tap a status to open that list
+                            </p>
                         </div>
-                    ) : (
-                        <ul className="divide-y divide-zinc-100">
-                            {pending_pia_requests.map((request) => (
-                                <li key={request.id}>
-                                    <Link
-                                        href={`/admin/founder/pia-requests?status=${request.status}`}
-                                        className="flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-zinc-50/80"
-                                    >
-                                        <div className="min-w-0">
-                                            <p className="truncate text-[14px] font-semibold text-zinc-950">{request.company}</p>
-                                            <p className="mt-0.5 truncate text-[12px] text-zinc-500">
-                                                {request.name} · {request.email}
-                                            </p>
-                                        </div>
-                                        <div className="flex shrink-0 flex-col items-end gap-1">
-                                            <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-[11px] font-semibold capitalize text-zinc-700">
-                                                {request.selected_tier ?? 'No tier'}
-                                            </span>
-                                            <span
-                                                className={cn(
-                                                    'text-[10px] font-bold tracking-wide uppercase',
-                                                    request.status === 'contacted' ? 'text-[#3A54A5]' : 'text-amber-600',
-                                                )}
+
+                        {breakdown.length > 0 && (
+                            <ul className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                                {breakdown.map((item) => {
+                                    const status = item.status ?? 'pending';
+                                    return (
+                                        <li key={item.label}>
+                                            <Link
+                                                href={`/admin/founder/founders?status=${status}`}
+                                                className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-[#F8F9FC]"
                                             >
-                                                {request.status}
-                                                {request.created_at ? ` · ${request.created_at}` : ''}
-                                            </span>
-                                        </div>
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </section>
-
-                {/* Recent activity */}
-                <section className="overflow-hidden rounded-2xl border border-zinc-100 bg-white shadow-sm xl:col-span-2">
-                    <div className="flex items-center gap-2.5 border-b border-zinc-100 px-5 py-4">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-50 text-zinc-500">
-                            <SolarIcon name="solar:history-linear" className="size-4" />
-                        </div>
-                        <div>
-                            <h2 className="text-[14px] font-semibold text-zinc-950">Recent activity</h2>
-                            <p className="text-[12px] text-zinc-500">Latest desk events</p>
-                        </div>
+                                                <div className="flex items-center gap-2.5">
+                                                    <span
+                                                        className="h-2.5 w-2.5 rounded-full"
+                                                        style={{ backgroundColor: item.color }}
+                                                    />
+                                                    <span className="text-[13px] font-medium text-zinc-700">{item.label}</span>
+                                                </div>
+                                                <span className="text-[14px] font-semibold text-zinc-950 tabular-nums">
+                                                    {item.value}
+                                                </span>
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
                     </div>
+                </DeskCard>
 
-                    {recent_activity.length === 0 ? (
-                        <div className="px-5 py-12 text-center text-[13px] text-zinc-500">No recent activity yet.</div>
-                    ) : (
-                        <ul className="divide-y divide-zinc-100">
-                            {recent_activity.slice(0, 6).map((item, i) => (
-                                <li key={i} className="flex items-start gap-3 px-5 py-3.5">
-                                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-zinc-500">
-                                        <SolarIcon
-                                            name={activityIcon[item.type] ?? 'solar:record-linear'}
-                                            className="size-3.5"
-                                        />
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="text-[13px] leading-snug font-medium text-zinc-900">{item.description}</p>
-                                        {item.email && (
-                                            <p className="mt-0.5 truncate text-[11px] text-zinc-500">{item.email}</p>
-                                        )}
-                                    </div>
-                                    <span className="shrink-0 text-[11px] text-zinc-400">{item.time}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </section>
+                <div className="flex flex-col gap-4 xl:col-span-2">
+                    <DeskCard>
+                        <div className="border-b border-zinc-100 px-5 py-4">
+                            <h2 className="text-[15px] font-semibold text-zinc-950">Things to handle</h2>
+                            <p className="mt-0.5 text-[12px] text-zinc-500">These need you next</p>
+                        </div>
+                        {needs_attention.length === 0 ? (
+                            <div className="px-5 py-10 text-center">
+                                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-[#F4F6FA] text-zinc-400">
+                                    <SolarIcon name="solar:check-circle-linear" className="size-5" />
+                                </div>
+                                <p className="mt-3 text-[13px] font-medium text-zinc-500">You are all caught up</p>
+                            </div>
+                        ) : (
+                            <ul className="divide-y divide-zinc-100">
+                                {needs_attention.map((item) => {
+                                    const copy = attentionCopy[item.id];
+                                    return (
+                                        <li key={item.id}>
+                                            <Link
+                                                href={item.action_url}
+                                                className="flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-[#F8F9FC]"
+                                            >
+                                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F4F6FA] text-zinc-500">
+                                                    <SolarIcon
+                                                        name={attentionIcon[item.id] ?? 'solar:bell-linear'}
+                                                        className="size-3.5"
+                                                    />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="truncate text-[13px] font-semibold text-zinc-950">
+                                                        {copy?.title ?? item.title}
+                                                    </p>
+                                                    <p className="truncate text-[11px] text-zinc-500">
+                                                        {copy?.description ?? item.description}
+                                                    </p>
+                                                </div>
+                                                <StatusPill
+                                                    tone={
+                                                        item.color === 'amber'
+                                                            ? 'amber'
+                                                            : item.color === 'blue'
+                                                              ? 'blue'
+                                                              : 'zinc'
+                                                    }
+                                                >
+                                                    {item.count}
+                                                </StatusPill>
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </DeskCard>
+
+                    <DeskCard className="flex-1">
+                        <div className="border-b border-zinc-100 px-5 py-4">
+                            <h2 className="text-[15px] font-semibold text-zinc-950">What&apos;s been happening</h2>
+                            <p className="mt-0.5 text-[12px] text-zinc-500">Recent updates on your founders</p>
+                        </div>
+
+                        {recent_activity.length === 0 ? (
+                            <div className="px-5 py-10 text-center text-[13px] text-zinc-500">Nothing new yet.</div>
+                        ) : (
+                            <ul className="divide-y divide-zinc-100">
+                                {recent_activity.slice(0, 5).map((item, i) => (
+                                    <li key={i} className="flex items-start gap-3 px-5 py-3.5">
+                                        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F4F6FA] text-zinc-500">
+                                            <SolarIcon
+                                                name={activityIcon[item.type] ?? 'solar:record-linear'}
+                                                className="size-3.5"
+                                            />
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-[13px] leading-snug font-medium text-zinc-900">
+                                                {item.description}
+                                            </p>
+                                            {item.email && (
+                                                <p className="mt-1 truncate text-[11px] text-zinc-500">{item.email}</p>
+                                            )}
+                                        </div>
+                                        <span className="shrink-0 pt-0.5 text-[11px] font-medium text-zinc-400">
+                                            {item.time}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </DeskCard>
+                </div>
             </div>
         </div>
     );
@@ -600,12 +879,6 @@ export default function AdminDashboard({
     const canOpenSpotlightDesk = isSuperAdmin || isInvestorRelations;
     const deskHome =
         desk === 'founder' ? '/admin/founder' : desk === 'investors' ? '/admin/investors' : '/admin';
-    const deskLabel =
-        desk === 'investors'
-            ? 'Investor desk overview'
-            : isSuperAdmin
-              ? 'Full platform overview'
-              : 'Admin overview';
 
     const handoffSteps = dealflow_handoff
         ? [
@@ -648,11 +921,12 @@ export default function AdminDashboard({
         return (
             <AdminLayout>
                 <Head title="Founder desk — Admin" />
-                <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-xs">
-                    <div className="no-scrollbar flex-1 overflow-y-auto px-6 py-8 sm:px-10 lg:px-12 lg:py-10">
+                {/* Ref 1 soft blue-gray canvas */}
+                <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-3xl bg-[#F4F6FA] shadow-xs">
+                    <div className="no-scrollbar flex-1 overflow-y-auto px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-9">
                         <FounderDeskHome
                             metrics={metrics}
-                            pending_pia_requests={pending_pia_requests}
+                            needs_attention={needs_attention}
                             recent_activity={recent_activity}
                             isAnalyst={isAnalyst}
                             isSuperAdmin={isSuperAdmin}
@@ -667,64 +941,208 @@ export default function AdminDashboard({
         <AdminLayout>
             <Head title="Dashboard — Admin" />
 
-            <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-xs">
-                <div className="no-scrollbar flex-1 overflow-y-auto px-6 py-8 sm:px-10 lg:py-10">
-                    <div className="mb-10 flex items-start justify-between">
+            <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden rounded-3xl bg-[#F4F6FA] shadow-xs">
+                <div className="no-scrollbar flex-1 overflow-y-auto px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-9">
+                    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
                         <div>
-                            <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl">Overview</h1>
-                            <p className="mt-2 text-[15px] font-medium text-zinc-500">{deskLabel}</p>
+                            <p className="text-[12px] font-medium text-zinc-500">{formatDeskDate(new Date())}</p>
+                            <h1 className="mt-1 text-[1.75rem] leading-tight font-semibold tracking-tight text-zinc-950 sm:text-[2rem]">
+                                {greetingForNow()}
+                            </h1>
+                            <p className="mt-1 text-[14px] font-medium text-zinc-500">
+                                {desk === 'investors'
+                                    ? 'A quick look at the investor desk'
+                                    : 'A quick look across the platform'}
+                            </p>
                         </div>
-                        {isSuperAdmin && desk === 'platform' && (
-                            <div className="flex shrink-0 items-center gap-1 overflow-x-auto rounded-xl border border-zinc-200/80 bg-white p-1 shadow-2xs">
-                                {(
-                                    [
-                                        { key: 'all', label: 'All Time' },
-                                        { key: '7d', label: '7 Days' },
-                                        { key: '30d', label: '30 Days' },
-                                        { key: 'ytd', label: 'YTD' },
-                                        { key: '12m', label: '12 Months' },
-                                    ] as const
-                                ).map(({ key, label }) => {
-                                    const isSelected = date_range === key;
-                                    return (
-                                        <button
-                                            key={key}
-                                            type="button"
-                                            onClick={() =>
-                                                router.get(deskHome, { date_range: key }, { preserveState: true, preserveScroll: true })
-                                            }
-                                            className={cn(
-                                                'shrink-0 rounded-lg px-3 py-1.5 text-[12.5px] font-medium transition-all duration-150',
-                                                isSelected
-                                                    ? 'bg-zinc-100/80 font-semibold text-zinc-950 shadow-xs'
-                                                    : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
-                                            )}
-                                        >
-                                            {label}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        )}
+                        <div className="flex flex-wrap items-center gap-2">
+                            {isSuperAdmin && desk === 'platform' && (
+                                <div className="flex shrink-0 items-center gap-1 overflow-x-auto rounded-xl border border-zinc-200/70 bg-white p-1 shadow-[0_4px_24px_-8px_rgba(15,23,42,0.08)]">
+                                    {(
+                                        [
+                                            { key: 'all', label: 'All' },
+                                            { key: '7d', label: '7d' },
+                                            { key: '30d', label: '30d' },
+                                            { key: 'ytd', label: 'YTD' },
+                                            { key: '12m', label: '12m' },
+                                        ] as const
+                                    ).map(({ key, label }) => {
+                                        const isSelected = date_range === key;
+                                        return (
+                                            <button
+                                                key={key}
+                                                type="button"
+                                                onClick={() =>
+                                                    router.get(deskHome, { date_range: key }, { preserveState: true, preserveScroll: true })
+                                                }
+                                                className={cn(
+                                                    'shrink-0 rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition-all duration-150',
+                                                    isSelected
+                                                        ? 'bg-[#F4F6FA] font-semibold text-zinc-950'
+                                                        : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
+                                                )}
+                                            >
+                                                {label}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                            {desk === 'investors' ? (
+                                <Link
+                                    href="/admin/investors/accounts"
+                                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#3A54A5] px-3.5 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors hover:bg-[#2D4182]"
+                                >
+                                    <SolarIcon name="solar:users-group-rounded-linear" className="size-3.5 text-white" />
+                                    View investors
+                                </Link>
+                            ) : (
+                                <Link
+                                    href="/admin/founder/founders"
+                                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#3A54A5] px-3.5 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors hover:bg-[#2D4182]"
+                                >
+                                    <SolarIcon name="solar:users-group-rounded-linear" className="size-3.5 text-white" />
+                                    View founders
+                                </Link>
+                            )}
+                        </div>
                     </div>
+
+                    {desk === 'platform' && isSuperAdmin && (
+                        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+                            {[
+                                {
+                                    label: 'Founders',
+                                    value: metrics.total_founders ?? 0,
+                                    href: '/admin/founder/founders',
+                                    icon: 'solar:users-group-rounded-linear',
+                                },
+                                {
+                                    label: 'In progress',
+                                    value: metrics.active_audits ?? 0,
+                                    href: '/admin/founder/founders?status=in_progress',
+                                    icon: 'solar:play-circle-linear',
+                                },
+                                {
+                                    label: 'Pending KYC',
+                                    value: metrics.pending_kyc ?? 0,
+                                    href: '/admin/investors/accounts?kyc_status=pending',
+                                    icon: 'solar:shield-warning-linear',
+                                    pulse: (metrics.pending_kyc ?? 0) > 0,
+                                },
+                                {
+                                    label: 'New messages',
+                                    value: metrics.my_open_messages ?? 0,
+                                    href: '/admin/founder/messages',
+                                    icon: 'solar:inbox-linear',
+                                    pulse: (metrics.my_open_messages ?? 0) > 0,
+                                },
+                            ].map((stat) => (
+                                <Link key={stat.label} href={stat.href} className="block">
+                                    <DeskCard className="h-full transition-shadow hover:shadow-[0_8px_28px_-10px_rgba(15,23,42,0.12)]">
+                                        <div className="p-4 sm:p-5">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
+                                                    {stat.label}
+                                                </span>
+                                                <div className="flex items-center gap-1.5">
+                                                    {stat.pulse && (
+                                                        <span className="relative flex h-1.5 w-1.5">
+                                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3A54A5] opacity-50" />
+                                                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#3A54A5]" />
+                                                        </span>
+                                                    )}
+                                                    <div className="flex size-8 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-500">
+                                                        <SolarIcon name={stat.icon} className="size-3.5" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p className="mt-4 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                                {stat.value}
+                                            </p>
+                                        </div>
+                                    </DeskCard>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+
+                    {desk === 'investors' && (isSuperAdmin || isCompliance || isInvestorRelations) && (
+                        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+                            {[
+                                {
+                                    label: 'Active investors',
+                                    value: metrics.active_investors ?? 0,
+                                    href: '/admin/investors/accounts',
+                                    icon: 'solar:users-group-rounded-linear',
+                                },
+                                {
+                                    label: 'Pending KYC',
+                                    value: metrics.pending_kyc ?? 0,
+                                    href: '/admin/investors/accounts?kyc_status=pending',
+                                    icon: 'solar:shield-warning-linear',
+                                    pulse: (metrics.pending_kyc ?? 0) > 0,
+                                },
+                                {
+                                    label: 'Approved KYC',
+                                    value: metrics.approved_kyc ?? 0,
+                                    href: '/admin/investors/accounts?kyc_status=approved',
+                                    icon: 'solar:shield-check-linear',
+                                },
+                                {
+                                    label: 'Pending dealflow',
+                                    value: metrics.pending_interests ?? 0,
+                                    href: '/admin/investors/dealflow/interests?status=pending',
+                                    icon: 'solar:folder-with-files-linear',
+                                    pulse: (metrics.pending_interests ?? 0) > 0,
+                                },
+                            ].map((stat) => (
+                                <Link key={stat.label} href={stat.href} className="block">
+                                    <DeskCard className="h-full transition-shadow hover:shadow-[0_8px_28px_-10px_rgba(15,23,42,0.12)]">
+                                        <div className="p-4 sm:p-5">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
+                                                    {stat.label}
+                                                </span>
+                                                <div className="flex items-center gap-1.5">
+                                                    {stat.pulse && (
+                                                        <span className="relative flex h-1.5 w-1.5">
+                                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3A54A5] opacity-50" />
+                                                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#3A54A5]" />
+                                                        </span>
+                                                    )}
+                                                    <div className="flex size-8 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-500">
+                                                        <SolarIcon name={stat.icon} className="size-3.5" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <p className="mt-4 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                                {stat.value}
+                                            </p>
+                                        </div>
+                                    </DeskCard>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
 
                     {isSuperAdmin && system_alerts.length > 0 && <SystemAlertsWidget alerts={system_alerts} />}
 
                     {handoffSteps.length > 0 && (
-                        <div className="mb-10">
-                            <div className="mb-4">
-                                <h2 className="text-[13px] font-semibold tracking-wider text-zinc-900 uppercase">Dealflow handoff</h2>
-                                <p className="mt-1 text-[12px] font-medium text-zinc-500">
-                                    Founder audit → Spotlight publish → investor interests
+                        <DeskCard className="mb-6">
+                            <div className="border-b border-zinc-100 px-5 py-4">
+                                <h2 className="text-[15px] font-semibold text-zinc-950">Dealflow handoff</h2>
+                                <p className="mt-0.5 text-[12px] text-zinc-500">
+                                    Founder audit → Spotlight → investor interests
                                 </p>
                             </div>
-                            <div className="grid grid-cols-1 gap-px overflow-hidden border border-zinc-200 bg-zinc-200 sm:grid-cols-2 xl:grid-cols-4">
+                            <div className="grid grid-cols-1 gap-px bg-zinc-100 sm:grid-cols-2 xl:grid-cols-4">
                                 {handoffSteps.map((step, index) => {
                                     const inner = (
                                         <div
                                             className={cn(
                                                 'flex h-full flex-col justify-between bg-white p-4 sm:p-5',
-                                                step.available && 'transition-colors hover:bg-zinc-50',
+                                                step.available && 'transition-colors hover:bg-[#F8F9FC]',
                                                 !step.available && 'opacity-70',
                                             )}
                                         >
@@ -756,151 +1174,189 @@ export default function AdminDashboard({
                                     );
                                 })}
                             </div>
-                        </div>
+                        </DeskCard>
                     )}
 
                     {needs_attention.length > 0 && (
-                        <div className="mb-10">
-                            <p className="mb-4 text-[11px] font-medium tracking-[0.14em] text-zinc-500 uppercase">Action required</p>
-                            <div className="divide-y divide-zinc-100 border border-zinc-200/80">
+                        <DeskCard className="mb-6">
+                            <div className="border-b border-zinc-100 px-5 py-4">
+                                <h2 className="text-[15px] font-semibold text-zinc-950">Things to handle</h2>
+                                <p className="mt-0.5 text-[12px] text-zinc-500">These need you next</p>
+                            </div>
+                            <ul className="divide-y divide-zinc-100">
                                 {needs_attention.map((item) => (
-                                    <Link
-                                        key={item.id}
-                                        href={item.action_url}
-                                        className="flex items-center justify-between gap-4 px-4 py-3.5 transition-colors hover:bg-zinc-50"
-                                    >
-                                        <div className="flex min-w-0 items-center gap-3">
-                                            <SolarIcon name={item.icon} className="text-zinc-400" />
-                                            <div className="min-w-0">
-                                                <p className="truncate text-[13px] font-semibold text-zinc-950">{item.title}</p>
-                                                <p className="truncate text-[12px] text-zinc-500">{item.description}</p>
+                                    <li key={item.id}>
+                                        <Link
+                                            href={item.action_url}
+                                            className="flex items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-[#F8F9FC]"
+                                        >
+                                            <div className="flex min-w-0 items-center gap-3">
+                                                <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-500">
+                                                    <SolarIcon name={item.icon} className="size-3.5" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="truncate text-[13px] font-semibold text-zinc-950">{item.title}</p>
+                                                    <p className="truncate text-[12px] text-zinc-500">{item.description}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <span className="text-[20px] font-semibold tabular-nums text-zinc-950">{item.count}</span>
+                                            <span className="text-[20px] font-semibold tabular-nums text-zinc-950">{item.count}</span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </DeskCard>
+                    )}
+
+                    {showInvestorMetrics && desk === 'platform' && (isSuperAdmin || isCompliance || isInvestorRelations) && (
+                        <div className="mb-6">
+                            <p className="mb-3 text-[13px] font-medium text-zinc-500">Investor desk</p>
+                            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
+                                {[
+                                    {
+                                        label: 'Active investors',
+                                        value: metrics.active_investors ?? 0,
+                                        href: '/admin/investors/accounts',
+                                        icon: 'solar:users-group-rounded-linear',
+                                    },
+                                    {
+                                        label: 'Approved KYC',
+                                        value: metrics.approved_kyc ?? 0,
+                                        href: '/admin/investors/accounts?kyc_status=approved',
+                                        icon: 'solar:shield-check-linear',
+                                    },
+                                    {
+                                        label: 'Pending dealflow',
+                                        value: metrics.pending_interests ?? 0,
+                                        href: '/admin/investors/dealflow/interests?status=pending',
+                                        icon: 'solar:folder-with-files-linear',
+                                    },
+                                    {
+                                        label: 'Scheduled calls',
+                                        value: metrics.scheduled_founder_calls ?? 0,
+                                        href: '/admin/investors/dealflow/interests?call_status=scheduled',
+                                        icon: 'solar:phone-calling-linear',
+                                    },
+                                ].map((stat) => (
+                                    <Link key={stat.label} href={stat.href} className="block">
+                                        <DeskCard className="h-full transition-shadow hover:shadow-[0_8px_28px_-10px_rgba(15,23,42,0.12)]">
+                                            <div className="p-4 sm:p-5">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
+                                                        {stat.label}
+                                                    </span>
+                                                    <div className="flex size-8 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-500">
+                                                        <SolarIcon name={stat.icon} className="size-3.5" />
+                                                    </div>
+                                                </div>
+                                                <p className="mt-4 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                                    {stat.value}
+                                                </p>
+                                            </div>
+                                        </DeskCard>
                                     </Link>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    {showInvestorMetrics && (isSuperAdmin || isCompliance || isInvestorRelations) && (
-                        <div className="mb-10">
-                            {desk === 'platform' && (
-                                <p className="mb-4 text-[11px] font-medium tracking-[0.14em] text-zinc-500 uppercase">Investor desk</p>
-                            )}
-                            <div className="mb-2 grid grid-cols-2 gap-x-6 lg:grid-cols-4">
-                                <MetricCard
-                                    label="Active Investors"
-                                    value={metrics.active_investors ?? 0}
-                                    icon="solar:users-group-rounded-linear"
-                                    href="/admin/investors/accounts"
-                                />
-                                <MetricCard
-                                    label="Pending KYC"
-                                    value={metrics.pending_kyc ?? 0}
-                                    icon="solar:shield-warning-linear"
-                                    pulse={(metrics.pending_kyc ?? 0) > 0}
-                                    href="/admin/investors/accounts?kyc_status=pending"
-                                />
-                                <MetricCard
-                                    label="Approved KYC"
-                                    value={metrics.approved_kyc ?? 0}
-                                    icon="solar:shield-check-linear"
-                                    href="/admin/investors/accounts?kyc_status=approved"
-                                />
-                                <MetricCard
-                                    label="Pending Dealflow"
-                                    value={metrics.pending_interests ?? 0}
-                                    icon="solar:folder-with-files-linear"
-                                    href="/admin/investors/dealflow/interests?status=pending"
-                                />
-                            </div>
-                            {(isSuperAdmin || isInvestorRelations) && (
-                                <div className="grid grid-cols-2 gap-x-6 lg:grid-cols-4">
-                                    <MetricCard
-                                        label="Scheduled Calls"
-                                        value={metrics.scheduled_founder_calls ?? 0}
-                                        icon="solar:phone-calling-linear"
-                                        href="/admin/investors/dealflow/interests?call_status=scheduled"
-                                    />
-                                    <MetricCard
-                                        label="Rejected KYC"
-                                        value={metrics.rejected_kyc ?? 0}
-                                        icon="solar:close-circle-linear"
-                                        href="/admin/investors/accounts?kyc_status=rejected"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    )}
-
                     {showPlatformFinance && (
                         <>
-                            <div className="mb-6 grid grid-cols-2 gap-x-6 lg:grid-cols-4">
-                                <MetricCard
-                                    label="Revenue collected"
-                                    value={fmtCurrency(metrics.revenue_by_currency?.NGN ?? 0, 'NGN')}
-                                    subValue={`USD: ${fmtCurrency(metrics.revenue_by_currency?.USD ?? 0, 'USD')}`}
-                                    icon="solar:wallet-money-linear"
-                                    href="/admin/revenue"
-                                />
-                            </div>
+                            <DeskCard className="mb-6">
+                                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 px-5 py-4">
+                                    <div>
+                                        <h2 className="text-[15px] font-semibold text-zinc-950">Money collected</h2>
+                                        <p className="mt-0.5 text-[12px] text-zinc-500">What founders have paid so far</p>
+                                    </div>
+                                    <Link
+                                        href="/admin/revenue"
+                                        className="rounded-lg bg-zinc-100 px-3 py-1.5 text-[12px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-200/80"
+                                    >
+                                        See payments
+                                    </Link>
+                                </div>
+                                <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-3">
+                                    <div>
+                                        <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">This month</p>
+                                        <p className="mt-2 text-[22px] font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                            {fmtCurrency(metrics.revenue_this_month ?? 0)}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">In naira</p>
+                                        <p className="mt-2 text-[22px] font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                            {fmtCurrency(metrics.revenue_by_currency?.NGN ?? 0, 'NGN')}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">In dollars</p>
+                                        <p className="mt-2 text-[22px] font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                            {fmtCurrency(metrics.revenue_by_currency?.USD ?? 0, 'USD')}
+                                        </p>
+                                    </div>
+                                </div>
+                            </DeskCard>
 
-                            <div className="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                                <div className="flex flex-col gap-6 lg:col-span-2">
+                            <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+                                <div className="flex flex-col gap-4 lg:col-span-2">
                                     {(metrics.monthly_revenue?.length ?? 0) > 0 && (
-                                        <RevenueAreaChart data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
+                                        <DeskCard className="p-5 sm:p-6">
+                                            <RevenueAreaChart data={metrics.monthly_revenue!} thisMonth={metrics.revenue_this_month ?? 0} />
+                                        </DeskCard>
                                     )}
                                 </div>
-                                <div className="flex flex-col gap-6">
-                                    {(metrics.audit_breakdown?.length ?? 0) > 0 && <AuditDonut data={metrics.audit_breakdown!} />}
+                                <div className="flex flex-col gap-4">
+                                    {(metrics.audit_breakdown?.length ?? 0) > 0 && (
+                                        <DeskCard className="p-5 sm:p-6">
+                                            <AuditDonut data={metrics.audit_breakdown!} />
+                                        </DeskCard>
+                                    )}
                                     {metrics.revenue_by_tier && (
-                                        <div>
-                                            <div className="mb-4 flex items-center gap-4 border-b border-zinc-100 pb-4">
-                                                <span className="text-[15px] font-semibold text-zinc-900">Revenue by Tier</span>
+                                        <DeskCard>
+                                            <div className="border-b border-zinc-100 px-5 py-4">
+                                                <h2 className="text-[15px] font-semibold text-zinc-950">Revenue by tier</h2>
                                             </div>
-                                            <div className="grid grid-cols-1 gap-3">
+                                            <div className="space-y-0 divide-y divide-zinc-100 p-2">
                                                 {(['foundation', 'growth', 'institutional'] as const).map((tier) => (
-                                                    <div key={tier} className="relative w-full border border-zinc-200/80 bg-white p-4">
-                                                        <div className="flex items-center justify-between">
-                                                            <p className="text-[13px] font-medium text-zinc-500 capitalize">{tier}</p>
-                                                            <SolarIcon name="solar:card-linear" className="text-zinc-300" />
-                                                        </div>
-                                                        <p className="mt-2 text-xl font-semibold tracking-tight text-zinc-900">
+                                                    <div key={tier} className="flex items-center justify-between px-3 py-3">
+                                                        <p className="text-[13px] font-medium text-zinc-500 capitalize">{tier}</p>
+                                                        <p className="text-[15px] font-semibold tracking-tight text-zinc-950 tabular-nums">
                                                             {fmtCurrency(metrics.revenue_by_tier![tier])}
                                                         </p>
                                                     </div>
                                                 ))}
                                             </div>
-                                        </div>
+                                        </DeskCard>
                                     )}
-                                    {metrics.funnel && <FunnelChart data={metrics.funnel} />}
+                                    {metrics.funnel && (
+                                        <DeskCard className="overflow-hidden">
+                                            <FunnelChart data={metrics.funnel} />
+                                        </DeskCard>
+                                    )}
                                 </div>
                             </div>
                         </>
                     )}
 
                     {(desk === 'investors' || desk === 'platform') && (
-                        <div className="min-w-0">
-                            <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-4">
-                                <span className="text-[15px] font-semibold text-zinc-900">Recent Activity</span>
+                        <DeskCard>
+                            <div className="border-b border-zinc-100 px-5 py-4">
+                                <h2 className="text-[15px] font-semibold text-zinc-950">Recent activity</h2>
                             </div>
 
                             {recent_activity.length === 0 ? (
-                                <div className="border border-zinc-200/80 bg-white p-10 text-center text-sm font-medium text-zinc-500">
+                                <div className="px-5 py-10 text-center text-[13px] font-medium text-zinc-500">
                                     No recent activity for this desk yet.
                                 </div>
                             ) : (
-                                <div className="overflow-hidden border border-zinc-200/80 bg-white">
+                                <ul className="divide-y divide-zinc-100">
                                     {recent_activity.slice(0, 8).map((item, i) => (
-                                        <div
-                                            key={i}
-                                            className="flex items-start gap-3 border-b border-zinc-100 p-4 transition-colors last:border-0 hover:bg-zinc-50/50 sm:p-5"
-                                        >
-                                            <SolarIcon
-                                                name={activityIcon[item.type] ?? 'solar:record-linear'}
-                                                className="mt-0.5 size-[15px] text-zinc-400"
-                                            />
+                                        <li key={i} className="flex items-start gap-3 px-5 py-3.5 transition-colors hover:bg-[#F8F9FC]">
+                                            <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-400">
+                                                <SolarIcon
+                                                    name={activityIcon[item.type] ?? 'solar:record-linear'}
+                                                    className="size-3.5"
+                                                />
+                                            </div>
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex flex-wrap items-center gap-x-2">
                                                     <span className="text-[11px] font-medium tracking-wider text-zinc-400 uppercase">
@@ -911,11 +1367,11 @@ export default function AdminDashboard({
                                                 {item.email && <p className="mt-1 truncate text-xs font-medium text-zinc-500">{item.email}</p>}
                                             </div>
                                             <span className="shrink-0 text-[11px] font-medium text-zinc-400">{item.time}</span>
-                                        </div>
+                                        </li>
                                     ))}
-                                </div>
+                                </ul>
                             )}
-                        </div>
+                        </DeskCard>
                     )}
                 </div>
             </div>

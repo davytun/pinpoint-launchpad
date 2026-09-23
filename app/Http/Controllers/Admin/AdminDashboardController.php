@@ -64,29 +64,37 @@ class AdminDashboardController extends Controller
                     $metrics['complete_audits'] = Payment::where('audit_status', 'complete')->count();
                     $metrics['high_scorers'] = DiagnosticSession::where('score', '>', 85)->when($startDate, fn ($q) => $q->where('completed_at', '>=', $startDate))->count();
                     $metrics['needs_info_count'] = Payment::where('audit_status', 'needs_info')->count();
+                    $metrics['audit_breakdown'] = [
+                        ['label' => 'Not started',       'value' => $metrics['pending_audits'], 'color' => '#64748b', 'status' => 'pending'],
+                        ['label' => 'In progress',       'value' => $metrics['active_audits'],  'color' => '#3A54A5', 'status' => 'in_progress'],
+                        ['label' => 'Waiting on founder', 'value' => $metrics['needs_info_count'], 'color' => '#f59e0b', 'status' => 'needs_info'],
+                        ['label' => 'Paused',            'value' => Payment::where('audit_status', 'on_hold')->count(), 'color' => '#f97316', 'status' => 'on_hold'],
+                        ['label' => 'Finished',          'value' => $metrics['complete_audits'], 'color' => '#10b981', 'status' => 'complete'],
+                    ];
+                    $metrics['funnel'] = [
+                        'signed_up' => Founder::count(),
+                        'completed_diagnostic' => Founder::whereNotNull('diagnostic_session_id')->count(),
+                        'uploaded_documents' => Founder::has('documents')->count(),
+                        'audit_complete' => Founder::whereHas('payment', fn ($q) => $q->where('audit_status', 'complete'))->count(),
+                    ];
+                    $metrics['engagement_trend'] = self::engagementTrend();
                 } else {
                     $assignedFounderIds = AuditAssignment::where('analyst_id', $user->id)->pluck('founder_id');
                     $metrics['my_assigned'] = $assignedFounderIds->count();
                     $metrics['active_audits'] = Founder::whereIn('id', $assignedFounderIds)->whereHas('payment', fn ($q) => $q->where('audit_status', 'in_progress'))->count();
+                    $metrics['pending_audits'] = Founder::whereIn('id', $assignedFounderIds)->whereHas('payment', fn ($q) => $q->where('audit_status', 'pending'))->count();
+                    $metrics['complete_audits'] = Founder::whereIn('id', $assignedFounderIds)->whereHas('payment', fn ($q) => $q->where('audit_status', 'complete'))->count();
                     $metrics['needs_info_count'] = Founder::whereIn('id', $assignedFounderIds)->whereHas('payment', fn ($q) => $q->where('audit_status', 'needs_info'))->count();
+                    $onHold = Founder::whereIn('id', $assignedFounderIds)->whereHas('payment', fn ($q) => $q->where('audit_status', 'on_hold'))->count();
+                    $metrics['audit_breakdown'] = [
+                        ['label' => 'Not started',        'value' => $metrics['pending_audits'], 'color' => '#64748b', 'status' => 'pending'],
+                        ['label' => 'In progress',        'value' => $metrics['active_audits'],  'color' => '#3A54A5', 'status' => 'in_progress'],
+                        ['label' => 'Waiting on founder', 'value' => $metrics['needs_info_count'], 'color' => '#f59e0b', 'status' => 'needs_info'],
+                        ['label' => 'Paused',             'value' => $onHold, 'color' => '#f97316', 'status' => 'on_hold'],
+                        ['label' => 'Finished',           'value' => $metrics['complete_audits'], 'color' => '#10b981', 'status' => 'complete'],
+                    ];
+                    $metrics['engagement_trend'] = self::engagementTrend($assignedFounderIds->all());
                 }
-            }
-
-            if ($user->canManageAudit() && $user->isSuperAdmin()) {
-                $metrics['audit_breakdown'] = [
-                    ['label' => 'Pending',     'value' => Payment::where('audit_status', 'pending')->count(),     'color' => '#64748b'],
-                    ['label' => 'In Progress', 'value' => Payment::where('audit_status', 'in_progress')->count(), 'color' => '#f59e0b'],
-                    ['label' => 'Needs Info',  'value' => Payment::where('audit_status', 'needs_info')->count(),  'color' => '#ef4444'],
-                    ['label' => 'On Hold',     'value' => Payment::where('audit_status', 'on_hold')->count(),     'color' => '#f97316'],
-                    ['label' => 'Complete',    'value' => Payment::where('audit_status', 'complete')->count(),    'color' => '#10b981'],
-                ];
-
-                $metrics['funnel'] = [
-                    'signed_up' => Founder::count(),
-                    'completed_diagnostic' => Founder::whereNotNull('diagnostic_session_id')->count(),
-                    'uploaded_documents' => Founder::has('documents')->count(),
-                    'audit_complete' => Founder::whereHas('payment', fn ($q) => $q->where('audit_status', 'complete'))->count(),
-                ];
             }
         }
 
@@ -102,7 +110,8 @@ class AdminDashboardController extends Controller
                 ->count();
         }
 
-        if ($showPlatform && $user->canAccessFinancials()) {
+        // Platform finance + Founder desk finance snapshot (superadmin only).
+        if (($showPlatform || $desk === 'founder') && $user->canAccessFinancials()) {
             $metrics['total_revenue'] = Payment::where('status', 'paid')->when($startDate, fn ($q) => $q->where('paid_at', '>=', $startDate))->sum('total_amount');
             $metrics['revenue_by_currency'] = self::revenueByCurrency($startDate);
             $metrics['revenue_this_month'] = Payment::where('status', 'paid')
@@ -129,6 +138,13 @@ class AdminDashboardController extends Controller
             $metrics['monthly_revenue'] = $monthly;
         }
 
+        // Compact PIA queue signal for Founder overview (not a duplicate table widget).
+        if ($desk === 'founder' && $user->canManageAudit()) {
+            $metrics['pending_pia_count'] = PiaApplication::query()
+                ->whereIn('status', ['pending', 'contacted'])
+                ->count();
+        }
+
         $needsAttention = [];
         $systemAlerts = [];
 
@@ -139,10 +155,10 @@ class AdminDashboardController extends Controller
             if ($pendingPiaCount > 0) {
                 $needsAttention[] = [
                     'id' => 'pending_pia',
-                    'title' => 'PIA payment requests',
-                    'description' => 'Founders waiting for payment confirmation.',
+                    'title' => 'Payments waiting to confirm',
+                    'description' => 'Someone asked to pay — confirm once the money lands.',
                     'count' => $pendingPiaCount,
-                    'action_url' => $desk === 'founder' ? '/admin/founder/pia-requests?status=pending' : '/admin/pia-requests?status=pending',
+                    'action_url' => $desk === 'founder' ? '/admin/founder/pia-requests' : '/admin/pia-requests',
                     'icon' => 'solar:card-send-bold-duotone',
                     'color' => 'amber',
                 ];
@@ -152,8 +168,8 @@ class AdminDashboardController extends Controller
             if ($unreadMessagesCount > 0) {
                 $needsAttention[] = [
                     'id' => 'unread_messages',
-                    'title' => 'Unread Messages',
-                    'description' => 'Founders are waiting for a response.',
+                    'title' => 'Unread messages',
+                    'description' => 'Founders are waiting for a reply.',
                     'count' => $unreadMessagesCount,
                     'action_url' => '/admin/founder/messages',
                     'icon' => 'solar:letter-unread-bold-duotone',
@@ -228,8 +244,8 @@ class AdminDashboardController extends Controller
             if ($pendingAuditsCount > 0) {
                 $needsAttention[] = [
                     'id' => 'pending_audits',
-                    'title' => 'Pending Audits',
-                    'description' => "New audits that haven't been started.",
+                    'title' => 'Ready to start',
+                    'description' => 'New founders who have not been started yet.',
                     'count' => $pendingAuditsCount,
                     'action_url' => '/admin/founder/founders?status=pending',
                     'icon' => 'solar:document-add-bold-duotone',
@@ -270,23 +286,7 @@ class AdminDashboardController extends Controller
         }
 
         $pendingPiaRequests = [];
-        if ($desk === 'founder' && $user->canManageAudit()) {
-            $pendingPiaRequests = PiaApplication::query()
-                ->whereIn('status', ['pending', 'contacted'])
-                ->latest()
-                ->limit(8)
-                ->get()
-                ->map(fn (PiaApplication $application) => [
-                    'id' => $application->id,
-                    'name' => $application->name,
-                    'email' => $application->email,
-                    'company' => $application->company,
-                    'selected_tier' => $application->selected_tier,
-                    'status' => $application->status,
-                    'created_at' => $application->created_at?->diffForHumans(),
-                ])
-                ->all();
-        }
+        // Full PIA list lives on /admin/founder/pia-requests — overview only uses pending_pia_count + needs_attention.
 
         return Inertia::render('Admin/Dashboard', [
             'metrics' => $metrics,
@@ -475,7 +475,7 @@ class AdminDashboardController extends Controller
             foreach ($sessions as $s) {
                 $activity[] = [
                     'type' => 'diagnostic',
-                    'description' => "Diagnostic completed — score {$s->score}",
+                    'description' => "Diagnostic done — score {$s->score}",
                     'time' => $s->completed_at?->diffForHumans(),
                     'email' => $s->email,
                 ];
@@ -486,7 +486,7 @@ class AdminDashboardController extends Controller
             foreach ($payments as $p) {
                 $activity[] = [
                     'type' => 'payment',
-                    'description' => "Payment received — {$p->tier} tier",
+                    'description' => 'Payment received · '.ucfirst((string) $p->tier).' plan',
                     'time' => $p->paid_at?->diffForHumans(),
                     'email' => $p->customer_email,
                 ];
@@ -497,14 +497,23 @@ class AdminDashboardController extends Controller
             foreach ($messages as $m) {
                 $activity[] = [
                     'type' => 'message',
-                    'description' => 'New founder message',
+                    'description' => 'New message from a founder',
                     'time' => $m->created_at->diffForHumans(),
                     'email' => null,
                 ];
             }
         } else {
-            // Analyst: assigned founders' audit status + recent thread activity
+            // Analyst: assigned founders' status + recent thread activity
             $assignedFounderIds = AuditAssignment::where('analyst_id', $user->id)->pluck('founder_id');
+
+            $statusPlain = [
+                'pending' => 'not started yet',
+                'in_progress' => 'in progress',
+                'needs_info' => 'waiting on the founder',
+                'on_hold' => 'paused',
+                'complete' => 'finished',
+                'unpaid' => 'payment not confirmed',
+            ];
 
             Founder::query()
                 ->with(['payment', 'messageThread'])
@@ -512,11 +521,12 @@ class AdminDashboardController extends Controller
                 ->latest('updated_at')
                 ->limit(8)
                 ->get()
-                ->each(function (Founder $founder) use (&$activity) {
+                ->each(function (Founder $founder) use (&$activity, $statusPlain) {
                     $status = $founder->payment?->audit_status ?? 'unpaid';
+                    $plain = $statusPlain[$status] ?? str_replace('_', ' ', (string) $status);
                     $activity[] = [
                         'type' => 'message',
-                        'description' => ($founder->company_name ?: $founder->full_name).' — audit '.$status,
+                        'description' => ($founder->company_name ?: $founder->full_name).' — '.$plain,
                         'time' => $founder->updated_at?->diffForHumans() ?? '',
                         'email' => $founder->email,
                     ];
@@ -530,9 +540,10 @@ class AdminDashboardController extends Controller
                 ->limit(8)
                 ->get()
                 ->each(function (MessageThread $thread) use (&$activity) {
+                    $name = $thread->founder?->company_name ?? 'a founder';
                     $label = $thread->admin_unread_count > 0
-                        ? 'Unread message from '.($thread->founder?->company_name ?? 'assigned founder')
-                        : 'Recent message with '.($thread->founder?->company_name ?? 'assigned founder');
+                        ? "Unread message from {$name}"
+                        : "Recent message with {$name}";
 
                     $activity[] = [
                         'type' => 'message',
@@ -545,5 +556,60 @@ class AdminDashboardController extends Controller
 
         // Sort by most recent first (they're already roughly sorted but mixed)
         return array_slice($activity, 0, 15);
+    }
+
+    /**
+     * Last 6 months of founder work: payments started vs reviews finished.
+     *
+     * @param  list<int|string>|null  $founderIds
+     * @return list<array{month: string, started: int, finished: int}>
+     */
+    private static function engagementTrend(?array $founderIds = null): array
+    {
+        $monthly = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+
+            if ($founderIds !== null) {
+                $started = Founder::query()
+                    ->whereIn('id', $founderIds)
+                    ->whereHas('payment', function ($q) use ($date) {
+                        $q->where('status', 'paid')
+                            ->whereMonth('paid_at', $date->month)
+                            ->whereYear('paid_at', $date->year);
+                    })
+                    ->count();
+
+                $finished = Founder::query()
+                    ->whereIn('id', $founderIds)
+                    ->whereHas('payment', function ($q) use ($date) {
+                        $q->where('audit_status', 'complete')
+                            ->whereMonth('updated_at', $date->month)
+                            ->whereYear('updated_at', $date->year);
+                    })
+                    ->count();
+            } else {
+                $started = Payment::query()
+                    ->where('status', 'paid')
+                    ->whereMonth('paid_at', $date->month)
+                    ->whereYear('paid_at', $date->year)
+                    ->count();
+
+                $finished = Payment::query()
+                    ->where('audit_status', 'complete')
+                    ->whereMonth('updated_at', $date->month)
+                    ->whereYear('updated_at', $date->year)
+                    ->count();
+            }
+
+            $monthly[] = [
+                'month' => $date->format('M'),
+                'started' => (int) $started,
+                'finished' => (int) $finished,
+            ];
+        }
+
+        return $monthly;
     }
 }

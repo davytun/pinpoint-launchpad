@@ -16,6 +16,7 @@ interface ProfileRow {
     overall_score: number | null;
     is_public: boolean;
     is_live: boolean;
+    is_published?: boolean;
     is_expired: boolean;
     verified_badges_count: number;
     expires_at: string | null;
@@ -301,15 +302,25 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                                         {/* Actions */}
                                         <td className="px-5 py-3.5 text-right">
                                             <div className="flex items-center justify-end gap-1 text-zinc-400">
-                                                <a
-                                                    href={`/investor/spotlight/${profile.slug}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"
-                                                    title="View Spotlight Page"
-                                                >
-                                                    <Icon icon="solar:external-link-linear" className="size-4" />
-                                                </a>
+                                                {profile.is_published ? (
+                                                    <a
+                                                        href={`/investor/spotlight/${profile.slug}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"
+                                                        title="View Spotlight Page"
+                                                    >
+                                                        <Icon icon="solar:external-link-linear" className="size-4" />
+                                                    </a>
+                                                ) : (
+                                                    <Link
+                                                        href="/admin/investors/spotlight"
+                                                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"
+                                                        title="Publish in Spotlight"
+                                                    >
+                                                        <Icon icon="solar:upload-linear" className="size-4" />
+                                                    </Link>
+                                                )}
                                                 <Link
                                                     href={`/admin/founder/profiles/${profile.id}`}
                                                     className="inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors hover:bg-zinc-100 hover:text-zinc-800"

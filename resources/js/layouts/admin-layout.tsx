@@ -302,7 +302,7 @@ function SidebarContent({
                                 <NavItem
                                     href="/admin/pia-requests"
                                     icon="solar:document-add-linear"
-                                    label="PIA Requests"
+                                    label="Payment requests"
                                     active={isActive('/admin/pia-requests')}
                                     collapsed={collapsed}
                                     onClick={onNav}
@@ -357,7 +357,7 @@ function SidebarContent({
                                 <NavItem
                                     href="/admin/founder/pia-requests"
                                     icon="solar:card-send-linear"
-                                    label="PIA Requests"
+                                    label="Payment requests"
                                     active={isActive('/admin/founder/pia-requests')}
                                     collapsed={collapsed}
                                     onClick={onNav}
@@ -711,7 +711,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     )}
                 </header>
 
-                <div className="relative z-0 flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden">{children}</div>
+                <div className="relative z-0 flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">{children}</div>
             </main>
         </div>
     );

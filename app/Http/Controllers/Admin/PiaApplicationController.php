@@ -44,16 +44,27 @@ class PiaApplicationController extends Controller
                 'status' => $application->status,
                 'source' => $application->source,
                 'created_at' => $application->created_at->toIso8601String(),
+                'agreement_url' => $this->agreementUrlFor($application),
             ]);
 
         $desk = str_starts_with($request->path(), 'admin/founder') ? 'founder' : 'platform';
 
+        $statusCounts = [
+            'all' => PiaApplication::query()->count(),
+            'pending' => PiaApplication::query()->where('status', 'pending')->count(),
+            'contacted' => PiaApplication::query()->where('status', 'contacted')->count(),
+            'converted' => PiaApplication::query()->where('status', 'converted')->count(),
+        ];
+
         return Inertia::render('Admin/PiaRequests/Index', [
             'applications' => $applications,
             'activeStatus' => in_array($status, ['pending', 'contacted', 'converted'], true) ? $status : 'all',
+            'statusCounts' => $statusCounts,
             'tierAmounts' => self::TIER_AMOUNTS,
             'desk' => $desk,
-            'can_record_payment' => $request->user()?->isSuperAdmin() ?? false,
+            'can_record_payment' => $desk === 'founder'
+                ? ($request->user()?->canManageAudit() ?? false)
+                : ($request->user()?->isSuperAdmin() ?? false),
         ]);
     }
 
@@ -63,7 +74,22 @@ class PiaApplicationController extends Controller
             $application->update(['status' => 'contacted']);
         }
 
-        return back()->with('success', "{$application->name} is marked as contacted.");
+        return back()->with('success', "Marked as contacted — next, wait for {$application->name}'s payment.");
+    }
+
+    public function updateTier(Request $request, PiaApplication $application): RedirectResponse
+    {
+        if ($application->status === 'converted') {
+            return back()->with('error', 'This request is already paid — the plan cannot be changed.');
+        }
+
+        $validated = $request->validate([
+            'selected_tier' => ['required', 'in:foundation,growth,institutional'],
+        ]);
+
+        $application->update(['selected_tier' => $validated['selected_tier']]);
+
+        return back()->with('success', 'Plan saved for '.$application->company.'.');
     }
 
     public function confirmPaymentReceived(Request $request, PiaApplication $application): RedirectResponse
@@ -71,10 +97,24 @@ class PiaApplicationController extends Controller
         $validated = $request->validate([
             'amount' => ['required', 'integer', 'min:1'],
             'currency' => ['required', 'in:NGN,USD'],
+            'selected_tier' => ['nullable', 'in:foundation,growth,institutional'],
         ]);
 
+        if (! empty($validated['selected_tier'])) {
+            $application->update(['selected_tier' => $validated['selected_tier']]);
+            $application->refresh();
+        }
+
         if (! in_array($application->selected_tier, ['foundation', 'growth', 'institutional'], true)) {
-            return back()->with('error', 'Select a PIA tier before recording payment.');
+            return back()->with('error', 'Pick a plan before confirming payment.');
+        }
+
+        if ($application->status === 'converted') {
+            $existingUrl = $this->agreementUrlFor($application);
+
+            return back()
+                ->with('info', 'Payment was already confirmed for this request.')
+                ->with('agreement_url', $existingUrl);
         }
 
         $payment = DB::transaction(function () use ($application, $validated) {
@@ -109,12 +149,81 @@ class PiaApplicationController extends Controller
             return $payment;
         });
 
+        $agreementUrl = $this->issueAgreementInvite($application, $payment);
+        $mailed = $this->sendAgreementInvite($application, $agreementUrl);
+
+        return back()
+            ->with(
+                'success',
+                $mailed
+                    ? "Payment confirmed. Agreement link emailed to {$application->email}."
+                    : "Payment confirmed. Email could not be sent — copy the agreement link and send it to {$application->email}."
+            )
+            ->with('agreement_url', $agreementUrl);
+    }
+
+    public function resendAgreement(PiaApplication $application): RedirectResponse
+    {
+        if ($application->status !== 'converted') {
+            return back()->with('error', 'Confirm payment before sending an agreement link.');
+        }
+
+        $payment = Payment::query()->where('paystack_reference', 'offline-pia-'.$application->id)->first();
+        if (! $payment) {
+            return back()->with('error', 'No payment record found for this request.');
+        }
+
+        $agreementUrl = $this->issueAgreementInvite($application, $payment);
+        $mailed = $this->sendAgreementInvite($application, $agreementUrl);
+
+        return back()
+            ->with(
+                'success',
+                $mailed
+                    ? "Agreement link emailed again to {$application->email}."
+                    : "Email could not be sent — copy the agreement link and send it to {$application->email}."
+            )
+            ->with('agreement_url', $agreementUrl);
+    }
+
+    private function issueAgreementInvite(PiaApplication $application, Payment $payment): string
+    {
         $token = Str::random(64);
-        Cache::put('pia_agreement_invite_'.$token, ['payment_id' => $payment->id], now()->addDays(7));
-        $agreementUrl = route('onboarding.continue', ['token' => $token]);
 
-        Mail::to($application->email)->send(new PiaAgreementInviteMail($application->name, $agreementUrl));
+        Cache::put('pia_agreement_invite_'.$token, [
+            'payment_id' => $payment->id,
+            'pia_application_id' => $application->id,
+        ], now()->addDays(7));
 
-        return back()->with('success', "Payment recorded. A secure agreement link was sent to {$application->email}.");
+        Cache::put('pia_agreement_app_'.$application->id, $token, now()->addDays(7));
+
+        return route('onboarding.continue', ['token' => $token]);
+    }
+
+    private function agreementUrlFor(PiaApplication $application): ?string
+    {
+        if ($application->status !== 'converted') {
+            return null;
+        }
+
+        $token = Cache::get('pia_agreement_app_'.$application->id);
+        if (! is_string($token) || $token === '') {
+            return null;
+        }
+
+        return route('onboarding.continue', ['token' => $token]);
+    }
+
+    private function sendAgreementInvite(PiaApplication $application, string $agreementUrl): bool
+    {
+        try {
+            Mail::to($application->email)->send(new PiaAgreementInviteMail($application->name, $agreementUrl));
+
+            return true;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
     }
 }

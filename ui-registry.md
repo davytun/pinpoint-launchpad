@@ -384,7 +384,47 @@ Last updated: 2026-09-20
 | Icons | Iconify Solar `*-linear` only |
 
 **Pattern notes:**
-Overview monitors work and money. Payments waiting appear once under Things to handle. Full payment list stays on `/admin/founder/pia-requests` — **operational table**, not stacked cards (same admin list pattern as Profiles/Founders).
+Overview monitors work and money. Payments waiting appear once under Things to handle and open only diagnostic payment requests. Assessment applications appear as their own item and open `/admin/founder/assessments`. Full payment list stays on `/admin/founder/pia-requests` — **operational table**, not stacked cards (same admin list pattern as Profiles/Founders).
+
+### Assessments list (`/admin/assessments`, `/admin/founder/assessments`)
+
+File: resources/js/pages/Admin/Assessments/Index.tsx
+Last updated: 2026-09-23
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-white` inside the admin content pane |
+| Border | `border-zinc-200` header rule; `border-zinc-100` row rules |
+| Border radius | Outer shell `rounded-[22px]`; buttons `rounded-lg` |
+| Text — primary | `text-[1.5rem] font-semibold text-zinc-950` title; `text-[14px] font-semibold` company |
+| Text — secondary | `text-[13px] text-zinc-500` subtitle; `text-[12px] text-zinc-500` contact line |
+| Spacing | `px-6 py-7 sm:px-8 lg:px-10`; table `px-3 py-3.5` |
+| Hover state | Row `hover:bg-zinc-50/60`; primary button `hover:bg-[#2D4182]` |
+| Shadow | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` |
+| Accent usage | Active tab and primary action `#3A54A5` |
+
+**Pattern notes:**
+Same operational table as Payment requests. Statuses are New, In review, and Replied. There is no plan picker and no confirm-payment action. Email is a mailto link.
+
+### Payment requests list (`/admin/pia-requests`, `/admin/founder/pia-requests`)
+
+File: resources/js/pages/Admin/PiaRequests/Index.tsx
+Last updated: 2026-09-23
+
+| Property | Class |
+| --- | --- |
+| Background | `bg-white` inside the admin content pane |
+| Border | `border-zinc-200` header rule; `border-zinc-100` row rules |
+| Border radius | Outer shell `rounded-[22px]`; buttons `rounded-lg` |
+| Text — primary | `text-[1.5rem] font-semibold text-zinc-950` title; `text-[14px] font-semibold` company |
+| Text — secondary | `text-[13px] text-zinc-500` subtitle; `text-[12px] text-zinc-500` diagnostic detail |
+| Spacing | `px-6 py-7 sm:px-8 lg:px-10`; table `px-3 py-3.5` |
+| Hover state | Row `hover:bg-zinc-50/60`; primary button `hover:bg-[#2D4182]` |
+| Shadow | `shadow-[0_16px_36px_rgba(33,56,120,0.06)]` |
+| Accent usage | Active tab and primary action `#3A54A5` |
+
+**Pattern notes:**
+Company, name, and the chosen plan are read-only. The Diagnostic column shows score, band, stage, country, and raise target from the latest diagnostic for that email. A plan is only picked in the confirm dialog when the founder did not choose one.
 
 ### Founder auth (setup / login / password)
 

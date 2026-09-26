@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminFounderController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AssessmentApplicationController;
 use App\Http\Controllers\Admin\BlogImageController;
 use App\Http\Controllers\Admin\DiligenceRequestController;
 use App\Http\Controllers\Admin\InvestorAccountController;
@@ -94,6 +95,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/pia-requests/{application}/payment-received', [PiaApplicationController::class, 'confirmPaymentReceived'])->name('pia-requests.payment-received');
         Route::post('/pia-requests/{application}/resend-agreement', [PiaApplicationController::class, 'resendAgreement'])->name('pia-requests.resend-agreement');
 
+        Route::get('/assessments', [AssessmentApplicationController::class, 'index'])->name('assessments.index');
+        Route::patch('/assessments/{application}/review', [AssessmentApplicationController::class, 'markInReview'])->name('assessments.review');
+        Route::patch('/assessments/{application}/scope-sent', [AssessmentApplicationController::class, 'markScopeSent'])->name('assessments.scope-sent');
+
         Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
         Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
         Route::get('/revenue', [AdminDashboardController::class, 'revenue'])->name('revenue');
@@ -141,6 +146,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 ->name('founder.pia-requests.payment-received');
             Route::post('/pia-requests/{application}/resend-agreement', [PiaApplicationController::class, 'resendAgreement'])
                 ->name('founder.pia-requests.resend-agreement');
+
+            Route::get('/assessments', [AssessmentApplicationController::class, 'index'])->name('founder.assessments.index');
+            Route::patch('/assessments/{application}/review', [AssessmentApplicationController::class, 'markInReview'])->name('founder.assessments.review');
+            Route::patch('/assessments/{application}/scope-sent', [AssessmentApplicationController::class, 'markScopeSent'])->name('founder.assessments.scope-sent');
 
             Route::get('/founders', [AdminFounderController::class, 'index'])->name('founders.index');
             Route::get('/founders/{founder}', [AdminFounderController::class, 'show'])->name('founders.show');

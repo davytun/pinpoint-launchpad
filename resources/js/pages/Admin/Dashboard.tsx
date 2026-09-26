@@ -523,6 +523,10 @@ function FounderDeskHome({
             title: 'Payments waiting to confirm',
             description: 'Open the payment requests list and finish the next step.',
         },
+        open_assessments: {
+            title: 'Assessment applications',
+            description: 'Review them and reply with scope and fee.',
+        },
         unread_messages: {
             title: 'Unread messages',
             description: 'Founders are waiting for a reply.',
@@ -535,6 +539,7 @@ function FounderDeskHome({
 
     const attentionIcon: Record<string, string> = {
         pending_pia: 'solar:card-send-linear',
+        open_assessments: 'solar:clipboard-check-linear',
         unread_messages: 'solar:letter-unread-linear',
         pending_audits: 'solar:document-add-linear',
     };

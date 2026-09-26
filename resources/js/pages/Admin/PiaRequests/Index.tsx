@@ -17,6 +17,8 @@ interface Application {
     country: string;
     stage: string;
     raise_target: string;
+    score: number | null;
+    score_band_label: string | null;
     message: string | null;
     selected_tier: Tier | null;
     status: Status;
@@ -48,6 +50,12 @@ const tierLabels: Record<Tier, string> = {
     institutional: 'Institutional',
 };
 
+const stageLabels: Record<string, string> = {
+    concept: 'Concept',
+    seed: 'Seed',
+    growth: 'Growth',
+};
+
 const statusLabel: Record<Status, string> = {
     pending: 'New',
     contacted: 'Waiting',
@@ -75,6 +83,10 @@ function formatDate(iso: string) {
         month: 'short',
         year: 'numeric',
     });
+}
+
+function stageLabel(stage: string) {
+    return stageLabels[stage] ?? stage;
 }
 
 function currencyFor(application: Application): Currency {
@@ -238,11 +250,14 @@ export default function PiaRequestsIndex({
                         {applications.data.length === 0 ? (
                             <p className="py-16 text-center text-[13px] text-zinc-500">{emptyCopy}</p>
                         ) : (
-                            <table className="w-full min-w-[760px] border-collapse text-left">
+                            <table className="w-full min-w-[920px] border-collapse text-left">
                                 <thead>
                                     <tr className="border-b border-zinc-200">
                                         <th className="px-3 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-zinc-400 uppercase">
                                             Company
+                                        </th>
+                                        <th className="px-3 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-zinc-400 uppercase">
+                                            Diagnostic
                                         </th>
                                         <th className="px-3 py-2.5 text-[10px] font-semibold tracking-[0.12em] text-zinc-400 uppercase">
                                             Plan
@@ -274,6 +289,20 @@ export default function PiaRequestsIndex({
                                                     <p className="mt-0.5 truncate text-[12px] text-zinc-500">
                                                         {application.name} · {application.email}
                                                     </p>
+                                                </td>
+                                                <td className="px-3 py-3.5 align-middle">
+                                                    {application.score != null ? (
+                                                        <p className="text-[13px] font-medium text-zinc-900">
+                                                            {application.score}
+                                                            {application.score_band_label ? ` · ${application.score_band_label}` : ''}
+                                                        </p>
+                                                    ) : (
+                                                        <p className="text-[13px] text-zinc-400">No score</p>
+                                                    )}
+                                                    <p className="mt-0.5 text-[12px] text-zinc-500">
+                                                        {stageLabel(application.stage)} · {application.country}
+                                                    </p>
+                                                    <p className="mt-0.5 text-[12px] text-zinc-500">{application.raise_target}</p>
                                                 </td>
                                                 <td className="px-3 py-3.5 align-middle">
                                                     {application.selected_tier ? (
@@ -423,42 +452,60 @@ export default function PiaRequestsIndex({
 
                     {confirming && (
                         <div className="space-y-3">
+                            <div className="text-[13px] text-zinc-600">
+                                <p>
+                                    {confirming.score != null
+                                        ? `${confirming.score}${confirming.score_band_label ? ` · ${confirming.score_band_label}` : ''}`
+                                        : 'No score'}
+                                </p>
+                                <p className="mt-0.5">
+                                    {stageLabel(confirming.stage)} · {confirming.country}
+                                </p>
+                                <p className="mt-0.5">{confirming.raise_target}</p>
+                            </div>
                             <div>
                                 <p className="mb-2 text-[12px] font-medium text-zinc-500">Plan</p>
-                                <div className="overflow-hidden rounded-xl border border-zinc-200">
-                                    {(['foundation', 'growth', 'institutional'] as Tier[]).map((tier, index) => {
-                                        const selected = confirmTier === tier;
-                                        const amountLabel = formatMoney(
-                                            tierAmounts[currencyFor(confirming)][tier],
-                                            currencyFor(confirming),
-                                        );
-                                        return (
-                                            <button
-                                                key={tier}
-                                                type="button"
-                                                onClick={() => setConfirmTier(tier)}
-                                                className={cn(
-                                                    'flex w-full items-center justify-between px-3.5 py-2.5 text-left text-[13px] transition-colors',
-                                                    index > 0 && 'border-t border-zinc-100',
-                                                    selected
-                                                        ? 'bg-[#3A54A5] font-semibold text-white'
-                                                        : 'bg-white text-zinc-700 hover:bg-zinc-50',
-                                                )}
-                                            >
-                                                <span>{tierLabels[tier]}</span>
-                                                <span className={cn('tabular-nums', selected ? 'text-white/90' : 'text-zinc-500')}>
-                                                    {amountLabel}
-                                                </span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                                {confirming.selected_tier ? (
+                                    <div className="flex items-center justify-between rounded-xl border border-zinc-200 px-3.5 py-2.5 text-[13px]">
+                                        <span className="font-medium text-zinc-900">{tierLabels[confirming.selected_tier]}</span>
+                                        <span className="tabular-nums text-zinc-500">
+                                            {formatMoney(
+                                                tierAmounts[currencyFor(confirming)][confirming.selected_tier],
+                                                currencyFor(confirming),
+                                            )}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="overflow-hidden rounded-xl border border-zinc-200">
+                                        {(['foundation', 'growth', 'institutional'] as Tier[]).map((tier, index) => {
+                                            const selected = confirmTier === tier;
+                                            const amountLabel = formatMoney(
+                                                tierAmounts[currencyFor(confirming)][tier],
+                                                currencyFor(confirming),
+                                            );
+                                            return (
+                                                <button
+                                                    key={tier}
+                                                    type="button"
+                                                    onClick={() => setConfirmTier(tier)}
+                                                    className={cn(
+                                                        'flex w-full items-center justify-between px-3.5 py-2.5 text-left text-[13px] transition-colors',
+                                                        index > 0 && 'border-t border-zinc-100',
+                                                        selected
+                                                            ? 'bg-[#3A54A5] font-semibold text-white'
+                                                            : 'bg-white text-zinc-700 hover:bg-zinc-50',
+                                                    )}
+                                                >
+                                                    <span>{tierLabels[tier]}</span>
+                                                    <span className={cn('tabular-nums', selected ? 'text-white/90' : 'text-zinc-500')}>
+                                                        {amountLabel}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
-                            {confirmTier && (
-                                <p className="text-[14px] font-semibold text-zinc-950">
-                                    Amount: {formatMoney(tierAmounts[currencyFor(confirming)][confirmTier], currencyFor(confirming))}
-                                </p>
-                            )}
                         </div>
                     )}
 

@@ -27,33 +27,47 @@ class PiaApplicationController extends Controller
     {
         $status = $request->string('status')->value();
 
-        $applications = PiaApplication::query()
+        $applications = $this->paymentQuery()
             ->when(in_array($status, ['pending', 'contacted', 'converted'], true), fn ($query) => $query->where('status', $status))
             ->latest()
-            ->paginate(20)
-            ->through(fn (PiaApplication $application) => [
+            ->paginate(20);
+
+        $diagnostics = DiagnosticSession::query()
+            ->whereIn('email', $applications->getCollection()->pluck('email')->filter()->unique()->all())
+            ->latest('id')
+            ->get()
+            ->unique(fn (DiagnosticSession $session) => strtolower((string) $session->email))
+            ->keyBy(fn (DiagnosticSession $session) => strtolower((string) $session->email));
+
+        $applications->through(function (PiaApplication $application) use ($diagnostics) {
+            $diagnostic = $diagnostics->get(strtolower($application->email));
+
+            return [
                 'id' => $application->id,
                 'name' => $application->name,
                 'email' => $application->email,
                 'company' => $application->company,
-                'country' => $application->country,
-                'stage' => $application->stage,
-                'raise_target' => $application->raise_target,
+                'country' => $diagnostic?->country ?: $application->country,
+                'stage' => $diagnostic?->growth_stage ?: $application->stage,
+                'raise_target' => $diagnostic?->looking_to_raise ?: $application->raise_target,
+                'score' => $diagnostic?->score !== null ? (int) $diagnostic->score : null,
+                'score_band_label' => $diagnostic ? $diagnostic->getScoreBandLabel() : null,
                 'message' => $application->message,
                 'selected_tier' => $application->selected_tier,
                 'status' => $application->status,
                 'source' => $application->source,
                 'created_at' => $application->created_at->toIso8601String(),
                 'agreement_url' => $this->agreementUrlFor($application),
-            ]);
+            ];
+        });
 
         $desk = str_starts_with($request->path(), 'admin/founder') ? 'founder' : 'platform';
 
         $statusCounts = [
-            'all' => PiaApplication::query()->count(),
-            'pending' => PiaApplication::query()->where('status', 'pending')->count(),
-            'contacted' => PiaApplication::query()->where('status', 'contacted')->count(),
-            'converted' => PiaApplication::query()->where('status', 'converted')->count(),
+            'all' => $this->paymentQuery()->count(),
+            'pending' => $this->paymentQuery()->where('status', 'pending')->count(),
+            'contacted' => $this->paymentQuery()->where('status', 'contacted')->count(),
+            'converted' => $this->paymentQuery()->where('status', 'converted')->count(),
         ];
 
         return Inertia::render('Admin/PiaRequests/Index', [
@@ -70,6 +84,8 @@ class PiaApplicationController extends Controller
 
     public function markContacted(PiaApplication $application): RedirectResponse
     {
+        $this->ensurePaymentRequest($application);
+
         if ($application->status === 'pending') {
             $application->update(['status' => 'contacted']);
         }
@@ -79,6 +95,8 @@ class PiaApplicationController extends Controller
 
     public function updateTier(Request $request, PiaApplication $application): RedirectResponse
     {
+        $this->ensurePaymentRequest($application);
+
         if ($application->status === 'converted') {
             return back()->with('error', 'This request is already paid — the plan cannot be changed.');
         }
@@ -94,6 +112,8 @@ class PiaApplicationController extends Controller
 
     public function confirmPaymentReceived(Request $request, PiaApplication $application): RedirectResponse
     {
+        $this->ensurePaymentRequest($application);
+
         $validated = $request->validate([
             'amount' => ['required', 'integer', 'min:1'],
             'currency' => ['required', 'in:NGN,USD'],
@@ -164,6 +184,8 @@ class PiaApplicationController extends Controller
 
     public function resendAgreement(PiaApplication $application): RedirectResponse
     {
+        $this->ensurePaymentRequest($application);
+
         if ($application->status !== 'converted') {
             return back()->with('error', 'Confirm payment before sending an agreement link.');
         }
@@ -184,6 +206,16 @@ class PiaApplicationController extends Controller
                     : "Email could not be sent — copy the agreement link and send it to {$application->email}."
             )
             ->with('agreement_url', $agreementUrl);
+    }
+
+    private function paymentQuery()
+    {
+        return PiaApplication::query()->where('source', 'diagnostic_tier_selection');
+    }
+
+    private function ensurePaymentRequest(PiaApplication $application): void
+    {
+        abort_unless($application->source === 'diagnostic_tier_selection', 404);
     }
 
     private function issueAgreementInvite(PiaApplication $application, Payment $payment): string

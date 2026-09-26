@@ -307,6 +307,14 @@ function SidebarContent({
                                     collapsed={collapsed}
                                     onClick={onNav}
                                 />
+                                <NavItem
+                                    href="/admin/assessments"
+                                    icon="solar:clipboard-check-linear"
+                                    label="Assessments"
+                                    active={isActive('/admin/assessments')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
                                 <NavSection label="Admin" collapsed={collapsed} />
                                 <NavItem
                                     href="/admin/revenue"
@@ -359,6 +367,14 @@ function SidebarContent({
                                     icon="solar:card-send-linear"
                                     label="Payment requests"
                                     active={isActive('/admin/founder/pia-requests')}
+                                    collapsed={collapsed}
+                                    onClick={onNav}
+                                />
+                                <NavItem
+                                    href="/admin/founder/assessments"
+                                    icon="solar:clipboard-check-linear"
+                                    label="Assessments"
+                                    active={isActive('/admin/founder/assessments')}
                                     collapsed={collapsed}
                                     onClick={onNav}
                                 />

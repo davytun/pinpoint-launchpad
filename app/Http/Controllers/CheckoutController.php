@@ -249,7 +249,11 @@ class CheckoutController extends Controller
             'message' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $application = PiaApplication::create($validated);
+        $application = PiaApplication::create([
+            ...$validated,
+            'source' => 'assessment_page',
+            'status' => 'pending',
+        ]);
 
         try {
             $adminEmail = config('mail.admin_address', config('mail.from.address'));

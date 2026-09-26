@@ -84,6 +84,48 @@ test('founder desk surfaces open PIA requests for analysts and superadmins', fun
             ->where('needs_attention.0.id', 'pending_pia'));
 });
 
+test('a payment request shows the diagnostic score stage country and raise target', function () {
+    $admin = User::factory()->create(['role' => 'superadmin']);
+
+    DiagnosticSession::create([
+        'email' => 'ada@startup.test',
+        'name' => 'Ada Founder',
+        'company_name' => 'Startup Co',
+        'country' => 'Nigeria',
+        'growth_stage' => 'Seed',
+        'looking_to_raise' => '$100k-$500k',
+        'answers' => [],
+        'score' => 76,
+        'score_band' => 'mid_high',
+        'pillar_scores' => [],
+    ]);
+
+    PiaApplication::create([
+        'name' => 'Ada Founder',
+        'email' => 'ada@startup.test',
+        'company' => 'Startup Co',
+        'country' => 'Nigeria',
+        'stage' => 'seed',
+        'raise_target' => '$100k-$500k',
+        'source' => 'diagnostic_tier_selection',
+        'selected_tier' => 'foundation',
+        'status' => 'pending',
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.founder.pia-requests.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('applications.data.0.company', 'Startup Co')
+            ->where('applications.data.0.name', 'Ada Founder')
+            ->where('applications.data.0.selected_tier', 'foundation')
+            ->where('applications.data.0.score', 76)
+            ->where('applications.data.0.score_band_label', 'Getting Closer')
+            ->where('applications.data.0.stage', 'Seed')
+            ->where('applications.data.0.country', 'Nigeria')
+            ->where('applications.data.0.raise_target', '$100k-$500k'));
+});
+
 test('an analyst on the founder desk can record offline payment', function () {
     Mail::fake();
 
@@ -105,6 +147,7 @@ test('an analyst on the founder desk can record offline payment', function () {
         'country' => 'Nigeria',
         'stage' => 'seed',
         'raise_target' => '$100k-$500k',
+        'source' => 'diagnostic_tier_selection',
         'selected_tier' => 'growth',
         'status' => 'contacted',
     ]);

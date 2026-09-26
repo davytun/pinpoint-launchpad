@@ -141,6 +141,7 @@ class AdminDashboardController extends Controller
         // Compact PIA queue signal for Founder overview (not a duplicate table widget).
         if ($desk === 'founder' && $user->canManageAudit()) {
             $metrics['pending_pia_count'] = PiaApplication::query()
+                ->where('source', 'diagnostic_tier_selection')
                 ->whereIn('status', ['pending', 'contacted'])
                 ->count();
         }
@@ -150,6 +151,7 @@ class AdminDashboardController extends Controller
 
         if ($showFounder) {
             $pendingPiaCount = PiaApplication::query()
+                ->where('source', 'diagnostic_tier_selection')
                 ->whereIn('status', ['pending', 'contacted'])
                 ->count();
             if ($pendingPiaCount > 0) {
@@ -161,6 +163,22 @@ class AdminDashboardController extends Controller
                     'action_url' => $desk === 'founder' ? '/admin/founder/pia-requests' : '/admin/pia-requests',
                     'icon' => 'solar:card-send-bold-duotone',
                     'color' => 'amber',
+                ];
+            }
+
+            $openAssessmentCount = PiaApplication::query()
+                ->where('source', 'assessment_page')
+                ->whereIn('status', ['pending', 'contacted'])
+                ->count();
+            if ($openAssessmentCount > 0) {
+                $needsAttention[] = [
+                    'id' => 'open_assessments',
+                    'title' => 'Assessment applications',
+                    'description' => 'Review them and reply with scope and fee.',
+                    'count' => $openAssessmentCount,
+                    'action_url' => $desk === 'founder' ? '/admin/founder/assessments' : '/admin/assessments',
+                    'icon' => 'solar:clipboard-check-bold-duotone',
+                    'color' => 'blue',
                 ];
             }
 

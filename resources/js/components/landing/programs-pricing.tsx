@@ -1,162 +1,135 @@
+import LandingCta from '@/components/landing/landing-cta';
 import { Check } from 'lucide-react';
+
+type Plan = {
+    name: string;
+    badge: string;
+    price: string;
+    unit: string;
+    note?: string;
+    description: string;
+    features: string[];
+    cta: string;
+    href: string;
+    featured?: boolean;
+};
+
+const PLANS: Plan[] = [
+    {
+        name: 'Concept / Pre-Seed',
+        badge: 'Stage 01',
+        price: '₦350,000',
+        unit: 'from',
+        note: 'Or $500 for diaspora & international founders',
+        description: 'Perfect for founders validating an idea before approaching investors. See where you stand and what to fix.',
+        features: [
+            'Full PARAGON scan (weighted to Potential)',
+            '1 founder interview (60 min)',
+            'Analyst-delivered 12-15 page report',
+            '1 debrief call (10-12 hours total)',
+            'Turnaround: 7 working days',
+        ],
+        cta: 'Start Assessment',
+        href: '/assessment',
+    },
+    {
+        name: 'Seed / Early Traction',
+        badge: 'Stage 02',
+        price: '$1,500',
+        unit: 'fixed fee',
+        description: 'For growing startups with ARR under $500k, preparing for a first institutional cheque.',
+        features: [
+            'Everything in Stage 01',
+            'Financial review (up to 24 months)',
+            'Unit-economics and LTV: CAC build',
+            'Cap table & founding docs review',
+            'Partner-reviewed 25-30 page report',
+        ],
+        cta: 'Start Assessment',
+        href: '/assessment',
+        featured: true,
+    },
+    {
+        name: 'Seed+ / Growth',
+        badge: 'Stage 03',
+        price: '$3,500+',
+        unit: 'floor',
+        description: 'For founders with ARR above $500k raising a larger round or growth equity. Deepest verification depth.',
+        features: [
+            'Everything in Stage 02',
+            'Full data-room review',
+            'Corporate and governance analysis',
+            'Material contract & IP review',
+            'Board-ready presentation (Partner-led)',
+        ],
+        cta: 'Start Assessment',
+        href: '/assessment',
+    },
+];
 
 export default function ProgramsPricing() {
     return (
-        <section id="pricing" className="relative z-10 w-full py-20 font-sans sm:py-24">
-            <div className="mx-auto max-w-5xl px-6 md:px-8">
-                <div className="mb-14 max-w-2xl space-y-4">
-                    <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Programs & Pricing</span>
-                    <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl">
+        <section id="pricing" className="relative z-10 w-full scroll-mt-24 bg-[#F4F4F2] py-16 font-sans sm:py-20 md:py-24">
+            <div className="mx-auto w-full max-w-6xl px-6 md:px-8">
+                <div className="mx-auto max-w-2xl text-center">
+                    <span className="inline-flex rounded-full bg-white px-3.5 py-1 text-xs font-medium text-zinc-500 shadow-sm">
+                        Pricing Plan
+                    </span>
+                    <h2 className="font-display mt-5 text-3xl font-bold tracking-tight text-[#1B2A4A] sm:text-4xl md:text-5xl md:leading-[1.12]">
                         Choose the Assessment for your stage.
                     </h2>
-                    <p className="text-base leading-relaxed text-zinc-500">
+                    <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-zinc-500 sm:text-base">
                         Start free with Self-Scan. Paid Assessment fees are fixed for the work delivered, not contingent on whether you raise capital.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-3">
-                    {/* Concept / Pre-Seed */}
-                    <div className="flex flex-col justify-between rounded-4xl border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.02)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/50">
-                        <div>
-                            <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Stage 01</span>
-                            <h3 className="mt-1 text-2xl font-bold text-zinc-950">Concept / Pre-Seed</h3>
-                            <p className="mt-3 text-sm leading-relaxed text-zinc-500">
-                                For founders validating an idea before approaching investors. See where you stand and what to fix.
-                            </p>
-
-                            <div className="mt-6">
-                                <span className="text-xs font-medium text-zinc-400">Starting From</span>
-                                <div className="mt-1 flex items-baseline gap-1">
-                                    <span className="text-4xl font-extrabold tracking-tight text-zinc-900">₦350,000</span>
-                                </div>
-                                <p className="mt-2 text-xs font-medium text-zinc-500">
-                                    From ₦350,000 for domestic founders, or $500 for diaspora & international founders
-                                </p>
+                <div className="mt-12 grid grid-cols-1 items-stretch gap-5 lg:grid-cols-3 lg:gap-6">
+                    {PLANS.map((plan) => (
+                        <article
+                            key={plan.name}
+                            className="flex h-full flex-col rounded-[1.75rem] border border-zinc-200/80 bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)] sm:p-7"
+                        >
+                            <div className="flex items-start justify-between gap-3">
+                                <h3 className="text-lg font-bold tracking-tight text-[#1B2A4A] sm:text-xl">{plan.name}</h3>
+                                <span className="inline-flex shrink-0 items-center rounded-full bg-[#F0F0EE] px-2.5 py-1 text-[11px] font-semibold text-zinc-600">
+                                    {plan.badge}
+                                </span>
                             </div>
 
-                            <a
-                                href="/assessment"
-                                className="group mt-6 flex h-11 w-full items-center justify-center rounded-full border border-[#3A54A5] bg-transparent text-sm font-bold text-[#3A54A5] transition-all duration-200 hover:bg-[#3A54A5] hover:text-white active:scale-[0.98]"
-                            >
-                                Start Assessment
-                            </a>
-                            <a href="/diagnostic" className="mt-3 block text-center text-xs font-bold text-zinc-500 hover:text-[#3A54A5]">
-                                Or take the free Self-Scan first
-                            </a>
+                            <div className="mt-5 flex items-baseline gap-1.5">
+                                <span className="font-display text-[2.35rem] leading-none font-bold tracking-tight text-zinc-950">
+                                    {plan.price}
+                                </span>
+                                <span className="text-sm text-zinc-400">/{plan.unit}</span>
+                            </div>
+                            {plan.note ? <p className="mt-1.5 text-xs text-zinc-400">{plan.note}</p> : null}
 
-                            <ul className="mt-8 space-y-4 border-t border-zinc-200/50 pt-6 text-sm text-zinc-600">
-                                {[
-                                    'Full PARAGON scan (weighted to Potential)',
-                                    '1 founder interview (60 min)',
-                                    'Analyst-delivered 12-15 page report',
-                                    '1 debrief call (10-12 hours total)',
-                                    'Turnaround: 7 working days',
-                                ].map((item) => (
-                                    <li key={item} className="flex items-start gap-2.5">
-                                        <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                            <Check className="h-3 w-3 stroke-3" />
-                                        </span>
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
+                            <p className="mt-4 text-sm leading-relaxed text-zinc-500">{plan.description}</p>
 
-                    {/* Seed / Early Traction */}
-                    <div className="relative flex flex-col justify-between rounded-4xl bg-[#2D4182] p-8 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:bg-[#25366D]">
-                        <div>
-                            <span className="text-xs font-bold tracking-widest text-[#93C5FD] uppercase">Stage 02</span>
-                            <h3 className="mt-1 text-2xl font-bold text-white">Seed / Early Traction</h3>
-                            <p className="mt-3 text-sm leading-relaxed text-white/70">
-                                For founders with a working model and ARR under $500k, preparing for a first institutional cheque.
-                            </p>
-
-                            <div className="mt-6">
-                                <span className="text-xs font-medium text-white/50">Total Price</span>
-                                <div className="mt-1 flex items-baseline gap-1">
-                                    <span className="text-4xl font-extrabold tracking-tight text-white">$1,500</span>
-                                </div>
+                            <div className="mt-6 flex-1 rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
+                                <p className="text-sm font-semibold text-[#1B2A4A]">What&apos;s included</p>
+                                <ul className="mt-4 space-y-3.5">
+                                    {plan.features.map((item) => (
+                                        <li key={item} className="flex items-start gap-2.5 text-sm text-zinc-500">
+                                            <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#F0F0EE] text-zinc-500">
+                                                <Check className="size-3 stroke-[2.5]" aria-hidden />
+                                            </span>
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
 
-                            <a
-                                href="/assessment"
-                                className="group mt-6 flex h-11 w-full items-center justify-center rounded-full bg-white text-sm font-bold text-[#2D4182] transition-all duration-200 hover:bg-zinc-100 active:scale-[0.98]"
+                            <LandingCta
+                                href={plan.href}
+                                tone={plan.featured ? 'navy' : 'outline'}
+                                direction="right"
+                                className="mt-6 w-full justify-between"
                             >
-                                Start Assessment
-                            </a>
-                            <a href="/diagnostic" className="mt-3 block text-center text-xs font-bold text-white/60 hover:text-white">
-                                Or take the free Self-Scan first
-                            </a>
-
-                            <ul className="mt-8 space-y-4 border-t border-white/10 pt-6 text-sm text-white/80">
-                                {[
-                                    'Everything in Stage 01',
-                                    'Financial review (up to 24 months)',
-                                    'Unit-economics and LTV: CAC build',
-                                    'Cap table & founding docs review',
-                                    '3 interviews (25-30 hours total)',
-                                    'Partner-reviewed 25-30 page report',
-                                    'Turnaround: 12 working days',
-                                ].map((item) => (
-                                    <li key={item} className="flex items-start gap-2.5">
-                                        <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
-                                            <Check className="h-3 w-3 stroke-3" />
-                                        </span>
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-
-                    {/* Seed+ / Growth */}
-                    <div className="flex flex-col justify-between rounded-4xl border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.02)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-white/50">
-                        <div>
-                            <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">Stage 03</span>
-                            <h3 className="mt-1 text-2xl font-bold text-zinc-950">Seed+ / Growth</h3>
-                            <p className="mt-3 text-sm leading-relaxed text-zinc-500">
-                                For founders with ARR above $500k raising a larger round or growth equity. Deepest verification depth.
-                            </p>
-
-                            <div className="mt-6">
-                                <span className="text-xs font-medium text-zinc-400">Total Price</span>
-                                <div className="mt-1 flex items-baseline gap-1">
-                                    <span className="text-4xl font-extrabold tracking-tight text-zinc-900">$3,500+</span>
-                                    <span className="text-xs text-zinc-400">floor</span>
-                                </div>
-                            </div>
-
-                            <a
-                                href="/assessment"
-                                className="group mt-6 flex h-11 w-full items-center justify-center rounded-full border border-[#3A54A5] bg-transparent text-sm font-bold text-[#3A54A5] transition-all duration-200 hover:bg-[#3A54A5] hover:text-white active:scale-[0.98]"
-                            >
-                                Start Assessment
-                            </a>
-                            <a href="/diagnostic" className="mt-3 block text-center text-xs font-bold text-zinc-500 hover:text-[#3A54A5]">
-                                Or take the free Self-Scan first
-                            </a>
-
-                            <ul className="mt-8 space-y-4 border-t border-zinc-200/50 pt-6 text-sm text-zinc-600">
-                                {[
-                                    'Everything in Stage 02',
-                                    'Full data-room review',
-                                    'Corporate and governance analysis',
-                                    'Material contract & IP review',
-                                    '5+ interviews (60+ hours total)',
-                                    'Board-ready presentation (Partner-led)',
-                                    'Turnaround: 20 working days',
-                                ].map((item) => (
-                                    <li key={item} className="flex items-start gap-2.5">
-                                        <span className="flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-[#3A54A5]">
-                                            <Check className="h-3 w-3 stroke-3" />
-                                        </span>
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
+                                {plan.cta}
+                            </LandingCta>
+                        </article>
+                    ))}
                 </div>
             </div>
         </section>

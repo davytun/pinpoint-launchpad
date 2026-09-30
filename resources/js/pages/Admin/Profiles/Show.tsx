@@ -199,7 +199,7 @@ export default function AdminProfilesShow({ profile, founder, badges, investor_i
                                             value={sector}
                                             onChange={(e) => setSector(e.target.value)}
                                             className={inputClass}
-                                            placeholder="e.g. B2B SaaS"
+                                            placeholder="Enter your sector"
                                         />
                                     </div>
                                     <div>

@@ -17,7 +17,7 @@ interface BlogTeaserProps {
 }
 
 export default function BlogTeaser({ posts = [] }: BlogTeaserProps) {
-    if (!posts || posts.length === 0) return null;
+    const items = posts ?? [];
 
     return (
         <section id="blog-teaser" className="relative z-10 w-full border-t border-zinc-100 py-20 font-sans">
@@ -40,9 +40,23 @@ export default function BlogTeaser({ posts = [] }: BlogTeaserProps) {
                     </Link>
                 </div>
 
-                {/* Grid */}
+                {items.length === 0 ? (
+                    <div className="rounded-2xl border border-zinc-200/90 bg-white/60 px-6 py-10 text-center sm:px-10">
+                        <p className="text-base font-semibold text-zinc-800">New articles are on the way.</p>
+                        <p className="mt-2 text-sm leading-relaxed text-zinc-500">
+                            Check the blog for readiness guides and platform updates as we publish them.
+                        </p>
+                        <Link
+                            href="/blog"
+                            className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-[#3A54A5] transition-colors hover:text-[#2D4182]"
+                        >
+                            Go to the blog
+                            <ArrowRight className="h-4 w-4" />
+                        </Link>
+                    </div>
+                ) : (
                 <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    {posts.map((post) => (
+                    {items.map((post) => (
                         <div
                             key={post.slug}
                             className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-white/20 bg-white/40 p-5 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#3A54A5]/25 hover:shadow-lg"
@@ -89,6 +103,7 @@ export default function BlogTeaser({ posts = [] }: BlogTeaserProps) {
                         </div>
                     ))}
                 </div>
+                )}
             </div>
         </section>
     );

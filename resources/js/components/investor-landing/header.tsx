@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
+import LandingCta from '@/components/landing/landing-cta';
 import { PinpointLogo } from '@/components/pinpoint-logo';
 
 interface Props {
@@ -13,8 +14,8 @@ export default function InvestorLandingHeader({ cta }: Props) {
 
     return (
         <>
-            <div className="fixed top-4 left-1/2 z-50 w-full max-w-5xl -translate-x-1/2 px-4 font-sans sm:px-6">
-                <header className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between rounded-full border border-white/80 bg-white/40 px-5 backdrop-blur-md md:h-16 md:px-6">
+            <div className="fixed top-4 left-1/2 z-50 w-full max-w-6xl -translate-x-1/2 px-4 font-sans sm:px-6">
+                <header className="mx-auto flex h-14 w-full items-center justify-between rounded-full border border-white/80 bg-white/40 px-5 backdrop-blur-md md:h-16 md:px-6">
                     <Link href="/" className="flex shrink-0 items-center">
                         <PinpointLogo height={24} variant="dark" />
                     </Link>
@@ -36,12 +37,9 @@ export default function InvestorLandingHeader({ cta }: Props) {
                             Log in
                         </Link>
                         {cta.enabled ? (
-                            <a
-                                href={cta.url}
-                                className="inline-flex h-10 items-center justify-center rounded-full bg-[#3A54A5] px-5 text-sm font-bold text-white transition-colors hover:bg-[#2D4182]"
-                            >
+                            <LandingCta href={cta.url} tone="green" size="sm" direction="up-right">
                                 {cta.label}
-                            </a>
+                            </LandingCta>
                         ) : null}
                     </nav>
 
@@ -77,13 +75,15 @@ export default function InvestorLandingHeader({ cta }: Props) {
                             Log in
                         </Link>
                         {cta.enabled ? (
-                            <a
+                            <LandingCta
                                 href={cta.url}
+                                tone="green"
+                                direction="up-right"
+                                className="w-full justify-between"
                                 onClick={() => setMobileOpen(false)}
-                                className="rounded-full bg-[#3A54A5] py-2.5 text-center text-sm font-bold text-white"
                             >
                                 {cta.label}
-                            </a>
+                            </LandingCta>
                         ) : null}
                     </div>
                 )}

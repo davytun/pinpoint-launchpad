@@ -52,7 +52,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
-                            placeholder="email@example.com"
+                            placeholder="Enter your email address"
                         />
                         <InputError message={errors.email} />
                     </div>
@@ -74,7 +74,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             autoComplete="current-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Password"
+                            placeholder="Enter your password"
                         />
                         <InputError message={errors.password} />
                     </div>

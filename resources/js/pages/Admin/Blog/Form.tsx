@@ -90,7 +90,7 @@ export default function AdminBlogForm({ post }: PageProps) {
                                         value={data.title}
                                         onChange={(e) => setData('title', e.target.value)}
                                         className={inputClass}
-                                        placeholder="e.g. 5 Due Diligence Red Flags Most Startups Ignore"
+                                        placeholder="Enter your post title"
                                         required
                                     />
                                     {errors.title && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.title}</p>}
@@ -105,7 +105,7 @@ export default function AdminBlogForm({ post }: PageProps) {
                                         rows={3}
                                         maxLength={500}
                                         className={inputClass}
-                                        placeholder="A compelling, short summary (maximum 500 characters) shown on list pages."
+                                        placeholder="Enter your short excerpt / summary"
                                         required
                                     />
                                     <p className="mt-1 text-right text-[10px] font-semibold text-zinc-400">{data.excerpt.length} / 500 chars</p>
@@ -179,7 +179,7 @@ export default function AdminBlogForm({ post }: PageProps) {
                                         value={data.category}
                                         onChange={(e) => setData('category', e.target.value)}
                                         className={inputClass}
-                                        placeholder="e.g. Fundraising, Vetting"
+                                        placeholder="Enter your category"
                                     />
                                     {errors.category && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.category}</p>}
                                 </div>
@@ -192,7 +192,7 @@ export default function AdminBlogForm({ post }: PageProps) {
                                         value={data.author_name}
                                         onChange={(e) => setData('author_name', e.target.value)}
                                         className={inputClass}
-                                        placeholder="Pinpoint Team"
+                                        placeholder="Enter your author name"
                                         required
                                     />
                                     {errors.author_name && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.author_name}</p>}
@@ -306,7 +306,7 @@ export default function AdminBlogForm({ post }: PageProps) {
                                                     value={data.cover_image}
                                                     onChange={(e) => setData('cover_image', e.target.value)}
                                                     className={inputClass}
-                                                    placeholder="https://images.unsplash.com/..."
+                                                    placeholder="Enter your cover image URL"
                                                 />
                                             </div>
                                         </details>

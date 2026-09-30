@@ -105,7 +105,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                                         autoComplete="email"
                                         value={data.email}
                                         onChange={(e) => setData('email', e.target.value)}
-                                        placeholder="admin@pinpointlaunchpad.com"
+                                        placeholder="Enter your email address"
                                         aria-invalid={Boolean(errors.email)}
                                         className={`w-full rounded-xl border bg-white py-2.5 pr-4 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 shadow-xs transition outline-none focus:ring-2 ${
                                             errors.email
@@ -135,7 +135,7 @@ export default function AdminLogin({ status }: { status?: string }) {
                                         autoComplete="current-password"
                                         value={data.password}
                                         onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="••••••••"
+                                        placeholder="Enter your password"
                                         aria-invalid={Boolean(errors.password)}
                                         className={`w-full rounded-xl border bg-white py-2.5 pr-10 pl-10 text-[13px] text-zinc-950 placeholder-zinc-400 shadow-xs transition outline-none focus:ring-2 ${
                                             errors.password

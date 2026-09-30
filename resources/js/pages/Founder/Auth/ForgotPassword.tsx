@@ -58,7 +58,7 @@ export default function FounderForgotPassword({ flash }: PageProps) {
                                         ? 'border-red-400 focus:border-red-500'
                                         : 'border-zinc-200 focus:border-[#3A54A5]',
                                 )}
-                                placeholder="you@company.com"
+                                placeholder="Enter your email address"
                                 required
                             />
                             {errors.email && (

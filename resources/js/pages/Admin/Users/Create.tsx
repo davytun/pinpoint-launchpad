@@ -46,7 +46,7 @@ export default function AdminUsersCreate() {
                             onChange={(e) => setData('name', e.target.value)}
                             maxLength={100}
                             className={inputClass}
-                            placeholder="Jane Smith"
+                            placeholder="Enter your full name"
                             required
                         />
                         {errors.name && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.name}</p>}
@@ -59,7 +59,7 @@ export default function AdminUsersCreate() {
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             className={inputClass}
-                            placeholder="jane@example.com"
+                            placeholder="Enter your email address"
                             required
                         />
                         {errors.email && <p className="mt-1 text-xs font-semibold text-rose-600">{errors.email}</p>}

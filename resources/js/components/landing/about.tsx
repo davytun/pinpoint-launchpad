@@ -1,4 +1,4 @@
-import { ArrowRight, Search, ShieldCheck } from 'lucide-react';
+import { Search, ShieldCheck } from 'lucide-react';
 
 export default function About() {
     return (
@@ -14,40 +14,32 @@ export default function About() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div className="rounded-4xl border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.03)] backdrop-blur-md">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#3A54A5]/15 bg-white/80 text-[#3A54A5] shadow-sm">
+                <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-16">
+                    <div>
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#E4EAF8] text-[#2F468B]">
                             <Search className="h-5 w-5 stroke-[1.5]" />
                         </div>
-                        <h3 className="font-display mt-5 text-2xl font-bold tracking-tight text-zinc-950">See what is missing</h3>
-                        <p className="mt-3 text-base leading-relaxed text-zinc-600">
+                        <h3 className="font-display mt-5 text-xl font-bold tracking-tight text-zinc-950">See what is missing</h3>
+                        <p className="mt-2 max-w-sm text-sm leading-relaxed text-zinc-500">
                             Start with a free Self-Scan. In about six minutes you get an indicative PARAGON score across seven areas, private to you,
                             with no investor visibility.
                         </p>
-                        <a
-                            href="/diagnostic"
-                            className="group mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-[#3A54A5] transition-colors hover:text-[#2d4182]"
-                        >
+                        <a href="/diagnostic" className="mt-5 inline-flex text-sm font-medium text-zinc-950 transition-colors hover:text-[#2F468B]">
                             Take the free Self-Scan
-                            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                         </a>
                     </div>
 
-                    <div className="rounded-4xl border border-white/80 bg-white/30 p-8 shadow-[0_8px_30px_rgba(58,84,165,0.03)] backdrop-blur-md">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#3A54A5]/15 bg-white/80 text-[#3A54A5] shadow-sm">
+                    <div>
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#D4F5A4] text-[#3A7D2C]">
                             <ShieldCheck className="h-5 w-5 stroke-[1.5]" />
                         </div>
-                        <h3 className="font-display mt-5 text-2xl font-bold tracking-tight text-zinc-950">Build proof investors can review</h3>
-                        <p className="mt-3 text-base leading-relaxed text-zinc-600">
+                        <h3 className="font-display mt-5 text-xl font-bold tracking-tight text-zinc-950">Build proof investors can review</h3>
+                        <p className="mt-2 max-w-sm text-sm leading-relaxed text-zinc-500">
                             When you are ready, the paid Assessment has analysts review your evidence against PARAGON and deliver a written report:
                             the foundation for a profile investors can evaluate on Pinpoint.
                         </p>
-                        <a
-                            href="/assessment"
-                            className="group mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-[#3A54A5] transition-colors hover:text-[#2d4182]"
-                        >
+                        <a href="/assessment" className="mt-5 inline-flex text-sm font-medium text-zinc-950 transition-colors hover:text-[#3A7D2C]">
                             Learn about the Assessment
-                            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                         </a>
                     </div>
                 </div>

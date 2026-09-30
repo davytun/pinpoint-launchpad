@@ -301,7 +301,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                             id="company-name"
                                             value={companyName}
                                             onChange={(e) => setCompanyName(e.target.value)}
-                                            placeholder="Acme Technologies Ltd"
+                                            placeholder="Enter your company name"
                                             className="mt-1.5 block w-full rounded-xl border border-zinc-200 bg-white/80 px-4 py-3 text-sm font-semibold text-zinc-800 placeholder-zinc-400 shadow-2xs transition-all duration-200 focus:border-[#3A54A5] focus:bg-white focus:ring-1 focus:ring-[#3A54A5] focus:outline-none"
                                         />
                                     </div>

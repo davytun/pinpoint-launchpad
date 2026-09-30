@@ -78,7 +78,7 @@ export default function FounderLogin({ flash }: PageProps) {
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
                                 className={fieldClass(errors.email)}
-                                placeholder="you@company.com"
+                                placeholder="Enter your email address"
                                 required
                             />
                             {errors.email && (
@@ -108,7 +108,7 @@ export default function FounderLogin({ flash }: PageProps) {
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     className={cn(fieldClass(errors.password), 'pr-11')}
-                                    placeholder="Your password"
+                                    placeholder="Enter your password"
                                     required
                                 />
                                 <button

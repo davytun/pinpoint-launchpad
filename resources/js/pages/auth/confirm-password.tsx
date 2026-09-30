@@ -37,7 +37,7 @@ export default function ConfirmPassword() {
                             id="password"
                             type="password"
                             name="password"
-                            placeholder="Password"
+                            placeholder="Enter your password"
                             autoComplete="current-password"
                             value={data.password}
                             autoFocus

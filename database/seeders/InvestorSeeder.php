@@ -13,6 +13,12 @@ class InvestorSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->warn('InvestorSeeder skipped (production).');
+
+            return;
+        }
+
         // Clean out any old dummy kyc files
         Storage::disk('local')->deleteDirectory('investor-kyc');
 

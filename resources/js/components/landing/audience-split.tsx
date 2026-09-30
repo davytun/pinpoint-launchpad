@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react';
+import LandingCta from '@/components/landing/landing-cta';
 
 export default function AudienceSplit() {
     return (
@@ -13,15 +13,9 @@ export default function AudienceSplit() {
                             analyst-reviewed profiles, all on the same platform.
                         </p>
                     </div>
-                    <a
-                        href="/investor"
-                        className="group mt-8 inline-flex h-11 shrink-0 items-center justify-between rounded-full bg-[#6EBE44] pr-1 pl-5 text-sm font-bold text-white shadow-xs transition-all duration-300 hover:bg-[#5da837] active:scale-[0.98] md:mt-0"
-                    >
-                        <span>Explore as an investor</span>
-                        <span className="ml-2 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white transition-transform duration-300 group-hover:translate-x-0.5">
-                            <ChevronRight className="h-4 w-4 stroke-[2.5]" />
-                        </span>
-                    </a>
+                    <LandingCta href="/investor" tone="green" direction="up-right" className="mt-8 shrink-0 md:mt-0">
+                        Explore as an investor
+                    </LandingCta>
                 </div>
             </div>
         </section>

@@ -152,7 +152,7 @@ export default function EmailGate() {
                                                 type="text"
                                                 required
                                                 autoComplete="name"
-                                                placeholder="Jane Doe"
+                                                placeholder="Enter your full name"
                                                 defaultValue=""
                                                 className="h-12 w-full rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 transition-all duration-200 outline-none placeholder:text-zinc-400 focus:border-[#3A54A5] focus:ring-2 focus:ring-[#3A54A5]/10"
                                             />
@@ -169,7 +169,7 @@ export default function EmailGate() {
                                                 type="text"
                                                 required
                                                 autoComplete="organization-title"
-                                                placeholder="Founder & CEO"
+                                                placeholder="Enter your role / title"
                                                 defaultValue=""
                                                 className="h-12 w-full rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 transition-all duration-200 outline-none placeholder:text-zinc-400 focus:border-[#3A54A5] focus:ring-2 focus:ring-[#3A54A5]/10"
                                             />
@@ -186,7 +186,7 @@ export default function EmailGate() {
                                                 type="email"
                                                 required
                                                 autoComplete="email"
-                                                placeholder="founder@startup.com"
+                                                placeholder="Enter your work email address"
                                                 defaultValue=""
                                                 className="h-12 w-full rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 transition-all duration-200 outline-none placeholder:text-zinc-400 focus:border-[#3A54A5] focus:ring-2 focus:ring-[#3A54A5]/10"
                                             />

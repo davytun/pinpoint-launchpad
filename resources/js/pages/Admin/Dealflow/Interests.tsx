@@ -506,7 +506,7 @@ function InterestDrawer({
                                             type="text"
                                             value={meetingLink}
                                             onChange={(e) => setMeetingLink(e.target.value)}
-                                            placeholder="https://meet.google.com/..."
+                                            placeholder="Enter your meeting link / access details"
                                             className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:outline-none"
                                         />
                                     </div>
@@ -518,7 +518,7 @@ function InterestDrawer({
                                         <textarea
                                             value={coordinationNotes}
                                             onChange={(e) => setCoordinationNotes(e.target.value)}
-                                            placeholder="Context or preparation notes for the session..."
+                                            placeholder="Enter your internal IR coordination notes"
                                             rows={2}
                                             className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:outline-none"
                                         />
@@ -905,7 +905,7 @@ export default function AdminInterests({
                             type="text"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search investor, startup, or message text..."
+                            placeholder="Search investor, startup, or message..."
                             className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                         />
                         {search && (

@@ -100,7 +100,7 @@ export default function InvestorForgotPassword({ flash }: PageProps) {
                                             ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
                                             : 'border-zinc-200 focus:border-[#3A54A5]/60',
                                     )}
-                                    placeholder="you@example.com"
+                                    placeholder="Enter your email address"
                                     required
                                 />
                                 {errors.email && (

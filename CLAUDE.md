@@ -33,6 +33,7 @@ npm run format:check    # check formatting without writing
 php artisan migrate
 php artisan migrate:fresh --seed
 php artisan db:seed --class=AdminSeeder
+php artisan db:seed --class=DemoDataSeeder   # local/staging only — sample investors, spotlight, blog posts
 php artisan tinker
 ```
 

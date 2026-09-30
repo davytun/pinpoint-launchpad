@@ -100,7 +100,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                             type="text"
                                             value={data.full_name}
                                             onChange={(e) => setData('full_name', e.target.value)}
-                                            placeholder="e.g. John Adeyemi"
+                                            placeholder="Enter your full name"
                                             disabled={processing}
                                             autoFocus
                                             className={fieldClassName(errors.full_name)}
@@ -117,7 +117,7 @@ export default function ConfirmDetails({ email, tier_label, info }: PageProps) {
                                             type="text"
                                             value={data.company_name}
                                             onChange={(e) => setData('company_name', e.target.value)}
-                                            placeholder="e.g. Acme Technologies Ltd."
+                                            placeholder="Enter your company name"
                                             disabled={processing}
                                             className={fieldClassName(errors.company_name)}
                                         />

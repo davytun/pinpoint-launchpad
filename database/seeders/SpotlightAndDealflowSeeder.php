@@ -21,6 +21,12 @@ class SpotlightAndDealflowSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->warn('SpotlightAndDealflowSeeder skipped (production).');
+
+            return;
+        }
+
         $admin = User::first();
         $investor = Investor::first() ?? Investor::factory()->create([
             'email' => 'davidakintunde433@gmail.com',

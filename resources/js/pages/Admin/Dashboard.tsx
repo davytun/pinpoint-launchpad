@@ -125,50 +125,6 @@ function SolarIcon({ name, className }: { name: string; className?: string }) {
     return <Icon icon={name} className={cn('size-4 shrink-0', className)} />;
 }
 
-function MetricCard({
-    label,
-    value,
-    subValue,
-    pulse = false,
-    href,
-    icon,
-}: {
-    label: string;
-    value: string | number;
-    subValue?: React.ReactNode;
-    pulse?: boolean;
-    href?: string;
-    icon: string;
-}) {
-    const inner = (
-        <div className="group relative flex h-full flex-col justify-between border-b border-zinc-200 py-4 pr-4 transition-colors hover:border-[#3A54A5]/40">
-            <div className="flex items-start justify-between gap-2">
-                <span className="text-[11px] font-medium tracking-wide text-zinc-500 uppercase">{label}</span>
-                <div className="flex items-center gap-2">
-                    {pulse && Number(String(value).replace(/\D/g, '') || 0) > 0 && (
-                        <span className="relative flex h-1.5 w-1.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3A54A5] opacity-50" />
-                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#3A54A5]" />
-                        </span>
-                    )}
-                    <SolarIcon name={icon} className="size-[15px] text-zinc-400 group-hover:text-[#3A54A5]" />
-                </div>
-            </div>
-            <div className="mt-3">
-                <span className="text-[24px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">{value}</span>
-                {subValue && <span className="mt-1 block text-[11px] font-medium text-zinc-500">{subValue}</span>}
-            </div>
-        </div>
-    );
-    if (href)
-        return (
-            <Link href={href} className="block h-full">
-                {inner}
-            </Link>
-        );
-    return inner;
-}
-
 // ─── Revenue sparkline ────────────────────────────────────────────────────────
 
 const revenueChartConfig = {
@@ -870,7 +826,6 @@ export default function AdminDashboard({
     needs_attention = [],
     system_alerts = [],
     dealflow_handoff = null,
-    pending_pia_requests = [],
     user_role,
     date_range = 'all',
     desk = 'platform',

@@ -15,8 +15,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,
             DiagnosticQuestionSeeder::class,
             AdminSeeder::class,
-            InvestorSeeder::class,
-            SpotlightAndDealflowSeeder::class,
+            DemoDataSeeder::class,
         ]);
     }
 }

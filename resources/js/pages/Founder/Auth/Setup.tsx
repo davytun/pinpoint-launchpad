@@ -68,7 +68,7 @@ export default function FounderSetup({ email, token, full_name, company_name }: 
                                 value={data.full_name}
                                 onChange={(e) => setData('full_name', e.target.value)}
                                 className={fieldClass(errors.full_name)}
-                                placeholder="Jane Smith"
+                                placeholder="Enter your full name"
                                 autoComplete="name"
                             />
                             {errors.full_name && (

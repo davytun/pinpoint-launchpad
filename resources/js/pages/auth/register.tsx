@@ -49,7 +49,7 @@ export default function Register() {
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             disabled={processing}
-                            placeholder="Full name"
+                            placeholder="Enter your full name"
                         />
                         <InputError message={errors.name} className="mt-2" />
                     </div>
@@ -65,7 +65,7 @@ export default function Register() {
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             disabled={processing}
-                            placeholder="email@example.com"
+                            placeholder="Enter your email address"
                         />
                         <InputError message={errors.email} />
                     </div>

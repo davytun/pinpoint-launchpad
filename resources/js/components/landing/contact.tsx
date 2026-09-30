@@ -61,7 +61,7 @@ export default function Contact() {
                                             required
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
-                                            placeholder="John Doe"
+                                            placeholder="Enter your full name"
                                             className="w-full border-b border-zinc-200 bg-transparent py-2.5 text-sm text-zinc-900 transition-colors outline-none placeholder:text-zinc-300 focus:border-[#3A54A5]"
                                         />
                                         {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
@@ -78,7 +78,7 @@ export default function Contact() {
                                             required
                                             value={data.email}
                                             onChange={(e) => setData('email', e.target.value)}
-                                            placeholder="john@example.com"
+                                            placeholder="Enter your email address"
                                             className="w-full border-b border-zinc-200 bg-transparent py-2.5 text-sm text-zinc-900 transition-colors outline-none placeholder:text-zinc-300 focus:border-[#3A54A5]"
                                         />
                                         {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
@@ -95,7 +95,7 @@ export default function Contact() {
                                         id="company_name"
                                         value={data.company_name}
                                         onChange={(e) => setData('company_name', e.target.value)}
-                                        placeholder="Acme Corp"
+                                        placeholder="Enter your company name"
                                         className="w-full border-b border-zinc-200 bg-transparent py-2.5 text-sm text-zinc-900 transition-colors outline-none placeholder:text-zinc-300 focus:border-[#3A54A5]"
                                     />
                                     {errors.company_name && <p className="mt-1 text-xs text-red-500">{errors.company_name}</p>}

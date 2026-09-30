@@ -1,3 +1,4 @@
+import LandingCta from '@/components/landing/landing-cta';
 import { ArrowRight } from 'lucide-react';
 
 export default function CtaQuote() {
@@ -11,12 +12,7 @@ export default function CtaQuote() {
                     See what you are missing, build your readiness profile, and make your business easier for investors on Pinpoint to evaluate.
                 </p>
                 <div className="flex flex-col items-center justify-center gap-4 pt-2 sm:flex-row">
-                    <a
-                        href="/diagnostic"
-                        className="inline-flex h-11 items-center justify-center rounded-full bg-[#3A54A5] px-6 text-sm font-bold text-white transition-colors hover:bg-[#2D4182]"
-                    >
-                        Start free Self-Scan
-                    </a>
+                    <LandingCta href="/diagnostic" direction="up-right">Start free Self-Scan</LandingCta>
                     <a
                         href="/assessment"
                         className="inline-flex items-center gap-1.5 text-sm font-bold text-[#3A54A5] transition-colors duration-200 hover:text-[#2D4182]"

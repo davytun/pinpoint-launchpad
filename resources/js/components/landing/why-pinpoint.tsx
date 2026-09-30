@@ -1,58 +1,74 @@
 import { BadgeCheck, ListChecks, Radar } from 'lucide-react';
 import React from 'react';
 
-interface BenefitCardProps {
+const points: {
     title: string;
     description: string;
     icon: React.ComponentType<{ className?: string }>;
-}
-
-function BenefitCard({ title, description, icon: Icon }: BenefitCardProps) {
-    return (
-        <div className="group relative overflow-hidden rounded-2xl border border-white/20 bg-[#3A54A5]/3 p-6 shadow-[0_4px_20px_rgba(58,84,165,0.01)] backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-[#3A54A5]/25 hover:bg-white/20 hover:shadow-[0_8px_30px_rgba(58,84,165,0.04)]">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#3A54A5]/15 bg-linear-to-br from-white to-[#3A54A5]/5 text-[#3A54A5] shadow-[0_2px_10px_rgba(58,84,165,0.03)] transition-transform duration-300 group-hover:scale-105">
-                <Icon className="h-5 w-5 stroke-[1.5]" />
-            </div>
-            <h3 className="font-display mt-4 text-lg font-bold text-zinc-950">{title}</h3>
-            <p className="mt-2 max-w-[36ch] font-sans text-sm leading-relaxed text-zinc-500">{description}</p>
-        </div>
-    );
-}
+}[] = [
+    {
+        title: 'Find the gaps first',
+        description: 'See where your business is weak before investors do, across market, execution, risk, and operations.',
+        icon: ListChecks,
+    },
+    {
+        title: 'Turn claims into structured proof',
+        description: 'Organise your information into a PARAGON readiness profile analysts can assess and investors can review.',
+        icon: Radar,
+    },
+    {
+        title: 'Become discoverable on Pinpoint',
+        description: 'After Assessment, eligible startups can appear in Spotlight, where investors on the platform review profiles.',
+        icon: BadgeCheck,
+    },
+];
 
 export default function WhyPinpoint() {
     return (
-        <section id="why-pinpoint" className="relative z-10 w-full py-16 font-sans sm:py-20">
-            <div className="mx-auto max-w-5xl px-6 md:px-8">
-                <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-5 lg:gap-12">
-                    <div className="space-y-4 lg:col-span-2">
-                        <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl">
+        <section id="why-pinpoint" className="relative z-10 w-full bg-[#1B2E58] font-sans text-white">
+            <div className="mx-auto grid w-full max-w-6xl items-center gap-6 px-6 py-8 sm:px-8 sm:py-10 lg:grid-cols-2 lg:gap-12 lg:py-12">
+                    <div className="relative mx-auto w-full max-w-xs px-4 py-5 sm:max-w-sm lg:mx-0 lg:max-w-none">
+                        <img
+                            src="/images/founder-laptop.jpg"
+                            alt="Founder reviewing work on a laptop"
+                            className="aspect-[3/4] w-full rounded-[1.75rem] object-cover object-[62%_center]"
+                        />
+                        <div className="absolute top-1 right-0 w-[9.25rem] rounded-2xl bg-white px-3 py-2.5 text-zinc-950 shadow-[0_10px_28px_rgba(15,23,42,0.16)]">
+                            <p className="text-[11px] text-zinc-500">Self-Scan</p>
+                            <p className="font-display text-base leading-tight font-bold">Private to you</p>
+                            <p className="mt-0.5 text-[11px] text-zinc-500">7 areas, no investors</p>
+                        </div>
+                        <div className="absolute bottom-8 left-0 w-[9.25rem] rounded-2xl bg-white px-3 py-2.5 text-zinc-950 shadow-[0_10px_28px_rgba(15,23,42,0.16)]">
+                            <p className="text-[11px] text-zinc-500">Assessment</p>
+                            <p className="font-display text-base leading-tight font-bold">Written report</p>
+                            <p className="mt-0.5 text-[11px] text-zinc-500">Proof investors review</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-[2rem] lg:leading-[1.15]">
                             Everything investors need to understand your startup.
                         </h2>
-                        <p className="font-sans text-base leading-relaxed text-zinc-500">
+                        <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70">
                             Pinpoint turns scattered claims into structured evidence across seven areas, so you know what is strong, what is missing,
                             and what investors will ask next.
                         </p>
-                    </div>
 
-                    <div className="grid grid-cols-1 gap-4 lg:col-span-3">
-                        <BenefitCard
-                            title="Find the gaps first"
-                            description="See where your business is weak before investors do, across market, execution, risk, and operations."
-                            icon={ListChecks}
-                        />
-                        <BenefitCard
-                            title="Turn claims into structured proof"
-                            description="Organise your information into a PARAGON readiness profile analysts can assess and investors can review."
-                            icon={Radar}
-                        />
-                        <BenefitCard
-                            title="Become discoverable on Pinpoint"
-                            description="After Assessment, eligible startups can appear in Spotlight, where investors on the platform review profiles."
-                            icon={BadgeCheck}
-                        />
+                        <ul className="mt-5 space-y-4">
+                            {points.map(({ title, description, icon: Icon }) => (
+                                <li key={title} className="flex gap-3">
+                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white">
+                                        <Icon className="h-3.5 w-3.5 stroke-[1.5]" />
+                                    </span>
+                                    <div>
+                                        <h3 className="font-display text-sm font-bold text-white">{title}</h3>
+                                        <p className="mt-0.5 max-w-md text-sm leading-relaxed text-white/65">{description}</p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </div>
-            </div>
         </section>
     );
 }

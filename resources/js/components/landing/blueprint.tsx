@@ -1,21 +1,25 @@
+import LandingCta from '@/components/landing/landing-cta';
+import { router } from '@inertiajs/react';
+import { Compass, ListChecks, PieChart, ShieldCheck } from 'lucide-react';
+
 const STEPS = [
     {
-        number: '01',
+        icon: ListChecks,
         title: 'Complete Self-Scan',
         description: 'Answer benchmark questions for a free, private, indicative score across the seven PARAGON pillars. No investor sees this.',
     },
     {
-        number: '02',
+        icon: ShieldCheck,
         title: 'Take the Assessment',
         description: 'When you are ready, analysts review your evidence against PARAGON and deliver a written Assessment Report.',
     },
     {
-        number: '03',
+        icon: PieChart,
         title: 'Get your readiness profile',
         description: 'Receive your score, pillar breakdown, identified gaps, and the structured profile built from the assessment.',
     },
     {
-        number: '04',
+        icon: Compass,
         title: 'Get discovered on Pinpoint',
         description: 'Eligible startups can be published to Spotlight so investors on the platform can discover and review your profile.',
     },
@@ -23,34 +27,36 @@ const STEPS = [
 
 export default function Blueprint() {
     return (
-        <section id="blueprint" className="relative z-10 w-full overflow-hidden py-20 font-sans sm:py-24">
-            <div className="pointer-events-none absolute -right-32 -bottom-32 -z-10 h-[600px] w-[600px] rounded-full bg-linear-to-tl from-[#3A54A5]/15 via-[#93C5FD]/10 to-transparent opacity-100 blur-[130px]" />
-
-            <div className="mx-auto max-w-5xl px-6 md:px-8">
-                <div className="mx-auto max-w-2xl space-y-4 text-center">
-                    <span className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">How it works</span>
-                    <h2 className="font-display text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl md:text-5xl">
+        <section id="blueprint" className="relative z-10 w-full py-16 font-sans sm:py-20">
+            <div className="mx-auto grid w-full max-w-6xl items-start gap-10 px-6 md:px-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
+                <div className="lg:pt-2">
+                    <p className="text-xs font-bold tracking-widest text-[#3A54A5] uppercase">How it works</p>
+                    <h2 className="font-display mt-3 max-w-sm text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl lg:text-[2.65rem] lg:leading-[1.12]">
                         From Self-Scan to investor-ready profile
                     </h2>
-                    <p className="text-base leading-relaxed text-zinc-500">
+                    <p className="mt-4 max-w-sm text-sm leading-relaxed text-zinc-500 sm:text-base">
                         Self-Scan is free and private. The paid Assessment is where analysts review evidence. Spotlight discoverability follows
                         Assessment. It is not automatic and does not guarantee funding.
                     </p>
+                    <LandingCta onClick={() => router.visit('/diagnostic')} direction="up-right" className="mt-7">
+                        Start Self-Scan
+                    </LandingCta>
                 </div>
 
-                <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {STEPS.map((step, idx) => (
-                        <div
-                            key={idx}
-                            className="group relative rounded-3xl border border-white/80 bg-white/30 p-6 shadow-[0_8px_30px_rgba(58,84,165,0.03)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white hover:bg-white/50 hover:shadow-[0_20px_40px_rgba(58,84,165,0.06)] sm:p-7"
-                        >
-                            <div className="font-display text-4xl font-black text-[#3A54A5]/10 transition-colors duration-300 group-hover:text-[#3A54A5]/25 sm:text-5xl">
-                                {step.number}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {STEPS.map((step) => {
+                        const Icon = step.icon;
+
+                        return (
+                            <div key={step.title} className="rounded-2xl border border-zinc-200/90 bg-white p-5 sm:p-6">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E4EAF8] text-[#2F468B]">
+                                    <Icon className="h-5 w-5 stroke-[1.75]" aria-hidden />
+                                </div>
+                                <h3 className="mt-4 text-base font-bold tracking-tight text-zinc-950">{step.title}</h3>
+                                <p className="mt-1.5 text-sm leading-relaxed text-zinc-500">{step.description}</p>
                             </div>
-                            <h3 className="mt-3 font-sans text-base font-bold text-zinc-950 sm:text-lg">{step.title}</h3>
-                            <p className="mt-2 font-sans text-sm leading-relaxed text-zinc-500">{step.description}</p>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </section>

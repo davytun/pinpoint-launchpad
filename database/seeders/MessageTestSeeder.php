@@ -13,6 +13,12 @@ class MessageTestSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->warn('MessageTestSeeder skipped (production).');
+
+            return;
+        }
+
         $adminUser = User::first();
         $adminId = $adminUser ? $adminUser->id : 1;
 

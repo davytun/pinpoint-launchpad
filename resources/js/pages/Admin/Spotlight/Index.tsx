@@ -285,7 +285,7 @@ function SpotlightDrawer({
                                     type="text"
                                     value={sector}
                                     onChange={(e) => setSector(e.target.value)}
-                                    placeholder="e.g. B2B SaaS, FinTech, AI..."
+                                    placeholder="Enter your sector"
                                     className="w-full rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                                 />
                             </div>
@@ -295,7 +295,7 @@ function SpotlightDrawer({
                                     type="text"
                                     value={batch}
                                     onChange={(e) => setBatch(e.target.value)}
-                                    placeholder="e.g. Cohort 2026-Q1"
+                                    placeholder="Enter your batch"
                                     className="w-full rounded-xl border border-zinc-200/90 bg-white px-3.5 py-2 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                                 />
                             </div>

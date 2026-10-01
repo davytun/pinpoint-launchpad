@@ -85,13 +85,13 @@
 
   @if($isReady)
   <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
-    <a href="{{ url('/checkout') }}" class="cta-button">
+    <a href="{{ $session->continueUrl('checkout') }}" class="cta-button">
       Proceed to Application
     </a>
   </div>
   @else
   <div style="text-align: center; margin-bottom: 32px; margin-top: 32px;">
-    <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('diagnostic.view', now()->addDays(30), ['id' => $session->id]) }}" class="cta-button" style="background-color: #6B7280;">
+    <a href="{{ $session->continueUrl('result') }}" class="cta-button" style="background-color: #6B7280;">
       View Your Results
     </a>
   </div>

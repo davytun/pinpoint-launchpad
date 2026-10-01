@@ -270,6 +270,9 @@ Route::prefix('diagnostic')->name('diagnostic.')->group(function () {
     Route::get('/email-gate', [DiagnosticController::class, 'emailGate'])->name('email-gate');
     Route::post('/capture-email', [DiagnosticController::class, 'captureEmail'])->name('capture-email')->middleware('throttle:5,1');
     Route::get('/result', [DiagnosticController::class, 'result'])->name('result');
+    Route::get('/continue/{diagnosticSession}', [DiagnosticController::class, 'continue'])
+        ->middleware('signed')
+        ->name('continue');
     Route::get('/result/{id}', [DiagnosticController::class, 'viewById'])
         ->middleware('signed')
         ->name('view');

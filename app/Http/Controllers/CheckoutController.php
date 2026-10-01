@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Mail\PaymentAdminNotificationMail;
 use App\Mail\PaymentConfirmationMail;
 use App\Mail\PiaApplicationAdminMail;
-use App\Models\DiagnosticSession;
+use App\Models\Founder;
 use App\Models\Payment;
 use App\Models\PiaApplication;
+use App\Services\DiagnosticProgress;
 use App\Services\PaystackService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -91,20 +92,21 @@ class CheckoutController extends Controller
         ];
     }
 
-    public function index(Request $request): Response|RedirectResponse
+    public function index(Request $request, DiagnosticProgress $progress): Response|RedirectResponse
     {
-        $sessionId = $request->session()->get('diagnostic_session_id');
-
-        if (! $sessionId) {
-            return redirect()->route('diagnostic.index')
-                ->with('error', 'Please complete the PARAGON Diagnostic first.');
-        }
-
-        $diagnosticSession = DiagnosticSession::find($sessionId);
+        $diagnosticSession = $progress->resolve($request);
 
         if (! $diagnosticSession) {
             return redirect()->route('diagnostic.index')
                 ->with('error', 'Please complete the PARAGON Diagnostic first.');
+        }
+
+        $progress->remember($request, $diagnosticSession);
+        $sessionId = $diagnosticSession->id;
+
+        if (Founder::query()->where('email', $diagnosticSession->email)->exists()) {
+            return redirect()->route('founder.login')
+                ->with('info', 'An account already exists for this email. Log in to continue your application.');
         }
 
         if (in_array($diagnosticSession->score_band, ['low', 'mid_low'])) {
@@ -121,6 +123,8 @@ class CheckoutController extends Controller
             ->first();
 
         if ($paid) {
+            $request->session()->put('payment_id', $paid->id);
+
             return redirect()->route('onboarding.sign');
         }
 
@@ -168,19 +172,21 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function submitDiagnosticPiaRequest(Request $request): RedirectResponse
+    public function submitDiagnosticPiaRequest(Request $request, DiagnosticProgress $progress): RedirectResponse
     {
         $validated = $request->validate([
             'tier' => ['required', 'in:foundation,growth,institutional'],
             'diagnostic_session_id' => ['required', 'integer', 'exists:diagnostic_sessions,id'],
         ]);
 
-        $sessionId = (int) $request->session()->get('diagnostic_session_id');
-        if ($sessionId !== (int) $validated['diagnostic_session_id']) {
+        $diagnosticSession = $progress->resolve($request);
+
+        if (! $diagnosticSession || $diagnosticSession->id !== (int) $validated['diagnostic_session_id']) {
             abort(403, 'Session mismatch.');
         }
 
-        $diagnosticSession = DiagnosticSession::findOrFail($sessionId);
+        $progress->remember($request, $diagnosticSession);
+
         if (in_array($diagnosticSession->score_band, ['low', 'mid_low'])) {
             return redirect()->route('diagnostic.result')
                 ->with('error', 'Your current score does not qualify for the audit programme.');

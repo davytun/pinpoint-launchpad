@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class DiagnosticSession extends Model
 {
@@ -32,6 +34,23 @@ class DiagnosticSession extends Model
         'cooldown_until' => 'datetime',
         'completed_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (DiagnosticSession $session): void {
+            if (! is_string($session->resume_token) || $session->resume_token === '') {
+                $session->resume_token = Str::random(64);
+            }
+        });
+    }
+
+    public function continueUrl(string $to = 'result'): string
+    {
+        return URL::temporarySignedRoute('diagnostic.continue', now()->addDays(60), [
+            'diagnosticSession' => $this->getKey(),
+            'to' => $to,
+        ]);
+    }
 
     public function scopeByEmail(Builder $query, string $email): Builder
     {

@@ -65,6 +65,63 @@ const PILLAR_LABELS: Record<string, string> = {
     network: 'Network',
 };
 
+const DRAFT_KEY = 'pinpoint-diagnostic-draft';
+
+interface DiagnosticDraft {
+    v: 1;
+    started: boolean;
+    basicsSubmitted: boolean;
+    currentIndex: number;
+    answers: Record<string, string>;
+    companyName: string;
+    country: string;
+    sector: string;
+    growthStage: string;
+    describeYou: string;
+    lookingToRaise: string;
+}
+
+function readDraft(): DiagnosticDraft | null {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
+    try {
+        const raw = window.localStorage.getItem(DRAFT_KEY);
+        if (!raw) {
+            return null;
+        }
+
+        const parsed = JSON.parse(raw) as Partial<DiagnosticDraft>;
+        if (parsed.v !== 1 || !parsed.answers || typeof parsed.answers !== 'object') {
+            return null;
+        }
+
+        const answers: Record<string, string> = {};
+        for (const [key, value] of Object.entries(parsed.answers)) {
+            if (typeof value === 'string') {
+                answers[key] = value;
+            }
+        }
+
+        return {
+            v: 1,
+            started: Boolean(parsed.started),
+            basicsSubmitted: Boolean(parsed.basicsSubmitted),
+            currentIndex: Number.isInteger(parsed.currentIndex) ? Number(parsed.currentIndex) : 0,
+            answers,
+            companyName: typeof parsed.companyName === 'string' ? parsed.companyName : '',
+            country: typeof parsed.country === 'string' ? parsed.country : '',
+            sector: typeof parsed.sector === 'string' ? parsed.sector : '',
+            growthStage: typeof parsed.growthStage === 'string' ? parsed.growthStage : '',
+            describeYou: typeof parsed.describeYou === 'string' ? parsed.describeYou : '',
+            lookingToRaise: typeof parsed.lookingToRaise === 'string' ? parsed.lookingToRaise : '',
+        };
+    } catch {
+        return null;
+    }
+}
+
 // ─── Custom Select Dropdown ───────────────────────────────────────────────────
 
 interface CustomSelectProps {
@@ -155,6 +212,74 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
     const [growthStage, setGrowthStage] = useState('');
     const [describeYou, setDescribeYou] = useState('');
     const [lookingToRaise, setLookingToRaise] = useState('');
+    const [draftReady, setDraftReady] = useState(false);
+    const [resumed, setResumed] = useState(false);
+    const restored = useRef(false);
+
+    useEffect(() => {
+        if (restored.current) {
+            return;
+        }
+        restored.current = true;
+
+        const draft = readDraft();
+        const hasDraft = draft !== null && (draft.started || draft.basicsSubmitted || Object.keys(draft.answers).length > 0);
+
+        if (draft && hasDraft) {
+            setCompanyName(draft.companyName);
+            setCountry(draft.country);
+            setSector(draft.sector);
+            setGrowthStage(draft.growthStage);
+            setDescribeYou(draft.describeYou);
+            setLookingToRaise(draft.lookingToRaise);
+            setAnswers(draft.answers as Record<number, string>);
+            setStarted(true);
+            setBasicsSubmitted(draft.basicsSubmitted || Object.keys(draft.answers).length > 0);
+            const maxIndex = Math.max(questions.length - 1, 0);
+            setCurrentIndex(Math.min(Math.max(draft.currentIndex, 0), maxIndex));
+            setResumed(true);
+        }
+
+        setDraftReady(true);
+    }, [questions.length]);
+
+    useEffect(() => {
+        if (!draftReady) {
+            return;
+        }
+
+        const hasProgress =
+            started ||
+            basicsSubmitted ||
+            companyName !== '' ||
+            country !== '' ||
+            sector !== '' ||
+            growthStage !== '' ||
+            describeYou !== '' ||
+            lookingToRaise !== '' ||
+            Object.keys(answers).length > 0;
+
+        if (!hasProgress) {
+            return;
+        }
+
+        const draft: DiagnosticDraft = {
+            v: 1,
+            started,
+            basicsSubmitted,
+            currentIndex,
+            answers,
+            companyName,
+            country,
+            sector,
+            growthStage,
+            describeYou,
+            lookingToRaise,
+        };
+
+        window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    }, [draftReady, started, basicsSubmitted, currentIndex, answers, companyName, country, sector, growthStage, describeYou, lookingToRaise]);
+
     function handleBasicsSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (isValid) {
@@ -164,6 +289,19 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
 
     const lockedRef = useRef(false);
     const question = questions[currentIndex];
+
+    if (!draftReady) {
+        return (
+            <>
+                <Head title="PARAGON Diagnostic" />
+                <DiagnosticLayout hideWordmark>
+                    <div className="mx-auto max-w-2xl px-4 pt-10 pb-20 sm:px-8">
+                        <PinpointLogo height={26} variant="dark" />
+                    </div>
+                </DiagnosticLayout>
+            </>
+        );
+    }
 
     if (!question) {
         return (
@@ -289,6 +427,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 <p className="mt-2 text-sm leading-relaxed font-semibold text-zinc-500">
                                     So the questions and the scoring match your stage.
                                 </p>
+                                {resumed && <p className="mt-3 text-sm font-semibold text-[#3A54A5]">Picking up where you left off.</p>}
 
                                 <div className="mt-8 space-y-5">
                                     {/* Company Name */}
@@ -409,12 +548,15 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                         describe_you: describeYou,
                         looking_to_raise: lookingToRaise,
                     },
-                    {
-                        onError: () => {
-                            setIsSubmitting(false);
-                            lockedRef.current = false;
+                        {
+                            onSuccess: () => {
+                                window.localStorage.removeItem(DRAFT_KEY);
+                            },
+                            onError: () => {
+                                setIsSubmitting(false);
+                                lockedRef.current = false;
+                            },
                         },
-                    },
                 );
             }, 200);
         } else {
@@ -490,7 +632,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                     </div>
 
                     <div className="mb-6 flex flex-col gap-2">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-3">
                             <span className="font-display text-sm font-bold tracking-widest text-zinc-500 uppercase">
                                 Question {currentIndex + 1}
                                 <span className="opacity-40"> / {total_questions}</span>
@@ -506,6 +648,7 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                 {PILLAR_LABELS[question.pillar] ?? question.pillar}
                             </Badge>
                         </div>
+                        {resumed && <p className="text-xs font-semibold text-[#3A54A5]">Picking up where you left off.</p>}
                         {/* Flat Editorial Progress */}
                         <div className="h-[3px] w-full overflow-hidden bg-zinc-200">
                             <motion.div
@@ -590,6 +733,17 @@ export default function DiagnosticIndex({ questions, total_questions }: PageProp
                                                 </button>
                                             ))}
                                         </div>
+
+                                        {isLast && answers[question.id] && !isSubmitting && (
+                                            <button
+                                                type="button"
+                                                onClick={() => selectAnswer(answers[question.id])}
+                                                className="group mt-6 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#3A54A5] text-sm font-bold text-white shadow-[0_8px_20px_rgba(58,84,165,0.2)] transition-all duration-200 hover:bg-[#2D4182] active:scale-[0.99]"
+                                            >
+                                                Continue to your results
+                                                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>

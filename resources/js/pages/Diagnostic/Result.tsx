@@ -1,5 +1,5 @@
 import DiagnosticLayout from '@/layouts/diagnostic-layout';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Activity, AlertCircle, AlertTriangle, ArrowRight, Cpu, Network, Scale, ShieldCheck, Target, TrendingUp, Zap } from 'lucide-react';
 import { useState } from 'react';
@@ -217,6 +217,7 @@ export default function DiagnosticResult({
     report_email,
     email_notice,
 }: PageProps) {
+    const { flash } = usePage<{ flash?: { info?: string } }>().props;
     const meta = BAND_META[score_band] ?? BAND_META.mid_high;
     const safePillars: PillarScores = {
         potential: pillar_scores?.potential ?? 0,
@@ -305,6 +306,11 @@ export default function DiagnosticResult({
 
             <DiagnosticLayout glowColor={meta.color}>
                 <div className="mx-auto max-w-4xl px-4 pt-8 pb-24 sm:px-8">
+                    {flash?.info && (
+                        <p role="status" className="mb-6 text-sm font-medium text-[#3A54A5]">
+                            {flash.info}
+                        </p>
+                    )}
                     {(email_notice || report_email) && (
                         <div
                             role="status"

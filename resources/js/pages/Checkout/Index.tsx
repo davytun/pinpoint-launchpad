@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Check, CheckCircle2, Loader2, Mail } from 'lucide-react';
 import { useState } from 'react';
@@ -77,6 +77,7 @@ export default function CheckoutIndex({
     request_submitted = false,
     submitted_tier = null,
 }: PageProps) {
+    const { flash } = usePage<{ flash?: { info?: string } }>().props;
     const [selectedTier, setSelectedTier] = useState<string | null>(submitted_tier);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -196,6 +197,11 @@ export default function CheckoutIndex({
                     </Dialog>
 
                     <div className="mx-auto max-w-5xl px-6 pt-8 pb-28 md:px-8">
+                        {flash?.info && (
+                            <p role="status" className="mb-6 text-sm font-medium text-[#3A54A5]">
+                                {flash.info}
+                            </p>
+                        )}
                         {/* ── Wordmark ── */}
                         <header className="mb-10 flex items-center justify-between">
                             <PinpointLogo height={24} variant="dark" />

@@ -15,6 +15,7 @@ use App\Models\DiagnosticSession;
 use App\Models\Founder;
 use App\Models\Payment;
 use App\Models\Setting;
+use App\Services\DiagnosticProgress;
 use App\Services\ScoringService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -26,6 +27,8 @@ use Inertia\Response;
 
 class DiagnosticController extends Controller
 {
+    public function __construct(private DiagnosticProgress $progress) {}
+
     private const BAND_MESSAGES = [
         'low' => 'Raising now would waste your time and your reputation. That is not a judgement on the idea. It is a judgement on the state of the company around it — and every item is fixable.',
         'mid_low' => 'There is something here, but it is not yet an investable proposition. Do not start a raise from this position. You will burn your best introductions on a package that is not ready.',
@@ -35,26 +38,15 @@ class DiagnosticController extends Controller
 
     public function index(Request $request): Response|RedirectResponse
     {
-        // If quiz was completed but email not yet submitted, send back to email gate
+        // Quiz is scored, but the email is not saved yet. Keep them on that step.
         if ($request->session()->has('diagnostic_result')) {
             return redirect()->route('diagnostic.email-gate');
         }
 
-        // If full session already completed, send to results (cooldown still applies for new attempts)
-        if ($request->session()->has('diagnostic_session_id')) {
-            return redirect()->route('diagnostic.result');
-        }
+        $saved = $this->progress->resolve($request);
 
-        $email = $request->session()->get('diagnostic_email');
-
-        if ($email) {
-            $latest = DiagnosticSession::byEmail($email)
-                ->latest('completed_at')
-                ->first();
-
-            if ($latest && $latest->isOnCooldown()) {
-                return redirect()->route('diagnostic.blocked');
-            }
+        if ($saved && $this->progress->shouldResume($saved)) {
+            return $this->progress->redirectToProgress($request, $saved);
         }
 
         $questions = DiagnosticQuestion::active()->get();
@@ -106,9 +98,10 @@ class DiagnosticController extends Controller
     public function emailGate(Request $request): Response|RedirectResponse
     {
         if (! $request->session()->has('diagnostic_result')) {
-            // If result was already viewed, send back to result — not to index
-            if ($request->session()->has('result_viewed')) {
-                return redirect()->route('diagnostic.result');
+            $saved = $this->progress->resolve($request);
+
+            if ($saved) {
+                return $this->progress->redirectToProgress($request, $saved);
             }
 
             return redirect()->route('diagnostic.index')->with('error', 'Please complete the quiz first.');
@@ -124,6 +117,12 @@ class DiagnosticController extends Controller
     public function captureEmail(Request $request): RedirectResponse
     {
         if (! $request->session()->has('diagnostic_result')) {
+            $saved = $this->progress->resolve($request);
+
+            if ($saved) {
+                return $this->progress->redirectToProgress($request, $saved);
+            }
+
             return redirect()->route('diagnostic.index');
         }
 
@@ -135,25 +134,37 @@ class DiagnosticController extends Controller
 
         $email = $validated['email'];
 
-        // Block if email is already a Founder (signed up)
-        $isFounder = Founder::query()->where([['email', '=', (string) $email]])->exists();
-        if ($isFounder) {
-            return redirect()->route('diagnostic.email-gate')
-                ->with('error', 'An account already exists with this email. Please login to your dashboard.');
+        if (Founder::query()->where('email', $email)->exists()) {
+            return redirect()->route('founder.login')
+                ->with('info', 'An account already exists for this email. Log in to continue your application.');
         }
 
-        // Block if this email already has a paid payment — no re-entry
-        $alreadyPaid = Payment::query()->where([
-            ['customer_email', '=', (string) $email],
-            ['status', '=', 'paid'],
-        ])->exists();
+        $existing = DiagnosticSession::byEmail($email)
+            ->latest('completed_at')
+            ->first();
 
-        if ($alreadyPaid) {
-            return redirect()->route('diagnostic.email-gate')
-                ->with('error', 'This email has already completed the assessment and associated payment. Please contact support.');
+        if ($existing && $this->progress->shouldResume($existing)) {
+            return $this->progress->redirectToProgress($request, $existing);
         }
 
-        // IP-based cooldown — prevent email rotation abuse
+        $paid = Payment::paid()->where('customer_email', $email)->latest()->first();
+
+        if ($paid) {
+            $linked = $paid->diagnostic_session_id
+                ? DiagnosticSession::query()->find($paid->diagnostic_session_id)
+                : null;
+
+            if ($linked) {
+                return $this->progress->redirectToProgress($request, $linked);
+            }
+
+            $request->session()->put('payment_id', $paid->id);
+
+            return redirect()->route('onboarding.sign')
+                ->with('info', 'We found your payment. Picking up where you left off.');
+        }
+
+        // IP-based cooldown — prevent email rotation abuse on a new attempt
         $ipAddress = (string) $request->ip();
         $recentByIp = DiagnosticSession::query()->where([
             ['ip_address', '=', $ipAddress],
@@ -168,17 +179,6 @@ class DiagnosticController extends Controller
 
             return redirect()->route('diagnostic.email-gate')
                 ->with('error', 'Too many attempts from your network. Please try again in 24 hours.');
-        }
-
-        $existing = DiagnosticSession::byEmail($email)
-            ->latest('completed_at')
-            ->first();
-
-        if ($existing && $existing->isOnCooldown()) {
-            $request->session()->put('diagnostic_email', $email);
-            $request->session()->forget('diagnostic_result');
-
-            return redirect()->route('diagnostic.blocked');
         }
 
         $result = $request->session()->get('diagnostic_result');
@@ -210,8 +210,7 @@ class DiagnosticController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        $request->session()->put('diagnostic_email', $email);
-        $request->session()->put('diagnostic_session_id', $session->id);
+        $this->progress->remember($request, $session);
         $request->session()->forget('diagnostic_result');
         $request->session()->forget('diagnostic_basics');
 
@@ -240,13 +239,13 @@ class DiagnosticController extends Controller
 
     public function result(Request $request): Response|RedirectResponse
     {
-        $sessionId = $request->session()->get('diagnostic_session_id');
+        $session = $this->progress->resolve($request);
 
-        if (! $sessionId) {
+        if (! $session) {
             return redirect()->route('diagnostic.index')->with('error', 'Please complete the quiz to see your results.');
         }
 
-        $session = DiagnosticSession::findOrFail($sessionId);
+        $this->progress->remember($request, $session);
 
         $request->session()->put('result_viewed', true);
 
@@ -304,17 +303,13 @@ class DiagnosticController extends Controller
 
     public function sendChecklist(Request $request): JsonResponse
     {
-        $sessionId = $request->session()->get('diagnostic_session_id');
-
-        if (! $sessionId) {
-            return response()->json(['error' => 'Session not found.'], 403);
-        }
-
-        $session = DiagnosticSession::find($sessionId);
+        $session = $this->progress->resolve($request);
 
         if (! $session) {
             return response()->json(['error' => 'Session not found.'], 403);
         }
+
+        $this->progress->remember($request, $session);
 
         // Only low / mid-low bands get the checklist
         if (! in_array($session->score_band, ['low', 'mid_low'])) {
@@ -331,11 +326,14 @@ class DiagnosticController extends Controller
         // Route is signed — unsigned links cannot restore another person's diagnostic session.
         $session = DiagnosticSession::findOrFail($id);
 
-        $request->session()->put('diagnostic_session_id', $session->id);
-        $request->session()->put('diagnostic_email', $session->email);
-        $request->session()->put('result_viewed', true);
+        return $this->progress->redirectToProgress($request, $session, 'result');
+    }
 
-        return redirect()->route('diagnostic.result');
+    public function continue(Request $request, DiagnosticSession $diagnosticSession): RedirectResponse
+    {
+        $preferred = $request->query('to') === 'checkout' ? 'checkout' : 'result';
+
+        return $this->progress->redirectToProgress($request, $diagnosticSession, $preferred);
     }
 
     public function blocked(Request $request): Response|RedirectResponse

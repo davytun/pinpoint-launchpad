@@ -3,6 +3,7 @@ import { Head, router } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
+import { paginationLabel } from '@/lib/pagination';
 import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -1250,8 +1251,9 @@ export default function AdminFoundersIndex({
                                                   ? 'text-zinc-600 hover:bg-zinc-100'
                                                   : 'cursor-not-allowed text-zinc-300',
                                         )}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
+                                    >
+                                        {paginationLabel(link.label)}
+                                    </button>
                                 ))}
                             </div>
                         )}

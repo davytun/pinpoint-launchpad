@@ -3,6 +3,7 @@ import { Edit, Eye, Layers, Plus, Search, Trash2, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
+import { paginationLabel } from '@/lib/pagination';
 import { cn } from '@/lib/utils';
 
 interface BlogPostItem {
@@ -299,8 +300,9 @@ export default function AdminBlogIndex({ posts, filters, totals }: PageProps) {
                                             'flex min-w-8 items-center justify-center rounded-lg px-2 py-1.5 text-[12px] font-semibold transition-colors',
                                             link.active ? 'bg-zinc-900 text-white' : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900',
                                         )}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
+                                    >
+                                        {paginationLabel(link.label)}
+                                    </Link>
                                 );
                             })}
                         </div>

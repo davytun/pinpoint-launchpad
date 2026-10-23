@@ -1,5 +1,5 @@
 import { readFile, stat, writeFile, mkdir } from 'fs/promises';
-import { dirname, join } from 'path';
+import { basename, dirname, join } from 'path';
 import chalk from 'chalk';
 import { glob } from 'glob';
 
@@ -235,10 +235,13 @@ export async function auditCommand(files: string | string[], options: { format?:
   let format = options.format || 'text';
 
   if (outputPath) {
-    // Enforce 'output/' directory if not present and not an absolute path
-    if (!outputPath.startsWith('/') && !outputPath.startsWith('output/')) {
-        outputPath = join('output', outputPath);
+    if (outputPath.startsWith('/') || /^[A-Za-z]:[\\/]/.test(outputPath)) {
+      throw new Error('Audit report output must be a relative filename');
     }
+
+    // Reports are always written beneath output/. Dropping directory
+    // components prevents a caller from escaping that directory.
+    outputPath = join('output', basename(outputPath));
     
     if (outputPath.endsWith('.json')) format = 'json';
     if (outputPath.endsWith('.md')) format = 'markdown';
@@ -320,7 +323,7 @@ export async function auditCommand(files: string | string[], options: { format?:
         await mkdir(dir, { recursive: true });
     }
     await writeFile(outputPath, outputContent);
-    console.log(chalk.green(`\nAudit report saved to ${outputPath}`));
+    console.log(chalk.green('\nAudit report saved to %s'), outputPath);
   } else {
     console.log(outputContent);
   }

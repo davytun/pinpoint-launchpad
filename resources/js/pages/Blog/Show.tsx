@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import DOMPurify from 'dompurify';
 import { ArrowLeft, Calendar, Clock, Share2, User } from 'lucide-react';
 
 import SideRays from '@/components/SideRays';
@@ -129,7 +130,10 @@ export default function BlogShow({ post, related }: PageProps) {
 
                             {/* Article Body Content */}
                             <div className="prose prose-zinc text-zinc-850 max-w-none space-y-6 pt-4 font-sans text-base leading-relaxed md:text-lg lg:text-xl">
-                                <div dangerouslySetInnerHTML={{ __html: post.body }} className="blog-content space-y-5" />
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.body, { USE_PROFILES: { html: true } }) }}
+                                    className="blog-content space-y-5"
+                                />
                             </div>
 
                             <aside className="mt-12 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-6 sm:p-8">

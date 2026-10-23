@@ -1,4 +1,5 @@
 import AdminLayout from '@/layouts/admin-layout';
+import { paginationLabel } from '@/lib/pagination';
 import { cn } from '@/lib/utils';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
@@ -169,20 +170,22 @@ export default function AdminQuestionsIndex() {
                                         <Link
                                             key={i}
                                             href={link.url}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
                                             className={cn(
                                                 'rounded-lg border px-3 py-1.5 text-xs font-semibold transition-all duration-150',
                                                 link.active
                                                     ? 'border-[#3A54A5]/25 bg-[#3A54A5]/10 font-extrabold text-[#3A54A5] shadow-xs'
                                                     : 'text-zinc-650 border-zinc-200 bg-white shadow-xs hover:bg-zinc-50 hover:text-zinc-950',
                                             )}
-                                        />
+                                        >
+                                            {paginationLabel(link.label)}
+                                        </Link>
                                     ) : (
                                         <span
                                             key={i}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
                                             className="rounded-lg px-3 py-1.5 text-xs font-semibold text-zinc-400"
-                                        />
+                                        >
+                                            {paginationLabel(link.label)}
+                                        </span>
                                     ),
                                 )}
                             </div>

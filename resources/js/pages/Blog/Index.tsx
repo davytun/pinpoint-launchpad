@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import SideRays from '@/components/SideRays';
 import Footer from '@/components/landing/footer';
 import Header from '@/components/landing/header';
+import { paginationLabel } from '@/lib/pagination';
 import { cn } from '@/lib/utils';
 
 interface BlogPostItem {
@@ -275,8 +276,9 @@ export default function BlogIndex({ posts, categories, filters }: PageProps) {
                                                     ? 'border-transparent bg-[#3A54A5] text-white'
                                                     : 'text-zinc-650 border-zinc-200 bg-white hover:bg-zinc-50',
                                             )}
-                                            dangerouslySetInnerHTML={{ __html: link.label }}
-                                        />
+                                        >
+                                            {paginationLabel(link.label)}
+                                        </Link>
                                     );
                                 })}
                             </div>

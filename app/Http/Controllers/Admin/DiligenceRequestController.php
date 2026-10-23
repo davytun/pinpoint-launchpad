@@ -55,18 +55,25 @@ class DiligenceRequestController extends Controller
             });
         }
 
-        $allRequests = DiligenceRequest::all();
+        $statusCounts = DiligenceRequest::query()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        $categoryCounts = DiligenceRequest::query()
+            ->selectRaw('category, count(*) as total')
+            ->groupBy('category')
+            ->pluck('total', 'category');
         $totals = [
-            'all' => $allRequests->count(),
-            'submitted' => $allRequests->where('status', 'submitted')->count(),
-            'waiting_for_founder' => $allRequests->where('status', 'waiting_for_founder')->count(),
-            'founder_responded' => $allRequests->where('status', 'founder_responded')->count(),
-            'resolved' => $allRequests->where('status', 'resolved')->count(),
-            'declined' => $allRequests->where('status', 'declined')->count(),
-            'financial' => $allRequests->where('category', 'financial')->count(),
-            'operational' => $allRequests->where('category', 'operational')->count(),
-            'legal_governance' => $allRequests->where('category', 'legal_governance')->count(),
-            'document_request' => $allRequests->where('category', 'document_request')->count(),
+            'all' => (int) $statusCounts->sum(),
+            'submitted' => (int) ($statusCounts['submitted'] ?? 0),
+            'waiting_for_founder' => (int) ($statusCounts['waiting_for_founder'] ?? 0),
+            'founder_responded' => (int) ($statusCounts['founder_responded'] ?? 0),
+            'resolved' => (int) ($statusCounts['resolved'] ?? 0),
+            'declined' => (int) ($statusCounts['declined'] ?? 0),
+            'financial' => (int) ($categoryCounts['financial'] ?? 0),
+            'operational' => (int) ($categoryCounts['operational'] ?? 0),
+            'legal_governance' => (int) ($categoryCounts['legal_governance'] ?? 0),
+            'document_request' => (int) ($categoryCounts['document_request'] ?? 0),
         ];
 
         return Inertia::render('Admin/Dealflow/Diligence', [

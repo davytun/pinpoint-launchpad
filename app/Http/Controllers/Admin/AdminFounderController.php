@@ -8,9 +8,11 @@ use App\Mail\AuditStatusUpdatedMail;
 use App\Mail\NewMessageFounderMail;
 use App\Models\AuditAssignment;
 use App\Models\Founder;
+use App\Models\MessageThread;
 use App\Models\Payment;
 use App\Models\User;
 use App\Services\MessageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,20 +31,28 @@ class AdminFounderController extends Controller
         $analystFilter = $request->query('analyst_id', 'all');
         $search = trim((string) $request->query('search', ''));
 
-        $query = Founder::with([
-            'payment',
-            'diagnosticSession',
-            'profile',
-            'documents',
-            'signature',
-            'messageThread',
-            'auditAssignment.analyst',
-        ]);
+        $applyDeskScope = function ($builder) use ($user): void {
+            if ($user->isAnalyst()) {
+                $builder->whereIn('id', function ($sub) use ($user) {
+                    $sub->select('founder_id')
+                        ->from('audit_assignments')
+                        ->where('analyst_id', $user->id);
+                });
+            }
+        };
 
-        if ($user->isAnalyst()) {
-            $founderIds = AuditAssignment::where('analyst_id', $user->id)->pluck('founder_id');
-            $query->whereIn('id', $founderIds);
-        }
+        $query = Founder::query()
+            ->with([
+                'payment',
+                'diagnosticSession:id,score,score_band,pillar_scores',
+                'profile',
+                'signature',
+                'messageThread',
+                'auditAssignment.analyst',
+            ])
+            ->withCount('documents');
+
+        $applyDeskScope($query);
 
         if ($status !== 'all') {
             $query->whereHas('payment', fn ($pq) => $pq->where('audit_status', $status));
@@ -64,35 +74,25 @@ class AdminFounderController extends Controller
             });
         }
 
-        $scopedFounders = Founder::with(['payment', 'auditAssignment'])
-            ->when($user->isAnalyst(), fn ($q) => $q->whereIn('id', AuditAssignment::where('analyst_id', $user->id)->pluck('founder_id')))
-            ->get();
+        $totalsQuery = Founder::query();
+        $applyDeskScope($totalsQuery);
         $totals = [
-            'total' => $scopedFounders->count(),
-            'pending' => $scopedFounders->filter(fn ($f) => ($f->payment?->audit_status ?? 'pending') === 'pending')->count(),
-            'in_progress' => $scopedFounders->filter(fn ($f) => $f->payment?->audit_status === 'in_progress')->count(),
-            'needs_info' => $scopedFounders->filter(fn ($f) => $f->payment?->audit_status === 'needs_info')->count(),
-            'on_hold' => $scopedFounders->filter(fn ($f) => $f->payment?->audit_status === 'on_hold')->count(),
-            'complete' => $scopedFounders->filter(fn ($f) => $f->payment?->audit_status === 'complete')->count(),
-            'unassigned' => $scopedFounders->filter(fn ($f) => $f->auditAssignment === null)->count(),
+            'total' => (clone $totalsQuery)->count(),
+            'pending' => (clone $totalsQuery)->where(function ($q) {
+                $q->whereHas('payment', fn ($pq) => $pq->where('audit_status', 'pending'))
+                    ->orWhereDoesntHave('payment');
+            })->count(),
+            'in_progress' => (clone $totalsQuery)->whereHas('payment', fn ($pq) => $pq->where('audit_status', 'in_progress'))->count(),
+            'needs_info' => (clone $totalsQuery)->whereHas('payment', fn ($pq) => $pq->where('audit_status', 'needs_info'))->count(),
+            'on_hold' => (clone $totalsQuery)->whereHas('payment', fn ($pq) => $pq->where('audit_status', 'on_hold'))->count(),
+            'complete' => (clone $totalsQuery)->whereHas('payment', fn ($pq) => $pq->where('audit_status', 'complete'))->count(),
+            'unassigned' => (clone $totalsQuery)->whereDoesntHave('auditAssignment')->count(),
         ];
 
         $founders = $query->latest()->paginate(15)->withQueryString()->through(function ($f) {
             $score = $f->score ?? $f->profile?->overall_score;
             $scoreBand = $f->score_band ?? ($score ? ($score >= 85 ? 'high' : ($score >= 75 ? 'mid_high' : ($score >= 60 ? 'mid_low' : 'low'))) : null);
             $tier = $f->tier ?? ($score ? ($score >= 85 ? 'institutional' : ($score >= 70 ? 'growth' : 'foundation')) : 'foundation');
-
-            $threadMessages = $f->messageThread ? $f->messageThread->messages()->visible()->oldest()->get()->map(fn ($msg) => [
-                'id' => $msg->id,
-                'sender_type' => $msg->sender_type,
-                'sender_name' => $msg->senderName($f),
-                'body' => $msg->body,
-                'has_attachment' => $msg->has_attachment,
-                'attachment_filename' => $msg->attachment_filename,
-                'attachment_size' => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
-                'created_at' => $msg->created_at->format('d M, H:i'),
-                'is_from_founder' => $msg->isFromFounder(),
-            ]) : [];
 
             return [
                 'id' => $f->id,
@@ -114,24 +114,13 @@ class AdminFounderController extends Controller
                     : null,
                 'assigned_at' => $f->auditAssignment?->assigned_at?->toISOString(),
                 'audit_notes' => $f->auditAssignment?->notes,
-                'documents_count' => $f->documents->count(),
-                'documents' => $f->documents->map(fn ($doc) => [
-                    'id' => $doc->id,
-                    'original_filename' => $doc->original_filename,
-                    'category' => $doc->category,
-                    'category_label' => $doc->categoryLabel(),
-                    'file_size' => $doc->fileSizeForHumans(),
-                    'reviewed' => $doc->is_reviewed,
-                    'analyst_note' => $doc->analyst_note,
-                    'created_at' => $doc->created_at->format('d M Y'),
-                ]),
+                'documents_count' => (int) $f->documents_count,
                 'signature' => $f->signature ? [
                     'status' => $f->signature->status,
                     'signed_at' => $f->signature->signed_at?->format('d M Y'),
                     'signer_name' => $f->signature->signer_name,
                 ] : null,
                 'message_thread_id' => $f->messageThread?->id,
-                'messages' => $threadMessages,
                 'unread_messages' => $f->messageThread?->admin_unread_count ?? 0,
                 'pillar_scores' => $f->diagnosticSession?->pillar_scores,
                 'profile' => $f->profile ? [
@@ -169,35 +158,18 @@ class AdminFounderController extends Controller
             abort(403);
         }
 
-        $thread = $this->messageService->getOrCreateThread($founder);
-        $this->messageService->markThreadRead($thread, 'admin');
-
         $founder->load([
-            'diagnosticSession',
+            'diagnosticSession:id,score,score_band,pillar_scores',
             'payment',
             'signature',
-            'profile.badges',
             'profile.spotlightEntry',
-            'documents',
             'auditAssignment.analyst',
         ]);
+        $founder->loadCount('documents');
 
-        $messages = $thread->messages()
-            ->visible()
-            ->oldest()
-            ->get()
-            ->map(fn ($msg) => [
-                'id' => $msg->id,
-                'sender_type' => $msg->sender_type,
-                'sender_name' => $msg->senderName($founder),
-                'body' => $msg->body,
-                'has_attachment' => $msg->has_attachment,
-                'attachment_filename' => $msg->attachment_filename,
-                'attachment_size' => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
-                'created_at' => $msg->created_at->format('d M, H:i'),
-                'created_at_date' => $msg->created_at->format('Y-m-d'),
-                'is_from_founder' => $msg->isFromFounder(),
-            ]);
+        $thread = $this->messageService->getOrCreateThread($founder);
+        $this->messageService->markThreadRead($thread, 'admin');
+        $thread->refresh();
 
         $analysts = $user->isSuperAdmin()
             ? User::where('role', 'analyst')->select('id', 'name', 'email')->get()
@@ -233,22 +205,14 @@ class AdminFounderController extends Controller
                 'signed_at' => $founder->signature->signed_at?->format('d M Y'),
                 'signer_name' => $founder->signature->signer_name,
             ] : null,
-            'documents' => $founder->documents->map(fn ($d) => [
-                'id' => $d->id,
-                'original_filename' => $d->original_filename,
-                'category' => $d->category,
-                'category_label' => $d->categoryLabel(),
-                'file_size' => $d->fileSizeForHumans(),
-                'reviewed' => $d->is_reviewed,
-                'analyst_note' => $d->analyst_note,
-                'created_at' => $d->created_at->format('d M Y'),
-            ]),
+            'documents_count' => (int) $founder->documents_count,
+            'documents' => Inertia::defer(fn () => $this->documentPayload($founder)),
             'message_thread' => [
                 'id' => $thread->id,
-                'total_messages' => $messages->count(),
+                'total_messages' => $thread->messages()->visible()->count(),
                 'unread_count' => $thread->admin_unread_count,
             ],
-            'thread_messages' => $messages,
+            'thread_messages' => Inertia::defer(fn () => $this->messagePayload($founder, $thread)),
             'profile' => $founder->profile ? [
                 'id' => $founder->profile->id,
                 'is_live' => $founder->profile->isLive(),
@@ -264,6 +228,24 @@ class AdminFounderController extends Controller
             ] : null,
             'analysts' => $analysts,
             'user_role' => $user->role,
+        ]);
+    }
+
+    public function panel(Founder $founder): JsonResponse
+    {
+        $user = Auth::user();
+
+        if (! $user->canAccessFounder($founder->id)) {
+            abort(403);
+        }
+
+        $thread = $founder->messageThread;
+
+        return response()->json([
+            'documents' => $this->documentPayload($founder),
+            'messages' => $thread ? $this->messagePayload($founder, $thread) : [],
+            'message_thread_id' => $thread?->id,
+            'unread_messages' => $thread?->admin_unread_count ?? 0,
         ]);
     }
 
@@ -368,5 +350,49 @@ class AdminFounderController extends Controller
         }
 
         return back()->with('success', 'Audit status updated and response processed successfully.');
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function documentPayload(Founder $founder): array
+    {
+        $founder->loadMissing('documents');
+
+        return $founder->documents->map(fn ($document) => [
+            'id' => $document->id,
+            'original_filename' => $document->original_filename,
+            'category' => $document->category,
+            'category_label' => $document->categoryLabel(),
+            'file_size' => $document->fileSizeForHumans(),
+            'reviewed' => $document->is_reviewed,
+            'analyst_note' => $document->analyst_note,
+            'created_at' => $document->created_at->format('d M Y'),
+        ])->values()->all();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function messagePayload(Founder $founder, MessageThread $thread): array
+    {
+        return $thread->messages()
+            ->visible()
+            ->oldest()
+            ->get()
+            ->map(fn ($message) => [
+                'id' => $message->id,
+                'sender_type' => $message->sender_type,
+                'sender_name' => $message->senderName($founder),
+                'body' => $message->body,
+                'has_attachment' => $message->has_attachment,
+                'attachment_filename' => $message->attachment_filename,
+                'attachment_size' => $message->has_attachment ? $message->attachmentSizeForHumans() : null,
+                'created_at' => $message->created_at->format('d M, H:i'),
+                'created_at_date' => $message->created_at->format('Y-m-d'),
+                'is_from_founder' => $message->isFromFounder(),
+            ])
+            ->values()
+            ->all();
     }
 }

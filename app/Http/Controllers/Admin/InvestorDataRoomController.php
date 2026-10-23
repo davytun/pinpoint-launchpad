@@ -44,33 +44,20 @@ class InvestorDataRoomController extends Controller
             });
         }
 
-        $allGrants = InvestorDataRoomGrant::all();
+        $grantTotals = InvestorDataRoomGrant::query()->selectRaw('
+            count(*) as total,
+            sum(case when revoked_at is null then 1 else 0 end) as active,
+            sum(case when revoked_at is not null then 1 else 0 end) as revoked,
+            count(distinct case when revoked_at is null then profile_id end) as unique_startups
+        ')->first();
         $totals = [
-            'total' => $allGrants->count(),
-            'active' => $allGrants->whereNull('revoked_at')->count(),
-            'revoked' => $allGrants->whereNotNull('revoked_at')->count(),
-            'unique_startups' => $allGrants->whereNull('revoked_at')->pluck('profile_id')->unique()->count(),
+            'total' => (int) $grantTotals->total,
+            'active' => (int) $grantTotals->active,
+            'revoked' => (int) $grantTotals->revoked,
+            'unique_startups' => (int) $grantTotals->unique_startups,
         ];
 
-        // Map ULID profile IDs to company names for readable audit trail
-        $profileIds = AuditLog::query()
-            ->where(function ($query) {
-                $query->where('event', 'like', 'investor.interest_%')
-                    ->orWhere('event', 'like', 'data_room.%');
-            })
-            ->pluck('metadata')
-            ->map(fn ($m) => is_array($m) ? ($m['profile_id'] ?? null) : null)
-            ->filter()
-            ->unique();
-
-        $profilesMap = FounderProfile::query()
-            ->whereIn('id', $profileIds)
-            ->with('founder:id,company_name')
-            ->get()
-            ->keyBy('id')
-            ->map(fn ($p) => $p->founder?->company_name ?? 'Startup Profile');
-
-        $auditEvents = AuditLog::query()
+        $auditLogs = AuditLog::query()
             ->with('actor')
             ->where(function ($query) {
                 $query->where('event', 'like', 'investor.interest_%')
@@ -78,7 +65,24 @@ class InvestorDataRoomController extends Controller
             })
             ->latest()
             ->limit(40)
-            ->get()
+            ->get();
+
+        $profileIds = $auditLogs
+            ->map(fn (AuditLog $log) => is_array($log->metadata) ? ($log->metadata['profile_id'] ?? null) : null)
+            ->filter()
+            ->unique()
+            ->values();
+
+        $profilesMap = $profileIds->isEmpty()
+            ? collect()
+            : FounderProfile::query()
+                ->whereIn('id', $profileIds)
+                ->with('founder:id,company_name')
+                ->get()
+                ->keyBy('id')
+                ->map(fn ($p) => $p->founder?->company_name ?? 'Startup Profile');
+
+        $auditEvents = $auditLogs
             ->map(function (AuditLog $log) use ($profilesMap) {
                 $profileId = is_array($log->metadata) ? ($log->metadata['profile_id'] ?? null) : null;
                 $companyName = $profileId && isset($profilesMap[$profileId]) ? $profilesMap[$profileId] : null;

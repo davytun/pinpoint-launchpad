@@ -44,7 +44,10 @@ class AdminMessageController extends Controller
         }
 
         if ($selectedThreadId) {
-            $activeThreadModel = MessageThread::with(['founder.diagnosticSession', 'founder.payment'])->find($selectedThreadId);
+            $activeThreadModel = MessageThread::with([
+                'founder.diagnosticSession:id,score',
+                'founder.payment:id,tier',
+            ])->find($selectedThreadId);
             if ($activeThreadModel && ! $user->canAccessFounder((string) $activeThreadModel->founder_id)) {
                 abort(403, 'You are not assigned to this founder.');
             }
@@ -52,7 +55,10 @@ class AdminMessageController extends Controller
 
         if (! $activeThreadModel && $threads->isNotEmpty()) {
             $firstId = $threads->first()['id'];
-            $activeThreadModel = MessageThread::with(['founder.diagnosticSession', 'founder.payment'])->find($firstId);
+            $activeThreadModel = MessageThread::with([
+                'founder.diagnosticSession:id,score',
+                'founder.payment:id,tier',
+            ])->find($firstId);
         }
 
         $activeThreadData = null;
@@ -101,7 +107,10 @@ class AdminMessageController extends Controller
         }
 
         $threads = $this->getThreadsData();
-        $thread->load(['founder.diagnosticSession', 'founder.payment']);
+        $thread->load([
+            'founder.diagnosticSession:id,score',
+            'founder.payment:id,tier',
+        ]);
         $founder = $thread->founder;
 
         $this->messageService->markThreadRead($thread, 'admin');
@@ -140,7 +149,13 @@ class AdminMessageController extends Controller
         $user = Auth::user();
 
         $query = MessageThread::with(['founder:id,full_name,company_name,email'])
-            ->withCount(['messages as total_messages']);
+            ->withCount(['messages as total_messages'])
+            ->addSelect(['last_preview_body' => Message::query()
+                ->select('body')
+                ->whereColumn('messages.thread_id', 'message_threads.id')
+                ->where('is_deleted', false)
+                ->latest()
+                ->limit(1)]);
 
         if ($user->isAnalyst()) {
             $query->whereIn('founder_id', $user->assignedFounderIds());
@@ -157,10 +172,7 @@ class AdminMessageController extends Controller
                 'unread_count' => $thread->admin_unread_count,
                 'total_messages' => $thread->total_messages,
                 'last_message_at' => $thread->last_message_at?->diffForHumans(),
-                'last_message_preview' => Str::limit(
-                    $thread->messages()->visible()->latest()->value('body') ?? 'Attachment',
-                    60
-                ),
+                'last_message_preview' => Str::limit($thread->last_preview_body ?: 'Attachment', 60),
             ]);
     }
 

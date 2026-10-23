@@ -122,8 +122,8 @@ test('analyst document and profile access is assignment-scoped', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('Admin/Profiles/Index')
-            ->has('profiles', 1)
-            ->where('profiles.0.id', $assignedProfile->id));
+            ->has('profiles.data', 1)
+            ->where('profiles.data.0.id', $assignedProfile->id));
 
     // Cross-founder document URL param mismatch
     $this->actingAs($analyst)

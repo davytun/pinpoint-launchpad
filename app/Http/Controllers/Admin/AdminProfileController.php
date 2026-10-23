@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DiagnosticSession;
 use App\Models\FounderProfile;
 use App\Models\VerificationBadge;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,40 +15,73 @@ use Inertia\Response;
 
 class AdminProfileController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $user = Auth::user();
+        $status = $request->string('status')->toString();
+        $search = trim($request->string('search')->toString());
 
-        $query = FounderProfile::with(['founder:id,full_name,company_name,email', 'spotlightEntry'])
-            ->withCount(['badges as verified_badges_count' => fn ($q) => $q->where('is_verified', true)]);
-
-        if ($user->isAnalyst()) {
-            $query->whereIn('founder_id', $user->assignedFounderIds());
+        if (! in_array($status, ['live', 'draft', 'expired'], true)) {
+            $status = 'all';
         }
 
-        $profiles = $query
+        $scoped = FounderProfile::query();
+
+        if ($user->isAnalyst()) {
+            $scoped->whereIn('founder_id', function ($sub) use ($user) {
+                $sub->select('founder_id')
+                    ->from('audit_assignments')
+                    ->where('analyst_id', $user->id);
+            });
+        }
+
+        $totals = [
+            'all' => (clone $scoped)->count(),
+            'live' => $this->applyProfileTab(clone $scoped, 'live')->count(),
+            'draft' => $this->applyProfileTab(clone $scoped, 'draft')->count(),
+            'expired' => $this->applyProfileTab(clone $scoped, 'expired')->count(),
+        ];
+
+        $list = $this->applyProfileTab(clone $scoped, $status);
+
+        if ($search !== '') {
+            $like = '%'.$search.'%';
+            $list->whereHas('founder', function ($founder) use ($like) {
+                $founder->where('company_name', 'like', $like)
+                    ->orWhere('full_name', 'like', $like)
+                    ->orWhere('email', 'like', $like);
+            });
+        }
+
+        $profiles = $list
+            ->with(['founder:id,full_name,company_name,email', 'spotlightEntry'])
+            ->withCount(['badges as verified_badges_count' => fn ($q) => $q->where('is_verified', true)])
             ->latest('verified_at')
-            ->get()
-            ->map(fn ($p) => [
-                'id' => $p->id,
-                'slug' => $p->slug,
-                'company_name' => $p->founder?->company_name,
-                'founder_name' => $p->founder?->full_name,
-                'founder_email' => $p->founder?->email,
-                'overall_score' => $p->overall_score,
-                'is_public' => $p->is_public,
-                'is_live' => $p->isLive(),
-                'is_published' => $p->spotlightEntry?->published_at !== null,
-                'is_expired' => $p->isExpired(),
-                'verified_badges_count' => $p->verified_badges_count,
-                'verified_at' => $p->verified_at?->format('d M Y'),
-                'expires_at' => $p->expires_at?->format('d M Y'),
-                'batch' => $p->batch,
-                'sector' => $p->sector,
+            ->paginate(20)
+            ->withQueryString()
+            ->through(fn (FounderProfile $profile) => [
+                'id' => $profile->id,
+                'slug' => $profile->slug,
+                'company_name' => $profile->founder?->company_name,
+                'founder_name' => $profile->founder?->full_name,
+                'founder_email' => $profile->founder?->email,
+                'overall_score' => $profile->overall_score,
+                'is_public' => $profile->is_public,
+                'is_live' => $profile->isLive(),
+                'is_published' => $profile->spotlightEntry?->published_at !== null,
+                'is_expired' => $profile->isExpired(),
+                'verified_badges_count' => $profile->verified_badges_count,
+                'verified_at' => $profile->verified_at?->format('d M Y'),
+                'expires_at' => $profile->expires_at?->format('d M Y'),
+                'batch' => $profile->batch,
+                'sector' => $profile->sector,
             ]);
 
         return Inertia::render('Admin/Profiles/Index', [
             'profiles' => $profiles,
+            'totals' => $totals,
+            'activeStatus' => $status,
+            'search' => $search,
         ]);
     }
 
@@ -66,7 +100,7 @@ class AdminProfileController extends Controller
         if ($profile->founder?->email) {
             $diagnosticSession = DiagnosticSession::byEmail($profile->founder->email)
                 ->latest('completed_at')
-                ->first();
+                ->first(['id', 'email', 'score', 'score_band', 'pillar_scores', 'completed_at']);
         }
 
         $radarData = $profile->radar_data;
@@ -159,6 +193,34 @@ class AdminProfileController extends Controller
         ]);
 
         return back()->with('success', 'Badge updated.');
+    }
+
+    private function applyProfileTab(Builder $query, string $status): Builder
+    {
+        if ($status === 'live') {
+            return $query->where('is_public', true)
+                ->whereNotNull('verified_at')
+                ->where(fn ($live) => $live->whereNull('expires_at')->orWhere('expires_at', '>', now()));
+        }
+
+        if ($status === 'expired') {
+            return $query->where('is_public', true)
+                ->whereNotNull('expires_at')
+                ->where('expires_at', '<=', now());
+        }
+
+        if ($status === 'draft') {
+            return $query->where(function ($draft) {
+                $draft->where('is_public', false)
+                    ->orWhere(function ($publicDraft) {
+                        $publicDraft->where('is_public', true)
+                            ->whereNull('verified_at')
+                            ->where(fn ($open) => $open->whereNull('expires_at')->orWhere('expires_at', '>', now()));
+                    });
+            });
+        }
+
+        return $query;
     }
 
     private function authorizeProfile(FounderProfile $profile): void

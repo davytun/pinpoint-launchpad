@@ -33,6 +33,7 @@ class PiaApplicationController extends Controller
             ->paginate(20);
 
         $diagnostics = DiagnosticSession::query()
+            ->select(['id', 'email', 'country', 'growth_stage', 'looking_to_raise', 'score', 'score_band'])
             ->whereIn('email', $applications->getCollection()->pluck('email')->filter()->unique()->all())
             ->latest('id')
             ->get()

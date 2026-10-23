@@ -77,22 +77,37 @@ class InvestorInterestController extends Controller
             });
         }
 
-        $allInterests = InvestorInterest::all();
+        $totalsRow = InvestorInterest::query()->selectRaw("
+            count(*) as all_count,
+            sum(case when status = 'pending' then 1 else 0 end) as pending,
+            sum(case when status = 'approved' then 1 else 0 end) as approved,
+            sum(case when status = 'denied' then 1 else 0 end) as denied,
+            sum(case when status = 'pending' and (founder_decision is null or founder_decision = 'pending') then 1 else 0 end) as awaiting_founder,
+            sum(case when status = 'pending' and founder_decision = 'approved' then 1 else 0 end) as founder_authorized,
+            sum(case when type = 'founder_call' and founder_decision = 'approved' and scheduled_at is null then 1 else 0 end) as awaiting_schedule,
+            sum(case when type = 'data_room_access' and founder_decision = 'approved' and status = 'pending' then 1 else 0 end) as awaiting_grant,
+            sum(case when type = 'data_room_access' then 1 else 0 end) as data_room_requests,
+            sum(case when type = 'founder_call' then 1 else 0 end) as founder_call_requests,
+            sum(case when type = 'more_details' then 1 else 0 end) as more_details_requests,
+            sum(case when type = 'founder_call' and scheduled_at is not null and completed_at is null then 1 else 0 end) as scheduled_calls,
+            sum(case when type = 'founder_call' and completed_at is not null then 1 else 0 end) as completed_calls,
+            sum(case when type = 'founder_call' and status = 'pending' then 1 else 0 end) as pending_introductions
+        ")->first();
         $totals = [
-            'all' => $allInterests->count(),
-            'pending' => $allInterests->where('status', 'pending')->count(),
-            'approved' => $allInterests->where('status', 'approved')->count(),
-            'denied' => $allInterests->where('status', 'denied')->count(),
-            'awaiting_founder' => $allInterests->where('status', 'pending')->filter(fn ($i) => $i->founder_decision === null || $i->founder_decision === 'pending')->count(),
-            'founder_authorized' => $allInterests->where('status', 'pending')->where('founder_decision', 'approved')->count(),
-            'awaiting_schedule' => $allInterests->where('type', 'founder_call')->where('founder_decision', 'approved')->whereNull('scheduled_at')->count(),
-            'awaiting_grant' => $allInterests->where('type', 'data_room_access')->where('founder_decision', 'approved')->where('status', 'pending')->count(),
-            'data_room_requests' => $allInterests->where('type', 'data_room_access')->count(),
-            'founder_call_requests' => $allInterests->where('type', 'founder_call')->count(),
-            'more_details_requests' => $allInterests->where('type', 'more_details')->count(),
-            'scheduled_calls' => $allInterests->where('type', 'founder_call')->whereNotNull('scheduled_at')->whereNull('completed_at')->count(),
-            'completed_calls' => $allInterests->where('type', 'founder_call')->whereNotNull('completed_at')->count(),
-            'pending_introductions' => $allInterests->where('type', 'founder_call')->where('status', 'pending')->count(),
+            'all' => (int) $totalsRow->all_count,
+            'pending' => (int) $totalsRow->pending,
+            'approved' => (int) $totalsRow->approved,
+            'denied' => (int) $totalsRow->denied,
+            'awaiting_founder' => (int) $totalsRow->awaiting_founder,
+            'founder_authorized' => (int) $totalsRow->founder_authorized,
+            'awaiting_schedule' => (int) $totalsRow->awaiting_schedule,
+            'awaiting_grant' => (int) $totalsRow->awaiting_grant,
+            'data_room_requests' => (int) $totalsRow->data_room_requests,
+            'founder_call_requests' => (int) $totalsRow->founder_call_requests,
+            'more_details_requests' => (int) $totalsRow->more_details_requests,
+            'scheduled_calls' => (int) $totalsRow->scheduled_calls,
+            'completed_calls' => (int) $totalsRow->completed_calls,
+            'pending_introductions' => (int) $totalsRow->pending_introductions,
         ];
 
         $sectors = FounderProfile::query()

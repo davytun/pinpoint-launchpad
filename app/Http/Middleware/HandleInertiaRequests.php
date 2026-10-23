@@ -41,19 +41,20 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        return array_merge(parent::share($request), [
+        $staff = Auth::guard('web')->user();
+        $founder = Auth::guard('founder')->user();
+        $investor = Auth::guard('investor')->user();
+        $founderProfile = $founder?->profile;
+
+        return [
             ...parent::share($request),
             'name' => config('app.name'),
             'seo' => Seo::forRequest($request),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
-                'founder' => Auth::guard('founder')->check()
-                    ? Auth::guard('founder')->user()->only(['id', 'email', 'full_name', 'company_name', 'avatar'])
-                    : null,
-                'investor' => Auth::guard('investor')->check()
-                    ? Auth::guard('investor')->user()->only(['id', 'email', 'account_status', 'kyc_status'])
-                    : null,
+                'user' => $staff,
+                'founder' => $founder?->only(['id', 'email', 'full_name', 'company_name', 'avatar']),
+                'investor' => $investor?->only(['id', 'email', 'account_status', 'kyc_status']),
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),
@@ -61,51 +62,32 @@ class HandleInertiaRequests extends Middleware
                 'info' => $request->session()->get('info'),
                 'agreement_url' => $request->session()->get('agreement_url'),
             ],
-            'admin_unread_messages' => ($admin = Auth::guard('web')->user())?->canAccessFounderAdmin()
-                ? $admin->adminUnreadMessagesCount()
+            'admin_unread_messages' => $staff?->canAccessFounderAdmin()
+                ? $staff->adminUnreadMessagesCount()
                 : null,
-            'unread_messages_count' => Auth::guard('founder')->check()
-                ? (int) (Auth::guard('founder')->user()->messageThread?->founder_unread_count ?? 0)
+            'unread_messages_count' => $founder
+                ? (int) ($founder->messageThread?->founder_unread_count ?? 0)
                 : null,
-            'founder_portal' => (function () {
-                if (! Auth::guard('founder')->check()) {
-                    return null;
-                }
-
-                $founder = Auth::guard('founder')->user();
-                $profile = $founder->profile;
-
-                return [
-                    'spotlight_ready' => $profile !== null,
-                    'pending_diligence_count' => $profile
-                        ? (int) $profile->diligenceRequests()->where('status', 'waiting_for_founder')->count()
-                        : 0,
-                ];
-            })(),
+            'founder_portal' => $founder ? [
+                'spotlight_ready' => $founderProfile !== null,
+                'pending_diligence_count' => $founderProfile
+                    ? (int) $founderProfile->diligenceRequests()->where('status', 'waiting_for_founder')->count()
+                    : 0,
+            ] : null,
             'platform_unread_notifications' => [
-                'admin' => Auth::guard('web')->check()
-                    ? (Auth::guard('web')->user()->unreadNotifications()->count() ?? 0)
-                    : 0,
-                'founder' => Auth::guard('founder')->check()
-                    ? (Auth::guard('founder')->user()->unreadNotifications()->count() ?? 0)
-                    : 0,
-                'investor' => Auth::guard('investor')->check()
-                    ? (Auth::guard('investor')->user()->unreadNotifications()->count() ?? 0)
-                    : 0,
+                'admin' => $staff ? (int) $staff->unreadNotifications()->count() : 0,
+                'founder' => $founder ? (int) $founder->unreadNotifications()->count() : 0,
+                'investor' => $investor ? (int) $investor->unreadNotifications()->count() : 0,
             ],
             'platform_recent_notifications' => [
-                'founder' => Auth::guard('founder')->check()
-                    ? NotificationPresenter::collection(
-                        Auth::guard('founder')->user()->notifications()->latest()->take(5)->get()
-                    )
+                'founder' => $founder
+                    ? NotificationPresenter::collection($founder->notifications()->latest()->take(5)->get())
                     : [],
-                'investor' => Auth::guard('investor')->check()
-                    ? NotificationPresenter::collection(
-                        Auth::guard('investor')->user()->notifications()->latest()->take(5)->get()
-                    )
+                'investor' => $investor
+                    ? NotificationPresenter::collection($investor->notifications()->latest()->take(5)->get())
                     : [],
             ],
             'csrf_token' => csrf_token(),
-        ]);
+        ];
     }
 }

@@ -1,6 +1,6 @@
 import { Icon } from '@iconify/react';
-import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
@@ -24,8 +24,32 @@ interface ProfileRow {
     sector: string | null;
 }
 
+interface PageLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginatedProfiles {
+    data: ProfileRow[];
+    from: number | null;
+    to: number | null;
+    total: number;
+    links: PageLink[];
+}
+
+interface ProfileTotals {
+    all: number;
+    live: number;
+    draft: number;
+    expired: number;
+}
+
 interface PageProps {
-    profiles: ProfileRow[];
+    profiles: PaginatedProfiles;
+    totals: ProfileTotals;
+    activeStatus: 'all' | 'live' | 'draft' | 'expired';
+    search: string;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -72,32 +96,39 @@ function StatusBadge({ row }: { row: ProfileRow }) {
 
 // ─── Main Page (Mercury Layout) ───────────────────────────────────────────────
 
-export default function AdminProfilesIndex({ profiles }: PageProps) {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [activeTab, setActiveTab] = useState<'all' | 'live' | 'draft' | 'expired'>('all');
+export default function AdminProfilesIndex({ profiles, totals, activeStatus, search }: PageProps) {
+    const [searchQuery, setSearchQuery] = useState(search);
 
-    // Filter Logic
-    const filteredProfiles = profiles.filter((p) => {
-        const matchesSearch =
-            !searchQuery.trim() ||
-            (p.company_name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
-            (p.founder_name?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
-            p.founder_email.toLowerCase().includes(searchQuery.toLowerCase());
+    useEffect(() => {
+        setSearchQuery(search);
+    }, [search]);
 
-        let matchesTab = true;
-        const isDraft = !p.is_public || (!p.is_live && !p.is_expired);
-        if (activeTab === 'live') matchesTab = p.is_live && !isDraft;
-        else if (activeTab === 'draft') matchesTab = isDraft;
-        else if (activeTab === 'expired') matchesTab = p.is_expired && !isDraft;
+    useEffect(() => {
+        if (searchQuery === search) return;
+        const timer = setTimeout(() => {
+            router.get(
+                route('admin.profiles.index'),
+                {
+                    ...(activeStatus !== 'all' ? { status: activeStatus } : {}),
+                    ...(searchQuery.trim() ? { search: searchQuery.trim() } : {}),
+                },
+                { preserveState: true, preserveScroll: true, replace: true },
+            );
+        }, 300);
 
-        return matchesSearch && matchesTab;
-    });
+        return () => clearTimeout(timer);
+    }, [searchQuery, search, activeStatus]);
 
-    // Metric Totals
-    const totalCount = profiles.length;
-    const liveCount = profiles.filter((p) => p.is_live && p.is_public).length;
-    const draftCount = profiles.filter((p) => !p.is_public || (!p.is_live && !p.is_expired)).length;
-    const expiredCount = profiles.filter((p) => p.is_expired && p.is_public).length;
+    function openTab(tab: 'all' | 'live' | 'draft' | 'expired') {
+        router.get(
+            route('admin.profiles.index'),
+            {
+                ...(tab !== 'all' ? { status: tab } : {}),
+                ...(searchQuery.trim() ? { search: searchQuery.trim() } : {}),
+            },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    }
 
     return (
         <AdminLayout>
@@ -127,16 +158,16 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                     <div className="px-6 py-3">
                         <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Total Profiles</span>
                         <div className="mt-0.5 flex items-baseline gap-2">
-                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{totalCount}</span>
+                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{totals.all}</span>
                         </div>
                     </div>
 
                     <div className="px-6 py-3">
                         <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Live & Public</span>
                         <div className="mt-0.5 flex items-baseline gap-2">
-                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{liveCount}</span>
-                            {pct(liveCount, totalCount) && (
-                                <span className="text-[11px] font-medium text-emerald-600">{pct(liveCount, totalCount)}</span>
+                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{totals.live}</span>
+                            {pct(totals.live, totals.all) && (
+                                <span className="text-[11px] font-medium text-emerald-600">{pct(totals.live, totals.all)}</span>
                             )}
                         </div>
                     </div>
@@ -144,9 +175,9 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                     <div className="px-6 py-3">
                         <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Draft Status</span>
                         <div className="mt-0.5 flex items-baseline gap-2">
-                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{draftCount}</span>
-                            {pct(draftCount, totalCount) && (
-                                <span className="text-[11px] font-medium text-zinc-400">{pct(draftCount, totalCount)}</span>
+                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{totals.draft}</span>
+                            {pct(totals.draft, totals.all) && (
+                                <span className="text-[11px] font-medium text-zinc-400">{pct(totals.draft, totals.all)}</span>
                             )}
                         </div>
                     </div>
@@ -154,9 +185,9 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                     <div className="px-6 py-3">
                         <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">Expired</span>
                         <div className="mt-0.5 flex items-baseline gap-2">
-                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{expiredCount}</span>
-                            {pct(expiredCount, totalCount) && (
-                                <span className="text-[11px] font-medium text-amber-600">{pct(expiredCount, totalCount)}</span>
+                            <span className="text-[17px] font-bold text-zinc-950 tabular-nums">{totals.expired}</span>
+                            {pct(totals.expired, totals.all) && (
+                                <span className="text-[11px] font-medium text-amber-600">{pct(totals.expired, totals.all)}</span>
                             )}
                         </div>
                     </div>
@@ -174,11 +205,11 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                                 { key: 'expired', label: 'Expired' },
                             ] as const
                         ).map(({ key, label }) => {
-                            const isSelected = activeTab === key;
+                            const isSelected = activeStatus === key;
                             return (
                                 <button
                                     key={key}
-                                    onClick={() => setActiveTab(key)}
+                                    onClick={() => openTab(key)}
                                     className={cn(
                                         'flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-all duration-150',
                                         isSelected ? 'bg-white font-bold text-zinc-950 shadow-2xs' : 'text-zinc-500 hover:text-zinc-900',
@@ -216,7 +247,7 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
 
                 {/* ── Table Container (Independently Scrollable) ──────────────── */}
                 <div className="min-h-0 flex-1 overflow-auto">
-                    {filteredProfiles.length === 0 ? (
+                    {profiles.data.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
                             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-400">
                                 <Icon icon="solar:users-group-two-rounded-linear" className="size-6" />
@@ -245,7 +276,7 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-100 bg-white">
-                                {filteredProfiles.map((profile) => (
+                                {profiles.data.map((profile) => (
                                     <tr key={profile.id} className="group transition-colors duration-150 hover:bg-[#F9F9FB]">
                                         {/* Company & Founder (Soft Avatar) */}
                                         <td className="px-5 py-3.5">
@@ -334,6 +365,32 @@ export default function AdminProfilesIndex({ profiles }: PageProps) {
                                 ))}
                             </tbody>
                         </table>
+                    )}
+                </div>
+                <div className="flex shrink-0 items-center justify-between border-t border-zinc-100 px-6 py-3 text-xs text-zinc-400">
+                    <p>
+                        Showing {profiles.from ?? 0} to {profiles.to ?? 0} of {profiles.total} profiles
+                    </p>
+                    {profiles.links.length > 3 && (
+                        <div className="flex items-center gap-1">
+                            {profiles.links.map((link, i) => (
+                                <button
+                                    key={i}
+                                    type="button"
+                                    onClick={() => link.url && router.get(link.url, {}, { preserveScroll: true, preserveState: true })}
+                                    disabled={!link.url}
+                                    className={cn(
+                                        'rounded-md px-2 py-1 text-xs font-medium',
+                                        link.active
+                                            ? 'bg-zinc-950 font-bold text-white'
+                                            : link.url
+                                              ? 'text-zinc-600 hover:bg-zinc-100'
+                                              : 'cursor-not-allowed text-zinc-300',
+                                    )}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                />
+                            ))}
+                        </div>
                     )}
                 </div>
             </div>

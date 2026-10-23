@@ -53,8 +53,22 @@ interface Totals {
     needs_review: number;
 }
 
+interface PageLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+interface PaginatedProfiles {
+    data: SpotlightProfile[];
+    from: number | null;
+    to: number | null;
+    total: number;
+    links: PageLink[];
+}
+
 interface PageProps {
-    profiles: SpotlightProfile[];
+    profiles: PaginatedProfiles;
     activeStatus: 'all' | 'published' | 'ready' | 'needs_review';
     activeSector: string;
     search: string;
@@ -512,7 +526,7 @@ export default function SpotlightIndex({ profiles, activeStatus, activeSector, s
     // Synchronize activeDrawerProfile with latest Inertia page props
     useEffect(() => {
         if (activeDrawerProfile) {
-            const updated = profiles.find((p) => p.id === activeDrawerProfile.id);
+            const updated = profiles.data.find((p) => p.id === activeDrawerProfile.id);
             if (updated) {
                 setActiveDrawerProfile(updated);
             }
@@ -721,12 +735,12 @@ export default function SpotlightIndex({ profiles, activeStatus, activeSector, s
 
                     {/* Scrollable Rows */}
                     <div className="no-scrollbar min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
-                        {profiles.length === 0 ? (
+                        {profiles.data.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
                                 <p className="text-xs text-zinc-400">No spotlight startups found matching this filter.</p>
                             </div>
                         ) : (
-                            profiles.map((p) => (
+                            profiles.data.map((p) => (
                                 <div
                                     key={p.id}
                                     onClick={() => setActiveDrawerProfile(p)}
@@ -815,9 +829,34 @@ export default function SpotlightIndex({ profiles, activeStatus, activeSector, s
                     </div>
 
                     {/* Footer */}
-                    <div className="flex shrink-0 items-center justify-between border-t border-zinc-100 pt-3 text-xs text-zinc-400">
-                        <p>Showing {profiles.length} startups</p>
-                        <p className="font-medium text-zinc-600">{totals?.published ?? 0} live on Investor Portal</p>
+                    <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-3 text-xs text-zinc-400">
+                        <p>
+                            Showing {profiles.from ?? 0} to {profiles.to ?? 0} of {profiles.total} startups
+                        </p>
+                        <div className="flex items-center gap-4">
+                            <p className="font-medium text-zinc-600">{totals?.published ?? 0} live on Investor Portal</p>
+                            {profiles.links.length > 3 && (
+                                <div className="flex items-center gap-1">
+                                    {profiles.links.map((link, i) => (
+                                        <button
+                                            key={i}
+                                            type="button"
+                                            onClick={() => link.url && router.get(link.url, {}, { preserveScroll: true, preserveState: true })}
+                                            disabled={!link.url}
+                                            className={cn(
+                                                'rounded-md px-2 py-1 text-xs font-medium',
+                                                link.active
+                                                    ? 'bg-zinc-950 font-bold text-white'
+                                                    : link.url
+                                                      ? 'text-zinc-600 hover:bg-zinc-100'
+                                                      : 'cursor-not-allowed text-zinc-300',
+                                            )}
+                                            dangerouslySetInnerHTML={{ __html: link.label }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 

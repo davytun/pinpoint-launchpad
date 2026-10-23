@@ -152,6 +152,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::patch('/assessments/{application}/scope-sent', [AssessmentApplicationController::class, 'markScopeSent'])->name('founder.assessments.scope-sent');
 
             Route::get('/founders', [AdminFounderController::class, 'index'])->name('founders.index');
+            Route::get('/founders/{founder}/panel', [AdminFounderController::class, 'panel'])->name('founders.panel');
             Route::get('/founders/{founder}', [AdminFounderController::class, 'show'])->name('founders.show');
             Route::post('/founders/{founder}/assign', [AdminFounderController::class, 'assign'])->middleware('require.role:superadmin')->name('founders.assign');
             Route::patch('/founders/{founder}/audit-status', [AdminFounderController::class, 'updateAuditStatus'])->name('founders.audit-status');

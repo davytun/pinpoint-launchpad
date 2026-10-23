@@ -218,6 +218,58 @@ function FounderAuditDrawer({
     const [pendingStatusChange, setPendingStatusChange] = useState<string | null>(null);
     const [statusResponseNote, setStatusResponseNote] = useState('');
     const [notifyFounderViaMessage, setNotifyFounderViaMessage] = useState(true);
+    const [panel, setPanel] = useState<{
+        documents: DocumentItem[];
+        messages: MessageItem[];
+        message_thread_id: number | null;
+        unread_messages: number;
+    } | null>(null);
+    const [panelLoading, setPanelLoading] = useState(true);
+    const [panelVersion, setPanelVersion] = useState(0);
+
+    useEffect(() => {
+        let cancelled = false;
+        setPanelLoading(true);
+
+        fetch(route('admin.founders.panel', { founder: founder.id }), {
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin',
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Unable to load founder details.');
+                }
+
+                return response.json();
+            })
+            .then((data) => {
+                if (!cancelled) {
+                    setPanel(data);
+                }
+            })
+            .catch(() => {
+                if (!cancelled) {
+                    setPanel({
+                        documents: [],
+                        messages: [],
+                        message_thread_id: founder.message_thread_id ?? null,
+                        unread_messages: founder.unread_messages ?? 0,
+                    });
+                }
+            })
+            .finally(() => {
+                if (!cancelled) {
+                    setPanelLoading(false);
+                }
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [founder.id, founder.message_thread_id, founder.unread_messages, panelVersion]);
 
     // Quick chat form state
     const [replyBody, setReplyBody] = useState('');
@@ -226,8 +278,9 @@ function FounderAuditDrawer({
 
     const founderName = founder.full_name ?? founder.email;
     const companyName = founder.company_name ?? 'Startup';
-    const docs = founder.documents ?? [];
-    const msgs = founder.messages ?? [];
+    const docs = panel?.documents ?? [];
+    const msgs = panel?.messages ?? [];
+    const threadId = panel?.message_thread_id ?? founder.message_thread_id;
 
     function promptStatusChange(newStatus: string) {
         if (newStatus === 'needs_info' || newStatus === 'complete' || newStatus === 'on_hold') {
@@ -296,7 +349,7 @@ function FounderAuditDrawer({
     function handleSendReply(e: React.FormEvent) {
         e.preventDefault();
         if (!replyBody.trim() && !replyAttachment) return;
-        if (!founder.message_thread_id) {
+        if (!threadId) {
             router.get(`/admin/founder/messages?founder_id=${founder.id}`);
             return;
         }
@@ -308,11 +361,12 @@ function FounderAuditDrawer({
             data.append('attachment', replyAttachment);
         }
 
-        router.post(route('admin.messages.reply', { thread: founder.message_thread_id }), data, {
+        router.post(route('admin.messages.reply', { thread: threadId }), data, {
             preserveScroll: true,
             onSuccess: () => {
                 setReplyBody('');
                 setReplyAttachment(null);
+                setPanelVersion((version) => version + 1);
             },
             onFinish: () => setSendingReply(false),
         });
@@ -322,8 +376,16 @@ function FounderAuditDrawer({
         router.patch(route('admin.documents.reviewed', { founder: founder.id, document: docId }), {}, {
             preserveScroll: true,
             onSuccess: () => {
-                const updatedDocs = docs.map((d) => (d.id === docId ? { ...d, reviewed: !d.reviewed } : d));
-                onUpdateFounder({ ...founder, documents: updatedDocs });
+                setPanel((current) =>
+                    current
+                        ? {
+                              ...current,
+                              documents: current.documents.map((document) =>
+                                  document.id === docId ? { ...document, reviewed: !document.reviewed } : document,
+                              ),
+                          }
+                        : current,
+                );
             },
         });
     }
@@ -672,7 +734,9 @@ function FounderAuditDrawer({
                                 <span className="text-[11px] text-zinc-400">Click status to verify</span>
                             </div>
 
-                            {docs.length === 0 ? (
+                            {panelLoading ? (
+                                <p className="py-12 text-center text-xs text-zinc-400">Loading documents…</p>
+                            ) : docs.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-center text-zinc-400">
                                     <Icon icon="solar:document-text-linear" className="mb-2 size-8 text-zinc-300" />
                                     <p className="text-xs">No documents uploaded yet by this founder.</p>
@@ -748,7 +812,9 @@ function FounderAuditDrawer({
 
                             {/* Message Stream */}
                             <div className="max-h-[340px] space-y-3 overflow-y-auto pr-1">
-                                {msgs.length === 0 ? (
+                                {panelLoading ? (
+                                    <p className="py-12 text-center text-xs text-zinc-400">Loading messages…</p>
+                                ) : msgs.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-12 text-center text-zinc-400">
                                         <Icon icon="solar:chat-round-dots-linear" className="mb-2 size-8 text-zinc-300" />
                                         <p className="text-xs">No direct messages yet. Send a note below to start the conversation.</p>

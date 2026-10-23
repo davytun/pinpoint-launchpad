@@ -192,7 +192,9 @@ class BoldSignService
             ]);
 
             if ($response->successful()) {
-                $path = 'signatures/piw_'.$documentId.'.pdf';
+                // Provider document IDs are external input. A digest keeps the
+                // storage filename deterministic without allowing path segments.
+                $path = 'signatures/piw_'.hash('sha256', $documentId).'.pdf';
                 Storage::disk('local')->put($path, $response->body());
 
                 return $path;

@@ -62,7 +62,8 @@ interface PageProps {
         paystack_reference: string;
     } | null;
     signature: { id: number; status: string; signed_at: string | null; signer_name: string | null } | null;
-    documents: DocumentItem[];
+    documents?: DocumentItem[];
+    documents_count: number;
     message_thread: { id: number; total_messages: number; unread_count: number } | null;
     thread_messages?: MessageItem[];
     profile: { id: string; is_live: boolean; is_public: boolean; is_published: boolean; slug: string } | null;
@@ -144,9 +145,10 @@ export default function AdminFoundersShow({
     founder,
     payment,
     signature,
-    documents = [],
+    documents,
+    documents_count,
     message_thread,
-    thread_messages = [],
+    thread_messages,
     profile,
     assignment,
     analysts = [],
@@ -156,6 +158,7 @@ export default function AdminFoundersShow({
     const isSuperAdmin = user_role === 'superadmin';
     const isAnalyst = user_role === 'analyst';
     const canEdit = isSuperAdmin || isAnalyst;
+    const documentCount = documents ? documents.length : documents_count;
 
     const [activeTab, setActiveTab] = useState('Overview');
     const [showAssign, setShowAssign] = useState(false);
@@ -310,7 +313,7 @@ export default function AdminFoundersShow({
                                 <span>{tab.label}</span>
                                 {tab.id === 'Documents' && (
                                     <span className="rounded-full bg-zinc-200/80 px-1.5 py-0.2 text-[10px] font-bold text-zinc-700">
-                                        {documents.length}
+                                        {documentCount}
                                     </span>
                                 )}
                                 {tab.id === 'Messages' && message_thread && message_thread.unread_count > 0 && (
@@ -533,7 +536,9 @@ export default function AdminFoundersShow({
                     {/* ── TAB 2: Documents Review ── */}
                     {activeTab === 'Documents' && (
                         <div className="overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-2xs">
-                            {documents.length === 0 ? (
+                            {documents === undefined ? (
+                                <div className="py-16 text-center text-xs text-zinc-400">Loading documents…</div>
+                            ) : documents.length === 0 ? (
                                 <div className="py-16 text-center text-xs text-zinc-400">
                                     <Icon icon="solar:document-text-linear" className="mx-auto mb-2 size-8 text-zinc-300" />
                                     No audit documents uploaded yet by this founder.
@@ -623,7 +628,11 @@ export default function AdminFoundersShow({
 
                             {/* Message Bubbles Body */}
                             <div className="no-scrollbar min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
-                                {thread_messages.length === 0 ? (
+                                {thread_messages === undefined ? (
+                                    <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-400">
+                                        <p className="text-xs">Loading messages…</p>
+                                    </div>
+                                ) : thread_messages.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-16 text-center text-zinc-400">
                                         <Icon icon="solar:chat-round-dots-linear" className="mb-2 size-8 text-zinc-300" />
                                         <p className="text-xs">No messages yet. Send an audit directive or note to start the conversation.</p>
@@ -924,12 +933,12 @@ export default function AdminFoundersShow({
                                                 <div className="flex items-center justify-between rounded-xl border border-zinc-100 bg-[#FAFBFD] p-3 text-xs">
                                                     <div className="flex items-center gap-2.5">
                                                         <Icon
-                                                            icon={documents.length > 0 ? 'solar:check-circle-bold' : 'solar:clock-circle-linear'}
-                                                            className={cn('size-4', documents.length > 0 ? 'text-emerald-600' : 'text-zinc-400')}
+                                                            icon={documentCount > 0 ? 'solar:check-circle-bold' : 'solar:clock-circle-linear'}
+                                                            className={cn('size-4', documentCount > 0 ? 'text-emerald-600' : 'text-zinc-400')}
                                                         />
                                                         <span className="font-semibold text-zinc-900">Audit Documents Submitted</span>
                                                     </div>
-                                                    <span className="font-mono text-[11px] font-bold text-zinc-900">{documents.length} Files</span>
+                                                    <span className="font-mono text-[11px] font-bold text-zinc-900">{documentCount} Files</span>
                                                 </div>
                                             </div>
                                         </div>

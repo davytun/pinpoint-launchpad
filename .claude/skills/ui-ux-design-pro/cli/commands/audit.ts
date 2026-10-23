@@ -199,7 +199,7 @@ async function auditFile(filepath: string): Promise<Finding[]> {
     }
     return findings;
   } catch (err) {
-    console.warn(chalk.yellow(`Could not read file ${filepath}:`), err);
+    console.warn(chalk.yellow('Could not read file:'), filepath, err);
     return [];
   }
 }

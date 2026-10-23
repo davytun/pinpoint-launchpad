@@ -23,10 +23,11 @@ class DocumentService
         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         'image/jpeg',
         'image/png',
+        'image/webp',
     ];
 
     private const ALLOWED_EXTENSIONS = [
-        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'jpg', 'jpeg', 'png',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'ppt', 'pptx', 'jpg', 'jpeg', 'png', 'webp',
     ];
 
     private const MAX_SIZE = 104857600; // 100MB
@@ -48,7 +49,7 @@ class DocumentService
 
         if ($file->getSize() > self::MAX_SIZE) {
             throw ValidationException::withMessages([
-                'file' => 'File size must not exceed 10MB.',
+                'file' => 'File size must not exceed 100MB.',
             ]);
         }
     }

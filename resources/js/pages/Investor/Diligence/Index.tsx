@@ -81,10 +81,10 @@ function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
     }
 
     const field =
-        'mt-1.5 w-full border border-zinc-200 bg-white px-3 py-2.5 text-[14px] text-zinc-900 focus:border-zinc-500 focus:ring-2 focus:ring-zinc-200 focus:outline-none';
+        'mt-1.5 min-h-11 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-[14px] text-zinc-900 transition-colors focus:border-[#3A54A5] focus:ring-2 focus:ring-[#3A54A5]/15 focus:outline-none';
 
     return (
-        <form onSubmit={submit} className="mb-10 border-b border-zinc-200 pb-10">
+        <form onSubmit={submit} className="mb-10 border-y border-zinc-200 py-7 sm:px-1">
             <h2 className="text-[15px] font-semibold text-zinc-950">New inquiry</h2>
             <p className="mt-1 text-[13px] text-zinc-500">After a completed founder call. Pinpoint coordinates the answer.</p>
 
@@ -128,7 +128,11 @@ function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
                     placeholder="e.g. Clarification on Q3 gross margins"
                     required
                 />
-                {form.errors.subject && <p className="mt-1 text-[12px] text-rose-600">{form.errors.subject}</p>}
+                {form.errors.subject && (
+                    <p role="alert" className="mt-1 text-[12px] text-rose-600">
+                        {form.errors.subject}
+                    </p>
+                )}
             </label>
 
             <label className="mt-4 block text-[13px] font-medium text-zinc-700">
@@ -143,11 +147,13 @@ function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
                     required
                 />
                 {form.errors.request_details && (
-                    <p className="mt-1 text-[12px] text-rose-600">{form.errors.request_details}</p>
+                    <p role="alert" className="mt-1 text-[12px] text-rose-600">
+                        {form.errors.request_details}
+                    </p>
                 )}
             </label>
 
-            <label className="mt-4 flex items-center gap-2 text-[13px] text-zinc-700">
+            <label className="mt-4 flex min-h-11 items-center gap-2 text-[13px] text-zinc-700">
                 <input
                     type="checkbox"
                     checked={form.data.data_room_required}
@@ -160,7 +166,7 @@ function DiligenceSubmitForm({ profiles }: { profiles: EligibleProfile[] }) {
             <button
                 type="submit"
                 disabled={form.processing || !slug}
-                className="mt-5 inline-flex min-h-10 items-center rounded-lg bg-[#3A54A5] px-4 text-[13px] font-semibold text-white hover:bg-[#2D4182] disabled:opacity-50"
+                className="mt-5 inline-flex min-h-11 items-center rounded-lg bg-[#3A54A5] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#2D4182] focus-visible:ring-2 focus-visible:ring-[#3A54A5] focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
                 {form.processing ? 'Submitting…' : 'Submit inquiry'}
             </button>
@@ -181,15 +187,17 @@ export default function DiligenceIndex({
             <InvestorHeader activeTab="diligence" />
 
             <section className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-                <header className="mb-6">
+                <header className="mb-8 border-b border-zinc-200 pb-6">
                     <h1 className="font-display text-[1.75rem] font-bold tracking-tight text-zinc-950">Diligence</h1>
-                    <p className="mt-1 text-[14px] text-zinc-500">Post-call inquiries mediated by Pinpoint.</p>
+                    <p className="mt-1 max-w-xl text-[14px] leading-relaxed text-zinc-500">
+                        Post-call inquiries are coordinated by Pinpoint, keeping founder and investor conversations appropriately separate.
+                    </p>
                 </header>
 
                 <DiligenceSubmitForm profiles={eligible_profiles} />
 
                 {diligence_requests.length === 0 ? (
-                    <div className="border-t border-zinc-200 pt-8">
+                    <div className="pb-8 text-center">
                         <p className="text-[15px] text-zinc-600">No inquiries yet.</p>
                         <p className="mt-1.5 max-w-md text-[13px] leading-relaxed text-zinc-500">
                             {eligible_profiles.length > 0
@@ -215,9 +223,7 @@ export default function DiligenceIndex({
                             return (
                                 <li key={req.id} className="py-4">
                                     <div className="flex items-baseline justify-between gap-3">
-                                        <h2 className="min-w-0 truncate text-[15px] font-semibold text-zinc-950">
-                                            {req.subject}
-                                        </h2>
+                                        <h2 className="min-w-0 truncate text-[15px] font-semibold text-zinc-950">{req.subject}</h2>
                                         <span
                                             className={cn(
                                                 'shrink-0 text-[12px] font-semibold',
@@ -239,12 +245,10 @@ export default function DiligenceIndex({
                                         {req.data_room_required ? ' · Needs data room' : ''}
                                     </p>
 
-                                    <p className="mt-2 text-[13px] leading-snug whitespace-pre-wrap text-zinc-600">
-                                        {req.request_details}
-                                    </p>
+                                    <p className="mt-2 text-[13px] leading-snug whitespace-pre-wrap text-zinc-600">{req.request_details}</p>
 
                                     {req.investor_visible_response && (
-                                        <div className="mt-3 border-l-2 border-emerald-500 pl-3">
+                                        <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-3">
                                             <p className="text-[12px] font-semibold text-emerald-800">Pinpoint response</p>
                                             <p className="mt-1 text-[13px] leading-relaxed whitespace-pre-wrap text-zinc-700">
                                                 {req.investor_visible_response}

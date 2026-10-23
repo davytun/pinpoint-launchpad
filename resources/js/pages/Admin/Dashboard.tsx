@@ -53,6 +53,7 @@ interface SystemAlert {
 
 interface Metrics {
     my_open_messages?: number;
+    unassigned_founder_messages?: number;
     total_founders?: number;
     active_audits?: number;
     pending_audits?: number;
@@ -486,6 +487,10 @@ function FounderDeskHome({
         unread_messages: {
             title: 'Unread messages',
             description: 'Founders are waiting for a reply.',
+        },
+        unassigned_founder_messages: {
+            title: 'Unassigned founder messages',
+            description: 'Assign an owner before responding.',
         },
         pending_audits: {
             title: 'Ready to start',

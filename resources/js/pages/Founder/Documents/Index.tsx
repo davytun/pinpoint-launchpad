@@ -203,7 +203,7 @@ export default function FounderDocuments({
                                 type="file"
                                 multiple
                                 className="hidden"
-                                accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.jpg,.jpeg,.png"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.jpg,.jpeg,.png,.webp"
                                 onChange={(e) => {
                                     addFiles(e.target.files);
                                     e.target.value = '';
@@ -236,7 +236,7 @@ export default function FounderDocuments({
                                 >
                                     <Icon icon="solar:cloud-upload-linear" className="mb-2 size-6 text-zinc-400" />
                                     <p className="text-[14px] font-semibold text-zinc-950">Drop files or browse</p>
-                                    <p className="mt-1 text-[12px] text-zinc-500">PDF, DOCX, XLSX, images · 100MB max</p>
+                                    <p className="mt-1 text-[12px] text-zinc-500">PDF, Office files, JPG, PNG or WEBP · 100MB max</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3">

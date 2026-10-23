@@ -25,7 +25,10 @@ class AdminMessageController extends Controller
     public function inbox(Request $request): Response
     {
         $user = Auth::user();
-        $threads = $this->getThreadsData();
+        $unassignedOnly = $request->boolean('unassigned');
+        abort_if($unassignedOnly && ! $user->isSuperAdmin(), 403, 'Only superadmins can triage unassigned founder messages.');
+
+        $threads = $this->getThreadsData($unassignedOnly);
         $selectedThreadId = $request->query('thread');
         $founderId = $request->query('founder_id');
 
@@ -39,7 +42,7 @@ class AdminMessageController extends Controller
             if ($targetFounder) {
                 $thread = $this->messageService->getOrCreateThread($targetFounder);
                 $selectedThreadId = $thread->id;
-                $threads = $this->getThreadsData();
+                $threads = $this->getThreadsData($unassignedOnly);
             }
         }
 
@@ -95,6 +98,7 @@ class AdminMessageController extends Controller
             'messages' => $messagesData,
             'founder' => $founderData,
             'total_unread' => $user->adminUnreadMessagesCount(),
+            'showing_unassigned' => $unassignedOnly,
         ]);
     }
 
@@ -141,14 +145,15 @@ class AdminMessageController extends Controller
             'messages' => $messagesData,
             'founder' => $founderData,
             'total_unread' => $user->adminUnreadMessagesCount(),
+            'showing_unassigned' => false,
         ]);
     }
 
-    private function getThreadsData()
+    private function getThreadsData(bool $unassignedOnly = false)
     {
         $user = Auth::user();
 
-        $query = MessageThread::with(['founder:id,full_name,company_name,email'])
+        $query = MessageThread::with(['founder:id,full_name,company_name,email', 'founder.auditAssignment:founder_id,analyst_id'])
             ->withCount(['messages as total_messages'])
             ->addSelect(['last_preview_body' => Message::query()
                 ->select('body')
@@ -159,6 +164,10 @@ class AdminMessageController extends Controller
 
         if ($user->isAnalyst()) {
             $query->whereIn('founder_id', $user->assignedFounderIds());
+        }
+
+        if ($unassignedOnly) {
+            $query->whereDoesntHave('founder.auditAssignment');
         }
 
         return $query
@@ -173,6 +182,7 @@ class AdminMessageController extends Controller
                 'total_messages' => $thread->total_messages,
                 'last_message_at' => $thread->last_message_at?->diffForHumans(),
                 'last_message_preview' => Str::limit($thread->last_preview_body ?: 'Attachment', 60),
+                'is_unassigned' => $thread->founder?->auditAssignment === null,
             ]);
     }
 

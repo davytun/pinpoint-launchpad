@@ -56,6 +56,13 @@ class AdminDashboardController extends Controller
         if ($showFounder) {
             $metrics['my_open_messages'] = $user->adminUnreadMessagesCount();
 
+            if ($user->isSuperAdmin()) {
+                $metrics['unassigned_founder_messages'] = MessageThread::query()
+                    ->where('admin_unread_count', '>', 0)
+                    ->whereDoesntHave('founder.auditAssignment')
+                    ->count();
+            }
+
             if ($user->canManageAudit()) {
                 if ($user->isSuperAdmin()) {
                     $metrics['total_founders'] = Founder::when($startDate, fn ($q) => $q->where('created_at', '>=', $startDate))->count();
@@ -258,6 +265,18 @@ class AdminDashboardController extends Controller
         }
 
         if ($showFounder && $user->canManageAudit()) {
+            if ($user->isSuperAdmin() && ($metrics['unassigned_founder_messages'] ?? 0) > 0) {
+                $needsAttention[] = [
+                    'id' => 'unassigned_founder_messages',
+                    'title' => 'Unassigned founder messages',
+                    'description' => 'Assign an analyst before responding so the founder has a clear owner.',
+                    'count' => $metrics['unassigned_founder_messages'],
+                    'action_url' => '/admin/founder/messages?unassigned=1',
+                    'icon' => 'solar:user-plus-bold-duotone',
+                    'color' => 'amber',
+                ];
+            }
+
             $pendingAuditsCount = Payment::where('audit_status', 'pending')->count();
             if ($pendingAuditsCount > 0) {
                 $needsAttention[] = [

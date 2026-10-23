@@ -655,11 +655,13 @@ function FounderAuditDrawer({
                                             onChange={(e) => setNotes(e.target.value)}
                                             rows={2}
                                             placeholder="Internal verification notes, requested documents, cap table observations..."
-                                            className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-2.5 text-xs text-zinc-900 shadow-2xs placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+                                            disabled={!isSuperAdmin}
+                                            className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-2.5 text-xs text-zinc-900 shadow-2xs placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-zinc-50 disabled:text-zinc-500"
                                         />
+                                        {!isSuperAdmin && <p className="mt-1.5 text-[11px] leading-relaxed text-zinc-500">Assignment and directives are managed by a superadmin.</p>}
                                     </div>
 
-                                    <div className="flex justify-end pt-1">
+                                    {isSuperAdmin && <div className="flex justify-end pt-1">
                                         <button
                                             type="submit"
                                             disabled={updatingAnalyst}
@@ -672,7 +674,7 @@ function FounderAuditDrawer({
                                             )}
                                             <span>Save Lead & Directives</span>
                                         </button>
-                                    </div>
+                                    </div>}
                                 </form>
                             </div>
 

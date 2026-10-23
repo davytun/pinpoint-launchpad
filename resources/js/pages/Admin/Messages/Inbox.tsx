@@ -14,6 +14,7 @@ interface Thread {
     total_messages: number;
     last_message_at: string | null;
     last_message_preview: string;
+    is_unassigned: boolean;
 }
 
 interface Message {
@@ -55,6 +56,7 @@ interface PageProps {
     messages: Message[];
     founder: FounderDetails | null;
     total_unread: number;
+    showing_unassigned: boolean;
 }
 
 function getInitials(name?: string | null): string {
@@ -67,7 +69,7 @@ function getInitials(name?: string | null): string {
         .toUpperCase();
 }
 
-export default function AdminMessagesInbox({ threads, active_thread, messages, founder }: PageProps) {
+export default function AdminMessagesInbox({ threads, active_thread, messages, founder, showing_unassigned }: PageProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterTab, setFilterTab] = useState<'all' | 'unread'>('all');
     const [attachment, setAttachment] = useState<File | null>(null);
@@ -158,7 +160,10 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
                     {/* Header */}
                     <div className="shrink-0 border-b border-zinc-100 p-4 pb-3">
                         <div className="mb-3 flex items-center justify-between">
-                            <h1 className="text-[16px] font-bold tracking-tight text-zinc-950">Inbox</h1>
+                            <div>
+                                <h1 className="text-[16px] font-bold tracking-tight text-zinc-950">{showing_unassigned ? 'Unassigned messages' : 'Inbox'}</h1>
+                                {showing_unassigned && <p className="mt-0.5 text-[11px] text-zinc-500">Assign an owner before replying.</p>}
+                            </div>
                             <button
                                 onClick={() => setFilterTab(filterTab === 'all' ? 'unread' : 'all')}
                                 className={cn(
@@ -207,7 +212,7 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
                                 return (
                                     <Link
                                         key={t.id}
-                                        href={route('admin.messages.inbox', { thread: t.id })}
+                                        href={route('admin.messages.inbox', { thread: t.id, ...(showing_unassigned ? { unassigned: 1 } : {}) })}
                                         preserveState
                                         preserveScroll
                                         className={cn(
@@ -233,6 +238,9 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
                                                 >
                                                     {t.founder_name ?? 'Unknown'}
                                                 </p>
+                                                {t.is_unassigned && (
+                                                    <span className="shrink-0 rounded-full bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700">Unassigned</span>
+                                                )}
                                             </div>
                                             {t.last_message_at && (
                                                 <span className="shrink-0 text-[11px] font-normal text-zinc-400 tabular-nums">

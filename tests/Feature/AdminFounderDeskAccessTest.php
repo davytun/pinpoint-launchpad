@@ -7,6 +7,8 @@ use App\Models\FounderProfile;
 use App\Models\MessageThread;
 use App\Models\Payment;
 use App\Models\User;
+use App\Services\DocumentService;
+use Illuminate\Http\UploadedFile;
 
 test('analyst can only open message threads for assigned founders', function () {
     $analyst = User::factory()->create(['role' => 'analyst']);
@@ -172,4 +174,38 @@ test('analyst unread badge counts only assigned threads', function () {
     ]);
 
     expect($analyst->adminUnreadMessagesCount())->toBe(3);
+});
+
+test('only superadmins can triage unassigned founder messages', function () {
+    $superadmin = User::factory()->create(['role' => 'superadmin']);
+    $analyst = User::factory()->create(['role' => 'analyst']);
+    $founder = Founder::factory()->create();
+
+    $thread = MessageThread::create([
+        'founder_id' => $founder->id,
+        'admin_unread_count' => 1,
+        'founder_unread_count' => 0,
+        'last_message_at' => now(),
+    ]);
+
+    $this->actingAs($superadmin)
+        ->get(route('admin.messages.inbox', ['unassigned' => 1]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('showing_unassigned', true)
+            ->has('threads', 1)
+            ->where('threads.0.id', $thread->id)
+            ->where('threads.0.is_unassigned', true));
+
+    $this->actingAs($analyst)
+        ->get(route('admin.messages.inbox', ['unassigned' => 1]))
+        ->assertForbidden();
+});
+
+test('founder documents accept WEBP images', function () {
+    app(DocumentService::class)->validateFile(
+        UploadedFile::fake()->create('venture-logo.webp', 128, 'image/webp')
+    );
+
+    expect(true)->toBeTrue();
 });

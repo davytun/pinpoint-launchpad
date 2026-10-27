@@ -7,6 +7,13 @@ import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer } fro
 type RadarData = Record<string, number> | null;
 type InterestType = 'more_details' | 'founder_call' | 'data_room_access';
 
+type InterestState = {
+    type: InterestType;
+    status: string;
+    founder_decision: string | null;
+    investor_facing_status: string;
+};
+
 type Entry = {
     slug: string;
     company_name: string | null;
@@ -29,12 +36,7 @@ type Entry = {
     } | null;
     can_view_pitch_deck: boolean;
     can_submit_interest: boolean;
-    existing_interest?: {
-        type: InterestType;
-        status: string;
-        founder_decision: string | null;
-        investor_facing_status: string;
-    } | null;
+    interests_by_type?: Partial<Record<InterestType, InterestState>>;
 };
 
 const PILLARS = [
@@ -84,7 +86,13 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
     const score = entry.overall_score ?? null;
     const oneLiner = realCopy(entry.spotlight_one_liner);
     const summary = realCopy(entry.summary);
-    const interestForm = useForm<{ type: InterestType; message: string }>({ type: 'data_room_access', message: '' });
+    const requestedInterests = Object.values(entry.interests_by_type ?? {}) as InterestState[];
+    const requestedTypes = new Set(requestedInterests.map((interest) => interest.type));
+    const availableOptions = interestOptions.filter((option) => !requestedTypes.has(option.id));
+    const interestForm = useForm<{ type: InterestType; message: string }>({
+        type: availableOptions[0]?.id ?? 'data_room_access',
+        message: '',
+    });
     const pdfDeck = entry.pitch_deck?.kind === 'pdf' ? entry.pitch_deck : null;
     const otherFile = entry.pitch_deck && entry.pitch_deck.kind !== 'pdf' ? entry.pitch_deck : null;
 
@@ -116,21 +124,26 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
             </div>
 
             <main className="mx-auto max-w-6xl px-4 py-8 pb-28 sm:px-6 sm:py-10 lg:px-8 lg:pb-16">
-                {entry.existing_interest && (
-                    <div className="mb-8 flex flex-col gap-3 border border-zinc-200 bg-white px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-                        <div className="min-w-0">
-                            <p className="text-[13px] font-semibold text-zinc-950">
-                                {interestLabel(entry.existing_interest.type)} request
-                            </p>
-                            <p className="mt-0.5 text-[13px] text-zinc-500">{entry.existing_interest.investor_facing_status}</p>
+                {requestedInterests.length > 0 && (
+                    <div className="mb-8 border border-zinc-200 bg-white">
+                        <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-4 py-2.5 sm:px-5">
+                            <p className="text-[13px] font-semibold text-zinc-950">Your engagements</p>
+                            <Link
+                                href={route('investor.interests.index')}
+                                className="inline-flex shrink-0 items-center gap-1.5 text-[13px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
+                            >
+                                My Interests
+                                <Icon icon="solar:arrow-right-linear" className="size-3.5" />
+                            </Link>
                         </div>
-                        <Link
-                            href={route('investor.interests.index')}
-                            className="inline-flex shrink-0 items-center gap-1.5 text-[13px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
-                        >
-                            My Interests
-                            <Icon icon="solar:arrow-right-linear" className="size-3.5" />
-                        </Link>
+                        <ul className="divide-y divide-zinc-100">
+                            {requestedInterests.map((interest) => (
+                                <li key={interest.type} className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
+                                    <p className="text-[13px] font-medium text-zinc-950">{interestLabel(interest.type)}</p>
+                                    <p className="text-[13px] text-zinc-500">{interest.investor_facing_status}</p>
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 )}
 
@@ -143,15 +156,13 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                         {(entry.badges.length > 0 || entry.verified_badges_count > 0) && (
                             <>
                                 <span className="text-zinc-300">·</span>
-                                <span className="text-zinc-500">
-                                    {entry.badges.length || entry.verified_badges_count} diligence checks
-                                </span>
+                                <span className="text-zinc-500">{entry.badges.length || entry.verified_badges_count} diligence checks</span>
                             </>
                         )}
                     </div>
 
                     <div className="mt-4 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                        <div className="min-w-0 max-w-3xl">
+                        <div className="max-w-3xl min-w-0">
                             <h1 className="font-display text-[2.5rem] leading-[1.05] font-bold tracking-tight text-zinc-950 sm:text-[3rem]">
                                 {companyName}
                             </h1>
@@ -160,9 +171,7 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                             ) : (
                                 <p className="mt-3 text-[14px] text-zinc-400">One-liner pending from the founder desk.</p>
                             )}
-                            {entry.founder_name && (
-                                <p className="mt-2 text-[13px] text-zinc-500">{entry.founder_name}</p>
-                            )}
+                            {entry.founder_name && <p className="mt-2 text-[13px] text-zinc-500">{entry.founder_name}</p>}
                         </div>
 
                         {score != null && (
@@ -204,7 +213,7 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                             {radarItems.map((pillar) => (
                                 <div key={pillar.subject} className="flex items-baseline justify-between gap-2 text-[12px]">
                                     <dt className="text-zinc-500">{pillar.subject}</dt>
-                                    <dd className="font-mono font-semibold tabular-nums text-zinc-800">{pillar.value}</dd>
+                                    <dd className="font-mono font-semibold text-zinc-800 tabular-nums">{pillar.value}</dd>
                                 </div>
                             ))}
                         </dl>
@@ -271,9 +280,7 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                         <div className="mt-4 flex flex-col gap-3 border border-zinc-200 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                             <div className="min-w-0">
                                 <p className="truncate text-[14px] font-semibold text-zinc-950">{otherFile.original_filename}</p>
-                                <p className="mt-0.5 text-[12px] text-zinc-500">
-                                    Supporting file · not a PDF pitch deck. Download only.
-                                </p>
+                                <p className="mt-0.5 text-[12px] text-zinc-500">Supporting file · not a PDF pitch deck. Download only.</p>
                             </div>
                             {entry.can_view_pitch_deck && otherFile.download_url ? (
                                 <a
@@ -293,7 +300,15 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                 </section>
 
                 <section id="request-data-room" className="pt-8">
-                    {entry.existing_interest ? null : (
+                    {availableOptions.length === 0 ? (
+                        <p className="text-[14px] text-zinc-500">
+                            You have already engaged with every option for this venture. Manage them under{' '}
+                            <Link href={route('investor.interests.index')} className="font-semibold text-zinc-900 underline underline-offset-4">
+                                My Interests
+                            </Link>
+                            .
+                        </p>
+                    ) : (
                         <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
                             <div className="lg:col-span-5">
                                 <h2 className="text-[1.25rem] font-semibold tracking-tight text-zinc-950">Engage via Pinpoint</h2>
@@ -308,7 +323,7 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                                         <fieldset>
                                             <legend className="text-[13px] font-semibold text-zinc-950">How would you like to engage?</legend>
                                             <div className="mt-3 divide-y divide-zinc-100 border-y border-zinc-100">
-                                                {interestOptions.map((option) => (
+                                                {availableOptions.map((option) => (
                                                     <button
                                                         key={option.id}
                                                         type="button"
@@ -387,7 +402,7 @@ export default function SpotlightShow({ entry }: { entry: Entry }) {
                 </section>
             </main>
 
-            {entry.can_submit_interest && !entry.existing_interest && (
+            {entry.can_submit_interest && availableOptions.length > 0 && (
                 <div className="fixed inset-x-0 bottom-0 z-30 border-t border-zinc-200 bg-white p-3 sm:hidden">
                     <a
                         href="#request-data-room"

@@ -52,10 +52,26 @@ class InvestorSpotlightController extends Controller
         $investor = Auth::guard('investor')->user();
         $pitchDeck = $entry->profile->founder->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->latest()->first();
 
-        $existingInterest = $investor->interests()
+        $existingInterests = $investor->interests()
             ->where('profile_id', $entry->profile_id)
-            ->latest()
+            ->get();
+
+        $dataRoomGrant = $investor->dataRoomGrants()
+            ->where('profile_id', $entry->profile_id)
+            ->whereNull('revoked_at')
             ->first();
+
+        $interestsByType = [];
+        foreach ($existingInterests as $interest) {
+            $interestsByType[$interest->type] = [
+                'type' => $interest->type,
+                'status' => $interest->status,
+                'founder_decision' => $interest->founder_decision,
+                'investor_facing_status' => $interest->getInvestorFacingStatus(
+                    $interest->type === 'data_room_access' ? $dataRoomGrant : null
+                ),
+            ];
+        }
 
         $isImageDeck = $pitchDeck && str_starts_with((string) $pitchDeck->mime_type, 'image/');
         $isPdfDeck = $pitchDeck?->mime_type === 'application/pdf';
@@ -81,14 +97,7 @@ class InvestorSpotlightController extends Controller
                 ] : null,
                 'can_view_pitch_deck' => $investor->hasApprovedKyc(),
                 'can_submit_interest' => $investor->canAccessProtectedInvestorContent(),
-                'existing_interest' => $existingInterest ? [
-                    'type' => $existingInterest->type,
-                    'status' => $existingInterest->status,
-                    'founder_decision' => $existingInterest->founder_decision,
-                    'investor_facing_status' => $existingInterest->getInvestorFacingStatus(
-                        $investor->dataRoomGrants()->where('profile_id', $entry->profile_id)->whereNull('revoked_at')->first()
-                    ),
-                ] : null,
+                'interests_by_type' => $interestsByType,
             ]),
         ]);
     }

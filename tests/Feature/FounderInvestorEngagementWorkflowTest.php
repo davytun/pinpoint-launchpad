@@ -374,7 +374,7 @@ test('10. Rejection works cleanly for Founder and Admin', function () {
     Notification::assertSentTo($irStaff, DealflowAdminNotification::class);
 });
 
-test('11. Duplicate request behavior is idempotent and well-defined', function () {
+test('11. Distinct engagement types coexist and repeat submissions are idempotent', function () {
     [$founder, $profile] = setupPhase6Startup('Apex Tech', 'apex-tech');
     $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
 
@@ -388,19 +388,43 @@ test('11. Duplicate request behavior is idempotent and well-defined', function (
 
     expect(InvestorInterest::count())->toBe(1);
 
-    // Follow-up submission upgrades to founder call
+    // A different engagement type is tracked as its own interest rather than
+    // overwriting the first, so an approved data room never blocks a founder call.
     $this->actingAs($investor, 'investor')
         ->post(route('investor.interests.store', $profile->slug), [
             'type' => 'founder_call',
-            'message' => 'Upgraded to founder call.',
+            'message' => 'Also want a founder call.',
         ])
         ->assertRedirect();
 
-    expect(InvestorInterest::count())->toBe(1);
-    $interest = InvestorInterest::first();
-    expect($interest->type)->toBe('founder_call')
-        ->and($interest->message)->toBe('Upgraded to founder call.')
-        ->and($interest->status)->toBe('pending');
+    expect(InvestorInterest::count())->toBe(2);
+    $this->assertDatabaseHas('investor_interests', [
+        'investor_id' => $investor->id,
+        'profile_id' => $profile->id,
+        'type' => 'more_details',
+        'message' => 'Initial inquiry.',
+    ]);
+    $this->assertDatabaseHas('investor_interests', [
+        'investor_id' => $investor->id,
+        'profile_id' => $profile->id,
+        'type' => 'founder_call',
+        'message' => 'Also want a founder call.',
+        'status' => 'pending',
+    ]);
+
+    // Re-submitting the same type is idempotent: it refreshes the message
+    // instead of creating a duplicate row.
+    $this->actingAs($investor, 'investor')
+        ->post(route('investor.interests.store', $profile->slug), [
+            'type' => 'founder_call',
+            'message' => 'Rescheduled founder call.',
+        ])
+        ->assertRedirect();
+
+    expect(InvestorInterest::count())->toBe(2);
+    $callInterest = InvestorInterest::where('type', 'founder_call')->first();
+    expect($callInterest->message)->toBe('Rescheduled founder call.')
+        ->and($callInterest->status)->toBe('pending');
 });
 
 test('12. Data Room status remains independent of introduction status', function () {
@@ -504,4 +528,59 @@ test('15. Cross-startup isolation remains strictly intact', function () {
         ->assertForbidden();
 
     expect($interestA->fresh()->status)->toBe('pending');
+});
+
+test('16. Founder desk reports each engagement type independently when they coexist', function () {
+    [$founder, $profile] = setupPhase6Startup('Apex Tech', 'apex-tech');
+    $investor = Investor::factory()->create(['kyc_status' => Investor::KYC_STATUS_APPROVED]);
+
+    // Live scenario: one investor pursues all three engagement types on the same
+    // venture, with the data room already granted and the call already scheduled.
+    InvestorDataRoomGrant::create([
+        'investor_id' => $investor->id,
+        'profile_id' => $profile->id,
+        'granted_by_founder' => $founder->id,
+        'granted_at' => now(),
+    ]);
+
+    $dataRoomInterest = InvestorInterest::create([
+        'investor_id' => $investor->id,
+        'profile_id' => $profile->id,
+        'type' => 'data_room_access',
+        'status' => 'pending',
+        'founder_decision' => 'approved',
+    ]);
+
+    $callInterest = InvestorInterest::create([
+        'investor_id' => $investor->id,
+        'profile_id' => $profile->id,
+        'type' => 'founder_call',
+        'status' => 'approved',
+        'founder_decision' => 'approved',
+        'scheduled_at' => now()->addDays(2),
+        'meeting_link' => 'https://meet.pinpoint.test/call-1',
+    ]);
+
+    $questionInterest = InvestorInterest::create([
+        'investor_id' => $investor->id,
+        'profile_id' => $profile->id,
+        'type' => 'more_details',
+        'status' => 'pending',
+        'founder_decision' => 'approved',
+    ]);
+
+    $response = $this->actingAs($founder, 'founder')->get(route('founder.dashboard'));
+
+    $response->assertOk();
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('Founder/Dashboard')
+        ->has('investor_interests', 3)
+        // Grant state must stay on the data room row only.
+        ->where('investor_interests', fn ($interests) => collect($interests)
+            ->firstWhere('id', $dataRoomInterest->id)['data_room_granted'] === true
+            && collect($interests)->firstWhere('id', $callInterest->id)['data_room_granted'] === false
+            && collect($interests)->firstWhere('id', $questionInterest->id)['data_room_granted'] === false)
+        // The scheduled call keeps its own introduction state.
+        ->where('investor_interests', fn ($interests) => collect($interests)
+            ->firstWhere('id', $callInterest->id)['introduction_status'] === 'scheduled'));
 });

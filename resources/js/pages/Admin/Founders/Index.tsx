@@ -2,11 +2,10 @@ import { Icon } from '@iconify/react';
 import { Head, router } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AdminLayout from '@/layouts/admin-layout';
 import { paginationLabel } from '@/lib/pagination';
 import { cn } from '@/lib/utils';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Analyst {
     id: number;
@@ -17,7 +16,9 @@ interface Analyst {
 interface DocumentItem {
     id: string;
     original_filename: string;
-    type: string;
+    category: string;
+    category_label: string;
+    file_size?: string;
     reviewed: boolean;
     analyst_note?: string | null;
     created_at: string;
@@ -193,6 +194,19 @@ function ScoreBadge({ score }: { score: number | null; band?: string | null }) {
         </div>
     );
 }
+
+// Pillar + band tone helpers for the PARAGON diagnostic display (restrained tri-tier scale).
+const pillarBarTone = (v: number) => (v >= 85 ? 'bg-emerald-500' : v >= 70 ? 'bg-[#3A54A5]' : 'bg-amber-500');
+const pillarValTone = (v: number) => (v >= 85 ? 'text-emerald-600' : v >= 70 ? 'text-[#3A54A5]' : 'text-amber-600');
+const bandLabel = (s: number) => (s >= 85 ? 'Strong' : s >= 75 ? 'Solid' : s >= 60 ? 'Developing' : 'At Risk');
+const bandChip = (s: number) =>
+    s >= 85
+        ? 'bg-emerald-100 text-emerald-700'
+        : s >= 75
+          ? 'bg-[#3A54A5]/10 text-[#3A54A5]'
+          : s >= 60
+            ? 'bg-amber-100 text-amber-700'
+            : 'bg-rose-100 text-rose-700';
 
 // ─── Slide-Over Founder Detail & Audit Cockpit ─────────────────────────────────
 
@@ -374,21 +388,25 @@ function FounderAuditDrawer({
     }
 
     function toggleDocumentReviewed(docId: string) {
-        router.patch(route('admin.documents.reviewed', { founder: founder.id, document: docId }), {}, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setPanel((current) =>
-                    current
-                        ? {
-                              ...current,
-                              documents: current.documents.map((document) =>
-                                  document.id === docId ? { ...document, reviewed: !document.reviewed } : document,
-                              ),
-                          }
-                        : current,
-                );
+        router.patch(
+            route('admin.documents.reviewed', { founder: founder.id, document: docId }),
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setPanel((current) =>
+                        current
+                            ? {
+                                  ...current,
+                                  documents: current.documents.map((document) =>
+                                      document.id === docId ? { ...document, reviewed: !document.reviewed } : document,
+                                  ),
+                              }
+                            : current,
+                    );
+                },
             },
-        });
+        );
     }
 
     function copyEmail() {
@@ -446,9 +464,7 @@ function FounderAuditDrawer({
                             onClick={() => setDrawerTab('audit')}
                             className={cn(
                                 'flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-medium transition-all',
-                                drawerTab === 'audit'
-                                    ? 'bg-zinc-950 text-white shadow-2xs'
-                                    : 'text-zinc-600 hover:bg-zinc-200/60',
+                                drawerTab === 'audit' ? 'bg-zinc-950 text-white shadow-2xs' : 'text-zinc-600 hover:bg-zinc-200/60',
                             )}
                         >
                             <Icon icon="solar:shield-check-linear" className="size-3.5" />
@@ -460,16 +476,12 @@ function FounderAuditDrawer({
                             onClick={() => setDrawerTab('documents')}
                             className={cn(
                                 'flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-medium transition-all',
-                                drawerTab === 'documents'
-                                    ? 'bg-zinc-950 text-white shadow-2xs'
-                                    : 'text-zinc-600 hover:bg-zinc-200/60',
+                                drawerTab === 'documents' ? 'bg-zinc-950 text-white shadow-2xs' : 'text-zinc-600 hover:bg-zinc-200/60',
                             )}
                         >
                             <Icon icon="solar:document-text-linear" className="size-3.5" />
                             <span>Documents</span>
-                            <span className="rounded-full bg-zinc-200/80 px-1.5 py-0.2 text-[10px] font-bold text-zinc-800">
-                                {docs.length}
-                            </span>
+                            <span className="rounded-full bg-zinc-200/80 px-1.5 py-0.5 text-[10px] font-bold text-zinc-800">{docs.length}</span>
                         </button>
 
                         <button
@@ -477,28 +489,18 @@ function FounderAuditDrawer({
                             onClick={() => setDrawerTab('messages')}
                             className={cn(
                                 'flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-medium transition-all',
-                                drawerTab === 'messages'
-                                    ? 'bg-zinc-950 text-white shadow-2xs'
-                                    : 'text-zinc-600 hover:bg-zinc-200/60',
+                                drawerTab === 'messages' ? 'bg-zinc-950 text-white shadow-2xs' : 'text-zinc-600 hover:bg-zinc-200/60',
                             )}
                         >
                             <Icon icon="solar:chat-round-dots-linear" className="size-3.5" />
                             <span>Live Messages</span>
                             {founder.unread_messages && founder.unread_messages > 0 ? (
-                                <span className="rounded-full bg-blue-600 px-1.5 py-0.2 text-[10px] font-bold text-white">
+                                <span className="rounded-full bg-[#3A54A5] px-1.5 py-0.5 text-[10px] font-bold text-white">
                                     {founder.unread_messages}
                                 </span>
                             ) : null}
                         </button>
                     </div>
-
-                    <a
-                        href={route('admin.founders.show', { founder: founder.id })}
-                        className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-600 transition-colors hover:text-zinc-950"
-                    >
-                        <span>Audit Workspace</span>
-                        <Icon icon="solar:arrow-right-up-linear" className="size-3 text-zinc-400" />
-                    </a>
                 </div>
 
                 {/* ── Status Change Prompt Alert / Banner ───────────────────── */}
@@ -511,10 +513,7 @@ function FounderAuditDrawer({
                                     Set Status to {pendingStatusChange.replace('_', ' ')}
                                 </span>
                             </div>
-                            <button
-                                onClick={() => setPendingStatusChange(null)}
-                                className="text-xs font-medium text-amber-700 hover:text-amber-950"
-                            >
+                            <button onClick={() => setPendingStatusChange(null)} className="text-xs font-medium text-amber-700 hover:text-amber-950">
                                 Cancel
                             </button>
                         </div>
@@ -555,9 +554,7 @@ function FounderAuditDrawer({
                         <div className="space-y-5">
                             {/* Fast Action Status Switcher */}
                             <div className="space-y-2 rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4 shadow-2xs">
-                                <span className="block text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
-                                    Audit Workflow Stage
-                                </span>
+                                <span className="block text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Audit Workflow Stage</span>
                                 <div className="flex flex-wrap items-center gap-1.5">
                                     {['pending', 'in_progress', 'needs_info', 'complete', 'on_hold'].map((st) => (
                                         <button
@@ -580,7 +577,7 @@ function FounderAuditDrawer({
 
                             {/* PARAGON Score Card */}
                             <div className="space-y-3.5 rounded-2xl border border-zinc-200/80 bg-[#FAFBFD] p-4.5 shadow-2xs">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-start justify-between">
                                     <div>
                                         <span className="block text-[11px] font-bold tracking-wider text-zinc-400 uppercase">
                                             PARAGON Diagnostic Score
@@ -588,6 +585,16 @@ function FounderAuditDrawer({
                                         <div className="mt-0.5 flex items-center gap-2">
                                             <span className="font-mono text-2xl font-bold text-zinc-950">{founder.score ?? '—'}</span>
                                             <span className="font-mono text-xs text-zinc-400">/ 100</span>
+                                            {founder.score !== null && founder.score !== undefined && (
+                                                <span
+                                                    className={cn(
+                                                        'ml-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase',
+                                                        bandChip(founder.score),
+                                                    )}
+                                                >
+                                                    {bandLabel(founder.score)}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="text-right">
@@ -597,19 +604,24 @@ function FounderAuditDrawer({
                                 </div>
 
                                 {founder.pillar_scores && (
-                                    <div className="space-y-2 border-t border-zinc-100 pt-2">
+                                    <div className="grid gap-x-5 gap-y-2.5 border-t border-zinc-200/70 pt-3 sm:grid-cols-2">
                                         {Object.entries(founder.pillar_scores).map(([pillar, val]) => (
-                                            <div key={pillar} className="space-y-1">
-                                                <div className="flex items-center justify-between text-[11px]">
-                                                    <span className="font-medium text-zinc-600 capitalize">{pillar}</span>
-                                                    <span className="font-mono font-bold text-zinc-900">{val}%</span>
-                                                </div>
-                                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200/60">
+                                            <div key={pillar} className="flex items-center gap-2.5">
+                                                <span className="w-[70px] shrink-0 text-[11px] font-medium text-zinc-600 capitalize">{pillar}</span>
+                                                <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-zinc-200/70">
                                                     <div
-                                                        className="h-full rounded-full bg-zinc-900 transition-all duration-300"
+                                                        className={cn('h-full rounded-full transition-all duration-500', pillarBarTone(val))}
                                                         style={{ width: `${Math.min(100, Math.max(0, val))}%` }}
                                                     />
                                                 </div>
+                                                <span
+                                                    className={cn(
+                                                        'w-9 shrink-0 text-right font-mono text-[11px] font-bold tabular-nums',
+                                                        pillarValTone(val),
+                                                    )}
+                                                >
+                                                    {val}%
+                                                </span>
                                             </div>
                                         ))}
                                     </div>
@@ -620,25 +632,45 @@ function FounderAuditDrawer({
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
                                     <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Assigned Analyst Lead</h4>
-                                    <span className="text-[11px] text-zinc-400">{founder.assigned_analyst ? 'Assigned' : 'Unassigned'}</span>
+                                    <span
+                                        className={cn(
+                                            'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10.5px] font-semibold',
+                                            founder.assigned_analyst
+                                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                : 'border-amber-200/70 bg-amber-50 text-amber-700',
+                                        )}
+                                    >
+                                        <span className={cn('size-1.5 rounded-full', founder.assigned_analyst ? 'bg-emerald-500' : 'bg-amber-500')} />
+                                        {founder.assigned_analyst ? 'Assigned' : 'Unassigned'}
+                                    </span>
                                 </div>
 
-                                <form onSubmit={handleAssignAnalyst} className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-2xs">
+                                <form
+                                    onSubmit={handleAssignAnalyst}
+                                    className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-2xs"
+                                >
                                     <div>
                                         <label className="mb-1 block text-[11px] font-semibold text-zinc-500">Lead Analyst</label>
                                         {isSuperAdmin ? (
-                                            <select
-                                                value={selectedAnalystId}
-                                                onChange={(e) => setSelectedAnalystId(e.target.value)}
-                                                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 shadow-2xs focus:border-zinc-400 focus:outline-none"
+                                            <Select
+                                                value={selectedAnalystId === '' ? 'none' : selectedAnalystId}
+                                                onValueChange={(v) => setSelectedAnalystId(v === 'none' ? '' : v)}
                                             >
-                                                <option value="">No Analyst Assigned (Unassigned)</option>
-                                                {analysts.map((a) => (
-                                                    <option key={a.id} value={String(a.id)}>
-                                                        {a.name} ({a.email})
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                <SelectTrigger className="w-full rounded-xl border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 shadow-2xs hover:bg-white focus:border-zinc-400 focus:ring-0 focus:ring-offset-0 data-[placeholder]:text-zinc-400">
+                                                    <SelectValue placeholder="Select an analyst" />
+                                                </SelectTrigger>
+                                                <SelectContent className="text-xs">
+                                                    <SelectItem value="none" className="py-2 text-xs">
+                                                        Unassigned (no lead)
+                                                    </SelectItem>
+                                                    {analysts.map((a) => (
+                                                        <SelectItem key={a.id} value={String(a.id)} className="py-2 text-xs">
+                                                            {a.name}
+                                                            <span className="text-zinc-400"> · {a.email}</span>
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         ) : (
                                             <p className="text-xs font-semibold text-zinc-900">
                                                 {founder.assigned_analyst?.name ?? 'No analyst assigned yet'}
@@ -658,31 +690,36 @@ function FounderAuditDrawer({
                                             disabled={!isSuperAdmin}
                                             className="w-full resize-none rounded-xl border border-zinc-200 bg-white p-2.5 text-xs text-zinc-900 shadow-2xs placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-zinc-50 disabled:text-zinc-500"
                                         />
-                                        {!isSuperAdmin && <p className="mt-1.5 text-[11px] leading-relaxed text-zinc-500">Assignment and directives are managed by a superadmin.</p>}
+                                        {!isSuperAdmin && (
+                                            <p className="mt-1.5 text-[11px] leading-relaxed text-zinc-500">
+                                                Assignment and directives are managed by a superadmin.
+                                            </p>
+                                        )}
                                     </div>
 
-                                    {isSuperAdmin && <div className="flex justify-end pt-1">
-                                        <button
-                                            type="submit"
-                                            disabled={updatingAnalyst}
-                                            className="flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800 disabled:opacity-50"
-                                        >
-                                            {updatingAnalyst ? (
-                                                <Icon icon="solar:refresh-linear" className="size-3 animate-spin" />
-                                            ) : (
-                                                <Icon icon="solar:check-circle-linear" className="size-3 text-emerald-400" />
-                                            )}
-                                            <span>Save Lead & Directives</span>
-                                        </button>
-                                    </div>}
+                                    {isSuperAdmin && (
+                                        <div className="flex justify-end pt-1">
+                                            <button
+                                                type="submit"
+                                                disabled={updatingAnalyst}
+                                                className="flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800 disabled:opacity-50"
+                                            >
+                                                {updatingAnalyst ? (
+                                                    <Icon icon="solar:refresh-linear" className="size-3 animate-spin" />
+                                                ) : (
+                                                    <Icon icon="solar:check-circle-linear" className="size-3 text-emerald-400" />
+                                                )}
+                                                <span>Save Lead & Directives</span>
+                                            </button>
+                                        </div>
+                                    )}
                                 </form>
                             </div>
 
                             {/* KYC & Entity Info */}
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                                    <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Founder Dossier & Contact</h4>
-                                    <span className="text-[11px] text-zinc-400">KYC Profile</span>
+                                    <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Founder Dossier &amp; Contact</h4>
                                 </div>
 
                                 <div className="space-y-2 rounded-2xl border border-zinc-200/80 bg-white p-4 text-xs shadow-2xs">
@@ -700,7 +737,11 @@ function FounderAuditDrawer({
                                         <span className="text-zinc-400">Official Email</span>
                                         <div className="flex items-center gap-2">
                                             <span className="font-mono text-[11px] font-medium text-zinc-900">{founder.email}</span>
-                                            <button onClick={copyEmail} className="text-zinc-400 transition-colors hover:text-zinc-800" title="Copy Email">
+                                            <button
+                                                onClick={copyEmail}
+                                                className="text-zinc-400 transition-colors hover:text-zinc-800"
+                                                title="Copy Email"
+                                            >
                                                 <Icon icon={copiedEmail ? 'solar:check-circle-linear' : 'solar:copy-linear'} className="size-3.5" />
                                             </button>
                                         </div>
@@ -745,35 +786,36 @@ function FounderAuditDrawer({
                                     <p className="text-xs">No documents uploaded yet by this founder.</p>
                                 </div>
                             ) : (
-                                <div className="space-y-2.5">
+                                <div className="divide-y divide-zinc-100 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white">
                                     {docs.map((doc) => (
-                                        <div
-                                            key={doc.id}
-                                            className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-200/80 bg-white p-3.5 text-xs shadow-2xs"
-                                        >
-                                            <div className="min-w-0 flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <Icon icon="solar:document-text-linear" className="size-4 shrink-0 text-zinc-500" />
-                                                    <span className="truncate font-semibold text-zinc-950">{doc.original_filename}</span>
-                                                </div>
-                                                <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-400">
-                                                    <span className="font-medium text-zinc-600 capitalize">
-                                                        {doc.category_label ?? doc.category ?? 'Document'}
+                                        <div key={doc.id} className="flex items-center justify-between gap-3 px-4 py-3 text-xs">
+                                            <div className="flex min-w-0 flex-1 items-center gap-3">
+                                                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500">
+                                                    <Icon icon="solar:document-text-linear" className="size-4" />
+                                                </span>
+                                                <div className="min-w-0">
+                                                    <span className="block truncate text-[12.5px] font-semibold text-zinc-950">
+                                                        {doc.original_filename}
                                                     </span>
-                                                    <span>·</span>
-                                                    <span>{doc.created_at}</span>
+                                                    <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-zinc-400">
+                                                        <span className="font-medium text-zinc-500 capitalize">
+                                                            {doc.category_label ?? doc.category ?? 'Document'}
+                                                        </span>
+                                                        <span>·</span>
+                                                        <span>{doc.created_at}</span>
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div className="flex shrink-0 items-center gap-2">
+                                            <div className="flex shrink-0 items-center gap-1.5">
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleDocumentReviewed(doc.id)}
                                                     className={cn(
-                                                        'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all',
+                                                        'inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
                                                         doc.reviewed
-                                                            ? 'border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                                                            : 'border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100',
+                                                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                                            : 'border-zinc-200 bg-white text-amber-700 hover:bg-amber-50',
                                                     )}
                                                 >
                                                     <Icon
@@ -785,8 +827,8 @@ function FounderAuditDrawer({
 
                                                 <a
                                                     href={route('admin.documents.download', { founder: founder.id, document: doc.id })}
-                                                    className="rounded-lg border border-zinc-200 bg-white p-1.5 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950"
-                                                    title="Download File"
+                                                    className="rounded-lg p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                                                    title="Download file"
                                                 >
                                                     <Icon icon="solar:download-linear" className="size-4" />
                                                 </a>
@@ -802,9 +844,7 @@ function FounderAuditDrawer({
                     {drawerTab === 'messages' && (
                         <div className="flex h-full flex-col justify-between space-y-3">
                             <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
-                                <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">
-                                    Direct Message Thread
-                                </h4>
+                                <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Direct Message Thread</h4>
                                 <a
                                     href={`/admin/founder/messages?founder_id=${founder.id}`}
                                     className="text-[11px] font-semibold text-zinc-500 hover:text-zinc-950"
@@ -828,7 +868,7 @@ function FounderAuditDrawer({
                                         return (
                                             <div
                                                 key={m.id}
-                                                className={cn('flex flex-col max-w-[85%]', isAdmin ? 'ml-auto items-end' : 'mr-auto items-start')}
+                                                className={cn('flex max-w-[85%] flex-col', isAdmin ? 'ml-auto items-end' : 'mr-auto items-start')}
                                             >
                                                 <div className="mb-0.5 flex items-center gap-1 text-[10px] text-zinc-400">
                                                     <span className="font-semibold text-zinc-600">{m.sender_name}</span>
@@ -839,13 +879,13 @@ function FounderAuditDrawer({
                                                     className={cn(
                                                         'rounded-2xl px-3.5 py-2 text-xs shadow-2xs',
                                                         isAdmin
-                                                            ? 'bg-zinc-950 text-white rounded-tr-xs'
-                                                            : 'border border-zinc-200/90 bg-white text-zinc-900 rounded-tl-xs',
+                                                            ? 'rounded-tr-xs bg-zinc-950 text-white'
+                                                            : 'rounded-tl-xs border border-zinc-200/90 bg-white text-zinc-900',
                                                     )}
                                                 >
-                                                    {m.body && <p className="whitespace-pre-wrap leading-relaxed">{m.body}</p>}
+                                                    {m.body && <p className="leading-relaxed whitespace-pre-wrap">{m.body}</p>}
                                                     {m.has_attachment && m.attachment_filename && (
-                                                        <div className="mt-1.5 flex items-center gap-1.5 text-[11px] opacity-90 underline">
+                                                        <div className="mt-1.5 flex items-center gap-1.5 text-[11px] underline opacity-90">
                                                             <Icon icon="solar:paperclip-linear" className="size-3" />
                                                             <a href={route('admin.messages.attachment.download', { message: m.id })}>
                                                                 {m.attachment_filename}
@@ -872,9 +912,7 @@ function FounderAuditDrawer({
                                 <div className="flex items-center justify-between">
                                     <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-2.5 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50">
                                         <Icon icon="solar:paperclip-linear" className="size-3.5 text-zinc-500" />
-                                        <span className="truncate max-w-[120px]">
-                                            {replyAttachment ? replyAttachment.name : 'Attach file'}
-                                        </span>
+                                        <span className="max-w-[120px] truncate">{replyAttachment ? replyAttachment.name : 'Attach file'}</span>
                                         <input
                                             type="file"
                                             className="hidden"
@@ -905,7 +943,7 @@ function FounderAuditDrawer({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
+                        className="rounded-xl px-3 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                     >
                         Close
                     </button>
@@ -914,7 +952,7 @@ function FounderAuditDrawer({
                         <button
                             type="button"
                             onClick={() => setDrawerTab('messages')}
-                            className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
                         >
                             <Icon icon="solar:chat-round-dots-linear" className="size-3.5 text-zinc-500" />
                             <span>Quick Chat</span>
@@ -923,7 +961,7 @@ function FounderAuditDrawer({
                         <button
                             type="button"
                             onClick={() => router.get(route('admin.founders.show', { founder: founder.id }))}
-                            className="flex items-center gap-1.5 rounded-full bg-zinc-950 px-4 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-zinc-800"
+                            className="flex items-center gap-1.5 rounded-xl bg-zinc-950 px-4 py-1.5 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-zinc-800"
                         >
                             <span>Open Audit Workspace</span>
                             <Icon icon="solar:arrow-right-linear" className="size-3.5" />
@@ -1027,85 +1065,92 @@ export default function AdminFoundersIndex({
                     </div>
                 </div>
 
-                {/* ── Minimalist Monochrome Metric Strip ────────── */}
-                <div className="mb-8 grid shrink-0 grid-cols-2 gap-4 sm:grid-cols-4">
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
-                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Total Founders</span>
-                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals.total}</span>
-                    </div>
-
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
-                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Audit In Progress</span>
-                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals.in_progress}</span>
-                    </div>
-
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
-                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Audits Complete</span>
-                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">{totals.complete}</span>
-                    </div>
-
-                    <div className="rounded-3xl bg-[#F9FAFB] p-5 transition-colors sm:p-6">
-                        <span className="mb-4 block text-[13px] font-medium text-zinc-500">Needs Attention</span>
-                        <span className="block text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
-                            {totals.needs_info + totals.on_hold}
-                        </span>
-                    </div>
-                </div>
-
-                {/* ── Status Tab Navigation ────────────────────────────────────── */}
-                <div className="mb-4 flex shrink-0 items-center justify-between gap-4 border-b border-zinc-100 pb-3">
-                    <div className="flex items-center gap-1.5 overflow-x-auto">
-                        {[
-                            { id: 'all', label: 'All Founders', count: totals.total },
-                            { id: 'in_progress', label: 'In Progress', count: totals.in_progress },
-                            { id: 'complete', label: 'Complete', count: totals.complete },
-                            { id: 'needs_info', label: 'Needs Info', count: totals.needs_info },
-                            { id: 'pending', label: 'Pending', count: totals.pending },
-                            { id: 'on_hold', label: 'On Hold', count: totals.on_hold },
-                        ].map((tab) => (
-                            <button
-                                key={tab.id}
-                                type="button"
-                                onClick={() => applyFilters({ status: tab.id === 'all' ? '' : tab.id })}
-                                className={cn(
-                                    'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
-                                    (tab.id === 'all' && activeStatus === 'all') || activeStatus === tab.id
-                                        ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
-                                        : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
-                                )}
-                            >
-                                <span>{tab.label}</span>
-                                <span
-                                    className={cn(
-                                        'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
-                                        (tab.id === 'all' && activeStatus === 'all') || activeStatus === tab.id
-                                            ? 'bg-zinc-950 text-white'
-                                            : 'bg-zinc-200/70 text-zinc-600',
-                                    )}
+                {/* ── Audit Pipeline (distribution + status + lead filter) ── */}
+                {(() => {
+                    const total = Math.max(totals.total, 0);
+                    const stages = [
+                        { id: 'all', label: 'All Founders', count: totals.total, tone: 'bg-zinc-900' },
+                        { id: 'complete', label: 'Complete', count: totals.complete, tone: 'bg-emerald-500' },
+                        { id: 'in_progress', label: 'In Progress', count: totals.in_progress, tone: 'bg-[#3A54A5]' },
+                        { id: 'needs_info', label: 'Needs Info', count: totals.needs_info, tone: 'bg-amber-500' },
+                        { id: 'on_hold', label: 'On Hold', count: totals.on_hold, tone: 'bg-rose-400' },
+                        { id: 'pending', label: 'Pending', count: totals.pending, tone: 'bg-zinc-300' },
+                    ];
+                    const isActive = (id: string) => (id === 'all' ? activeStatus === 'all' : activeStatus === id);
+                    const go = (id: string) => applyFilters({ status: id === 'all' ? '' : id });
+                    return (
+                        <div className="mb-6 shrink-0 rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-2xs sm:p-5">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Audit Pipeline</span>
+                                    <span className="text-xs text-zinc-400">
+                                        <span className="font-semibold text-zinc-900 tabular-nums">{total}</span> founder{total === 1 ? '' : 's'}
+                                    </span>
+                                </div>
+                                <select
+                                    value={activeAnalyst}
+                                    onChange={(e) => applyFilters({ analyst_id: e.target.value === 'all' ? '' : e.target.value })}
+                                    className="rounded-lg border border-zinc-200/90 bg-white px-2.5 py-1 text-xs text-zinc-700 shadow-2xs focus:border-zinc-400 focus:outline-none"
                                 >
-                                    {tab.count}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
+                                    <option value="all">All Audit Leads</option>
+                                    <option value="unassigned">Unassigned Only ({totals.unassigned})</option>
+                                    {analysts.map((a) => (
+                                        <option key={a.id} value={String(a.id)}>
+                                            Lead: {a.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                    {/* Analyst Lead Filter */}
-                    <div className="flex shrink-0 items-center gap-2">
-                        <select
-                            value={activeAnalyst}
-                            onChange={(e) => applyFilters({ analyst_id: e.target.value === 'all' ? '' : e.target.value })}
-                            className="rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs text-zinc-700 shadow-2xs focus:border-zinc-400 focus:outline-none"
-                        >
-                            <option value="all">All Audit Leads</option>
-                            <option value="unassigned">Unassigned Only ({totals.unassigned})</option>
-                            {analysts.map((a) => (
-                                <option key={a.id} value={String(a.id)}>
-                                    Lead: {a.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
+                            {/* Stacked distribution bar */}
+                            <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-zinc-100">
+                                {total > 0 &&
+                                    stages
+                                        .filter((s) => s.id !== 'all')
+                                        .map((s) =>
+                                            s.count > 0 ? (
+                                                <button
+                                                    key={s.id}
+                                                    type="button"
+                                                    title={`${s.label}: ${s.count}`}
+                                                    onClick={() => go(s.id)}
+                                                    className={cn('h-full transition-all duration-300', s.tone)}
+                                                    style={{ width: `${(s.count / total) * 100}%` }}
+                                                />
+                                            ) : null,
+                                        )}
+                            </div>
+
+                            {/* Status filter chips */}
+                            <div className="mt-3 flex flex-wrap gap-x-1.5 gap-y-2">
+                                {stages.map((s) => (
+                                    <button
+                                        key={s.id}
+                                        type="button"
+                                        onClick={() => go(s.id)}
+                                        className={cn(
+                                            'flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs transition-all',
+                                            isActive(s.id)
+                                                ? 'bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
+                                                : 'font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
+                                        )}
+                                    >
+                                        {s.id !== 'all' && <span className={cn('size-2 rounded-full', s.tone)} />}
+                                        <span>{s.label}</span>
+                                        <span
+                                            className={cn(
+                                                'rounded-full px-1.5 py-0.5 text-[10.5px] font-bold tabular-nums',
+                                                isActive(s.id) ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
+                                            )}
+                                        >
+                                            {s.count}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    );
+                })()}
 
                 {/* ── Search Bar Strip ────────────────────────────────────────── */}
                 <div className="mb-3 flex shrink-0 items-center justify-between gap-3">
@@ -1197,20 +1242,33 @@ export default function AdminFoundersIndex({
                                             <StatusBadge status={f.audit_status} />
                                         </div>
 
-                                        {/* Assigned Analyst */}
+                                        {/* Assigned Analyst (click to open the assign form) */}
                                         <div className="min-w-0 flex-1 truncate">
-                                            {f.assigned_analyst ? (
-                                                <div className="flex items-center gap-1.5 text-[11.5px] font-medium text-zinc-800">
-                                                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-900 text-[9px] font-bold text-white">
-                                                        {getInitials(f.assigned_analyst.name)}
-                                                    </div>
-                                                    <span className="truncate">{f.assigned_analyst.name}</span>
-                                                </div>
-                                            ) : (
-                                                <span className="py-0.2 inline-flex items-center gap-1 rounded-full border border-amber-200/60 bg-amber-50/80 px-2 text-[10.5px] font-medium text-amber-700">
-                                                    Unassigned
-                                                </span>
-                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setActiveDrawerFounder(f);
+                                                }}
+                                                title={f.assigned_analyst ? 'Change assigned analyst' : 'Assign an analyst'}
+                                                className="group inline-flex max-w-full items-center gap-1.5 rounded-md text-left"
+                                            >
+                                                {f.assigned_analyst ? (
+                                                    <>
+                                                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-[9px] font-bold text-white">
+                                                            {getInitials(f.assigned_analyst.name)}
+                                                        </div>
+                                                        <span className="truncate text-[11.5px] font-medium text-zinc-800 group-hover:text-zinc-950 group-hover:underline">
+                                                            {f.assigned_analyst.name}
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-200/60 bg-amber-50/80 px-2 py-0.5 text-[10.5px] font-medium text-amber-700 transition-colors group-hover:border-amber-300 group-hover:bg-amber-100">
+                                                        Unassigned
+                                                        <Icon icon="solar:add-circle-linear" className="size-3" />
+                                                    </span>
+                                                )}
+                                            </button>
                                         </div>
 
                                         {/* Actions */}

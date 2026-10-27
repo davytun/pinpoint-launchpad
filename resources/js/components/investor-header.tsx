@@ -2,8 +2,8 @@ import { PinpointLogo } from '@/components/pinpoint-logo';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useNotificationPolling } from '@/hooks/use-notification-polling';
 import { cn } from '@/lib/utils';
-import { PageProps } from '@inertiajs/core';
 import { Icon } from '@iconify/react';
+import { PageProps } from '@inertiajs/core';
 import { Link, router, usePage } from '@inertiajs/react';
 
 type Notification = {
@@ -57,10 +57,14 @@ export function InvestorHeader({
         };
 
         if (!notification.read_at) {
-            router.patch(route('investor.notifications.read', notification.id), {}, {
-                preserveScroll: true,
-                onSuccess: visit,
-            });
+            router.patch(
+                route('investor.notifications.read', notification.id),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: visit,
+                },
+            );
             return;
         }
 
@@ -72,12 +76,24 @@ export function InvestorHeader({
         router.patch(route('investor.notifications.read-all'), {}, { preserveScroll: true });
     }
 
-    const kycCopy =
+    const kycNotice =
         kycStatus === 'pending'
-            ? 'Identity verification is pending. You can browse Spotlight, but interest, diligence, data rooms, and pitch decks stay locked until approval.'
+            ? {
+                  title: 'Verification in review',
+                  body: 'Browse Spotlight while our team checks your details. Protected actions unlock on approval.',
+                  cta: 'Check status',
+              }
             : kycStatus === 'rejected'
-              ? 'Identity verification was not approved. Update your documents to unlock protected investor actions.'
-              : 'Complete identity verification to unlock interest, diligence, data rooms, and pitch decks.';
+              ? {
+                    title: 'We could not approve your documents',
+                    body: 'Re-upload your ID and proof of address and we will re-review, usually within a business day.',
+                    cta: 'Re-upload documents',
+                }
+              : {
+                    title: 'Verify to unlock the syndicate',
+                    body: 'Browsing is open. A quick identity check unlocks interest, diligence, and data rooms.',
+                    cta: 'Verify identity',
+                };
 
     return (
         <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/80 backdrop-blur-xl">
@@ -204,9 +220,7 @@ export function InvestorHeader({
                                                             isUnread ? 'text-zinc-900' : 'text-zinc-700',
                                                         )}
                                                     >
-                                                        {notification.data.title ??
-                                                            notification.data.type?.replaceAll('_', ' ') ??
-                                                            'Platform update'}
+                                                        {notification.data.title ?? notification.data.type?.replaceAll('_', ' ') ?? 'Platform update'}
                                                     </p>
                                                     {notification.data.body && (
                                                         <p className="mt-0.5 line-clamp-2 text-[12px] leading-relaxed text-zinc-500">
@@ -244,14 +258,30 @@ export function InvestorHeader({
             </div>
 
             {kycRestricted && (
-                <div className="border-t border-amber-200/70 bg-amber-50/90">
-                    <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-2 gap-y-1 px-4 py-2.5 text-center text-[12px] font-medium text-amber-900 sm:justify-between sm:px-6 lg:px-8 sm:text-left">
-                        <p className="max-w-3xl leading-snug">{kycCopy}</p>
+                <div className="border-t border-amber-200/70 bg-amber-50">
+                    <div className="mx-auto flex max-w-7xl flex-col gap-2.5 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+                        <div className="flex items-start gap-2.5">
+                            <Icon
+                                icon={
+                                    kycStatus === 'pending'
+                                        ? 'solar:clock-circle-linear'
+                                        : kycStatus === 'rejected'
+                                          ? 'solar:refresh-linear'
+                                          : 'solar:shield-user-linear'
+                                }
+                                className="mt-0.5 size-4 shrink-0 text-amber-600"
+                            />
+                            <p className="text-[12.5px] leading-snug">
+                                <span className="font-semibold text-amber-900">{kycNotice.title}:</span>{' '}
+                                <span className="text-amber-800/80">{kycNotice.body}</span>
+                            </p>
+                        </div>
                         <Link
                             href={route('investor.kyc.create')}
-                            className="shrink-0 font-bold underline underline-offset-2 hover:text-amber-950"
+                            className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg border border-amber-300/80 bg-white px-3 py-1.5 text-[12.5px] font-semibold text-amber-900 shadow-2xs transition-colors hover:bg-amber-100 sm:self-auto"
                         >
-                            {kycStatus === 'pending' ? 'View status' : 'Verify identity'}
+                            {kycNotice.cta}
+                            <Icon icon="solar:arrow-right-linear" className="size-3.5" />
                         </Link>
                     </div>
                 </div>

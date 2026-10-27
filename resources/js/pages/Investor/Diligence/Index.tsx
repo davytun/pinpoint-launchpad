@@ -197,21 +197,32 @@ export default function DiligenceIndex({
                 <DiligenceSubmitForm profiles={eligible_profiles} />
 
                 {diligence_requests.length === 0 ? (
-                    <div className="pb-8 text-center">
-                        <p className="text-[15px] text-zinc-600">No inquiries yet.</p>
-                        <p className="mt-1.5 max-w-md text-[13px] leading-relaxed text-zinc-500">
-                            {eligible_profiles.length > 0
-                                ? 'Use the form above after a completed founder introduction.'
-                                : 'Opens after Pinpoint marks a founder call as completed.'}
-                        </p>
-                        {eligible_profiles.length === 0 && (
-                            <Link
-                                href={route('investor.interests.index')}
-                                className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#3A54A5] hover:text-[#2D4182]"
-                            >
-                                My Interests
-                                <Icon icon="solar:arrow-right-linear" className="size-3.5" />
-                            </Link>
+                    <div className="mx-auto max-w-md py-12 text-center">
+                        <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-500">
+                            <Icon icon="solar:chat-round-dots-linear" className="size-5" />
+                        </div>
+                        {eligible_profiles.length > 0 ? (
+                            <>
+                                <h2 className="mt-5 text-lg font-semibold text-zinc-950">No inquiries yet</h2>
+                                <p className="mt-2 text-sm leading-6 text-zinc-500">
+                                    Use the form above to send a follow-up question. Pinpoint routes it to the founder and returns the answer here.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <h2 className="mt-5 text-lg font-semibold text-zinc-950">Diligence opens after a founder call</h2>
+                                <p className="mt-2 text-sm leading-6 text-zinc-500">
+                                    Once Pinpoint completes an introduction, you can raise follow-up questions here. We route each to the founder and
+                                    return verified answers, keeping both sides' conversations mediated.
+                                </p>
+                                <Link
+                                    href={route('investor.interests.index')}
+                                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 underline underline-offset-4"
+                                >
+                                    View my interests
+                                    <Icon icon="solar:arrow-right-linear" className="size-4" />
+                                </Link>
+                            </>
                         )}
                     </div>
                 ) : (

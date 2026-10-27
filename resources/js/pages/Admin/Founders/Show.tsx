@@ -2,10 +2,9 @@ import { Icon } from '@iconify/react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Analyst {
     id: number;
@@ -72,9 +71,22 @@ interface PageProps {
     user_role: 'superadmin' | 'analyst' | 'support' | 'investor_relations';
 }
 
+// Pillar + band tone helpers for the PARAGON display (restrained tri-tier scale).
+const pillarBarTone = (v: number) => (v >= 85 ? 'bg-emerald-500' : v >= 70 ? 'bg-[#3A54A5]' : 'bg-amber-500');
+const pillarValTone = (v: number) => (v >= 85 ? 'text-emerald-600' : v >= 70 ? 'text-[#3A54A5]' : 'text-amber-600');
+const bandLabel = (s: number) => (s >= 85 ? 'Strong' : s >= 75 ? 'Solid' : s >= 60 ? 'Developing' : 'At Risk');
+const bandChip = (s: number) =>
+    s >= 85
+        ? 'bg-emerald-100 text-emerald-700'
+        : s >= 75
+          ? 'bg-[#3A54A5]/10 text-[#3A54A5]'
+          : s >= 60
+            ? 'bg-amber-100 text-amber-700'
+            : 'bg-rose-100 text-rose-700';
+
 function SectionCard({ title, badge, children }: { title: string; badge?: React.ReactNode; children: React.ReactNode }) {
     return (
-        <div className="flex flex-col justify-between rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-2xs">
+        <div className="flex flex-col rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-2xs">
             <div className="mb-3.5 flex items-center justify-between border-b border-zinc-100 pb-2.5">
                 <h3 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">{title}</h3>
                 {badge}
@@ -88,7 +100,7 @@ function DataRow({ label, value }: { label: string; value: React.ReactNode }) {
     return (
         <div className="flex items-center justify-between gap-4 border-b border-zinc-100/70 py-1.5 text-xs last:border-0">
             <span className="shrink-0 font-medium text-zinc-400">{label}</span>
-            <span className="text-right font-semibold text-zinc-950 truncate max-w-[260px]">{value ?? '—'}</span>
+            <span className="max-w-[260px] truncate text-right font-semibold text-zinc-950">{value ?? '—'}</span>
         </div>
     );
 }
@@ -165,7 +177,11 @@ export default function AdminFoundersShow({
     const [copiedEmail, setCopiedEmail] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const auditForm = useForm({
+    const auditForm = useForm<{
+        audit_status: string;
+        response_message: string;
+        send_message_to_founder: boolean;
+    }>({
         audit_status: payment?.audit_status ?? 'pending',
         response_message: '',
         send_message_to_founder: true,
@@ -247,9 +263,7 @@ export default function AdminFoundersShow({
                         </Link>
                         <div>
                             <div className="flex items-center gap-2.5">
-                                <h1 className="text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">
-                                    {companyName}
-                                </h1>
+                                <h1 className="text-xl font-bold tracking-tight text-zinc-950 sm:text-2xl">{companyName}</h1>
                                 {payment?.audit_status && <StatusBadge status={payment.audit_status} />}
                             </div>
                             <p className="mt-0.5 text-xs text-zinc-400">
@@ -267,7 +281,7 @@ export default function AdminFoundersShow({
                             <Icon icon="solar:chat-round-dots-linear" className="size-3.5 text-zinc-500" />
                             <span>Live Messages</span>
                             {message_thread && message_thread.unread_count > 0 && (
-                                <span className="rounded-full bg-blue-600 px-1.5 py-0.2 text-[10px] font-bold text-white">
+                                <span className="rounded-full bg-[#3A54A5] px-1.5 py-0.5 text-[10px] font-bold text-white">
                                     {message_thread.unread_count}
                                 </span>
                             )}
@@ -303,7 +317,7 @@ export default function AdminFoundersShow({
                                 type="button"
                                 onClick={() => setActiveTab(tab.id)}
                                 className={cn(
-                                    'flex items-center gap-1.5 shrink-0 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all duration-150',
+                                    'flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all duration-150',
                                     isActive
                                         ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
                                         : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
@@ -312,12 +326,12 @@ export default function AdminFoundersShow({
                                 <Icon icon={tab.icon} className="size-3.5" />
                                 <span>{tab.label}</span>
                                 {tab.id === 'Documents' && (
-                                    <span className="rounded-full bg-zinc-200/80 px-1.5 py-0.2 text-[10px] font-bold text-zinc-700">
+                                    <span className="rounded-full bg-zinc-200/80 px-1.5 py-0.5 text-[10px] font-bold text-zinc-700">
                                         {documentCount}
                                     </span>
                                 )}
                                 {tab.id === 'Messages' && message_thread && message_thread.unread_count > 0 && (
-                                    <span className="rounded-full bg-blue-600 px-1.5 py-0.2 text-[10px] font-bold text-white">
+                                    <span className="rounded-full bg-[#3A54A5] px-1.5 py-0.5 text-[10px] font-bold text-white">
                                         {message_thread.unread_count}
                                     </span>
                                 )}
@@ -330,7 +344,7 @@ export default function AdminFoundersShow({
                 <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto">
                     {/* ── TAB 1: Overview & Audit ── */}
                     {activeTab === 'Overview' && (
-                        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                        <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
                             {/* Card 1: Founder & Entity Details */}
                             <SectionCard title="Founder & Entity Details">
                                 <DataRow label="Full Legal Name" value={founderName} />
@@ -357,6 +371,16 @@ export default function AdminFoundersShow({
                                     <div className="flex items-baseline gap-2">
                                         <span className="font-mono text-3xl font-bold text-zinc-950">{founder.score ?? '—'}</span>
                                         <span className="font-mono text-xs text-zinc-400">/ 100</span>
+                                        {founder.score != null && (
+                                            <span
+                                                className={cn(
+                                                    'self-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase',
+                                                    bandChip(founder.score),
+                                                )}
+                                            >
+                                                {bandLabel(founder.score)}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="text-right">
                                         <span className="block text-[11px] text-zinc-400">Venture Tier</span>
@@ -370,11 +394,11 @@ export default function AdminFoundersShow({
                                             <div key={pillar} className="space-y-0.5">
                                                 <div className="flex items-center justify-between text-[11px]">
                                                     <span className="font-medium text-zinc-600 capitalize">{pillar}</span>
-                                                    <span className="font-mono font-bold text-zinc-900">{Math.round(score)}%</span>
+                                                    <span className={cn('font-mono font-bold', pillarValTone(score))}>{Math.round(score)}%</span>
                                                 </div>
                                                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200/60">
                                                     <div
-                                                        className="h-full rounded-full bg-zinc-900 transition-all duration-300"
+                                                        className={cn('h-full rounded-full transition-all duration-300', pillarBarTone(score))}
                                                         style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
                                                     />
                                                 </div>
@@ -390,17 +414,28 @@ export default function AdminFoundersShow({
                                     <form onSubmit={submitAuditStatus} className="space-y-3">
                                         <div>
                                             <label className="mb-1 block text-[11px] font-semibold text-zinc-500">Audit Status</label>
-                                            <select
-                                                value={auditForm.data.audit_status}
-                                                onChange={(e) => auditForm.setData('audit_status', e.target.value)}
-                                                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 shadow-2xs focus:border-zinc-400 focus:outline-none"
-                                            >
-                                                <option value="pending">Pending Review</option>
-                                                <option value="in_progress">In Progress</option>
-                                                <option value="needs_info">Needs Information</option>
-                                                <option value="on_hold">On Hold</option>
-                                                <option value="complete">Complete & Verified</option>
-                                            </select>
+                                            <Select value={auditForm.data.audit_status} onValueChange={(v) => auditForm.setData('audit_status', v)}>
+                                                <SelectTrigger className="w-full rounded-xl border-zinc-200 bg-white text-xs shadow-2xs">
+                                                    <SelectValue placeholder="Select status" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="pending" className="text-xs">
+                                                        Pending Review
+                                                    </SelectItem>
+                                                    <SelectItem value="in_progress" className="text-xs">
+                                                        In Progress
+                                                    </SelectItem>
+                                                    <SelectItem value="needs_info" className="text-xs">
+                                                        Needs Information
+                                                    </SelectItem>
+                                                    <SelectItem value="on_hold" className="text-xs">
+                                                        On Hold
+                                                    </SelectItem>
+                                                    <SelectItem value="complete" className="text-xs">
+                                                        Complete &amp; Verified
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
 
                                         <div>
@@ -440,37 +475,67 @@ export default function AdminFoundersShow({
                             {/* Card 4: Assigned Analyst */}
                             <SectionCard title="Assigned Analyst Lead">
                                 {assignment ? (
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs font-semibold text-zinc-900">{assignment.analyst_name ?? '—'}</span>
-                                            <span className="text-[11px] text-zinc-400">Assigned {assignment.assigned_at}</span>
+                                    <div className="space-y-2.5">
+                                        <div className="flex items-center gap-2.5">
+                                            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#3A54A5]/10 text-xs font-bold text-[#3A54A5]">
+                                                {(assignment.analyst_name ?? '?')
+                                                    .trim()
+                                                    .split(/\s+/)
+                                                    .map((w) => w[0])
+                                                    .slice(0, 2)
+                                                    .join('')
+                                                    .toUpperCase()}
+                                            </span>
+                                            <div className="min-w-0">
+                                                <p className="truncate text-xs font-semibold text-zinc-950">{assignment.analyst_name ?? '—'}</p>
+                                                <p className="truncate text-[11px] text-zinc-400">
+                                                    {analysts.find((a) => String(a.id) === String(assignment.analyst_id))?.email ?? 'Analyst lead'}
+                                                </p>
+                                            </div>
+                                            <span className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                                                <span className="size-1.5 rounded-full bg-emerald-600" />
+                                                Assigned
+                                            </span>
                                         </div>
+                                        <p className="text-[11px] text-zinc-400">Assigned {assignment.assigned_at ?? '—'}</p>
                                         {assignment.notes && (
-                                            <p className="rounded-xl border border-zinc-200/80 bg-zinc-50 p-2.5 text-xs text-zinc-600">
+                                            <p className="rounded-xl border border-zinc-200/80 bg-zinc-50 p-2.5 text-xs leading-relaxed text-zinc-600">
                                                 {assignment.notes}
                                             </p>
                                         )}
                                     </div>
                                 ) : (
-                                    <p className="text-xs font-medium text-zinc-400">No analyst lead assigned yet.</p>
+                                    <div className="flex items-center gap-2.5">
+                                        <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-200 text-zinc-300">
+                                            <Icon icon="solar:user-linear" className="size-4" />
+                                        </span>
+                                        <p className="text-xs font-medium text-zinc-400">No analyst lead assigned yet.</p>
+                                    </div>
                                 )}
 
                                 {isSuperAdmin && (
                                     <div className="border-t border-zinc-100 pt-2">
                                         {showAssign ? (
                                             <form onSubmit={submitAssign} className="space-y-3">
-                                                <select
-                                                    value={assignForm.data.analyst_id}
-                                                    onChange={(e) => assignForm.setData('analyst_id', e.target.value)}
-                                                    className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 shadow-2xs focus:border-zinc-400 focus:outline-none"
+                                                <Select
+                                                    value={assignForm.data.analyst_id || 'none'}
+                                                    onValueChange={(v) => assignForm.setData('analyst_id', v === 'none' ? '' : v)}
                                                 >
-                                                    <option value="">Select Analyst Lead…</option>
-                                                    {analysts.map((a) => (
-                                                        <option key={a.id} value={a.id}>
-                                                            {a.name} ({a.email})
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                    <SelectTrigger className="w-full rounded-xl border-zinc-200 bg-white text-xs shadow-2xs">
+                                                        <SelectValue placeholder="Select Analyst Lead…" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="none" className="text-xs text-zinc-400">
+                                                            Select Analyst Lead…
+                                                        </SelectItem>
+                                                        {analysts.map((a) => (
+                                                            <SelectItem key={a.id} value={String(a.id)} className="text-xs">
+                                                                {a.name}
+                                                                <span className="text-zinc-400"> · {a.email}</span>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                                 <textarea
                                                     value={assignForm.data.notes}
                                                     onChange={(e) => assignForm.setData('notes', e.target.value)}
@@ -522,7 +587,10 @@ export default function AdminFoundersShow({
                             <SectionCard title="Legal Agreement & NDA">
                                 {signature ? (
                                     <>
-                                        <DataRow label="Status" value={<span className="font-semibold text-emerald-700 capitalize">{signature.status}</span>} />
+                                        <DataRow
+                                            label="Status"
+                                            value={<span className="font-semibold text-emerald-700 capitalize">{signature.status}</span>}
+                                        />
                                         <DataRow label="Signer Name" value={signature.signer_name} />
                                         <DataRow label="Timestamp" value={signature.signed_at} />
                                     </>
@@ -586,7 +654,7 @@ export default function AdminFoundersShow({
                                                 </button>
                                             </div>
                                             <div className="w-1/6 min-w-0 text-[11.5px] text-zinc-400">{doc.created_at}</div>
-                                            <div className="w-28 shrink-0 flex items-center justify-end gap-1.5">
+                                            <div className="flex w-28 shrink-0 items-center justify-end gap-1.5">
                                                 <a
                                                     href={route('admin.documents.download', { founder: founder.id, document: doc.id })}
                                                     className="rounded-lg border border-zinc-200/80 bg-white px-2.5 py-1 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
@@ -611,9 +679,7 @@ export default function AdminFoundersShow({
                                         {founder.full_name ? founder.full_name.charAt(0).toUpperCase() : 'F'}
                                     </div>
                                     <div>
-                                        <h4 className="text-xs font-bold text-zinc-950">
-                                            Conversation with {founderName}
-                                        </h4>
+                                        <h4 className="text-xs font-bold text-zinc-950">Conversation with {founderName}</h4>
                                         <p className="text-[11px] text-zinc-400">{founder.email}</p>
                                     </div>
                                 </div>
@@ -643,7 +709,7 @@ export default function AdminFoundersShow({
                                         return (
                                             <div
                                                 key={msg.id}
-                                                className={cn('flex flex-col max-w-[80%]', isAdmin ? 'ml-auto items-end' : 'mr-auto items-start')}
+                                                className={cn('flex max-w-[80%] flex-col', isAdmin ? 'ml-auto items-end' : 'mr-auto items-start')}
                                             >
                                                 <div className="mb-1 flex items-center gap-1.5 text-[10.5px] text-zinc-400">
                                                     <span className="font-semibold text-zinc-700">{msg.sender_name}</span>
@@ -655,17 +721,19 @@ export default function AdminFoundersShow({
                                                     className={cn(
                                                         'rounded-2xl px-4 py-2.5 text-xs shadow-2xs',
                                                         isAdmin
-                                                            ? 'bg-zinc-950 text-white rounded-tr-xs'
-                                                            : 'border border-zinc-200/90 bg-white text-zinc-900 rounded-tl-xs',
+                                                            ? 'rounded-tr-xs bg-zinc-950 text-white'
+                                                            : 'rounded-tl-xs border border-zinc-200/90 bg-white text-zinc-900',
                                                     )}
                                                 >
-                                                    {msg.body && <p className="whitespace-pre-wrap leading-relaxed">{msg.body}</p>}
+                                                    {msg.body && <p className="leading-relaxed whitespace-pre-wrap">{msg.body}</p>}
 
                                                     {msg.has_attachment && msg.attachment_filename && (
                                                         <div
                                                             className={cn(
                                                                 'mt-2 flex items-center justify-between gap-3 rounded-xl p-2 text-xs',
-                                                                isAdmin ? 'bg-zinc-800/80 text-zinc-200' : 'bg-zinc-50 text-zinc-700 border border-zinc-200/60',
+                                                                isAdmin
+                                                                    ? 'bg-zinc-800/80 text-zinc-200'
+                                                                    : 'border border-zinc-200/60 bg-zinc-50 text-zinc-700',
                                                             )}
                                                         >
                                                             <div className="flex items-center gap-1.5 truncate">
@@ -704,7 +772,7 @@ export default function AdminFoundersShow({
                                         rows={2}
                                         className="w-full resize-none rounded-xl border border-zinc-200 bg-[#FAFBFD] p-2.5 text-xs text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
                                         onKeyDown={(e) => {
-                                             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                                            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                                                 e.preventDefault();
                                                 submitReply(e);
                                             }
@@ -714,7 +782,7 @@ export default function AdminFoundersShow({
                                     <div className="flex items-center justify-between">
                                         <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-200/80 bg-white px-2.5 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50">
                                             <Icon icon="solar:paperclip-linear" className="size-3.5 text-zinc-500" />
-                                            <span className="truncate max-w-[140px]">
+                                            <span className="max-w-[140px] truncate">
                                                 {replyForm.data.attachment ? replyForm.data.attachment.name : 'Attach file'}
                                             </span>
                                             <input
@@ -753,7 +821,9 @@ export default function AdminFoundersShow({
                                             <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-3">
                                                 <div>
                                                     <h3 className="text-sm font-bold text-zinc-950">Investor Spotlight Syndicate</h3>
-                                                    <p className="text-[11px] text-zinc-400">Public profile indexed for accredited investor syndication.</p>
+                                                    <p className="text-[11px] text-zinc-400">
+                                                        Founder-written overview. Only an admin can publish this to the investor syndicate.
+                                                    </p>
                                                 </div>
                                                 <span
                                                     className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
@@ -766,18 +836,14 @@ export default function AdminFoundersShow({
                                                 >
                                                     <span
                                                         className={`h-1.5 w-1.5 rounded-full ${
-                                                            profile.is_published
-                                                                ? 'bg-emerald-600'
-                                                                : profile.is_live
-                                                                  ? 'bg-amber-500'
-                                                                  : 'bg-zinc-400'
+                                                            profile.is_published ? 'bg-emerald-600' : profile.is_live ? 'bg-amber-500' : 'bg-zinc-400'
                                                         }`}
                                                     />
                                                     <span>
                                                         {profile.is_published
                                                             ? 'Live on Syndicate'
                                                             : profile.is_live
-                                                              ? 'Ready — not published'
+                                                              ? 'Ready not published'
                                                               : profile.is_public
                                                                 ? 'Public Dossier'
                                                                 : 'Draft'}
@@ -813,11 +879,17 @@ export default function AdminFoundersShow({
                                                 </div>
                                             </div>
 
-                                            {!profile.is_published && (
-                                                <p className="mt-3 text-[11.5px] leading-relaxed text-zinc-500">
-                                                    This dossier is not live for investors yet. Publish it from Investor Desk → Spotlight.
+                                            <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
+                                                <Icon
+                                                    icon={profile.is_published ? 'solar:eye-circular-linear' : 'solar:shield-user-linear'}
+                                                    className="mt-0.5 size-4 shrink-0 text-[#3A54A5]"
+                                                />
+                                                <p className="text-[11.5px] leading-relaxed text-zinc-600">
+                                                    {profile.is_published
+                                                        ? 'Published to the investor syndicate by a Pinpoint admin. The live dossier reflects what the admin approved, not direct founder edits.'
+                                                        : 'Founders cannot publish their own spotlight. This overview is what the founder wrote; it only reaches investors after a Pinpoint admin reviews and publishes it from the Spotlight desk.'}
                                                 </p>
-                                            )}
+                                            </div>
 
                                             <div className="mt-5 flex gap-2.5">
                                                 {profile.is_published ? (
@@ -871,7 +943,7 @@ export default function AdminFoundersShow({
                                                         className="flex items-center justify-between rounded-xl border border-zinc-200/70 bg-white px-3 py-2 text-xs"
                                                     >
                                                         <span className="font-semibold text-zinc-800">{badge}</span>
-                                                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-700 text-[11px]">
+                                                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
                                                             <Icon icon="solar:check-circle-linear" className="size-3 text-emerald-600" />
                                                             Active
                                                         </span>
@@ -889,7 +961,9 @@ export default function AdminFoundersShow({
                                             <div className="mb-4 flex items-center justify-between border-b border-zinc-100 pb-3">
                                                 <div>
                                                     <h3 className="text-sm font-bold text-zinc-950">Spotlight Syndicate Readiness</h3>
-                                                    <p className="text-[11px] text-zinc-400">Prerequisites required before investor spotlight publishing.</p>
+                                                    <p className="text-[11px] text-zinc-400">
+                                                        Prerequisites required before investor spotlight publishing.
+                                                    </p>
                                                 </div>
                                                 <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
                                                     Audit in Review
@@ -900,23 +974,39 @@ export default function AdminFoundersShow({
                                                 <div className="flex items-center justify-between rounded-xl border border-zinc-100 bg-[#FAFBFD] p-3 text-xs">
                                                     <div className="flex items-center gap-2.5">
                                                         <Icon
-                                                            icon={payment?.status === 'paid' ? 'solar:check-circle-bold' : 'solar:clock-circle-linear'}
-                                                            className={cn('size-4', payment?.status === 'paid' ? 'text-emerald-600' : 'text-zinc-400')}
+                                                            icon={
+                                                                payment?.status === 'paid' ? 'solar:check-circle-bold' : 'solar:clock-circle-linear'
+                                                            }
+                                                            className={cn(
+                                                                'size-4',
+                                                                payment?.status === 'paid' ? 'text-emerald-600' : 'text-zinc-400',
+                                                            )}
                                                         />
                                                         <span className="font-semibold text-zinc-900">Audit Payment Confirmed</span>
                                                     </div>
-                                                    <span className="text-[11px] font-medium text-zinc-500 capitalize">{payment?.status ?? 'Pending'}</span>
+                                                    <span className="text-[11px] font-medium text-zinc-500 capitalize">
+                                                        {payment?.status ?? 'Pending'}
+                                                    </span>
                                                 </div>
 
                                                 <div className="flex items-center justify-between rounded-xl border border-zinc-100 bg-[#FAFBFD] p-3 text-xs">
                                                     <div className="flex items-center gap-2.5">
                                                         <Icon
-                                                            icon={signature?.status === 'signed' ? 'solar:check-circle-bold' : 'solar:clock-circle-linear'}
-                                                            className={cn('size-4', signature?.status === 'signed' ? 'text-emerald-600' : 'text-zinc-400')}
+                                                            icon={
+                                                                signature?.status === 'signed'
+                                                                    ? 'solar:check-circle-bold'
+                                                                    : 'solar:clock-circle-linear'
+                                                            }
+                                                            className={cn(
+                                                                'size-4',
+                                                                signature?.status === 'signed' ? 'text-emerald-600' : 'text-zinc-400',
+                                                            )}
                                                         />
                                                         <span className="font-semibold text-zinc-900">Legal Agreement & NDA Executed</span>
                                                     </div>
-                                                    <span className="text-[11px] font-medium text-zinc-500 capitalize">{signature?.status ?? 'Pending'}</span>
+                                                    <span className="text-[11px] font-medium text-zinc-500 capitalize">
+                                                        {signature?.status ?? 'Pending'}
+                                                    </span>
                                                 </div>
 
                                                 <div className="flex items-center justify-between rounded-xl border border-zinc-100 bg-[#FAFBFD] p-3 text-xs">
@@ -927,7 +1017,9 @@ export default function AdminFoundersShow({
                                                         />
                                                         <span className="font-semibold text-zinc-900">PARAGON Diagnostic Assessed</span>
                                                     </div>
-                                                    <span className="font-mono text-[11px] font-bold text-zinc-900">{founder.score ? `${founder.score}/100` : '—'}</span>
+                                                    <span className="font-mono text-[11px] font-bold text-zinc-900">
+                                                        {founder.score ? `${founder.score}/100` : '—'}
+                                                    </span>
                                                 </div>
 
                                                 <div className="flex items-center justify-between rounded-xl border border-zinc-100 bg-[#FAFBFD] p-3 text-xs">
@@ -951,7 +1043,8 @@ export default function AdminFoundersShow({
                                                 </div>
                                                 <h4 className="text-sm font-bold text-zinc-950">Publish Investor Spotlight Profile</h4>
                                                 <p className="text-xs leading-relaxed text-zinc-500">
-                                                    Finalizing the audit marks the venture as complete, mints the verification badges, indexes the founder for syndicate matching, and notifies all parties.
+                                                    Finalizing the audit marks the venture as complete, mints the verification badges, indexes the
+                                                    founder for syndicate matching, and notifies all parties.
                                                 </p>
                                             </div>
 

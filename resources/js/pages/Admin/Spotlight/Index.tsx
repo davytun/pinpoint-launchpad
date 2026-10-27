@@ -18,9 +18,11 @@ interface PitchDeck {
 }
 
 interface Badge {
-    id: string;
+    id: number | string | null;
     label: string;
     badge_type: string;
+    is_verified: boolean;
+    verified_at?: string | null;
 }
 
 interface SpotlightProfile {
@@ -97,6 +99,18 @@ function formatBytes(bytes?: number): string {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
+// Restrained tri-tier band scale for the PARAGON score (color encodes value).
+const bandLabel = (s: number) => (s >= 85 ? 'Strong' : s >= 75 ? 'Solid' : s >= 60 ? 'Developing' : 'At Risk');
+const bandValTone = (s: number) => (s >= 85 ? 'text-emerald-700' : s >= 75 ? 'text-[#3A54A5]' : s >= 60 ? 'text-amber-600' : 'text-rose-600');
+const bandChip = (s: number) =>
+    s >= 85
+        ? 'bg-emerald-100 text-emerald-700'
+        : s >= 75
+          ? 'bg-[#3A54A5]/10 text-[#3A54A5]'
+          : s >= 60
+            ? 'bg-amber-100 text-amber-700'
+            : 'bg-rose-100 text-rose-700';
+
 function buildParams(overrides: Record<string, string | undefined>, current: Partial<PageProps>) {
     const p: Record<string, string> = {};
     const status = overrides.status !== undefined ? overrides.status : current.activeStatus !== 'all' ? current.activeStatus : undefined;
@@ -127,6 +141,7 @@ function SpotlightDrawer({
     const [publishing, setPublishing] = useState(false);
     const [reviewingDeck, setReviewingDeck] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [badgeBusy, setBadgeBusy] = useState<string | null>(null);
 
     useEffect(() => {
         setOneLiner(profile.spotlight_one_liner);
@@ -220,6 +235,27 @@ function SpotlightDrawer({
         );
     }
 
+    function toggleBadge(badgeType: string, nextValue: boolean) {
+        setBadgeBusy(badgeType);
+        const prevBadges = profile.badges;
+        const prevCount = profile.verified_badges_count;
+
+        const nextBadges = profile.badges.map((b) =>
+            b.badge_type === badgeType ? { ...b, is_verified: nextValue, verified_at: nextValue ? 'just now' : null } : b,
+        );
+        onUpdateProfile({ ...profile, badges: nextBadges, verified_badges_count: nextBadges.filter((b) => b.is_verified).length });
+
+        router.patch(
+            `/admin/investors/spotlight/${profile.id}`,
+            { badge_type: badgeType, badge_verified: nextValue },
+            {
+                preserveScroll: true,
+                onFinish: () => setBadgeBusy(null),
+                onError: () => onUpdateProfile({ ...profile, badges: prevBadges, verified_badges_count: prevCount }),
+            },
+        );
+    }
+
     useEffect(() => {
         function handleKeyDown(e: KeyboardEvent) {
             if (e.key === 'Escape') onClose();
@@ -277,14 +313,20 @@ function SpotlightDrawer({
                 <div className="no-scrollbar min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
                     {/* Publishing Readiness Warning (if requirements pending) */}
                     {!profile.is_published && profile.publish_requirements.length > 0 && (
-                        <div className="space-y-2 rounded-xl border border-amber-200 bg-amber-50/70 p-3.5 text-xs">
-                            <div className="flex items-center gap-1.5 font-semibold text-amber-900">
+                        <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-3.5">
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-900">
                                 <Icon icon="solar:danger-triangle-linear" className="size-4 text-amber-600" />
-                                <span>Requirements to Publish ({profile.publish_requirements.length})</span>
+                                <span>
+                                    {profile.publish_requirements.length} {profile.publish_requirements.length === 1 ? 'item' : 'items'} left before
+                                    you can publish
+                                </span>
                             </div>
-                            <ul className="list-disc space-y-1 pl-5 text-[11.5px] text-amber-800">
+                            <ul className="mt-2 space-y-1.5">
                                 {profile.publish_requirements.map((req, idx) => (
-                                    <li key={idx}>{req}</li>
+                                    <li key={idx} className="flex items-center gap-2 text-[11.5px] text-amber-800">
+                                        <span className="size-3.5 shrink-0 rounded-[4px] border border-amber-300 bg-white" aria-hidden />
+                                        <span>{req}</span>
+                                    </li>
                                 ))}
                             </ul>
                         </div>
@@ -292,6 +334,10 @@ function SpotlightDrawer({
 
                     {/* Section 1: Investor Copy */}
                     <div className="space-y-4">
+                        <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
+                            <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Spotlight Details</h4>
+                            <span className="text-[11px] text-zinc-400">What investors see on the public page</span>
+                        </div>
                         {/* Sector & Batch */}
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1.5">
@@ -366,7 +412,7 @@ function SpotlightDrawer({
                             <div className="space-y-3 rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
                                 <div className="flex items-center justify-between">
                                     <div className="flex min-w-0 items-center gap-2.5">
-                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-red-200/60 bg-red-50 text-red-600">
+                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-200/70 bg-zinc-100 text-zinc-500">
                                             <Icon icon="solar:document-text-linear" className="size-4.5" />
                                         </div>
                                         <div className="min-w-0">
@@ -427,24 +473,85 @@ function SpotlightDrawer({
                     <div className="space-y-3 pt-2">
                         <div className="flex items-center justify-between border-b border-zinc-100 pb-2">
                             <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">PARAGON Audit & Badges</h4>
-                            <span className="text-[11px] font-bold text-emerald-700">Score: {profile.overall_score ?? '—'}/100</span>
+                            <div className="flex items-center gap-2">
+                                {profile.overall_score != null && (
+                                    <span
+                                        className={cn(
+                                            'rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase',
+                                            bandChip(profile.overall_score),
+                                        )}
+                                    >
+                                        {bandLabel(profile.overall_score)}
+                                    </span>
+                                )}
+                                <span
+                                    className={cn(
+                                        'text-[12px] font-bold tabular-nums',
+                                        profile.overall_score != null ? bandValTone(profile.overall_score) : 'text-zinc-400',
+                                    )}
+                                >
+                                    {profile.overall_score ?? '—'}
+                                    <span className="font-medium text-zinc-400">/100</span>
+                                </span>
+                            </div>
                         </div>
 
-                        {profile.badges.length > 0 ? (
-                            <div className="flex flex-wrap gap-1.5">
-                                {profile.badges.map((b) => (
-                                    <span
-                                        key={b.id}
-                                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-200/70 bg-zinc-100 px-2.5 py-1 text-[11px] font-medium text-zinc-700"
-                                    >
-                                        <Icon icon="solar:verified-check-linear" className="size-3 text-emerald-600" />
-                                        <span>{b.label}</span>
-                                    </span>
-                                ))}
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <p className="text-[11px] text-zinc-400">Toggle the checks an analyst verified during the audit.</p>
+                                <span className="shrink-0 text-[11px] font-semibold text-zinc-500 tabular-nums">
+                                    {profile.badges.filter((b) => b.is_verified).length}/{profile.badges.length} verified
+                                </span>
                             </div>
-                        ) : (
-                            <p className="text-xs text-zinc-400">No verified badges awarded yet.</p>
-                        )}
+                            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                                {profile.badges.map((b) => {
+                                    const busy = badgeBusy === b.badge_type;
+                                    return (
+                                        <button
+                                            key={b.badge_type}
+                                            type="button"
+                                            role="switch"
+                                            aria-checked={b.is_verified}
+                                            disabled={busy}
+                                            onClick={() => toggleBadge(b.badge_type, !b.is_verified)}
+                                            className={cn(
+                                                'flex items-center gap-2.5 rounded-xl border px-3 py-2 text-left transition-colors disabled:opacity-60',
+                                                b.is_verified
+                                                    ? 'border-emerald-200/80 bg-emerald-50/60'
+                                                    : 'border-zinc-200/80 bg-white hover:bg-zinc-50',
+                                            )}
+                                        >
+                                            <span
+                                                className={cn(
+                                                    'relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors',
+                                                    b.is_verified ? 'bg-emerald-500' : 'bg-zinc-300',
+                                                )}
+                                            >
+                                                <span
+                                                    className={cn(
+                                                        'inline-block size-3 transform rounded-full bg-white shadow-sm transition-transform',
+                                                        b.is_verified ? 'translate-x-3.5' : 'translate-x-0.5',
+                                                    )}
+                                                />
+                                            </span>
+                                            <span
+                                                className={cn(
+                                                    'flex-1 truncate text-[11px] font-semibold',
+                                                    b.is_verified ? 'text-emerald-800' : 'text-zinc-500',
+                                                )}
+                                            >
+                                                {b.label}
+                                            </span>
+                                            {busy ? (
+                                                <Icon icon="solar:refresh-linear" className="size-3.5 shrink-0 animate-spin text-zinc-400" />
+                                            ) : b.is_verified ? (
+                                                <Icon icon="solar:check-circle-bold" className="size-4 shrink-0 text-emerald-600" />
+                                            ) : null}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -453,7 +560,7 @@ function SpotlightDrawer({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="rounded-full px-3 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
+                        className="rounded-xl px-3.5 py-2 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                     >
                         Close
                     </button>
@@ -463,7 +570,7 @@ function SpotlightDrawer({
                             type="button"
                             onClick={() => saveCopy()}
                             disabled={saving}
-                            className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 disabled:opacity-50"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50 disabled:opacity-50"
                         >
                             {saving ? (
                                 <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
@@ -471,7 +578,6 @@ function SpotlightDrawer({
                                 <Icon icon="solar:diskette-linear" className="size-3.5 text-zinc-500" />
                             )}
                             <span>Save Copy</span>
-                            <kbd className="py-0.2 rounded bg-zinc-100 px-1 font-mono text-[10px] text-zinc-400">⌘↵</kbd>
                         </button>
 
                         {profile.is_published ? (
@@ -479,7 +585,7 @@ function SpotlightDrawer({
                                 type="button"
                                 onClick={() => togglePublish(false)}
                                 disabled={publishing}
-                                className="flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3.5 py-1.5 text-xs font-semibold text-rose-700 shadow-2xs transition-all hover:bg-rose-100"
+                                className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-rose-700 shadow-2xs transition-colors hover:bg-rose-50"
                             >
                                 {publishing ? (
                                     <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
@@ -493,17 +599,20 @@ function SpotlightDrawer({
                                 type="button"
                                 onClick={() => togglePublish(true)}
                                 disabled={publishing || !canPublish}
+                                title={canPublish ? undefined : 'Complete the requirements above to publish'}
                                 className={cn(
-                                    'flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold shadow-2xs transition-all',
+                                    'flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-2xs transition-colors',
                                     canPublish
                                         ? 'bg-zinc-950 text-white hover:bg-zinc-800'
-                                        : 'cursor-not-allowed border border-zinc-200 bg-zinc-100 text-zinc-400',
+                                        : 'cursor-not-allowed border border-zinc-200 bg-white text-zinc-400',
                                 )}
                             >
                                 {publishing ? (
                                     <Icon icon="solar:refresh-linear" className="size-3.5 animate-spin" />
-                                ) : (
+                                ) : canPublish ? (
                                     <Icon icon="solar:crown-linear" className="size-3.5 text-amber-300" />
+                                ) : (
+                                    <Icon icon="solar:lock-linear" className="size-3.5 text-zinc-400" />
                                 )}
                                 <span>Publish to Spotlight</span>
                             </button>

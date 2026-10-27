@@ -22,27 +22,42 @@ class FounderDocumentController extends Controller
 
     public function index(): Response
     {
-        $founder = Auth::guard('founder')->user()->load(['documents', 'payment']);
+        /** @var Founder $founder */
+        $founder = Auth::guard('founder')->user()->load('payment');
 
-        $documents = $founder->documents()
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn ($doc) => [
-                'id' => $doc->id,
-                'category' => $doc->category,
-                'category_label' => $doc->categoryLabel(),
-                'original_filename' => $doc->original_filename,
-                'file_size' => $doc->fileSizeForHumans(),
-                'extension' => $doc->extension,
-                'file_icon' => $doc->fileIcon(),
-                'is_reviewed' => $doc->is_reviewed,
-                'is_deletable' => $doc->isDeletable(),
-                'created_at' => $doc->created_at->format('d M Y'),
-            ]);
+        $grouped = $founder->documents()->get()->groupBy('category');
+
+        $mapDoc = fn (FounderDocument $doc) => [
+            'id' => $doc->id,
+            'original_filename' => $doc->original_filename,
+            'file_size' => $doc->fileSizeForHumans(),
+            'extension' => $doc->extension,
+            'file_icon' => $doc->fileIcon(),
+            'is_reviewed' => $doc->is_reviewed,
+            'is_deletable' => $doc->isDeletable(),
+            'created_at' => $doc->created_at->format('d M Y'),
+        ];
+
+        $categories = collect($this->categoryList())
+            ->map(function (array $cat) use ($grouped, $mapDoc) {
+                /** @var \Illuminate\Support\Collection $files */
+                $files = $grouped->get($cat['value'], collect());
+
+                return [
+                    ...$cat,
+                    'files' => $files->map($mapDoc)->values()->all(),
+                ];
+            })
+            ->values()
+            ->all();
 
         $totalCount = $founder->documents()->count();
-        $canUpload = $totalCount < 20;
         $auditStatus = $founder->payment?->audit_status ?? 'pending';
+        $requiredTotal = collect($this->categoryList())->where('required', true)->count();
+        $requiredDone = collect($categories)
+            ->where('required', true)
+            ->filter(fn (array $c) => count($c['files']) > 0)
+            ->count();
 
         return Inertia::render('Founder/Documents/Index', [
             'founder' => [
@@ -51,10 +66,14 @@ class FounderDocumentController extends Controller
                 'full_name' => $founder->full_name,
                 'company_name' => $founder->company_name,
             ],
-            'documents' => $documents,
-            'can_upload' => $canUpload,
+            'categories' => $categories,
+            'required_total' => $requiredTotal,
+            'required_done' => $requiredDone,
+            'can_upload' => $totalCount < 20,
             'audit_status' => $auditStatus,
-            'categories' => $this->categoryList(),
+            // Required slots lock once the analyst review has begun so evidence
+            // can't be swapped mid-audit; "Other" stays open for extras.
+            'locked' => in_array($auditStatus, ['in_progress', 'complete'], true),
             'total_count' => $totalCount,
             'max_files' => 20,
         ]);
@@ -147,16 +166,18 @@ class FounderDocumentController extends Controller
 
     private function categoryList(): array
     {
+        // Order matters: the checklist surfaces these top-to-bottom and treats the
+        // first unfilled required slot as the founder's "next" action.
         return [
-            ['value' => 'cap_table',                 'label' => 'Cap Table'],
-            ['value' => 'financial_forecast',         'label' => 'Financial Forecast'],
-            ['value' => 'bank_statement',             'label' => 'Bank Statement'],
-            ['value' => 'pitch_deck',                 'label' => 'Pitch Deck'],
-            ['value' => 'articles_of_incorporation',  'label' => 'Articles of Incorporation'],
-            ['value' => 'ip_assignment',              'label' => 'IP Assignment'],
-            ['value' => 'customer_contracts',         'label' => 'Customer Contracts / LOIs'],
-            ['value' => 'unit_economics',             'label' => 'Unit Economics Model'],
-            ['value' => 'other',                      'label' => 'Other'],
+            ['value' => 'pitch_deck',                'label' => 'Pitch Deck',                'required' => true],
+            ['value' => 'cap_table',                 'label' => 'Cap Table',                 'required' => true],
+            ['value' => 'financial_forecast',        'label' => 'Financial Forecast',        'required' => true],
+            ['value' => 'bank_statement',            'label' => 'Bank Statement',            'required' => true],
+            ['value' => 'unit_economics',            'label' => 'Unit Economics Model',      'required' => true],
+            ['value' => 'customer_contracts',        'label' => 'Customer Contracts / LOIs', 'required' => true],
+            ['value' => 'ip_assignment',             'label' => 'IP Assignment',             'required' => true],
+            ['value' => 'articles_of_incorporation', 'label' => 'Articles of Incorporation', 'required' => true],
+            ['value' => 'other',                     'label' => 'Other documents',           'required' => false],
         ];
     }
 }

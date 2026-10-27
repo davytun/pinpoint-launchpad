@@ -7,6 +7,7 @@ use App\Jobs\NotifyInvestorsOfSpotlight;
 use App\Models\AuditLog;
 use App\Models\FounderProfile;
 use App\Models\SpotlightEntry;
+use App\Models\VerificationBadge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -104,10 +105,12 @@ class SpotlightController extends Controller
             'spotlight_one_liner' => ['sometimes', 'nullable', 'string', 'max:120'],
             'spotlight_summary' => ['sometimes', 'nullable', 'string', 'max:500'],
             'mark_deck_reviewed' => ['sometimes', 'boolean'],
+            'badge_type' => ['sometimes', 'string', 'max:50'],
+            'badge_verified' => ['sometimes', 'boolean'],
         ]);
 
         abort_unless(
-            array_key_exists('publish', $data) || array_key_exists('spotlight_one_liner', $data) || array_key_exists('spotlight_summary', $data) || array_key_exists('mark_deck_reviewed', $data) || array_key_exists('sector', $data) || array_key_exists('batch', $data),
+            array_key_exists('publish', $data) || array_key_exists('spotlight_one_liner', $data) || array_key_exists('spotlight_summary', $data) || array_key_exists('mark_deck_reviewed', $data) || array_key_exists('sector', $data) || array_key_exists('batch', $data) || array_key_exists('badge_type', $data),
             422,
             'Choose content to update or a publishing action.'
         );
@@ -121,6 +124,34 @@ class SpotlightController extends Controller
                     'reviewed_by' => $request->user()?->id,
                 ]);
             }
+        }
+
+        if ($request->filled('badge_type')) {
+            $type = (string) $data['badge_type'];
+            $verified = $request->boolean('badge_verified');
+            $defaultLabel = VerificationBadge::displayMap()[$type] ?? ucwords(str_replace('_', ' ', $type));
+
+            $badge = VerificationBadge::firstOrCreate(
+                ['profile_id' => $profile->id, 'badge_type' => $type],
+                ['label' => $defaultLabel, 'is_verified' => $verified, 'verified_at' => $verified ? now() : null],
+            );
+
+            if (! $badge->wasRecentlyCreated) {
+                $badge->update(['is_verified' => $verified, 'verified_at' => $verified ? now() : null]);
+            }
+
+            AuditLog::create([
+                'event' => 'spotlight.badge_updated',
+                'actor_type' => $request->user()::class,
+                'actor_id' => $request->user()->id,
+                'auditable_type' => $profile::class,
+                'auditable_id' => $profile->id,
+                'metadata' => ['profile_id' => $profile->id, 'badge_type' => $type, 'is_verified' => $verified],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+
+            return back()->with('success', $verified ? 'Badge verified for this spotlight.' : 'Badge removed from this spotlight.');
         }
 
         $content = array_intersect_key($data, array_flip(['spotlight_one_liner', 'spotlight_summary', 'sector', 'batch']));
@@ -271,11 +302,17 @@ class SpotlightController extends Controller
             'needs_review' => $requirements->isNotEmpty(),
             'verified_badges_count' => $profile->verified_badges_count,
             'publish_requirements' => $requirements->all(),
-            'badges' => $profile->badges->where('is_verified', true)->map(fn ($badge) => [
-                'id' => $badge->id,
-                'label' => $badge->label,
-                'badge_type' => $badge->badge_type,
-            ])->values()->all(),
+            'badges' => collect(VerificationBadge::displayMap())->map(function ($defaultLabel, $type) use ($profile) {
+                $row = $profile->badges->firstWhere('badge_type', $type);
+
+                return [
+                    'id' => $row?->id,
+                    'badge_type' => $type,
+                    'label' => $row?->label ?? $defaultLabel,
+                    'is_verified' => (bool) $row?->is_verified,
+                    'verified_at' => $row?->verified_at?->format('d M Y'),
+                ];
+            })->values()->all(),
             'pitch_deck' => $pitchDeck ? [
                 'id' => $pitchDeck->id,
                 'original_filename' => $pitchDeck->original_filename,

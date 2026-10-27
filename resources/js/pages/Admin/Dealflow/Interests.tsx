@@ -456,13 +456,13 @@ function InterestDrawer({
 
                     {/* Section 2.5: Introduction & Call Coordination (If Founder Call) */}
                     {interest.type === 'founder_call' && (
-                        <div className="space-y-4 rounded-2xl border border-indigo-200/80 bg-[#f8faff] p-4.5 shadow-2xs">
-                            <div className="flex items-center justify-between border-b border-indigo-100/80 pb-2.5">
+                        <div className="space-y-4 rounded-2xl border border-[#3A54A5]/25 bg-[#3A54A5]/[0.04] p-4.5 shadow-2xs">
+                            <div className="flex items-center justify-between border-b border-[#3A54A5]/15 pb-2.5">
                                 <div className="flex items-center gap-2">
-                                    <Icon icon="solar:phone-calling-bold-duotone" className="size-4 text-indigo-600" />
-                                    <h4 className="text-xs font-bold tracking-wider text-indigo-950 uppercase">Founder Introduction Coordination</h4>
+                                    <Icon icon="solar:phone-calling-bold-duotone" className="size-4 text-[#3A54A5]" />
+                                    <h4 className="text-xs font-bold tracking-wider text-zinc-950 uppercase">Founder Introduction Coordination</h4>
                                 </div>
-                                <span className="text-[11px] font-bold text-indigo-700">
+                                <span className="text-[11px] font-bold text-[#3A54A5]">
                                     {interest.completed_at
                                         ? 'Completed'
                                         : interest.scheduled_at
@@ -495,7 +495,7 @@ function InterestDrawer({
                                             value={scheduledAt}
                                             onChange={(e) => setScheduledAt(e.target.value)}
                                             required
-                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:outline-none"
+                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:ring-1 focus:ring-[#3A54A5]/30 focus:outline-none"
                                         />
                                     </div>
 
@@ -508,7 +508,7 @@ function InterestDrawer({
                                             value={meetingLink}
                                             onChange={(e) => setMeetingLink(e.target.value)}
                                             placeholder="Enter your meeting link / access details"
-                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:outline-none"
+                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:ring-1 focus:ring-[#3A54A5]/30 focus:outline-none"
                                         />
                                     </div>
 
@@ -521,7 +521,7 @@ function InterestDrawer({
                                             onChange={(e) => setCoordinationNotes(e.target.value)}
                                             placeholder="Enter your internal IR coordination notes"
                                             rows={2}
-                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:outline-none"
+                                            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-[#3A54A5] focus:ring-1 focus:ring-[#3A54A5]/30 focus:outline-none"
                                         />
                                     </div>
 
@@ -529,7 +529,7 @@ function InterestDrawer({
                                         <button
                                             type="submit"
                                             disabled={isScheduling}
-                                            className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-indigo-700 disabled:opacity-50"
+                                            className="flex items-center gap-1.5 rounded-xl bg-[#3A54A5] px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-[#2F4589] disabled:opacity-50"
                                         >
                                             <Icon icon="solar:calendar-linear" className="size-3.5" />
                                             <span>{interest.scheduled_at ? 'Update Schedule' : 'Schedule Call'}</span>
@@ -540,7 +540,7 @@ function InterestDrawer({
                                                 type="button"
                                                 onClick={handleCompleteCall}
                                                 disabled={isCompleting}
-                                                className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition hover:bg-emerald-700 disabled:opacity-50"
+                                                className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-emerald-700 disabled:opacity-50"
                                             >
                                                 <Icon icon="solar:check-circle-linear" className="size-3.5" />
                                                 <span>Mark Call Completed</span>
@@ -549,7 +549,7 @@ function InterestDrawer({
                                     </div>
                                 </form>
                             ) : (
-                                <p className="text-[11.5px] text-indigo-700">
+                                <p className="text-[11.5px] text-zinc-600">
                                     Approve this request to enable date/time scheduling and coordination with the founder and investor.
                                 </p>
                             )}
@@ -783,64 +783,76 @@ export default function AdminInterests({
             {/* ── Main Full-Height Container ───────────────────────────────────── */}
             <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs lg:rounded-[22px] lg:p-8">
                 {/* ── Top Bar ─────────────────────────────────────────────────── */}
-                <div className="mb-6 flex shrink-0 items-center justify-between">
+                <div className="mb-6 flex shrink-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <h1 className="text-xl font-bold tracking-tight text-zinc-950">Investor Interests & Dealflow</h1>
-                        <p className="mt-0.5 text-xs text-zinc-500">
-                            Monitor, audit, and approve investor engagement, data room clearances, and founder introductions.
+                        <p className="text-[10px] font-bold tracking-[0.16em] text-zinc-400 uppercase">Dealflow desk</p>
+                        <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-zinc-950">Investor Interests &amp; Dealflow</h1>
+                        <p className="mt-1.5 max-w-xl text-[13px] leading-5 text-zinc-500">
+                            Approve investor engagements, data room clearances, and founder introductions.
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-1.5">
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/investors/dealflow/diligence')}
-                            className="flex items-center gap-1.5 rounded-xl border border-indigo-200/90 bg-indigo-50/70 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-2xs transition-colors hover:bg-indigo-100"
+                            onClick={() => router.get('/admin/investors/dealflow/interests')}
+                            aria-current="page"
+                            className="flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3 py-1.5 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-zinc-800"
                         >
-                            <Icon icon="solar:folder-with-files-bold" className="size-3.5 text-indigo-600" />
-                            <span>Post-Intro Diligence</span>
+                            <Icon icon="solar:hand-money-linear" className="size-3.5" />
+                            <span>Interests</span>
                         </button>
 
                         <button
                             type="button"
                             onClick={() => router.get('/admin/investors/dealflow/data-rooms')}
-                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
                         >
-                            <Icon icon="solar:key-linear" className="size-3.5 text-zinc-500" />
+                            <Icon icon="solar:key-linear" className="size-3.5" />
                             <span>Data Room Grants</span>
                         </button>
 
                         <button
                             type="button"
-                            onClick={() => router.get('/admin/investors/spotlight')}
-                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+                            onClick={() => router.get('/admin/investors/dealflow/diligence')}
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
                         >
-                            <Icon icon="solar:crown-linear" className="size-3.5 text-zinc-500" />
-                            <span>Spotlight Startups</span>
+                            <Icon icon="solar:magnifer-linear" className="size-3.5" />
+                            <span>Post-Intro Diligence</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => router.get('/admin/investors/spotlight')}
+                            className="flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                        >
+                            <Icon icon="solar:crown-linear" className="size-3.5" />
+                            <span>Spotlight</span>
                         </button>
                     </div>
                 </div>
 
-                {/* ── Minimal Monochrome Stats Strip (Refero Clean Look) ───────── */}
-                <div className="mb-6 grid shrink-0 grid-cols-2 gap-3 sm:grid-cols-4">
-                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Total Inquiries</span>
-                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.all}</span>
+                {/* ── Request-mix metrics strip (status counts live in the tabs below) ─ */}
+                <div className="mb-6 grid shrink-0 grid-cols-2 gap-x-3 divide-zinc-200 border-y border-zinc-200 py-3.5 sm:grid-cols-4 sm:divide-x sm:px-5">
+                    <div>
+                        <span className="block text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Total inquiries</span>
+                        <span className="mt-0.5 block font-mono text-lg leading-none font-semibold text-zinc-950">{totals.all}</span>
                     </div>
-
-                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Pending Decision</span>
-                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.pending}</span>
+                    <div>
+                        <span className="block text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Data room requests</span>
+                        <span className="mt-0.5 block font-mono text-lg leading-none font-semibold text-zinc-950">{totals.data_room_requests}</span>
                     </div>
-
-                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Data Room Granted</span>
-                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.data_room_requests}</span>
+                    <div>
+                        <span className="block text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Founder call requests</span>
+                        <span className="mt-0.5 block font-mono text-lg leading-none font-semibold text-zinc-950">
+                            {totals.founder_call_requests}
+                        </span>
                     </div>
-
-                    <div className="rounded-xl border border-zinc-200/80 bg-[#FAFBFD] p-3.5">
-                        <span className="block text-[11px] font-semibold tracking-wider text-zinc-400 uppercase">Founder Calls</span>
-                        <span className="mt-1 block text-xl font-bold text-zinc-950 tabular-nums">{totals.founder_call_requests}</span>
+                    <div>
+                        <span className="block text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Detail requests</span>
+                        <span className="mt-0.5 block font-mono text-lg leading-none font-semibold text-zinc-950">
+                            {totals.more_details_requests}
+                        </span>
                     </div>
                 </div>
 
@@ -871,18 +883,18 @@ export default function AdminInterests({
                                     type="button"
                                     onClick={() => applyFilters({ status: key === 'all' ? '' : key })}
                                     className={cn(
-                                        'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-150',
+                                        'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors',
                                         isSelected
-                                            ? 'border border-zinc-200/80 bg-zinc-100 font-semibold text-zinc-950 shadow-2xs'
-                                            : 'border border-transparent text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900',
+                                            ? 'bg-zinc-950 font-semibold text-white shadow-2xs'
+                                            : 'border border-transparent text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900',
                                     )}
                                 >
                                     <span>{label}</span>
                                     {count !== undefined && count > 0 && (
                                         <span
                                             className={cn(
-                                                'py-0.2 rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
-                                                isSelected ? 'bg-zinc-950 text-white' : 'bg-zinc-200/70 text-zinc-600',
+                                                'rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
+                                                isSelected ? 'bg-white text-zinc-950' : 'bg-zinc-200/70 text-zinc-600',
                                             )}
                                         >
                                             {count}
@@ -907,7 +919,7 @@ export default function AdminInterests({
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Search investor, startup, or message..."
-                            className="w-full rounded-xl border border-zinc-200/90 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+                            className="w-full rounded-xl border border-zinc-200 bg-white py-1.5 pr-8 pl-9 text-xs text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none"
                         />
                         {search && (
                             <button
@@ -1011,22 +1023,39 @@ export default function AdminInterests({
                 {/* ── Table Container with Fixed Non-Scrolling Header ─────────── */}
                 <div className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden">
                     {/* Fixed Table Header */}
-                    <div className="flex shrink-0 items-center gap-4 border-b border-zinc-100 px-4 py-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase select-none">
-                        <div className="w-52 shrink-0">Investor / Entity</div>
-                        <div className="w-48 shrink-0">Target Startup</div>
-                        <div className="w-40 shrink-0">Engagement Type</div>
-                        <div className="min-w-0 flex-1">Inquiry / Note</div>
-                        <div className="w-28 shrink-0">Status</div>
-                        <div className="w-28 shrink-0">Submitted</div>
-                        <div className="w-28 shrink-0 text-right">Action</div>
+                    <div className="grid shrink-0 grid-cols-[13rem_minmax(0,1fr)] items-center gap-4 border-b border-zinc-200 px-4 py-2 text-[10px] font-semibold tracking-[0.14em] text-zinc-400 uppercase select-none lg:grid-cols-[13rem_10rem_9.5rem_minmax(0,1fr)_8.5rem_6.5rem_7.5rem]">
+                        <div>Investor / Entity</div>
+                        <div className="hidden lg:block">Target Startup</div>
+                        <div className="hidden lg:block">Engagement Type</div>
+                        <div className="min-w-0">Inquiry / Note</div>
+                        <div className="hidden lg:block">Status</div>
+                        <div className="hidden lg:block">Submitted</div>
+                        <div className="hidden text-right lg:block">Action</div>
                     </div>
 
                     {/* Scrollable Rows */}
                     <div className="no-scrollbar min-h-0 flex-1 divide-y divide-zinc-100 overflow-y-auto">
                         {interests.data.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <Icon icon="solar:inbox-line-linear" className="mb-2 size-8 text-zinc-300" />
-                                <p className="text-xs text-zinc-400">No investor interest requests found matching this filter.</p>
+                            <div className="mx-auto max-w-md py-16 text-center">
+                                <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-500">
+                                    <Icon icon="solar:inbox-line-linear" className="size-5" />
+                                </div>
+                                <h2 className="mt-4 text-sm font-semibold text-zinc-950">No requests match this view</h2>
+                                <p className="mt-1.5 text-[13px] leading-5 text-zinc-500">
+                                    Try a different status tab or sector, or clear the search to see every incoming request.
+                                </p>
+                                {(search || activeType !== 'all' || activeSector !== 'all' || activeStatus !== 'all') && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSearch('');
+                                            applyFilters({ status: '', type: '', sector: '', search: '' });
+                                        }}
+                                        className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-900 underline underline-offset-4"
+                                    >
+                                        Clear all filters
+                                    </button>
+                                )}
                             </div>
                         ) : (
                             interests.data.map((item) => {
@@ -1037,7 +1066,7 @@ export default function AdminInterests({
                                     <div
                                         key={item.id}
                                         onClick={() => setActiveDrawerInterest(item)}
-                                        className="group flex cursor-pointer items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80"
+                                        className="group grid cursor-pointer grid-cols-[13rem_minmax(0,1fr)] items-center gap-4 px-4 py-3 text-xs transition-colors duration-150 hover:bg-zinc-50/80 lg:grid-cols-[13rem_10rem_9.5rem_minmax(0,1fr)_8.5rem_6.5rem_7.5rem]"
                                     >
                                         {/* Investor Column */}
                                         <div className="flex w-52 min-w-0 shrink-0 items-center gap-2.5">
@@ -1055,13 +1084,13 @@ export default function AdminInterests({
                                         </div>
 
                                         {/* Startup Column */}
-                                        <div className="w-48 min-w-0 shrink-0">
+                                        <div className="hidden min-w-0 lg:block">
                                             <span className="block truncate text-[12px] font-medium text-zinc-900">{companyName}</span>
                                             <span className="block truncate text-[11px] text-zinc-400">{item.profile?.sector}</span>
                                         </div>
 
                                         {/* Request Type */}
-                                        <div className="w-40 shrink-0">
+                                        <div className="hidden shrink-0 lg:block">
                                             <TypeBadge type={item.type} />
                                         </div>
 
@@ -1075,7 +1104,7 @@ export default function AdminInterests({
                                         </div>
 
                                         {/* Status & Founder Auth */}
-                                        <div className="w-28 shrink-0 space-y-0.5">
+                                        <div className="hidden shrink-0 space-y-0.5 lg:block">
                                             <StatusBadge status={item.status} />
                                             {item.founder_decision === 'approved' && (
                                                 <span className="block text-[10px] font-semibold text-emerald-600">Founder Authorized</span>
@@ -1089,10 +1118,12 @@ export default function AdminInterests({
                                         </div>
 
                                         {/* Submitted Date */}
-                                        <div className="w-28 shrink-0 text-[11.5px] text-zinc-500">{formatRelativeTime(item.created_at)}</div>
+                                        <div className="hidden w-28 shrink-0 font-mono text-[11.5px] text-zinc-500 lg:block">
+                                            {formatRelativeTime(item.created_at)}
+                                        </div>
 
                                         {/* Action Button */}
-                                        <div className="w-28 shrink-0 text-right">
+                                        <div className="hidden shrink-0 text-right lg:block">
                                             <button
                                                 type="button"
                                                 onClick={(e) => {
@@ -1113,7 +1144,9 @@ export default function AdminInterests({
                     {/* ── Table Footer & Pagination ────────────────────────────── */}
                     <div className="flex shrink-0 items-center justify-between border-t border-zinc-100 pt-3 text-xs text-zinc-400">
                         <p>
-                            Showing {interests.from ?? 0} to {interests.to ?? 0} of {interests.total} requests
+                            Showing <span className="font-mono text-zinc-700">{interests.from ?? 0}</span> to{' '}
+                            <span className="font-mono text-zinc-700">{interests.to ?? 0}</span> of{' '}
+                            <span className="font-mono text-zinc-700">{interests.total}</span> requests
                         </p>
 
                         {interests.links.length > 3 && (

@@ -31,3 +31,9 @@ Avoid generic fintech dashboards, noisy sales funnels, visual novelty that obscu
 ## Accessibility & Inclusion
 
 Meet WCAG 2.1 AA as a baseline. Support keyboard navigation, visible focus states, semantic form labels and errors, sufficient contrast, and reduced motion preferences.
+
+## Documentation
+
+- Portal flow reference (client-facing): `docs/user-flow.html`
+- Live end-to-end test walkthrough: `docs/live-test-checklist.md`
+- Production architecture and business rules: `docs/INVESTOR-PORTAL-SPEC.md`

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pinpoint Launchpad — User Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --brand: #3A54A5;
+    --brand-dark: #2D4182;
+    --ink: #09090b;
+    --muted: #71717a;
+    --soft: #a1a1aa;
+    --line: #e4e4e7;
+    --canvas: #fafaf9;
+    --surface: #ffffff;
+    --ok: #047857;
+    --ok-bg: #ecfdf5;
+    --warn: #b45309;
+    --warn-bg: #fffbeb;
+    --bad: #be123c;
+    --bad-bg: #fff1f2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, system-ui, sans-serif; background: var(--canvas); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px 96px; }
+
+  header.page { padding: 64px 0 40px; border-bottom: 1px solid var(--line); margin-bottom: 56px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--brand); }
+  h1 { font-family: "Bricolage Grotesque", sans-serif; font-size: 40px; font-weight: 800; letter-spacing: -.03em; margin-top: 10px; }
+  .lede { margin-top: 12px; max-width: 68ch; font-size: 15px; line-height: 1.7; color: var(--muted); }
+
+  section { margin-bottom: 76px; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+  .sec-num { font-family: "JetBrains Mono", monospace; font-size: 13px; font-weight: 600; color: var(--soft); }
+  h2 { font-family: "Bricolage Grotesque", sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  .sec-note { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 78ch; margin-bottom: 28px; }
+  .sec-note b { color: var(--ink); font-weight: 600; }
+
+  /* role tags */
+  .who { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; border-radius: 5px; padding: 3px 7px; margin-bottom: 8px; }
+  .who.inv { background: #3A54A50D; color: var(--brand-dark); }
+  .who.adm { background: var(--warn-bg); color: var(--warn); }
+  .who.fnd { background: var(--ok-bg); color: var(--ok); }
+  .who.sys { background: #f4f4f5; color: #3f3f46; }
+
+  /* horizontal step chain */
+  .chain { display: flex; flex-wrap: wrap; align-items: stretch; row-gap: 14px; }
+  .chain .step { width: 168px; }
+  .arrow-r { display: flex; align-items: center; color: var(--soft); padding: 0 6px; font-size: 15px; flex: 0 0 auto; }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; box-shadow: 0 1px 2px rgb(0 0 0 / .03); }
+  .step .k { font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 600; color: var(--soft); }
+  .step .t { font-size: 13.5px; font-weight: 600; margin-top: 4px; line-height: 1.35; }
+  .step .d { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .step.gate { border-color: #3A54A555; background: #3A54A50A; }
+  .step.gate .k { color: var(--brand); }
+  .step.final { background: var(--ink); border-color: var(--ink); }
+  .step.final .k, .step.final .d { color: #a1a1aa; }
+  .step.final .t { color: #fff; }
+
+  /* engagement lanes */
+  .prelanes { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .pill { font-size: 12.5px; font-weight: 500; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; background: var(--surface); white-space: nowrap; }
+  .pill.brand { border-color: #3A54A533; background: #3A54A50D; color: var(--brand-dark); font-weight: 600; }
+  .pill.ok { border-color: #04785726; background: var(--ok-bg); color: var(--ok); font-weight: 600; }
+  .pill.warn { border-color: #b4530926; background: var(--warn-bg); color: var(--warn); font-weight: 600; }
+  .pill.bad { border-color: #be123c26; background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+  .p-sep { color: var(--soft); font-size: 13px; }
+
+  .lane { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px 16px; margin-bottom: 14px; }
+  .lane h3 { font-size: 14.5px; font-weight: 700; letter-spacing: -.01em; margin-bottom: 2px; }
+  .lane .sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .lane-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 0; row-gap: 10px; }
+  .lane-flow .arrow-r { padding: 0 8px; }
+  .node { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-size: 12.5px; font-weight: 500; background: var(--canvas); line-height: 1.4; }
+  .node small { display: block; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+  .node.brand { border-color: #3A54A540; background: #3A54A50D; color: var(--brand-dark); font-weight: 600; }
+  .node.ok { border-color: #04785733; background: var(--ok-bg); color: var(--ok); font-weight: 600; }
+  .node.warn { border-color: #b4530933; background: var(--warn-bg); color: var(--warn); font-weight: 600; }
+  .node.bad { border-color: #be123c33; background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+  .node.ink { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 600; }
+
+  .consent-note { margin-top: 12px; border: 1px dashed #3A54A555; background: #3A54A508; border-radius: 10px; padding: 10px 14px; font-size: 12.5px; line-height: 1.6; color: var(--brand-dark); }
+
+  /* diligence branches */
+  .gate-strip { display: flex; align-items: center; gap: 10px; border: 1px dashed #3A54A555; background: #3A54A508; border-radius: 12px; padding: 12px 16px; font-size: 13px; color: var(--brand-dark); margin-bottom: 22px; }
+  .gate-strip .g { font-family: "JetBrains Mono", monospace; font-weight: 600; }
+  .branches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .branch { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .branch .bt { font-size: 13px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .branch .bt .m { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--soft); font-weight: 600; }
+  .vflow { display: flex; flex-direction: column; }
+  .vflow .vnode { border: 1px solid var(--line); border-radius: 9px; padding: 8px 11px; font-size: 12px; line-height: 1.45; background: var(--canvas); margin-bottom: 20px; position: relative; }
+  .vflow .vnode:last-child { margin-bottom: 0; }
+  .vflow .vnode::after { content: "↓"; position: absolute; left: 50%; bottom: -17px; transform: translateX(-50%); color: var(--soft); font-size: 13px; }
+  .vflow .vnode:last-child::after { content: none; }
+  .vnode b { font-weight: 600; }
+  .vnode .st { display: block; font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--soft); margin-top: 2px; }
+
+  /* invariants */
+  .rules { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .rule { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  .rule .n { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--soft); font-weight: 600; }
+  .rule .t { font-size: 14px; font-weight: 600; margin-top: 6px; }
+  .rule .d { font-size: 12.5px; color: var(--muted); line-height: 1.65; margin-top: 5px; }
+
+  footer { border-top: 1px solid var(--line); padding-top: 24px; font-size: 12px; color: var(--soft); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer .m { font-family: "JetBrains Mono", monospace; }
+
+  @media (max-width: 900px) {
+    .branches { grid-template-columns: 1fr; }
+    .rules { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page">
+    <p class="eyebrow">Pinpoint Launchpad</p>
+    <h1>How the platform flows</h1>
+    <p class="lede">Three roles, one mediated pipeline. Pinpoint and Investor Relations sit between Founder and Investor on every engagement: the Founder gives consent, IR makes the final operational decision, and the system records each state. Nothing reaches one side without passing through the desks.</p>
+  </header>
+
+  <!-- 01 FOUNDER JOURNEY -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Founder journey</h2></div>
+    <p class="sec-note">From first self-scan to a published spotlight profile. Payment is confirmed <b>offline by an admin</b> (the primary money path); Paystack endpoints exist only for historical transactions. Each step unlocks the next.</p>
+
+    <div class="chain">
+      <div class="step"><span class="k">F1</span><p class="t">Landing page</p><p class="d">Discovery, diagnostic CTA</p></div>
+      <div class="arrow-r">→</div>
+      <div class="step"><span class="k">F2</span><p class="t">Self-scan diagnostic</p><p class="d">PARAGON pillars scored</p></div>
+      <div class="arrow-r">→</div>
+      <div class="step gate"><span class="k">F3</span><p class="t">Qualified band?</p><p class="d">mid-high / high proceed; lower bands see result only</p></div>
+      <div class="arrow-r">→</div>
+      <div class="step"><span class="k">F4</span><p class="t">PIA tier request</p><p class="d">/checkout/request — a request, not a payment</p></div>
+      <div class="arrow-r">→</div>
+      <div class="step"><span class="k">F5</span><p class="t">Admin confirms payment</p><p class="d">Offline transfer verified by IR / superadmin</p></div>
+      <div class="arrow-r">→</div>
+      <div class="step"><span class="k">F6</span><p class="t">BoldSign agreement</p><p class="d">E-signature, webhook completes state</p></div>
+      <div class="arrow-r">→</div>
+      <div class="step"><span class="k">F7</span><p class="t">Audit &amp; documents</p><p class="d">Analyst review, verification badges, scoring</p></div>
+      <div class="arrow-r">→</div>
+      <div class="step final"><span class="k">F8</span><p class="t">Spotlight published</p><p class="d">Visible to approved investors only</p></div>
+    </div>
+  </section>
+
+  <!-- 02 INVESTOR ENGAGEMENT -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Investor engagement</h2></div>
+    <p class="sec-note">One venture, three independent tracks. A pending or approved track never blocks another; each keeps its own state from request to resolution. <b>Founder authorization is consent for Pinpoint to proceed — it is not a grant of access, an introduction, or a disclosure of contacts.</b> IR makes the final decision on every track.</p>
+
+    <div class="prelanes">
+      <span class="pill brand">Register + profile</span><span class="p-sep">→</span>
+      <span class="pill warn">Compliance: KYC approved</span><span class="p-sep">→</span>
+      <span class="pill">Browse /investor/spotlight</span><span class="p-sep">→</span>
+      <span class="pill">Venture page — pick an engagement</span>
+    </div>
+
+    <!-- Lane: question -->
+    <div class="lane">
+      <h3>Ask a question <span class="who inv">Investor</span></h3>
+      <p class="sub">more_details — analyst context or a specific follow-up.</p>
+      <div class="lane-flow">
+        <div class="node">Submitted<small>Pinpoint Reviewing</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node ok">Founder consents<small>Consent only — no answer disclosed yet</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node warn">IR final decision<small>Approved / declined</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node brand">Answer routed via Pinpoint<small>Mediated reply to investor</small></div>
+      </div>
+    </div>
+
+    <!-- Lane: call -->
+    <div class="lane">
+      <h3>Arrange founder call <span class="who inv">Investor</span></h3>
+      <p class="sub">founder_call — a mediated briefing coordinated by Investor Relations.</p>
+      <div class="lane-flow">
+        <div class="node">Requested<small>Pinpoint Reviewing</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node ok">Founder consents<small>Authorizes IR to coordinate</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node warn">IR approves<small>Approved</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node warn">IR schedules + link<small>Scheduled</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node brand">Investor joins meeting</div>
+        <div class="arrow-r">→</div>
+        <div class="node ink">IR marks completed<small>Completed — unlocks diligence</small></div>
+      </div>
+      <p class="consent-note">Decline at either decision point is terminal: the investor sees <b>Declined</b>. Only a <b>completed</b> call, recorded by IR, opens the diligence loop for that venture.</p>
+    </div>
+
+    <!-- Lane: data room -->
+    <div class="lane">
+      <h3>Request data room <span class="who inv">Investor</span></h3>
+      <p class="sub">data_room_access — startup-specific access to cap table, legal, financials, audit materials.</p>
+      <div class="lane-flow">
+        <div class="node">Requested<small>Pinpoint Reviewing</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node ok">Founder consents<small>Not the grant itself</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node warn">IR approves<small>Final operational decision</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node brand">System creates the grant<small>Investor sees Open</small></div>
+        <div class="arrow-r">→</div>
+        <div class="node warn">IR revokes / reinstates<small>Revoked · notified on reinstate</small></div>
+      </div>
+      <p class="consent-note">The grant is created by the system when IR approves (audit event <b>data_room.granted_by_admin</b>). Founders never grant, and investors never self-serve. Revoking access never cancels an approved or scheduled call on the same venture.</p>
+    </div>
+  </section>
+
+  <!-- 03 DILIGENCE LOOP -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Post-introduction diligence</h2></div>
+    <p class="sec-note">The loop the whole mediation exists for: founder input and internal notes stay private until IR explicitly releases an investor-visible response. The server rejects diligence submissions unless a completed founder call exists for that venture — the UI gate and the workflow service enforce the same rule.</p>
+
+    <div class="gate-strip"><span class="g">GATE</span> Unlocks only after IR marks the founder call <b>&nbsp;completed&nbsp;</b> for that investor + venture.</div>
+
+    <div class="branches">
+      <div class="branch">
+        <p class="bt"><span class="m">A</span> Founder input needed</p>
+        <div class="vflow">
+          <div class="vnode"><b>Investor</b> submits inquiry<span class="st">submitted</span></div>
+          <div class="vnode"><b>IR</b> requests founder response<span class="st">waiting_for_founder</span></div>
+          <div class="vnode"><b>Founder</b> answers to Pinpoint only<span class="st">founder_responded</span></div>
+          <div class="vnode"><b>IR</b> releases sanitized reply<span class="st">resolved</span></div>
+          <div class="vnode"><b>Investor</b> sees the answer + notification</div>
+        </div>
+      </div>
+      <div class="branch">
+        <p class="bt"><span class="m">B</span> Pinpoint answers directly</p>
+        <div class="vflow">
+          <div class="vnode"><b>Investor</b> submits inquiry<span class="st">submitted</span></div>
+          <div class="vnode"><b>IR</b> reviews, may hold<span class="st">under_review</span></div>
+          <div class="vnode"><b>IR</b> releases a reply without founder input<span class="st">resolved</span></div>
+          <div class="vnode"><b>Investor</b> sees the answer + notification</div>
+        </div>
+      </div>
+      <div class="branch">
+        <p class="bt"><span class="m">C</span> Request declined</p>
+        <div class="vflow">
+          <div class="vnode"><b>Investor</b> submits inquiry<span class="st">submitted</span></div>
+          <div class="vnode"><b>IR</b> declines with a reason<span class="st">declined</span></div>
+          <div class="vnode"><b>Investor</b> sees the decline reason + notification</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INVARIANTS -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Core invariants</h2></div>
+    <p class="sec-note">Rules the platform enforces in middleware, request classes, services, and tests — not just in the interface.</p>
+    <div class="rules">
+      <div class="rule"><p class="n">R1</p><p class="t">Mediation is absolute</p><p class="d">There is no direct Founder–Investor channel anywhere: no private contact disclosure, no direct messaging. Every arrow between the two sides passes through a Pinpoint desk.</p></div>
+      <div class="rule"><p class="n">R2</p><p class="t">Consent is not access</p><p class="d">Founder authorization permits Pinpoint and IR to proceed. It never grants a data room, never books a call, and never releases information. IR's decision is the operational trigger.</p></div>
+      <div class="rule"><p class="n">R3</p><p class="t">Engagements are independent</p><p class="d">Question, call, and data room run as parallel tracks on the same venture. Each has its own lifecycle; approving, declining, or revoking one never changes another.</p></div>
+      <div class="rule"><p class="n">R4</p><p class="t">Revoke is not cancel</p><p class="d">Pulling data room access leaves an approved or scheduled introduction untouched. Reinstate notifies the investor explicitly.</p></div>
+      <div class="rule"><p class="n">R5</p><p class="t">Diligence is earned, not menued</p><p class="d">The follow-up loop opens only after a completed, IR-coordinated introduction — enforced server-side, with the founder's words released only after IR sanitizes them.</p></div>
+      <div class="rule"><p class="n">R6</p><p class="t">Sensitive data has one door</p><p class="d">KYC evidence stays with Compliance. Confidential documents stay data-room-only, behind approved KYC, an active grant, and signed URLs. Hiding a UI element is never the authorization boundary.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Pinpoint Investment Network — portal flow reference</span>
+    <span class="m">docs/INVESTOR-PORTAL-SPEC.md · InvestorInterestWorkflowService · DiligenceWorkflowService</span>
+  </footer>
+</div>
+</body>
+</html>

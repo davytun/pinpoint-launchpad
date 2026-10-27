@@ -284,3 +284,31 @@ These are not technical questions; they are business decisions that Pinpoint sho
 8. The communication rule for what founders are told about investor interest and access decisions.
 
 Once these eight points are confirmed, the implementation can be specified without guessing or changing direction mid-build.
+
+---
+
+## 14. Implementation status — October 2026 cycle
+
+The build described above is implemented and verified. Current state of the gates in sections 10–11:
+
+### Verified in code and tests
+
+- Full automated suite: 189 tests / 1,702 assertions green, covering every investor state, KYC decision, role permission, publication state, document visibility rule, data-room revoke/reinstate, diligence mediation, and notification outcome listed under "Quality assurance".
+- Cross-role engagement model: investors hold one independent track per engagement type (question, founder call, data room) on each venture; a granted data room never blocks or relabels a call, and revoke never cancels an introduction. Enforced at the database (unique per investor + venture + type), service, and UI layers.
+- Founder authorization is consent only; IR/admin makes every final operational decision, and the data-room grant is system-created on IR approval (audit event `data_room.granted_by_admin`). Matches section 2's removal of founder grant authority.
+- Server-side gates, not UI hiding: diligence submit rejects without a completed IR-coordinated introduction; data-room downloads require approved KYC, an active grant, correct ownership, and signed URLs; desk access is middleware-enforced by role.
+- Sensitive-data rules: investor-facing payloads expose only released, sanitized fields; founder notes, admin internal notes, and KYC evidence never cross the mediation boundary.
+
+### Fixed this cycle
+
+- One-interest-per-startup constraint that blocked combining engagements (migration + workflow service + spotlight UI).
+- Founder desk state leakage: profile-level data-room grant flag relabeled call/question rows, and grants keyed by investor only could bleed across a founder's multiple ventures. Regression-pinned by engagement workflow test 16.
+- Stale assertions in admin dashboard and PIA checkout tests, synced to shipped behavior.
+
+### Still open before go-live
+
+- The eight business decisions in section 13 require formal sign-off (visible-document policy, grant expiry, second approval, retention).
+- Production environment: set real `MAIL_*`, `BOLDSIGN_*`, admin-seeder credentials, and SEO verification tokens per `.env.example`; `deploy.sh` covers migrations, guarded seeders, caching, and prints the required cron (`schedule:run`, which drives the queue on shared hosting) and queue-worker commands.
+- Backup/restore rehearsal, error monitoring, and the first-week monitoring plan (operational readiness, section 11) are server-side tasks not covered by code.
+- Execute `docs/live-test-checklist.md` end to end with realistic non-production data before launch.
+

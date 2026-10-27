@@ -47,13 +47,6 @@ export default function FounderLogin({ flash }: PageProps) {
                         Use the email and password from when you set up your founder account.
                     </p>
 
-                    <p className="mt-4 text-[13px] text-zinc-500">
-                        Staff accounts use{' '}
-                        <a href="/admin/login" className="font-medium text-[#3A54A5] hover:text-[#2D4182]">
-                            /admin/login
-                        </a>
-                        .
-                    </p>
 
                     {flash?.info && (
                         <p role="status" className="mt-6 text-[13px] font-medium text-[#3A54A5]">

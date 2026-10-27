@@ -50,6 +50,8 @@ export default function FounderMessages({
 }: PageProps) {
     const threadRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const cursorRef = useRef<string | null>(null);
+    const awaitingRef = useRef(false);
 
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [body, setBody] = useState('');
@@ -59,6 +61,8 @@ export default function FounderMessages({
 
     useEffect(() => {
         setMessages(initialMessages);
+        cursorRef.current = initialMessages.length ? String(initialMessages[initialMessages.length - 1].id) : null;
+        awaitingRef.current = false;
     }, [initialMessages]);
 
     useEffect(() => {
@@ -67,12 +71,39 @@ export default function FounderMessages({
         }
     }, [messages]);
 
-    // Auto-refresh every 30s
+    // Near-real-time poll: cheap cursor check every 3s, full reload only when new messages land.
     useEffect(() => {
-        const interval = setInterval(() => {
-            router.reload({ only: ['messages'] });
-        }, 30000);
-        return () => clearInterval(interval);
+        let cancelled = false;
+
+        async function tick() {
+            if (document.hidden || cancelled || awaitingRef.current) return;
+            try {
+                const url = new URL(route('founder.messages.poll'), window.location.origin);
+                if (cursorRef.current) url.searchParams.set('after', cursorRef.current);
+                const res = await fetch(url.toString(), {
+                    headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                if (!res.ok || cancelled) return;
+                const data = await res.json();
+                if (Array.isArray(data.messages) && data.messages.length > 0) {
+                    awaitingRef.current = true;
+                    router.reload({ only: ['messages'] });
+                }
+            } catch {
+                /* transient network blip; next tick retries */
+            }
+        }
+
+        const interval = setInterval(tick, 3000);
+        const onVisible = () => {
+            if (!document.hidden) tick();
+        };
+        document.addEventListener('visibilitychange', onVisible);
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', onVisible);
+        };
     }, []);
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {

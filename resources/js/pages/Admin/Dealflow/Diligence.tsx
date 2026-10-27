@@ -87,6 +87,16 @@ interface PageProps {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+function getInitials(name?: string | null): string {
+    if (!name) return 'IN';
+    return name
+        .split(' ')
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase();
+}
+
 function formatDate(isoString?: string | null): string {
     if (!isoString) return '—';
     return new Date(isoString).toLocaleDateString('en-US', {
@@ -96,24 +106,51 @@ function formatDate(isoString?: string | null): string {
     });
 }
 
-function getStatusBadge(status: string) {
+function humanizeCategory(category: string): string {
+    return category.replace(/_/g, ' ');
+}
+
+function getStatusBadge(status: DiligenceRequestItem['status']) {
     switch (status) {
         case 'submitted':
-            return { label: 'Submitted to Pinpoint', bg: 'bg-amber-500/10 text-amber-500 border-amber-500/20' };
+            return { label: 'At Pinpoint', cls: 'border-amber-200/80 bg-amber-50 text-amber-700', icon: 'solar:clock-circle-linear' };
+        case 'under_review':
+            return { label: 'Under review', cls: 'border-amber-200/80 bg-amber-50 text-amber-700', icon: 'solar:magnifer-linear' };
         case 'waiting_for_founder':
-            return { label: 'Waiting for Founder', bg: 'bg-blue-500/10 text-blue-500 border-blue-500/20' };
+            return { label: 'With Founder', cls: 'border-sky-200/80 bg-sky-50 text-sky-700', icon: 'solar:user-speak-linear' };
         case 'founder_responded':
-            return { label: 'Founder Responded', bg: 'bg-purple-500/10 text-purple-500 border-purple-500/20' };
+            return { label: 'Responded', cls: 'border-violet-200/80 bg-violet-50 text-violet-700', icon: 'solar:chat-round-dots-linear' };
         case 'resolved':
-            return { label: 'Resolved / Published', bg: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' };
+            return { label: 'Resolved', cls: 'border-emerald-200/80 bg-emerald-50 text-emerald-700', icon: 'solar:check-circle-linear' };
         case 'declined':
-            return { label: 'Declined', bg: 'bg-red-500/10 text-red-500 border-red-500/20' };
+            return { label: 'Declined', cls: 'border-rose-200/80 bg-rose-50 text-rose-700', icon: 'solar:close-circle-linear' };
         default:
-            return { label: status, bg: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' };
+            return { label: status, cls: 'border-zinc-200/80 bg-zinc-50 text-zinc-600', icon: 'solar:info-circle-linear' };
     }
 }
 
-export default function DiligenceIndex({ requests, activeStatus, activeCategory, activeQueue, totals }: PageProps) {
+function StatusBadge({ status }: { status: DiligenceRequestItem['status'] }) {
+    const badge = getStatusBadge(status);
+    return (
+        <span className={cn('inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap', badge.cls)}>
+            <Icon icon={badge.icon} className="size-3" />
+            <span>{badge.label}</span>
+        </span>
+    );
+}
+
+// ─── Cross-desk navigation ────────────────────────────────────────────────────
+
+const DESK_LINKS = [
+    { key: 'interests', label: 'Interests', icon: 'solar:hand-money-linear', path: '/admin/investors/dealflow/interests' },
+    { key: 'data-rooms', label: 'Data Room Grants', icon: 'solar:key-linear', path: '/admin/investors/dealflow/data-rooms' },
+    { key: 'diligence', label: 'Post-Intro Diligence', icon: 'solar:magnifer-linear', path: '/admin/investors/dealflow/diligence' },
+    { key: 'spotlight', label: 'Spotlight', icon: 'solar:crown-linear', path: '/admin/investors/spotlight' },
+];
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function DiligenceIndex({ requests, activeQueue, totals }: PageProps) {
     const [selectedReq, setSelectedReq] = useState<DiligenceRequestItem | null>(null);
     const [instructions, setInstructions] = useState('');
     const [investorResponse, setInvestorResponse] = useState('');
@@ -135,15 +172,7 @@ export default function DiligenceIndex({ requests, activeStatus, activeCategory,
     };
 
     const handleFilterQueue = (queue: string) => {
-        router.get(
-            route('admin.dealflow.diligence.index'),
-            {
-                queue,
-                status: activeStatus !== 'all' ? activeStatus : undefined,
-                category: activeCategory !== 'all' ? activeCategory : undefined,
-            },
-            { preserveState: true },
-        );
+        router.get(route('admin.dealflow.diligence.index'), { queue }, { preserveState: true, replace: true });
     };
 
     const handleRequestFounder = () => {
@@ -198,312 +227,363 @@ export default function DiligenceIndex({ requests, activeStatus, activeCategory,
         );
     };
 
+    const queues = [
+        { key: 'all', label: 'All Requests', count: totals.all },
+        { key: 'submitted', label: 'Awaiting IR Review', count: totals.submitted },
+        { key: 'waiting_for_founder', label: 'With Founder', count: totals.waiting_for_founder },
+        { key: 'founder_responded', label: 'Founder Responded', count: totals.founder_responded },
+        { key: 'resolved', label: 'Resolved', count: totals.resolved },
+    ];
+
     return (
         <AdminLayout>
             <Head title="Post-Introduction Diligence Orchestration — Pinpoint Admin" />
 
-            <div className="space-y-6">
-                {/* Header */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-xs lg:rounded-[22px] lg:p-8">
+                {/* ── Top Bar ─────────────────────────────────────────────────── */}
+                <div className="mb-6 flex shrink-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-white">Post-Introduction Diligence</h1>
-                        <p className="text-sm text-zinc-400">
-                            Admin-mediated post-call questions, operational follow-ups, and confidential document requests.
+                        <p className="text-[10px] font-bold tracking-[0.16em] text-zinc-400 uppercase">Dealflow desk</p>
+                        <h1 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-zinc-950">Post-Introduction Diligence</h1>
+                        <p className="mt-1.5 max-w-xl text-[13px] leading-5 text-zinc-500">
+                            IR-mediated post-call questions, operational follow-ups, and confidential document requests.
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => router.get(route('admin.dealflow.interests.index'))}
-                            className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800/60 px-3.5 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-zinc-700/80"
-                        >
-                            <Icon icon="solar:users-group-two-rounded-bold" className="size-4 text-zinc-400" />
-                            View Dealflow Interests
-                        </button>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                        {DESK_LINKS.map((link) => {
+                            const active = link.key === 'diligence';
+                            return (
+                                <button
+                                    key={link.key}
+                                    type="button"
+                                    onClick={() => router.get(link.path)}
+                                    aria-current={active ? 'page' : undefined}
+                                    className={cn(
+                                        'flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors',
+                                        active
+                                            ? 'bg-zinc-950 text-white shadow-2xs hover:bg-zinc-800'
+                                            : 'border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900',
+                                    )}
+                                >
+                                    <Icon icon={link.icon} className="size-3.5" />
+                                    <span>{link.label}</span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* Queue Summary Cards */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
-                    {[
-                        { label: 'All Requests', count: totals.all, queue: 'all', icon: 'solar:folder-with-files-bold' },
-                        {
-                            label: 'Awaiting IR Review',
-                            count: totals.submitted,
-                            queue: 'submitted',
-                            icon: 'solar:hourglass-bold',
-                            highlight: totals.submitted > 0,
-                        },
-                        { label: 'With Founder', count: totals.waiting_for_founder, queue: 'waiting_for_founder', icon: 'solar:user-speak-bold' },
-                        {
-                            label: 'Founder Responded',
-                            count: totals.founder_responded,
-                            queue: 'founder_responded',
-                            icon: 'solar:chat-round-check-bold',
-                            highlight: totals.founder_responded > 0,
-                        },
-                        { label: 'Resolved / Published', count: totals.resolved, queue: 'resolved', icon: 'solar:check-circle-bold' },
-                    ].map((card) => {
-                        const active = activeQueue === card.queue;
+                {/* ── Category-mix metrics strip (status counts live in the tabs below) ── */}
+                <div className="mb-6 grid shrink-0 grid-cols-2 gap-x-3 divide-zinc-200 border-y border-zinc-200 py-3.5 sm:grid-cols-4 sm:divide-x sm:px-5">
+                    <div>
+                        <span className="block text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Financial</span>
+                        <span className="mt-0.5 block font-mono text-lg leading-none font-semibold text-zinc-950">{totals.financial}</span>
+                    </div>
+                    <div>
+                        <span className="block text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Operational</span>
+                        <span className="mt-0.5 block font-mono text-lg leading-none font-semibold text-zinc-950">{totals.operational}</span>
+                    </div>
+                    <div>
+                        <span className="block text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Legal &amp; governance</span>
+                        <span className="mt-0.5 block font-mono text-lg leading-none font-semibold text-zinc-950">{totals.legal_governance}</span>
+                    </div>
+                    <div>
+                        <span className="block text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">Document requests</span>
+                        <span className="mt-0.5 block font-mono text-lg leading-none font-semibold text-zinc-950">{totals.document_request}</span>
+                    </div>
+                </div>
+
+                {/* ── Queue tabs ──────────────────────────────────────────────── */}
+                <div className="mb-4 flex shrink-0 items-center gap-1.5 overflow-x-auto border-b border-zinc-100 pb-3">
+                    {queues.map((q) => {
+                        const active = activeQueue === q.key;
                         return (
                             <button
-                                key={card.queue}
-                                onClick={() => handleFilterQueue(card.queue)}
+                                key={q.key}
+                                type="button"
+                                onClick={() => handleFilterQueue(q.key)}
                                 className={cn(
-                                    'flex flex-col gap-2 rounded-xl border p-4 text-left transition',
+                                    'flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors',
                                     active
-                                        ? 'border-indigo-500/50 bg-indigo-500/10 text-white'
-                                        : 'border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/40',
+                                        ? 'bg-zinc-950 font-semibold text-white shadow-2xs'
+                                        : 'border border-transparent text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900',
                                 )}
                             >
-                                <div className="flex items-center justify-between">
-                                    <Icon icon={card.icon} className={cn('size-5', active ? 'text-indigo-400' : 'text-zinc-500')} />
-                                    {card.highlight && <span className="inline-flex size-2 animate-pulse rounded-full bg-amber-500" />}
-                                </div>
-                                <div>
-                                    <span className="text-2xl font-bold text-white">{card.count}</span>
-                                    <p className="text-xs font-medium text-zinc-400">{card.label}</p>
-                                </div>
+                                <span>{q.label}</span>
+                                {q.count > 0 && (
+                                    <span
+                                        className={cn(
+                                            'rounded-full px-1.5 text-[10.5px] font-bold tabular-nums',
+                                            active ? 'bg-white text-zinc-950' : 'bg-zinc-200/70 text-zinc-600',
+                                        )}
+                                    >
+                                        {q.count}
+                                    </span>
+                                )}
                             </button>
                         );
                     })}
                 </div>
 
-                {/* Table */}
-                <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 shadow-sm">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm text-zinc-300">
-                            <thead className="border-b border-zinc-800 bg-zinc-900/80 text-xs font-semibold tracking-wider text-zinc-400 uppercase">
-                                <tr>
-                                    <th className="px-6 py-4">Startup & Investor</th>
-                                    <th className="px-6 py-4">Category & Subject</th>
-                                    <th className="px-6 py-4">Status</th>
-                                    <th className="px-6 py-4">Submitted</th>
-                                    <th className="px-6 py-4 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-zinc-800/60">
-                                {requests.data.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={5} className="px-6 py-12 text-center text-zinc-500">
-                                            No diligence requests found matching the current queue.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    requests.data.map((req) => {
-                                        const badge = getStatusBadge(req.status);
-                                        return (
-                                            <tr key={req.id} className="transition hover:bg-zinc-800/30">
-                                                <td className="px-6 py-4">
-                                                    <div className="font-semibold text-white">{req.profile?.founder?.company_name || 'Startup'}</div>
-                                                    <div className="text-xs text-zinc-400">
-                                                        By: {req.investor?.profile?.full_name || req.investor?.email || 'Investor'}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="inline-flex rounded bg-zinc-800 px-2 py-0.5 text-[10px] font-bold tracking-wider text-zinc-300 uppercase">
-                                                            {req.category.replace('_', ' ')}
-                                                        </span>
-                                                        {req.data_room_required && (
-                                                            <span className="inline-flex items-center gap-1 rounded border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-400">
-                                                                <Icon icon="solar:shield-check-bold" className="size-3" />
-                                                                Data Room
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <div className="mt-1 line-clamp-1 font-medium text-zinc-200">{req.subject}</div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span
-                                                        className={cn(
-                                                            'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium',
-                                                            badge.bg,
-                                                        )}
-                                                    >
-                                                        {badge.label}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-xs text-zinc-400">{formatDate(req.created_at)}</td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <button
-                                                        onClick={() => openModal(req)}
-                                                        className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-indigo-500"
-                                                    >
-                                                        <Icon icon="solar:tuning-bold" className="size-3.5" />
-                                                        Orchestrate
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                )}
-                            </tbody>
-                        </table>
+                {/* ── Table ───────────────────────────────────────────────────── */}
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                    <div className="grid grid-cols-[13rem_minmax(0,1fr)] items-center gap-4 border-b border-zinc-100 px-4 pb-2 text-[10px] font-bold tracking-wider text-zinc-400 uppercase lg:grid-cols-[13rem_minmax(0,1fr)_10rem_8.5rem_7.5rem]">
+                        <span>Startup &amp; Investor</span>
+                        <span>Category &amp; Subject</span>
+                        <span className="hidden lg:block">Status</span>
+                        <span className="hidden lg:block">Submitted</span>
+                        <span className="hidden text-right lg:block">Action</span>
                     </div>
+
+                    {requests.data.length === 0 ? (
+                        <div className="mx-auto max-w-md py-16 text-center">
+                            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-zinc-100 text-zinc-500">
+                                <Icon icon="solar:magnifer-linear" className="size-5" />
+                            </div>
+                            <h2 className="mt-4 text-sm font-semibold text-zinc-950">No requests in this queue</h2>
+                            <p className="mt-1.5 text-[13px] leading-5 text-zinc-500">
+                                When an investor raises a post-call question it lands here for IR to triage.
+                            </p>
+                        </div>
+                    ) : (
+                        requests.data.map((req) => {
+                            const investorName = req.investor?.profile?.full_name ?? req.investor?.email ?? 'Investor';
+                            const companyName = req.profile?.founder?.company_name ?? 'Startup';
+                            return (
+                                <div
+                                    key={req.id}
+                                    onClick={() => openModal(req)}
+                                    className="group grid cursor-pointer grid-cols-[13rem_minmax(0,1fr)] items-center gap-4 border-b border-zinc-50 px-4 py-3 text-xs transition-colors duration-150 last:border-0 hover:bg-zinc-50/80 lg:grid-cols-[13rem_minmax(0,1fr)_10rem_8.5rem_7.5rem]"
+                                >
+                                    {/* Startup & Investor */}
+                                    <div className="flex min-w-0 items-center gap-2.5">
+                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-[11px] font-bold text-zinc-700">
+                                            {getInitials(companyName)}
+                                        </div>
+                                        <div className="min-w-0 pr-1">
+                                            <span className="block truncate text-[12.5px] font-semibold text-zinc-950 group-hover:underline">
+                                                {companyName}
+                                            </span>
+                                            <span className="block truncate text-[11px] text-zinc-400">By: {investorName}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Category & Subject */}
+                                    <div className="min-w-0 pr-4">
+                                        <div className="flex items-center gap-2">
+                                            <span className="inline-flex items-center rounded-lg border border-zinc-200/80 bg-zinc-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-zinc-700 uppercase">
+                                                {humanizeCategory(req.category)}
+                                            </span>
+                                            {req.data_room_required && (
+                                                <span className="inline-flex items-center gap-1 rounded-lg border border-[#3A54A5]/20 bg-[#3A54A5]/10 px-2 py-0.5 text-[10px] font-semibold text-[#3A54A5]">
+                                                    <Icon icon="solar:shield-check-linear" className="size-3" />
+                                                    Data Room
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="mt-1 line-clamp-1 text-[12px] font-medium text-zinc-900">{req.subject}</div>
+                                    </div>
+
+                                    {/* Status */}
+                                    <div className="hidden shrink-0 lg:block">
+                                        <StatusBadge status={req.status} />
+                                    </div>
+
+                                    {/* Submitted */}
+                                    <div className="hidden shrink-0 font-mono text-[11.5px] text-zinc-500 lg:block">{formatDate(req.created_at)}</div>
+
+                                    {/* Action */}
+                                    <div className="hidden shrink-0 text-right lg:block">
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openModal(req);
+                                            }}
+                                            className="rounded-lg border border-zinc-200/80 bg-white px-3 py-1 text-xs font-semibold whitespace-nowrap text-zinc-700 shadow-2xs transition-colors hover:bg-zinc-50"
+                                        >
+                                            Inspect &amp; Act
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
                 </div>
             </div>
 
-            {/* Orchestration Slide-over / Modal */}
+            {/* ── Orchestration panel ─────────────────────────────────────────── */}
             {selectedReq && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-xs">
-                    <div className="my-8 w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl">
-                        {/* Modal Header */}
-                        <div className="flex items-start justify-between border-b border-zinc-800 pb-4">
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="inline-flex rounded bg-indigo-500/20 px-2 py-0.5 text-xs font-bold text-indigo-300 uppercase">
-                                        {selectedReq.category.replace('_', ' ')}
-                                    </span>
-                                    <span
-                                        className={cn(
-                                            'inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium',
-                                            getStatusBadge(selectedReq.status).bg,
-                                        )}
-                                    >
-                                        {getStatusBadge(selectedReq.status).label}
-                                    </span>
-                                </div>
-                                <h2 className="mt-2 text-xl font-bold text-white">{selectedReq.subject}</h2>
-                                <p className="text-xs text-zinc-400">
-                                    Investor: <strong className="text-zinc-200">{selectedReq.investor?.profile?.full_name || 'Investor'}</strong> ·
-                                    Startup: <strong className="text-zinc-200">{selectedReq.profile?.founder?.company_name || 'Startup'}</strong>
-                                </p>
-                            </div>
-
-                            <button onClick={closeModal} className="rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-white">
-                                <Icon icon="solar:close-circle-bold" className="size-5" />
-                            </button>
-                        </div>
-
-                        {/* Investor's Inquiry */}
-                        <div className="space-y-2 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4">
-                            <h3 className="text-xs font-bold tracking-wider text-zinc-400 uppercase">Investor Request Details</h3>
-                            <p className="text-sm whitespace-pre-wrap text-zinc-200">{selectedReq.request_details}</p>
-                        </div>
-
-                        {/* Founder Coordination / Response */}
-                        <div className="space-y-4 rounded-xl border border-blue-900/30 bg-blue-950/10 p-4">
-                            <h3 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-blue-400 uppercase">
-                                <Icon icon="solar:user-hand-up-bold" className="size-4" />
-                                Pinpoint ↔ Founder Coordination
-                            </h3>
-
-                            {selectedReq.founder_notes_to_admin ? (
-                                <div className="space-y-1 rounded-lg border border-zinc-800 bg-zinc-900 p-3">
-                                    <div className="text-xs font-semibold text-emerald-400">
-                                        Founder Response (Received {formatDate(selectedReq.founder_responded_at)}):
+                <div className="fixed inset-0 z-50">
+                    <div className="fixed inset-0 bg-zinc-950/30 backdrop-blur-xs" onClick={closeModal} />
+                    <div className="fixed inset-0 overflow-y-auto">
+                        <div className="flex min-h-full items-center justify-center p-4">
+                            <div className="w-full max-w-3xl space-y-5 rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl">
+                                {/* Header */}
+                                <div className="flex items-start justify-between border-b border-zinc-100 pb-4">
+                                    <div className="min-w-0">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="inline-flex items-center rounded-lg border border-zinc-200/80 bg-zinc-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-zinc-700 uppercase">
+                                                {humanizeCategory(selectedReq.category)}
+                                            </span>
+                                            <StatusBadge status={selectedReq.status} />
+                                        </div>
+                                        <h2 className="mt-2 text-lg font-semibold tracking-[-0.02em] text-zinc-950">{selectedReq.subject}</h2>
+                                        <p className="mt-0.5 text-xs text-zinc-500">
+                                            Investor{' '}
+                                            <strong className="font-medium text-zinc-800">
+                                                {selectedReq.investor?.profile?.full_name || 'Investor'}
+                                            </strong>{' '}
+                                            · Startup{' '}
+                                            <strong className="font-medium text-zinc-800">
+                                                {selectedReq.profile?.founder?.company_name || 'Startup'}
+                                            </strong>
+                                        </p>
                                     </div>
-                                    <p className="text-sm whitespace-pre-wrap text-zinc-300">{selectedReq.founder_notes_to_admin}</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-medium text-zinc-400">
-                                        Admin Instructions for Founder (optional guidance sent with prompt):
-                                    </label>
-                                    <textarea
-                                        rows={3}
-                                        value={instructions}
-                                        onChange={(e) => setInstructions(e.target.value)}
-                                        placeholder="E.g., Please provide your Q3 2026 revenue retention cohort breakdown..."
-                                        className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 text-sm text-white focus:border-indigo-500 focus:outline-hidden"
-                                    />
                                     <button
                                         type="button"
-                                        onClick={handleRequestFounder}
-                                        disabled={submitting}
-                                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                                        onClick={closeModal}
+                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-800"
                                     >
-                                        <Icon icon="solar:forward-bold" className="size-4" />
-                                        {selectedReq.status === 'waiting_for_founder' ? 'Update Founder Prompt' : 'Forward Request to Founder'}
+                                        <Icon icon="solar:close-circle-linear" className="size-5" />
                                     </button>
                                 </div>
-                            )}
-                        </div>
 
-                        {/* Investor-Facing Response Release */}
-                        <div className="space-y-4 rounded-xl border border-emerald-900/30 bg-emerald-950/10 p-4">
-                            <h3 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-emerald-400 uppercase">
-                                <Icon icon="solar:check-read-bold" className="size-4" />
-                                Approved Investor-Facing Response
-                            </h3>
+                                {/* Investor request details */}
+                                <div className="space-y-1.5 rounded-xl border border-zinc-200 bg-zinc-50/70 p-4">
+                                    <h3 className="text-[11px] font-bold tracking-wider text-zinc-400 uppercase">Investor request details</h3>
+                                    <p className="text-sm leading-6 whitespace-pre-wrap text-zinc-700">{selectedReq.request_details}</p>
+                                </div>
 
-                            <div className="space-y-2">
-                                <label className="block text-xs font-medium text-zinc-400">
-                                    Verified Response for Investor (sanitized & formatted by Admin/IR):
-                                </label>
-                                <textarea
-                                    rows={4}
-                                    value={investorResponse}
-                                    onChange={(e) => setInvestorResponse(e.target.value)}
-                                    placeholder="Write or refine the verified response visible to the investor..."
-                                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-3 text-sm text-white focus:border-emerald-500 focus:outline-hidden"
-                                />
+                                {/* Founder coordination */}
+                                <div className="space-y-3 rounded-xl border border-sky-200/70 bg-sky-50/40 p-4">
+                                    <h3 className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-sky-700 uppercase">
+                                        <Icon icon="solar:user-hand-up-linear" className="size-4" />
+                                        Pinpoint &rarr; Founder coordination
+                                    </h3>
+
+                                    {selectedReq.founder_notes_to_admin ? (
+                                        <div className="space-y-1 rounded-lg border border-zinc-200 bg-white p-3">
+                                            <div className="text-xs font-semibold text-emerald-700">
+                                                Founder response (received {formatDate(selectedReq.founder_responded_at)})
+                                            </div>
+                                            <p className="text-sm leading-6 whitespace-pre-wrap text-zinc-700">
+                                                {selectedReq.founder_notes_to_admin}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <label className="block text-[11px] font-semibold tracking-wider text-zinc-500 uppercase">
+                                                Instructions for founder (optional guidance sent with the prompt)
+                                            </label>
+                                            <textarea
+                                                rows={3}
+                                                value={instructions}
+                                                onChange={(e) => setInstructions(e.target.value)}
+                                                placeholder="e.g. Please provide your Q3 2026 revenue retention cohort breakdown."
+                                                className="w-full rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-hidden"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={handleRequestFounder}
+                                                disabled={submitting}
+                                                className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                                            >
+                                                <Icon icon="solar:forward-linear" className="size-3.5" />
+                                                {selectedReq.status === 'waiting_for_founder'
+                                                    ? 'Update founder prompt'
+                                                    : 'Forward request to founder'}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Investor-facing response release */}
+                                <div className="space-y-3 rounded-xl border border-emerald-200/70 bg-emerald-50/40 p-4">
+                                    <h3 className="flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-emerald-700 uppercase">
+                                        <Icon icon="solar:check-read-linear" className="size-4" />
+                                        Approved investor-facing response
+                                    </h3>
+
+                                    <div className="space-y-1.5">
+                                        <label className="block text-[11px] font-semibold tracking-wider text-zinc-500 uppercase">
+                                            Verified response for investor (sanitized and formatted by IR)
+                                        </label>
+                                        <textarea
+                                            rows={4}
+                                            value={investorResponse}
+                                            onChange={(e) => setInvestorResponse(e.target.value)}
+                                            placeholder="Write or refine the verified response visible to the investor."
+                                            className="w-full rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-hidden"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="block text-[11px] font-semibold tracking-wider text-zinc-500 uppercase">
+                                            Internal admin notes (never visible to investor or founder)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={adminNotes}
+                                            onChange={(e) => setAdminNotes(e.target.value)}
+                                            placeholder="Private staff notes"
+                                            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs text-zinc-900 focus:border-zinc-400 focus:outline-hidden"
+                                        />
+                                    </div>
+
+                                    <div className="flex items-center justify-between pt-1">
+                                        <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-600">
+                                            <input
+                                                type="checkbox"
+                                                checked={markResolved}
+                                                onChange={(e) => setMarkResolved(e.target.checked)}
+                                                className="rounded border-zinc-300 bg-white text-zinc-900 focus:ring-0"
+                                            />
+                                            Mark inquiry as fully resolved
+                                        </label>
+
+                                        <button
+                                            type="button"
+                                            onClick={handleReleaseResponse}
+                                            disabled={submitting || !investorResponse.trim()}
+                                            className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-950 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-zinc-800 disabled:opacity-50"
+                                        >
+                                            <Icon icon="solar:send-linear" className="size-3.5 text-emerald-400" />
+                                            Release response to investor
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Decline / close */}
+                                <div className="flex items-center justify-between gap-3 border-t border-zinc-100 pt-4">
+                                    <div className="flex max-w-md flex-1 items-center gap-2">
+                                        <input
+                                            type="text"
+                                            value={declineReason}
+                                            onChange={(e) => setDeclineReason(e.target.value)}
+                                            placeholder="Decline reason for investor"
+                                            className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-900 focus:border-zinc-400 focus:outline-hidden"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleDecline}
+                                            disabled={submitting}
+                                            className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition-colors hover:bg-rose-100 disabled:opacity-50"
+                                        >
+                                            Decline inquiry
+                                        </button>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={closeModal}
+                                        className="rounded-lg px-4 py-2 text-xs font-semibold text-zinc-500 transition-colors hover:text-zinc-900"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
                             </div>
-
-                            <div className="space-y-2">
-                                <label className="block text-xs font-medium text-zinc-400">
-                                    Internal Admin Notes (never visible to investor or founder):
-                                </label>
-                                <input
-                                    type="text"
-                                    value={adminNotes}
-                                    onChange={(e) => setAdminNotes(e.target.value)}
-                                    placeholder="Private staff notes..."
-                                    className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-white focus:border-zinc-500 focus:outline-hidden"
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2">
-                                <label className="flex cursor-pointer items-center gap-2 text-xs text-zinc-300">
-                                    <input
-                                        type="checkbox"
-                                        checked={markResolved}
-                                        onChange={(e) => setMarkResolved(e.target.checked)}
-                                        className="rounded border-zinc-700 bg-zinc-800 text-emerald-600 focus:ring-0"
-                                    />
-                                    Mark inquiry as fully resolved
-                                </label>
-
-                                <button
-                                    type="button"
-                                    onClick={handleReleaseResponse}
-                                    disabled={submitting || !investorResponse.trim()}
-                                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
-                                >
-                                    <Icon icon="solar:send-bold" className="size-4" />
-                                    Release Approved Response to Investor
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Decline Option */}
-                        <div className="flex items-center justify-between border-t border-zinc-800 pt-4">
-                            <div className="flex max-w-md flex-1 items-center gap-2">
-                                <input
-                                    type="text"
-                                    value={declineReason}
-                                    onChange={(e) => setDeclineReason(e.target.value)}
-                                    placeholder="Decline reason for investor..."
-                                    className="flex-1 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs text-white"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handleDecline}
-                                    disabled={submitting}
-                                    className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-400 transition hover:bg-red-500/20"
-                                >
-                                    Decline Inquiry
-                                </button>
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={closeModal}
-                                className="rounded-lg px-4 py-2 text-xs font-semibold text-zinc-400 hover:text-white"
-                            >
-                                Close
-                            </button>
                         </div>
                     </div>
                 </div>

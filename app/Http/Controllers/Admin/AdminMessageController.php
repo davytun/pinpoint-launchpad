@@ -8,6 +8,7 @@ use App\Models\Founder;
 use App\Models\Message;
 use App\Models\MessageThread;
 use App\Services\MessageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -192,18 +193,60 @@ class AdminMessageController extends Controller
             ->visible()
             ->oldest()
             ->get()
-            ->map(fn ($msg) => [
-                'id' => $msg->id,
-                'sender_type' => $msg->sender_type,
-                'sender_name' => $msg->senderName($founder),
-                'body' => $msg->body,
-                'has_attachment' => $msg->has_attachment,
-                'attachment_filename' => $msg->attachment_filename,
-                'attachment_size' => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
-                'created_at' => $msg->created_at->format('d M, H:i'),
-                'created_at_date' => $msg->created_at->format('Y-m-d'),
-                'is_from_founder' => $msg->isFromFounder(),
-            ]);
+            ->map(fn ($msg) => $this->mapMessage($msg, $founder))
+            ->all();
+    }
+
+    private function mapMessage(Message $msg, $founder): array
+    {
+        return [
+            'id' => $msg->id,
+            'sender_type' => $msg->sender_type,
+            'sender_name' => $msg->senderName($founder),
+            'body' => $msg->body,
+            'has_attachment' => $msg->has_attachment,
+            'attachment_filename' => $msg->attachment_filename,
+            'attachment_size' => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
+            'created_at' => $msg->created_at->format('d M, H:i'),
+            'created_at_date' => $msg->created_at->format('Y-m-d'),
+            'is_from_founder' => $msg->isFromFounder(),
+        ];
+    }
+
+    /**
+     * Lightweight near-real-time poll. Returns only messages newer than the
+     * cursor plus the current unread total, so the inbox can refresh cheaply.
+     */
+    public function poll(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+
+        $messages = [];
+        $threadId = $request->query('thread');
+        $after = $request->query('after');
+
+        if ($threadId) {
+            $thread = MessageThread::with('founder')->find($threadId);
+
+            if ($thread && $user->canAccessFounder((string) $thread->founder_id)) {
+                $query = $thread->messages()->visible();
+                if ($after) {
+                    $query->where('id', '>', $after);
+                }
+
+                $new = $query->orderBy('id')->limit(100)->get();
+                $messages = $new->map(fn (Message $msg) => $this->mapMessage($msg, $thread->founder))->all();
+
+                if ($messages !== []) {
+                    $this->messageService->markThreadRead($thread, 'admin');
+                }
+            }
+        }
+
+        return response()->json([
+            'messages' => $messages,
+            'total_unread' => $user->adminUnreadMessagesCount(),
+        ]);
     }
 
     public function reply(Request $request, MessageThread $thread): RedirectResponse

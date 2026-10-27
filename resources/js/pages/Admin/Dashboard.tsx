@@ -283,11 +283,7 @@ function SystemAlertsWidget({ alerts }: { alerts?: SystemAlert[] }) {
             <p className="text-[11px] font-medium tracking-[0.14em] text-zinc-500 uppercase">System alerts</p>
             <div className="divide-y divide-zinc-100 border border-zinc-200/80">
                 {alerts.map((alert) => (
-                    <Link
-                        key={alert.id}
-                        href={alert.action_url}
-                        className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-zinc-50"
-                    >
+                    <Link key={alert.id} href={alert.action_url} className="flex items-start gap-3 px-4 py-3.5 transition-colors hover:bg-zinc-50">
                         <SolarIcon
                             name={alert.type === 'error' ? 'solar:danger-triangle-linear' : 'solar:info-circle-linear'}
                             className={alert.type === 'error' ? 'mt-0.5 text-red-600' : 'mt-0.5 text-amber-600'}
@@ -323,24 +319,13 @@ const activityTypeLabel: Record<string, string> = {
 function DeskCard({ children, className }: { children: ReactNode; className?: string }) {
     // Ref 2 — Mondays card shell
     return (
-        <div
-            className={cn(
-                'overflow-hidden rounded-xl border border-zinc-200/70 bg-white shadow-[0_4px_24px_-8px_rgba(15,23,42,0.08)]',
-                className,
-            )}
-        >
+        <div className={cn('overflow-hidden rounded-xl border border-zinc-200/70 bg-white shadow-[0_4px_24px_-8px_rgba(15,23,42,0.08)]', className)}>
             {children}
         </div>
     );
 }
 
-function StatusPill({
-    children,
-    tone = 'zinc',
-}: {
-    children: ReactNode;
-    tone?: 'zinc' | 'amber' | 'blue' | 'emerald';
-}) {
+function StatusPill({ children, tone = 'zinc' }: { children: ReactNode; tone?: 'zinc' | 'amber' | 'blue' | 'emerald' }) {
     // Ref 2 pills + Ref 4 quiet badge language
     const tones = {
         zinc: 'bg-zinc-100 text-zinc-700',
@@ -348,11 +333,7 @@ function StatusPill({
         blue: 'bg-[#3A54A5]/10 text-[#3A54A5]',
         emerald: 'bg-emerald-50 text-emerald-700',
     };
-    return (
-        <span className={cn('inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize', tones[tone])}>
-            {children}
-        </span>
-    );
+    return <span className={cn('inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize', tones[tone])}>{children}</span>;
 }
 
 function greetingForNow(date = new Date()) {
@@ -389,9 +370,7 @@ function EngagementAreaChart({ data }: { data: EngagementTrendPoint[] }) {
             <div className="mb-1 flex items-end justify-between gap-3">
                 <div>
                     <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">Finished this period</p>
-                    <p className="mt-1 text-[28px] font-semibold tracking-tight text-zinc-950 tabular-nums">
-                        {finishedThisSpan}
-                    </p>
+                    <p className="mt-1 text-[28px] font-semibold tracking-tight text-zinc-950 tabular-nums">{finishedThisSpan}</p>
                 </div>
                 <div className="flex items-center gap-3 pb-1 text-[11px] font-medium text-zinc-500">
                     <span className="inline-flex items-center gap-1.5">
@@ -417,13 +396,7 @@ function EngagementAreaChart({ data }: { data: EngagementTrendPoint[] }) {
                         </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E4E4E7" opacity={0.55} />
-                    <XAxis
-                        dataKey="month"
-                        tick={{ fill: '#A1A1AA', fontSize: 11 }}
-                        axisLine={false}
-                        tickLine={false}
-                        tickMargin={10}
-                    />
+                    <XAxis dataKey="month" tick={{ fill: '#A1A1AA', fontSize: 11 }} axisLine={false} tickLine={false} tickMargin={10} />
                     <ChartTooltip
                         content={
                             <ChartTooltipContent
@@ -435,22 +408,8 @@ function EngagementAreaChart({ data }: { data: EngagementTrendPoint[] }) {
                             />
                         }
                     />
-                    <Area
-                        type="monotone"
-                        dataKey="started"
-                        stroke="#94A3B8"
-                        strokeWidth={2}
-                        fill="url(#engStarted)"
-                        fillOpacity={1}
-                    />
-                    <Area
-                        type="monotone"
-                        dataKey="finished"
-                        stroke="#3A54A5"
-                        strokeWidth={2.25}
-                        fill="url(#engFinished)"
-                        fillOpacity={1}
-                    />
+                    <Area type="monotone" dataKey="started" stroke="#94A3B8" strokeWidth={2} fill="url(#engStarted)" fillOpacity={1} />
+                    <Area type="monotone" dataKey="finished" stroke="#3A54A5" strokeWidth={2.25} fill="url(#engFinished)" fillOpacity={1} />
                 </AreaChart>
             </ChartContainer>
         </div>
@@ -574,9 +533,7 @@ function FounderDeskHome({
                         {greetingForNow(today)}
                     </h1>
                     <p className="mt-1 text-[14px] font-medium text-zinc-500">
-                        {isAnalyst
-                            ? 'A quick look at the founders on your list'
-                            : 'A quick look across the founder desk'}
+                        {isAnalyst ? 'A quick look at the founders on your list' : 'A quick look across the founder desk'}
                     </p>
                 </div>
                 <Link
@@ -594,9 +551,7 @@ function FounderDeskHome({
                         <DeskCard className="h-full transition-shadow hover:shadow-[0_8px_28px_-10px_rgba(15,23,42,0.12)]">
                             <div className="p-4 sm:p-5">
                                 <div className="flex items-start justify-between gap-2">
-                                    <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
-                                        {stat.label}
-                                    </span>
+                                    <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">{stat.label}</span>
                                     <div className="flex items-center gap-1.5">
                                         {stat.pulse && (
                                             <span className="relative flex h-1.5 w-1.5">
@@ -609,9 +564,7 @@ function FounderDeskHome({
                                         </div>
                                     </div>
                                 </div>
-                                <p className="mt-4 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">
-                                    {stat.value}
-                                </p>
+                                <p className="mt-4 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">{stat.value}</p>
                             </div>
                         </DeskCard>
                     </Link>
@@ -670,9 +623,7 @@ function FounderDeskHome({
                         <div>
                             <h2 className="text-[15px] font-semibold text-zinc-950">Where founders stand</h2>
                             <p className="mt-0.5 text-[12px] text-zinc-500">
-                                {isAnalyst
-                                    ? 'How work is moving for the people on your list'
-                                    : 'Started vs finished over the last six months'}
+                                {isAnalyst ? 'How work is moving for the people on your list' : 'Started vs finished over the last six months'}
                             </p>
                         </div>
                         <Link
@@ -693,9 +644,7 @@ function FounderDeskHome({
                         )}
 
                         <div className="flex items-center justify-between gap-3 border-t border-zinc-100 pt-4">
-                            <p className="text-[12px] font-medium text-zinc-500">
-                                {finishedNow} finished right now · tap a status to open that list
-                            </p>
+                            <p className="text-[12px] font-medium text-zinc-500">{finishedNow} finished right now · tap a status to open that list</p>
                         </div>
 
                         {breakdown.length > 0 && (
@@ -709,15 +658,10 @@ function FounderDeskHome({
                                                 className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-[#F8F9FC]"
                                             >
                                                 <div className="flex items-center gap-2.5">
-                                                    <span
-                                                        className="h-2.5 w-2.5 rounded-full"
-                                                        style={{ backgroundColor: item.color }}
-                                                    />
+                                                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
                                                     <span className="text-[13px] font-medium text-zinc-700">{item.label}</span>
                                                 </div>
-                                                <span className="text-[14px] font-semibold text-zinc-950 tabular-nums">
-                                                    {item.value}
-                                                </span>
+                                                <span className="text-[14px] font-semibold text-zinc-950 tabular-nums">{item.value}</span>
                                             </Link>
                                         </li>
                                     );
@@ -751,28 +695,13 @@ function FounderDeskHome({
                                                 className="flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-[#F8F9FC]"
                                             >
                                                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F4F6FA] text-zinc-500">
-                                                    <SolarIcon
-                                                        name={attentionIcon[item.id] ?? 'solar:bell-linear'}
-                                                        className="size-3.5"
-                                                    />
+                                                    <SolarIcon name={attentionIcon[item.id] ?? 'solar:bell-linear'} className="size-3.5" />
                                                 </div>
                                                 <div className="min-w-0 flex-1">
-                                                    <p className="truncate text-[13px] font-semibold text-zinc-950">
-                                                        {copy?.title ?? item.title}
-                                                    </p>
-                                                    <p className="truncate text-[11px] text-zinc-500">
-                                                        {copy?.description ?? item.description}
-                                                    </p>
+                                                    <p className="truncate text-[13px] font-semibold text-zinc-950">{copy?.title ?? item.title}</p>
+                                                    <p className="truncate text-[11px] text-zinc-500">{copy?.description ?? item.description}</p>
                                                 </div>
-                                                <StatusPill
-                                                    tone={
-                                                        item.color === 'amber'
-                                                            ? 'amber'
-                                                            : item.color === 'blue'
-                                                              ? 'blue'
-                                                              : 'zinc'
-                                                    }
-                                                >
+                                                <StatusPill tone={item.color === 'amber' ? 'amber' : item.color === 'blue' ? 'blue' : 'zinc'}>
                                                     {item.count}
                                                 </StatusPill>
                                             </Link>
@@ -796,22 +725,13 @@ function FounderDeskHome({
                                 {recent_activity.slice(0, 5).map((item, i) => (
                                     <li key={i} className="flex items-start gap-3 px-5 py-3.5">
                                         <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F4F6FA] text-zinc-500">
-                                            <SolarIcon
-                                                name={activityIcon[item.type] ?? 'solar:record-linear'}
-                                                className="size-3.5"
-                                            />
+                                            <SolarIcon name={activityIcon[item.type] ?? 'solar:record-linear'} className="size-3.5" />
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-[13px] leading-snug font-medium text-zinc-900">
-                                                {item.description}
-                                            </p>
-                                            {item.email && (
-                                                <p className="mt-1 truncate text-[11px] text-zinc-500">{item.email}</p>
-                                            )}
+                                            <p className="text-[13px] leading-snug font-medium text-zinc-900">{item.description}</p>
+                                            {item.email && <p className="mt-1 truncate text-[11px] text-zinc-500">{item.email}</p>}
                                         </div>
-                                        <span className="shrink-0 pt-0.5 text-[11px] font-medium text-zinc-400">
-                                            {item.time}
-                                        </span>
+                                        <span className="shrink-0 pt-0.5 text-[11px] font-medium text-zinc-400">{item.time}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -842,8 +762,7 @@ export default function AdminDashboard({
     const showInvestorMetrics = desk === 'investors' || desk === 'platform';
     const showPlatformFinance = desk === 'platform' && isSuperAdmin;
     const canOpenSpotlightDesk = isSuperAdmin || isInvestorRelations;
-    const deskHome =
-        desk === 'founder' ? '/admin/founder' : desk === 'investors' ? '/admin/investors' : '/admin';
+    const deskHome = desk === 'founder' ? '/admin/founder' : desk === 'investors' ? '/admin/investors' : '/admin';
 
     const handoffSteps = dealflow_handoff
         ? [
@@ -915,9 +834,7 @@ export default function AdminDashboard({
                                 {greetingForNow()}
                             </h1>
                             <p className="mt-1 text-[14px] font-medium text-zinc-500">
-                                {desk === 'investors'
-                                    ? 'A quick look at the investor desk'
-                                    : 'A quick look across the platform'}
+                                {desk === 'investors' ? 'A quick look at the investor desk' : 'A quick look across the platform'}
                             </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
@@ -1007,9 +924,7 @@ export default function AdminDashboard({
                                     <DeskCard className="h-full transition-shadow hover:shadow-[0_8px_28px_-10px_rgba(15,23,42,0.12)]">
                                         <div className="p-4 sm:p-5">
                                             <div className="flex items-start justify-between gap-2">
-                                                <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
-                                                    {stat.label}
-                                                </span>
+                                                <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">{stat.label}</span>
                                                 <div className="flex items-center gap-1.5">
                                                     {stat.pulse && (
                                                         <span className="relative flex h-1.5 w-1.5">
@@ -1040,6 +955,7 @@ export default function AdminDashboard({
                                     value: metrics.active_investors ?? 0,
                                     href: '/admin/investors/accounts',
                                     icon: 'solar:users-group-rounded-linear',
+                                    show: true,
                                 },
                                 {
                                     label: 'Pending KYC',
@@ -1047,12 +963,14 @@ export default function AdminDashboard({
                                     href: '/admin/investors/accounts?kyc_status=pending',
                                     icon: 'solar:shield-warning-linear',
                                     pulse: (metrics.pending_kyc ?? 0) > 0,
+                                    show: true,
                                 },
                                 {
                                     label: 'Approved KYC',
                                     value: metrics.approved_kyc ?? 0,
                                     href: '/admin/investors/accounts?kyc_status=approved',
                                     icon: 'solar:shield-check-linear',
+                                    show: true,
                                 },
                                 {
                                     label: 'Pending dealflow',
@@ -1060,34 +978,37 @@ export default function AdminDashboard({
                                     href: '/admin/investors/dealflow/interests?status=pending',
                                     icon: 'solar:folder-with-files-linear',
                                     pulse: (metrics.pending_interests ?? 0) > 0,
+                                    show: canOpenSpotlightDesk,
                                 },
-                            ].map((stat) => (
-                                <Link key={stat.label} href={stat.href} className="block">
-                                    <DeskCard className="h-full transition-shadow hover:shadow-[0_8px_28px_-10px_rgba(15,23,42,0.12)]">
-                                        <div className="p-4 sm:p-5">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
-                                                    {stat.label}
-                                                </span>
-                                                <div className="flex items-center gap-1.5">
-                                                    {stat.pulse && (
-                                                        <span className="relative flex h-1.5 w-1.5">
-                                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3A54A5] opacity-50" />
-                                                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#3A54A5]" />
-                                                        </span>
-                                                    )}
-                                                    <div className="flex size-8 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-500">
-                                                        <SolarIcon name={stat.icon} className="size-3.5" />
+                            ]
+                                .filter((stat) => stat.show)
+                                .map((stat) => (
+                                    <Link key={stat.label} href={stat.href} className="block">
+                                        <DeskCard className="h-full transition-shadow hover:shadow-[0_8px_28px_-10px_rgba(15,23,42,0.12)]">
+                                            <div className="p-4 sm:p-5">
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <span className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
+                                                        {stat.label}
+                                                    </span>
+                                                    <div className="flex items-center gap-1.5">
+                                                        {stat.pulse && (
+                                                            <span className="relative flex h-1.5 w-1.5">
+                                                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3A54A5] opacity-50" />
+                                                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#3A54A5]" />
+                                                            </span>
+                                                        )}
+                                                        <div className="flex size-8 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-500">
+                                                            <SolarIcon name={stat.icon} className="size-3.5" />
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <p className="mt-4 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">
+                                                    {stat.value}
+                                                </p>
                                             </div>
-                                            <p className="mt-4 text-[28px] leading-none font-semibold tracking-tight text-zinc-950 tabular-nums">
-                                                {stat.value}
-                                            </p>
-                                        </div>
-                                    </DeskCard>
-                                </Link>
-                            ))}
+                                        </DeskCard>
+                                    </Link>
+                                ))}
                         </div>
                     )}
 
@@ -1097,9 +1018,7 @@ export default function AdminDashboard({
                         <DeskCard className="mb-6">
                             <div className="border-b border-zinc-100 px-5 py-4">
                                 <h2 className="text-[15px] font-semibold text-zinc-950">Dealflow handoff</h2>
-                                <p className="mt-0.5 text-[12px] text-zinc-500">
-                                    Founder audit → Spotlight → investor interests
-                                </p>
+                                <p className="mt-0.5 text-[12px] text-zinc-500">Founder audit → Spotlight → investor interests</p>
                             </div>
                             <div className="grid grid-cols-1 gap-px bg-zinc-100 sm:grid-cols-2 xl:grid-cols-4">
                                 {handoffSteps.map((step, index) => {
@@ -1112,9 +1031,7 @@ export default function AdminDashboard({
                                             )}
                                         >
                                             <div>
-                                                <p className="text-[10px] font-medium tracking-[0.16em] text-zinc-400 uppercase">
-                                                    Step {index + 1}
-                                                </p>
+                                                <p className="text-[10px] font-medium tracking-[0.16em] text-zinc-400 uppercase">Step {index + 1}</p>
                                                 <h3 className="mt-1 text-[13px] font-semibold text-zinc-950">{step.label}</h3>
                                                 <p className="mt-0.5 text-[11px] text-zinc-500">{step.hint}</p>
                                             </div>
@@ -1164,7 +1081,7 @@ export default function AdminDashboard({
                                                     <p className="truncate text-[12px] text-zinc-500">{item.description}</p>
                                                 </div>
                                             </div>
-                                            <span className="text-[20px] font-semibold tabular-nums text-zinc-950">{item.count}</span>
+                                            <span className="text-[20px] font-semibold text-zinc-950 tabular-nums">{item.count}</span>
                                         </Link>
                                     </li>
                                 ))}
@@ -1317,10 +1234,7 @@ export default function AdminDashboard({
                                     {recent_activity.slice(0, 8).map((item, i) => (
                                         <li key={i} className="flex items-start gap-3 px-5 py-3.5 transition-colors hover:bg-[#F8F9FC]">
                                             <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#F4F6FA] text-zinc-400">
-                                                <SolarIcon
-                                                    name={activityIcon[item.type] ?? 'solar:record-linear'}
-                                                    className="size-3.5"
-                                                />
+                                                <SolarIcon name={activityIcon[item.type] ?? 'solar:record-linear'} className="size-3.5" />
                                             </div>
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex flex-wrap items-center gap-x-2">

@@ -9,6 +9,7 @@ use App\Models\Message;
 use App\Models\User;
 use App\Notifications\FounderMessageReceivedNotification;
 use App\Services\MessageService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,18 +36,8 @@ class FounderMessageController extends Controller
             ->visible()
             ->oldest()
             ->get()
-            ->map(fn ($msg) => [
-                'id' => $msg->id,
-                'sender_type' => $msg->sender_type,
-                'sender_name' => $msg->senderName($founder),
-                'body' => $msg->body,
-                'has_attachment' => $msg->has_attachment,
-                'attachment_filename' => $msg->attachment_filename,
-                'attachment_size' => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
-                'created_at' => $msg->created_at->format('d M Y, H:i'),
-                'created_at_date' => $msg->created_at->format('Y-m-d'),
-                'is_from_founder' => $msg->isFromFounder(),
-            ]);
+            ->map(fn ($msg) => $this->mapMessage($msg, $founder))
+            ->all();
 
         $analyst = $founder->assignedAnalyst();
 
@@ -67,6 +58,52 @@ class FounderMessageController extends Controller
                 'full_name' => $founder->full_name,
                 'company_name' => $founder->company_name,
             ],
+        ]);
+    }
+
+    private function mapMessage(Message $msg, Founder $founder): array
+    {
+        return [
+            'id' => $msg->id,
+            'sender_type' => $msg->sender_type,
+            'sender_name' => $msg->senderName($founder),
+            'body' => $msg->body,
+            'has_attachment' => $msg->has_attachment,
+            'attachment_filename' => $msg->attachment_filename,
+            'attachment_size' => $msg->has_attachment ? $msg->attachmentSizeForHumans() : null,
+            'created_at' => $msg->created_at->format('d M Y, H:i'),
+            'created_at_date' => $msg->created_at->format('Y-m-d'),
+            'is_from_founder' => $msg->isFromFounder(),
+        ];
+    }
+
+    /**
+     * Lightweight near-real-time poll. Returns only messages newer than the
+     * cursor so the founder thread can refresh cheaply.
+     */
+    public function poll(Request $request): JsonResponse
+    {
+        /** @var Founder $founder */
+        $founder = Auth::guard('founder')->user();
+        $thread = $this->messageService->getOrCreateThread($founder);
+
+        $after = $request->query('after');
+
+        $query = $thread->messages()->visible();
+        if ($after) {
+            $query->where('id', '>', $after);
+        }
+
+        $new = $query->orderBy('id')->limit(100)->get();
+        $messages = $new->map(fn (Message $msg) => $this->mapMessage($msg, $founder))->all();
+
+        if ($messages !== []) {
+            $this->messageService->markThreadRead($thread, 'founder');
+        }
+
+        return response()->json([
+            'messages' => $messages,
+            'unread' => $thread->fresh()->founder_unread_count,
         ]);
     }
 

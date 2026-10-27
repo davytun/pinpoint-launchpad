@@ -132,6 +132,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::prefix('messages')->name('messages.')->middleware('require.role:superadmin,analyst')->group(function () {
             Route::get('/', [AdminMessageController::class, 'inbox'])->name('inbox');
+            Route::get('/poll', [AdminMessageController::class, 'poll'])->name('poll');
             Route::get('/attachment/{message}', [AdminMessageController::class, 'downloadAttachment'])->name('attachment.download');
             Route::get('/{thread}', [AdminMessageController::class, 'show'])->name('show');
             Route::post('/{thread}/reply', [AdminMessageController::class, 'reply'])->name('reply')->middleware('throttle:30,1');
@@ -392,6 +393,7 @@ Route::prefix('founder')->name('founder.')->group(function () {
 
         Route::prefix('messages')->name('messages.')->group(function () {
             Route::get('/', [FounderMessageController::class, 'index'])->name('index');
+            Route::get('/poll', [FounderMessageController::class, 'poll'])->name('poll');
             Route::post('/', [FounderMessageController::class, 'store'])->name('store')->middleware('throttle:20,1');
             Route::get('/attachment/{message}', [FounderMessageController::class, 'downloadAttachment'])->name('attachment.download');
         });

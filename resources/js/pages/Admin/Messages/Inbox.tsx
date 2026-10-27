@@ -69,7 +69,7 @@ function getInitials(name?: string | null): string {
         .toUpperCase();
 }
 
-export default function AdminMessagesInbox({ threads, active_thread, messages, founder, showing_unassigned }: PageProps) {
+export default function AdminMessagesInbox({ threads, active_thread, messages, founder, total_unread, showing_unassigned }: PageProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterTab, setFilterTab] = useState<'all' | 'unread'>('all');
     const [attachment, setAttachment] = useState<File | null>(null);
@@ -77,6 +77,9 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
 
     const threadRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const cursorRef = useRef<string | null>(null);
+    const unreadRef = useRef(total_unread);
+    const awaitingRef = useRef(false);
 
     const { data, setData, post, processing, reset } = useForm<{
         body: string;
@@ -90,11 +93,52 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
     }, [messages.length, active_thread?.id]);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            router.reload({ only: ['threads', 'messages', 'total_unread'] });
-        }, 25000);
-        return () => clearInterval(interval);
-    }, []);
+        cursorRef.current = messages.length ? String(messages[messages.length - 1].id) : null;
+        awaitingRef.current = false;
+    }, [messages]);
+
+    useEffect(() => {
+        unreadRef.current = total_unread;
+    }, [total_unread]);
+
+    // Near-real-time poll: cheap cursor + unread check every 3s, full reload only when something changed.
+    useEffect(() => {
+        let cancelled = false;
+        const activeId = active_thread?.id;
+
+        async function tick() {
+            if (document.hidden || cancelled || awaitingRef.current) return;
+            try {
+                const url = new URL(route('admin.messages.poll'), window.location.origin);
+                if (activeId) url.searchParams.set('thread', String(activeId));
+                if (cursorRef.current) url.searchParams.set('after', cursorRef.current);
+                const res = await fetch(url.toString(), {
+                    headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                if (!res.ok || cancelled) return;
+                const data = await res.json();
+                const hasNew = Array.isArray(data.messages) && data.messages.length > 0;
+                const unreadChanged = typeof data.total_unread === 'number' && data.total_unread !== unreadRef.current;
+                if (hasNew || unreadChanged) {
+                    awaitingRef.current = true;
+                    router.reload({ only: ['threads', 'messages', 'total_unread'] });
+                }
+            } catch {
+                /* transient network blip; next tick retries */
+            }
+        }
+
+        const interval = setInterval(tick, 3000);
+        const onVisible = () => {
+            if (!document.hidden) tick();
+        };
+        document.addEventListener('visibilitychange', onVisible);
+        return () => {
+            cancelled = true;
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', onVisible);
+        };
+    }, [active_thread?.id]);
 
     const filteredThreads = threads.filter((t) => {
         const matchesFilter = filterTab === 'all' || (filterTab === 'unread' && t.unread_count > 0);
@@ -232,8 +276,8 @@ export default function AdminMessagesInbox({ threads, active_thread, messages, f
                                                         isSelected
                                                             ? 'font-bold text-zinc-950'
                                                             : hasUnread
-                                                              ? 'font-bold text-zinc-900'
-                                                              : 'font-semibold text-zinc-800',
+                                                                ? 'font-bold text-zinc-900'
+                                                                : 'font-semibold text-zinc-800',
                                                     )}
                                                 >
                                                     {t.founder_name ?? 'Unknown'}

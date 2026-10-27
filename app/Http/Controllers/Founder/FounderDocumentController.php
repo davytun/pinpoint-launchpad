@@ -9,6 +9,7 @@ use App\Services\DocumentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -40,7 +41,7 @@ class FounderDocumentController extends Controller
 
         $categories = collect($this->categoryList())
             ->map(function (array $cat) use ($grouped, $mapDoc) {
-                /** @var \Illuminate\Support\Collection $files */
+                /** @var Collection $files */
                 $files = $grouped->get($cat['value'], collect());
 
                 return [
@@ -89,6 +90,15 @@ class FounderDocumentController extends Controller
 
         $founder = Auth::guard('founder')->user()->load('payment');
 
+        $category = $request->input('category');
+        $auditStatus = $founder->payment?->audit_status ?? 'pending';
+        if (in_array($auditStatus, ['in_progress', 'complete'], true) && $category !== 'other') {
+            return $this->uploadError(
+                'Required documents are locked while your review is underway. You can still add extras under Optional documents.',
+                $request
+            );
+        }
+
         $currentCount = $founder->documents()->count();
         $incoming = count($request->file('files'));
 
@@ -103,14 +113,14 @@ class FounderDocumentController extends Controller
         $uploaded = 0;
         foreach ($request->file('files') as $file) {
             try {
-                $this->documents->validateFile($file);
+                $this->documents->validateFile($file, $category);
             } catch (ValidationException $e) {
                 $msg = collect($e->errors())->flatten()->first() ?? 'Invalid file.';
 
                 return $this->uploadError($msg, $request);
             }
 
-            $document = $this->documents->store($file, $founder, $request->input('category'));
+            $document = $this->documents->store($file, $founder, $category);
 
             Mail::to(config('mail.admin_address'))->queue(
                 new DocumentUploadedMail($founder, $document)

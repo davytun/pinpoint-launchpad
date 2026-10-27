@@ -90,17 +90,19 @@ export default function FounderSpotlight({
                                 <div>
                                     <div className="mb-1 flex items-center justify-between">
                                         <label className="text-xs font-bold text-zinc-700">Executive Summary</label>
-                                        <span className="font-mono text-[11px] text-zinc-400">
-                                            {form.data.spotlight_summary.length}/500
+                                        <span
+                                            className={`font-mono text-[11px] ${form.data.spotlight_summary.length > 1200 ? 'font-bold text-amber-600' : 'text-zinc-400'}`}
+                                        >
+                                            {form.data.spotlight_summary.length}/5000
                                         </span>
                                     </div>
                                     <textarea
                                         value={form.data.spotlight_summary}
                                         onChange={(event) => form.setData('spotlight_summary', event.target.value)}
-                                        maxLength={500}
+                                        maxLength={5000}
                                         rows={6}
                                         placeholder="Describe the company, market opportunity, business model, and milestones achieved..."
-                                        className="w-full resize-none rounded-xl border border-zinc-200 bg-[#FAFBFD] p-3 text-xs leading-relaxed text-zinc-900 shadow-2xs placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
+                                        className="w-full resize-y rounded-xl border border-zinc-200 bg-[#FAFBFD] p-3 text-xs leading-relaxed text-zinc-900 shadow-2xs placeholder:text-zinc-400 focus:border-zinc-400 focus:bg-white focus:outline-none"
                                     />
                                 </div>
 

@@ -24,7 +24,7 @@ class UpdateFounderSpotlightRequest extends FormRequest
     {
         return [
             'spotlight_one_liner' => ['nullable', 'string', 'max:120'],
-            'spotlight_summary' => ['nullable', 'string', 'max:500'],
+            'spotlight_summary' => ['nullable', 'string', 'max:5000'],
         ];
     }
 }

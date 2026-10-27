@@ -42,7 +42,7 @@ test('Spotlight content respects the agreed limits', function () {
         ->from(route('founder.spotlight.edit'))
         ->patch(route('founder.spotlight.update'), [
             'spotlight_one_liner' => str_repeat('a', 121),
-            'spotlight_summary' => str_repeat('b', 501),
+            'spotlight_summary' => str_repeat('b', 5001),
         ]);
 
     $response->assertRedirect(route('founder.spotlight.edit'))
@@ -153,5 +153,5 @@ test('a reviewed pitch deck is required before an investor relations user can pu
 
     $this->actingAs($investorRelations)
         ->patch(route('admin.spotlight.update', $profile), ['publish' => true])
-        ->assertStatus(422);
+        ->assertSessionHasErrors(['publish']);
 });

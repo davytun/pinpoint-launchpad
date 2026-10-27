@@ -32,7 +32,9 @@ class DocumentService
 
     private const MAX_SIZE = 104857600; // 100MB
 
-    public function validateFile(UploadedFile $file): void
+    private const PDF_ONLY_CATEGORIES = ['pitch_deck'];
+
+    public function validateFile(UploadedFile $file, ?string $category = null): void
     {
         if (! \in_array($file->getMimeType(), self::ALLOWED_MIMES)) {
             throw ValidationException::withMessages([
@@ -50,6 +52,14 @@ class DocumentService
         if ($file->getSize() > self::MAX_SIZE) {
             throw ValidationException::withMessages([
                 'file' => 'File size must not exceed 100MB.',
+            ]);
+        }
+
+        if ($category !== null
+            && \in_array($category, self::PDF_ONLY_CATEGORIES, true)
+            && $file->getMimeType() !== 'application/pdf') {
+            throw ValidationException::withMessages([
+                'file' => 'The Pitch Deck must be a PDF file.',
             ]);
         }
     }

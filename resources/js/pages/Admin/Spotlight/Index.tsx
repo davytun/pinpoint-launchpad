@@ -12,6 +12,7 @@ interface PitchDeck {
     id: string;
     original_filename: string;
     is_reviewed: boolean;
+    is_pdf: boolean;
     file_size: number;
     analyst_note?: string | null;
     download_url?: string;
@@ -187,6 +188,7 @@ function SpotlightDrawer({
 
     function togglePublish(publish: boolean) {
         setPublishing(true);
+        setErrors({});
         router.patch(
             `/admin/investors/spotlight/${profile.id}`,
             {
@@ -207,6 +209,7 @@ function SpotlightDrawer({
                         batch,
                     });
                 },
+                onError: (err) => setErrors(err as Record<string, string>),
                 onFinish: () => setPublishing(false),
                 preserveScroll: true,
             },
@@ -220,10 +223,13 @@ function SpotlightDrawer({
             { mark_deck_reviewed: true },
             {
                 onSuccess: () => {
-                    const remainingRequirements = profile.publish_requirements.filter((r) => !r.toLowerCase().includes('pitch deck'));
+                    const isPdf = profile.pitch_deck?.is_pdf ?? false;
+                    const remainingRequirements = isPdf
+                        ? profile.publish_requirements.filter((r) => !r.toLowerCase().includes('pitch deck'))
+                        : profile.publish_requirements;
                     onUpdateProfile({
                         ...profile,
-                        has_reviewed_pitch_deck: true,
+                        has_reviewed_pitch_deck: isPdf,
                         pitch_deck: profile.pitch_deck ? { ...profile.pitch_deck, is_reviewed: true } : null,
                         publish_requirements: remainingRequirements,
                         is_ready: remainingRequirements.length === 0,
@@ -385,17 +391,17 @@ function SpotlightDrawer({
                         <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
                                 <label className="block text-xs font-semibold text-zinc-800">Executive Summary</label>
-                                <span className={cn('font-mono text-[10.5px]', summary.length > 450 ? 'font-bold text-amber-600' : 'text-zinc-400')}>
-                                    {summary.length} / 500
+                                <span className={cn('font-mono text-[10.5px]', summary.length > 1200 ? 'font-bold text-amber-600' : 'text-zinc-400')}>
+                                    {summary.length} / 5000
                                 </span>
                             </div>
                             <textarea
                                 rows={4}
-                                maxLength={500}
+                                maxLength={5000}
                                 value={summary}
                                 onChange={(e) => setSummary(e.target.value)}
                                 placeholder="Detailed summary highlighting market opportunity, growth metrics, and traction..."
-                                className="w-full resize-none rounded-xl border border-zinc-200/90 bg-white p-3 text-xs leading-relaxed text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+                                className="w-full resize-y rounded-xl border border-zinc-200/90 bg-white p-3 text-xs leading-relaxed text-zinc-900 shadow-2xs transition-colors placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
                             />
                             {errors.spotlight_summary && <p className="text-xs font-medium text-rose-600">{errors.spotlight_summary}</p>}
                         </div>
@@ -421,10 +427,15 @@ function SpotlightDrawer({
                                         </div>
                                     </div>
 
-                                    {profile.pitch_deck.is_reviewed ? (
+                                    {profile.pitch_deck.is_reviewed && profile.pitch_deck.is_pdf ? (
                                         <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                                             <Icon icon="solar:check-circle-linear" className="size-3 text-emerald-600" />
                                             <span>Reviewed</span>
+                                        </span>
+                                    ) : profile.pitch_deck.is_reviewed && !profile.pitch_deck.is_pdf ? (
+                                        <span className="inline-flex items-center gap-1 rounded-full border border-rose-200/80 bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700">
+                                            <Icon icon="solar:danger-triangle-linear" className="size-3 text-rose-600" />
+                                            <span>Not a PDF</span>
                                         </span>
                                     ) : (
                                         <span className="inline-flex items-center gap-1 rounded-full border border-amber-200/80 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
@@ -442,7 +453,7 @@ function SpotlightDrawer({
                                         className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-colors hover:bg-zinc-50"
                                     >
                                         <Icon icon="solar:download-minimalistic-linear" className="size-3.5 text-zinc-500" />
-                                        <span>Download PDF</span>
+                                        <span>{profile.pitch_deck.is_pdf ? 'Download PDF' : 'Download file'}</span>
                                     </a>
 
                                     {!profile.pitch_deck.is_reviewed && (
@@ -554,6 +565,12 @@ function SpotlightDrawer({
                         </div>
                     </div>
                 </div>
+
+                {errors.publish && (
+                    <div className="shrink-0 border-t border-rose-100 bg-rose-50 px-6 py-2.5 text-[11.5px] font-medium text-rose-700">
+                        {errors.publish}
+                    </div>
+                )}
 
                 {/* ── Sticky Action Footer ─────────────────────────────────── */}
                 <div className="flex shrink-0 items-center justify-between gap-3 border-t border-zinc-100 bg-[#FAFBFD] px-6 py-3.5">

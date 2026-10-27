@@ -11,6 +11,7 @@ use App\Models\VerificationBadge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -103,7 +104,7 @@ class SpotlightController extends Controller
             'sector' => ['sometimes', 'nullable', 'string', 'max:50'],
             'batch' => ['sometimes', 'nullable', 'string', 'max:50'],
             'spotlight_one_liner' => ['sometimes', 'nullable', 'string', 'max:120'],
-            'spotlight_summary' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'spotlight_summary' => ['sometimes', 'nullable', 'string', 'max:5000'],
             'mark_deck_reviewed' => ['sometimes', 'boolean'],
             'badge_type' => ['sometimes', 'string', 'max:50'],
             'badge_verified' => ['sometimes', 'boolean'],
@@ -175,25 +176,25 @@ class SpotlightController extends Controller
             $shouldPublish = $data['publish'];
 
             if ($shouldPublish) {
-                abort_unless($profile->isLive(), 422, 'Only PARAGON-complete, live profiles can be published to Spotlight.');
-                abort_unless($profile->spotlight_one_liner && $profile->spotlight_summary, 422, 'Founder Spotlight content is incomplete.');
+                if (! $profile->isLive()) {
+                    throw ValidationException::withMessages(['publish' => 'Only PARAGON-complete, live profiles can be published to Spotlight.']);
+                }
+                if (! $profile->spotlight_one_liner || ! $profile->spotlight_summary) {
+                    throw ValidationException::withMessages(['publish' => 'Add both a one-liner and an executive summary before publishing.']);
+                }
 
                 $placeholderCopy = [
                     'What your venture builds and solves, in one compelling sentence...',
                     'Describe the company, market opportunity, business model, and milestones achieved...',
                 ];
-                abort_if(
-                    in_array(trim((string) $profile->spotlight_one_liner), $placeholderCopy, true)
-                        || in_array(trim((string) $profile->spotlight_summary), $placeholderCopy, true),
-                    422,
-                    'Replace placeholder Spotlight copy with the real one-liner and summary before publishing.'
-                );
+                if (in_array(trim((string) $profile->spotlight_one_liner), $placeholderCopy, true)
+                    || in_array(trim((string) $profile->spotlight_summary), $placeholderCopy, true)) {
+                    throw ValidationException::withMessages(['publish' => 'Replace the placeholder Spotlight copy with real text before publishing.']);
+                }
 
-                abort_unless(
-                    $profile->founder->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->where('mime_type', 'application/pdf')->exists(),
-                    422,
-                    'A reviewed PDF pitch deck is required before publishing.'
-                );
+                if (! $profile->founder->documents()->where('visibility', 'spotlight')->where('is_reviewed', true)->where('mime_type', 'application/pdf')->exists()) {
+                    throw ValidationException::withMessages(['publish' => 'A reviewed PDF pitch deck is required before publishing.']);
+                }
             }
 
             $entry = SpotlightEntry::updateOrCreate(['profile_id' => $profile->id], [
@@ -271,13 +272,21 @@ class SpotlightController extends Controller
     private function spotlightRow(FounderProfile $profile): array
     {
         $pitchDeck = $profile->founder?->documents?->first();
-        $hasReviewedPitchDeck = $pitchDeck?->is_reviewed ?? false;
+        $isPdfDeck = ($pitchDeck?->mime_type ?? '') === 'application/pdf';
+        $hasReviewedPitchDeck = ($pitchDeck?->is_reviewed ?? false) && $isPdfDeck;
+
+        $deckRequirement = match (true) {
+            $pitchDeck === null => 'Upload a reviewed PDF pitch deck',
+            ! $isPdfDeck => 'Replace the pitch deck with a PDF (the current file is not a PDF)',
+            ! $pitchDeck->is_reviewed => 'Spotlight pitch deck needs review',
+            default => null,
+        };
 
         $requirements = collect([
             ! $profile->isLive() ? 'PARAGON verification pending' : null,
             ! $profile->spotlight_one_liner ? 'One-liner is required' : null,
             ! $profile->spotlight_summary ? 'Summary is required' : null,
-            ! $hasReviewedPitchDeck ? 'Spotlight pitch deck needs review' : null,
+            $deckRequirement,
         ])->filter()->values();
 
         $isPublished = $profile->spotlightEntry?->published_at !== null;
@@ -317,6 +326,7 @@ class SpotlightController extends Controller
                 'id' => $pitchDeck->id,
                 'original_filename' => $pitchDeck->original_filename,
                 'is_reviewed' => $pitchDeck->is_reviewed,
+                'is_pdf' => $isPdfDeck,
                 'file_size' => $pitchDeck->file_size,
                 'analyst_note' => $pitchDeck->analyst_note,
                 'download_url' => route('admin.documents.download', [$profile->founder_id, $pitchDeck->id]),

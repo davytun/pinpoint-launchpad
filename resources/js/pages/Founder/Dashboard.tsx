@@ -84,9 +84,19 @@ function engagementLabel(type: InvestorInterest['type']) {
 }
 
 function engagementStatus(interest: InvestorInterest) {
-    if (interest.data_room_granted) return 'Data room open';
-    if (interest.founder_decision === 'approved') return 'Approved — Pinpoint coordinating';
     if (interest.founder_decision === 'declined' || interest.status === 'denied') return 'Declined';
+
+    if (interest.type === 'founder_call') {
+        if (interest.completed_at) return 'Call completed';
+        if (interest.scheduled_at) return 'Call scheduled';
+    }
+
+    if (interest.type === 'data_room_access' && interest.data_room_granted) return 'Data room open';
+
+    if (interest.founder_decision === 'approved' || interest.status === 'approved') {
+        return 'Approved — Pinpoint coordinating';
+    }
+
     return 'Waiting on you';
 }
 
@@ -163,9 +173,7 @@ function nextAction(args: {
         return {
             tone: 'wait',
             title: analyst ? `Your analyst is ${analyst}` : 'Review in progress',
-            body: analyst
-                ? 'No action needed unless they message you.'
-                : 'No action needed unless your analyst messages you.',
+            body: analyst ? 'No action needed unless they message you.' : 'No action needed unless your analyst messages you.',
             href: route('founder.messages.index'),
             cta: 'Messages',
         };
@@ -174,9 +182,7 @@ function nextAction(args: {
         return {
             tone: 'wait',
             title: 'Review on hold',
-            body: analyst
-                ? `Check messages from ${analyst} for why, and what to do next.`
-                : 'Check messages for why, and what to do next.',
+            body: analyst ? `Check messages from ${analyst} for why, and what to do next.` : 'Check messages for why, and what to do next.',
             href: route('founder.messages.index'),
             cta: 'Messages',
         };
@@ -233,9 +239,7 @@ export default function FounderDashboard({
 
             <div className="flex h-full max-h-full min-w-0 flex-1 flex-col overflow-hidden">
                 <header className="shrink-0 pb-6">
-                    <p className="text-[13px] text-zinc-500">
-                        {tier ? <span className="capitalize">{tier} track</span> : 'Founder workspace'}
-                    </p>
+                    <p className="text-[13px] text-zinc-500">{tier ? <span className="capitalize">{tier} track</span> : 'Founder workspace'}</p>
                     <h1 className="font-display mt-1 text-[1.75rem] leading-tight font-bold tracking-tight text-zinc-950 sm:text-[2rem]">
                         {companyName}
                     </h1>
@@ -271,17 +275,13 @@ export default function FounderDashboard({
                                               : 'Share more details?'}
                                     </h2>
                                     <p className="mt-1.5 text-[14px] text-zinc-600">
-                                        <span className="font-medium text-zinc-800">
-                                            {interest.firm_name ?? interest.investor_name}
-                                        </span>
+                                        <span className="font-medium text-zinc-800">{interest.firm_name ?? interest.investor_name}</span>
                                         {interest.firm_name && interest.investor_name ? (
                                             <span className="text-zinc-500"> · {interest.investor_name}</span>
                                         ) : null}
                                     </p>
                                     {interest.message ? (
-                                        <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-zinc-600">
-                                            {interest.message}
-                                        </p>
+                                        <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-zinc-600">{interest.message}</p>
                                     ) : null}
                                     <div className="mt-5 flex flex-wrap gap-2">
                                         <button
@@ -326,10 +326,8 @@ export default function FounderDashboard({
                             )}
                         >
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="min-w-0 max-w-xl">
-                                    <h2 className="text-[1.125rem] font-semibold tracking-tight text-zinc-950">
-                                        {next.title}
-                                    </h2>
+                                <div className="max-w-xl min-w-0">
+                                    <h2 className="text-[1.125rem] font-semibold tracking-tight text-zinc-950">{next.title}</h2>
                                     <p className="mt-1.5 text-[14px] leading-relaxed text-zinc-600">{next.body}</p>
                                 </div>
                                 {next.href && next.cta && (
@@ -355,9 +353,7 @@ export default function FounderDashboard({
                             <ul className="mt-4 divide-y divide-zinc-100 border-t border-zinc-100">
                                 {otherInterests.map((interest) => (
                                     <li key={interest.id} className="py-4">
-                                        <p className="text-[14px] font-semibold text-zinc-950">
-                                            {interest.firm_name ?? interest.investor_name}
-                                        </p>
+                                        <p className="text-[14px] font-semibold text-zinc-950">{interest.firm_name ?? interest.investor_name}</p>
                                         <p className="mt-0.5 text-[13px] text-zinc-500">
                                             {engagementLabel(interest.type)}
                                             <span className="mx-1.5 text-zinc-300">·</span>
@@ -372,9 +368,7 @@ export default function FounderDashboard({
                     <section>
                         <div className="mb-5">
                             <h2 className="text-[15px] font-semibold text-zinc-950">Self-scan</h2>
-                            <p className="mt-1 text-[13px] text-zinc-500">
-                                From your answers. The analyst review may change this.
-                            </p>
+                            <p className="mt-1 text-[13px] text-zinc-500">From your answers. The analyst review may change this.</p>
                         </div>
 
                         {score != null ? (
@@ -384,9 +378,7 @@ export default function FounderDashboard({
                                         {score}
                                         <span className="ml-1 text-base font-medium text-zinc-400">/100</span>
                                     </p>
-                                    {band && (
-                                        <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-zinc-600">{band}</p>
-                                    )}
+                                    {band && <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-zinc-600">{band}</p>}
 
                                     <dl className="mt-8 space-y-0">
                                         {PILLARS.map(({ key, label }) => (
@@ -395,7 +387,7 @@ export default function FounderDashboard({
                                                 className="flex items-center justify-between gap-4 border-b border-zinc-100 py-2.5 text-[13px]"
                                             >
                                                 <dt className="text-zinc-500">{label}</dt>
-                                                <dd className="font-mono text-[13px] font-semibold tabular-nums text-zinc-900">
+                                                <dd className="font-mono text-[13px] font-semibold text-zinc-900 tabular-nums">
                                                     {pillar_scores[key] != null ? `${Math.round(pillar_scores[key]!)}%` : '—'}
                                                 </dd>
                                             </div>

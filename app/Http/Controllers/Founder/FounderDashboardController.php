@@ -128,7 +128,7 @@ class FounderDashboardController extends Controller
                 ->whereIn('profile_id', $profileIds)
                 ->whereNull('revoked_at')
                 ->get()
-                ->keyBy('investor_id');
+                ->keyBy(fn ($grant) => $grant->investor_id.':'.$grant->profile_id);
 
         $investorInterests = $profileIds === []
             ? []
@@ -138,7 +138,9 @@ class FounderDashboardController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($interest) use ($dataRoomGrants) {
-                    $grant = $dataRoomGrants->get($interest->investor_id);
+                    // Keyed per investor+profile so a grant on one venture never
+                    // relabels engagement rows on another venture of the same founder.
+                    $grant = $dataRoomGrants->get($interest->investor_id.':'.$interest->profile_id);
                     $latestActivity = $interest->completed_at
                         ?? $interest->scheduled_at
                         ?? $interest->reviewed_at
@@ -156,7 +158,7 @@ class FounderDashboardController extends Controller
                         'is_awaiting_founder' => $interest->isAwaitingFounder(),
                         'stage' => $interest->getEngagementStage($grant),
                         'introduction_status' => $interest->getIntroductionStatus(),
-                        'data_room_granted' => $grant !== null,
+                        'data_room_granted' => $interest->type === 'data_room_access' && $grant !== null,
                         'scheduled_at' => $interest->scheduled_at?->toISOString(),
                         'completed_at' => $interest->completed_at?->toISOString(),
                         'meeting_link' => $interest->meeting_link,

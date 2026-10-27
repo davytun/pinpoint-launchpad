@@ -71,7 +71,9 @@ test('a qualified founder can request a selected PIA tier without re-entering di
     expect($application->email)->toBe($diagnosticSession->email)
         ->and($application->source)->toBe('diagnostic_tier_selection')
         ->and($application->selected_tier)->toBe('growth')
-        ->and($application->message)->toBe('Selected PIA tier: growth.');
+        // 84300e89 replaced the legacy "Selected PIA tier" message text with the
+        // structured selected_tier column, so the free-form message stays empty.
+        ->and($application->message)->toBeNull();
 
     $this->withSession(['diagnostic_session_id' => $diagnosticSession->id])
         ->post(route('checkout.request'), [

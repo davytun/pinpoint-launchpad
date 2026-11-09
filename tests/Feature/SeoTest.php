@@ -76,6 +76,7 @@ it('serves sitemap.xml with indexable pages and published posts only', function 
     $response->assertOk();
     $response->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
     $response->assertSee('https://pinpointlaunchpad.com/', false);
+    $response->assertSee('https://pinpointlaunchpad.com/about', false);
     $response->assertSee('https://pinpointlaunchpad.com/investor', false);
     $response->assertSee('https://pinpointlaunchpad.com/assessment', false);
     $response->assertSee('https://pinpointlaunchpad.com/blog', false);
@@ -110,6 +111,7 @@ it('marks diagnostic pages as noindex', function () {
 it('renders indexable marketing pages with canonical and og tags', function () {
     $cases = [
         '/' => ['Prove your startup is ready for investment', 'FAQPage'],
+        '/about' => ['About Pinpoint | Investment readiness for startups', 'WebPage'],
         '/investor' => ['See startups that have been reviewed', 'FAQPage'],
         '/assessment' => ['Pinpoint Investment Assessment', 'Service'],
         '/blog' => ['Insights and articles', 'Blog'],

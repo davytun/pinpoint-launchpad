@@ -256,6 +256,9 @@ Route::get('/', function () {
         'latest_posts' => $latestPosts,
     ]);
 })->name('home');
+Route::get('/about', function () {
+    return Inertia::render('About');
+})->name('about');
 Route::get('/orbit-demo', function () {
     return Inertia::render('OrbitDemo');
 })->name('orbit.demo');

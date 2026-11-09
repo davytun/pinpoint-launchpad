@@ -29,7 +29,11 @@ class Seo
         $baseUrl = rtrim((string) config('app.url'), '/');
 
         $titlePart = $overrides['title'] ?? $page['title'] ?? $siteName;
-        $fullTitle = self::formatTitle($titlePart, $siteName, ! empty($overrides['title_is_full']));
+        $fullTitle = self::formatTitle(
+            $titlePart,
+            $siteName,
+            ! empty($overrides['title_is_full']) || ! empty($page['title_is_full']),
+        );
 
         $description = $overrides['description']
             ?? $page['description']

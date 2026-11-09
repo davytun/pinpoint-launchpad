@@ -61,6 +61,15 @@ return [
             'schema' => ['organization', 'website', 'faq'],
         ],
 
+        'about' => [
+            'title' => 'About Pinpoint | Investment readiness for startups',
+            'title_is_full' => true,
+            'description' => 'Pinpoint, built by Infusion Lawyers, helps founders prove their startups are investment-ready and gives investors verified profiles they can trust.',
+            'robots' => 'index, follow',
+            'og_type' => 'website',
+            'schema' => ['organization', 'webpage'],
+        ],
+
         'investor.index' => [
             'title' => 'See startups that have been reviewed, not just pitched',
             'description' => 'Join Pinpoint as an investor to browse reviewed startups, see readiness scores and gaps, and dig deeper when a company deserves your time.',
@@ -261,6 +270,7 @@ return [
 
     'sitemap_paths' => [
         '/',
+        '/about',
         '/investor',
         '/assessment',
         '/blog',

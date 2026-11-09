@@ -74,13 +74,19 @@ export default function Header({ cta = DEFAULT_CTA }: HeaderProps) {
                         >
                             Assessment
                         </Link>
+                        <Link href="/about" className="text-sm font-semibold whitespace-nowrap text-zinc-600 transition-colors hover:text-zinc-950">
+                            About
+                        </Link>
                         <Link href="/blog" className="text-sm font-semibold whitespace-nowrap text-zinc-600 transition-colors hover:text-zinc-950">
                             Blog
                         </Link>
                     </nav>
 
                     <div className="hidden shrink-0 items-center gap-4 lg:flex xl:gap-5">
-                        <Link href="/investor" className="text-sm font-semibold whitespace-nowrap text-zinc-500 transition-colors hover:text-zinc-950">
+                        <Link
+                            href="/investor"
+                            className="text-sm font-semibold whitespace-nowrap text-zinc-500 transition-colors hover:text-zinc-950"
+                        >
                             For investors
                         </Link>
                         <Link
@@ -125,6 +131,9 @@ export default function Header({ cta = DEFAULT_CTA }: HeaderProps) {
                         ))}
                         <Link href="/assessment" onClick={() => setMobileOpen(false)} className="py-1.5 text-sm font-semibold text-zinc-700">
                             Assessment
+                        </Link>
+                        <Link href="/about" onClick={() => setMobileOpen(false)} className="py-1.5 text-sm font-semibold text-zinc-700">
+                            About
                         </Link>
                         <Link href="/blog" onClick={() => setMobileOpen(false)} className="py-1.5 text-sm font-semibold text-zinc-700">
                             Blog

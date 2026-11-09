@@ -18,9 +18,9 @@ export default function Footer() {
     };
 
     return (
-        <footer className="relative z-10 w-full bg-[#0D1325] py-16 font-sans text-zinc-300">
+        <footer className="relative z-10 w-full bg-[#0D1325] py-12 font-sans text-zinc-300 md:py-16">
             <div className="mx-auto max-w-5xl px-6 md:px-8">
-                <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
                     {/* Brand Column */}
                     <div className="space-y-4">
                         <PinpointLogo height={26} variant="white" />
@@ -64,14 +64,17 @@ export default function Footer() {
                     </div>
 
                     {/* Legal & Socials (Right Aligned on desktop) */}
-                    <div className="flex flex-col space-y-4 md:items-end">
+                    <div className="flex flex-col gap-4 md:items-end">
                         <h4 className="text-xs font-bold tracking-widest text-zinc-400 uppercase md:text-sm">Explore</h4>
-                        <div className="text-zinc-350 flex flex-col space-y-2.5 text-sm font-semibold md:items-end md:text-base">
-                            <Link href="/assessment" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                        <nav aria-label="Footer" className="grid grid-cols-2 gap-x-5 gap-y-3 text-sm font-semibold md:flex md:flex-col md:items-end md:gap-2.5 md:text-base">
+                            <Link href="/assessment" className="col-span-2 text-left transition-colors outline-none hover:text-white md:text-right">
                                 Pinpoint Investment Assessment
                             </Link>
                             <Link href="/investor" className="text-left transition-colors outline-none hover:text-white md:text-right">
                                 For investors
+                            </Link>
+                            <Link href="/about" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                About Pinpoint
                             </Link>
                             <Link href="/" className="text-left transition-colors outline-none hover:text-white md:text-right">
                                 For founders
@@ -79,19 +82,21 @@ export default function Footer() {
                             <a href="/blog" className="text-left transition-colors outline-none hover:text-white md:text-right">
                                 Blog
                             </a>
-                            <Link href="/terms" className="text-left transition-colors outline-none hover:text-white md:text-right">
-                                Terms & Conditions
-                            </Link>
-                            <Link href="/privacy" className="text-left transition-colors outline-none hover:text-white md:text-right">
-                                Privacy Notice
-                            </Link>
-                            <Link href="/investor-terms" className="text-left transition-colors outline-none hover:text-white md:text-right">
-                                Investor Terms
-                            </Link>
-                            <Link href="/cookies" className="text-left transition-colors outline-none hover:text-white md:text-right">
-                                Cookies Policy
-                            </Link>
-                        </div>
+                            <div className="col-span-2 mt-2 grid grid-cols-2 gap-x-5 gap-y-3 border-t border-white/10 pt-5 text-zinc-400 md:mt-0 md:flex md:flex-col md:items-end md:gap-2.5 md:border-0 md:pt-0">
+                                <Link href="/terms" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                    Terms & Conditions
+                                </Link>
+                                <Link href="/privacy" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                    Privacy Notice
+                                </Link>
+                                <Link href="/investor-terms" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                    Investor Terms
+                                </Link>
+                                <Link href="/cookies" className="text-left transition-colors outline-none hover:text-white md:text-right">
+                                    Cookies Policy
+                                </Link>
+                            </div>
+                        </nav>
 
                         {/* Social Icons */}
                         <div className="flex items-center gap-3 pt-2">

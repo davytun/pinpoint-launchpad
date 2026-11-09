@@ -137,6 +137,7 @@ Route::prefix('admin')->name('admin.')->middleware('admin.2fa.configured')->grou
             Route::post('/', [AdminUserController::class, 'store'])->name('store');
             Route::get('/{user}/edit', [AdminUserController::class, 'edit'])->name('edit');
             Route::patch('/{user}', [AdminUserController::class, 'update'])->name('update');
+            Route::delete('/{user}/two-factor', [AdminUserController::class, 'resetTwoFactor'])->name('two-factor.destroy');
             Route::delete('/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
         });
     });

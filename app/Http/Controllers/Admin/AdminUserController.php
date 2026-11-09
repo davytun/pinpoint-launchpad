@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AuditAssignment;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Fortify\Actions\DisableTwoFactorAuthentication;
 
 class AdminUserController extends Controller
 {
@@ -69,6 +71,7 @@ class AdminUserController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'two_factor_enabled' => $user->hasEnabledTwoFactorAuthentication(),
             ],
             'user_role' => Auth::user()->role,
             'is_self' => $user->id === Auth::id(),
@@ -106,5 +109,36 @@ class AdminUserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'Team member removed.');
+    }
+
+    public function resetTwoFactor(Request $request, User $user, DisableTwoFactorAuthentication $disableTwoFactor): RedirectResponse
+    {
+        abort_unless($user->canOperateAdmin(), 404);
+
+        if ($user->is(Auth::user())) {
+            return back()->withErrors(['two_factor' => 'Another superadmin must reset your two-factor authentication.']);
+        }
+
+        if (! $user->hasEnabledTwoFactorAuthentication()) {
+            return back()->with('info', 'Two-factor authentication is not configured for this team member.');
+        }
+
+        $disableTwoFactor($user);
+
+        AuditLog::create([
+            'event' => 'admin.two_factor.reset',
+            'actor_type' => User::class,
+            'actor_id' => (string) Auth::id(),
+            'auditable_type' => User::class,
+            'auditable_id' => (string) $user->getKey(),
+            'metadata' => [
+                'target_email' => $user->email,
+                'target_role' => $user->role,
+            ],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return back()->with('success', "Two-factor authentication was reset for {$user->name}.");
     }
 }

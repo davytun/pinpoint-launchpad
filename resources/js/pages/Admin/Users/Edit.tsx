@@ -1,24 +1,43 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LoaderCircle, RotateCcw, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import AdminLayout from '@/layouts/admin-layout';
 import { cn } from '@/lib/utils';
 
 interface PageProps {
-    member: { id: number; name: string; email: string; role: 'superadmin' | 'analyst' | 'compliance' | 'investor_relations' | 'support' };
+    member: {
+        id: number;
+        name: string;
+        email: string;
+        role: 'superadmin' | 'analyst' | 'compliance' | 'investor_relations' | 'support';
+        two_factor_enabled: boolean;
+    };
     user_role: string;
     is_self: boolean;
 }
 
 export default function AdminUsersEdit({ member, is_self }: PageProps) {
+    const [resetDialogOpen, setResetDialogOpen] = useState(false);
     const { data, setData, patch, processing, errors } = useForm({
         name: member.name,
         role: member.role,
     });
+    const twoFactorReset = useForm({ two_factor: '' });
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
         patch(route('admin.users.update', { user: member.id }));
+    }
+
+    function resetTwoFactor() {
+        twoFactorReset.delete(route('admin.users.two-factor.destroy', { user: member.id }), {
+            onSuccess: () => setResetDialogOpen(false),
+        });
     }
 
     const inputClass =
@@ -88,6 +107,76 @@ export default function AdminUsersEdit({ member, is_self }: PageProps) {
                         </button>
                     </div>
                 </form>
+
+                <Card className="mt-10 max-w-lg rounded-xl">
+                    <CardHeader className="flex-row items-start justify-between gap-4">
+                        <div className="flex flex-col gap-1.5">
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <ShieldCheck aria-hidden="true" className="size-4" />
+                                Two-factor authentication
+                            </CardTitle>
+                            <CardDescription>Authenticator protection for this operations account.</CardDescription>
+                        </div>
+                        <Badge variant={member.two_factor_enabled ? 'default' : 'secondary'}>
+                            {member.two_factor_enabled ? 'Enabled' : 'Setup required'}
+                        </Badge>
+                    </CardHeader>
+
+                    <CardContent className="flex flex-col gap-4">
+                        {member.two_factor_enabled ? (
+                            <>
+                                <p className="text-sm leading-relaxed text-muted-foreground">
+                                    Reset this only if {member.name} has lost access to their authenticator and recovery codes. They will need to set it up again.
+                                </p>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="self-start"
+                                    disabled={is_self}
+                                    onClick={() => setResetDialogOpen(true)}
+                                >
+                                    <RotateCcw data-icon="inline-start" />
+                                    Reset two-factor authentication
+                                </Button>
+                                {is_self ? (
+                                    <p className="text-xs text-muted-foreground">Another superadmin must reset your own two-factor authentication.</p>
+                                ) : null}
+                            </>
+                        ) : (
+                            <p className="text-sm leading-relaxed text-muted-foreground">
+                                This team member will be guided through setup the next time they sign in.
+                            </p>
+                        )}
+
+                        {twoFactorReset.errors.two_factor ? (
+                            <p role="alert" className="text-sm text-destructive">
+                                {twoFactorReset.errors.two_factor}
+                            </p>
+                        ) : null}
+                    </CardContent>
+                </Card>
+
+                <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Reset two-factor authentication?</DialogTitle>
+                            <DialogDescription>
+                                This removes {member.name}&apos;s authenticator and recovery codes. Their current admin access will stop until they enroll again.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button type="button" variant="outline">
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+                            <Button type="button" variant="destructive" disabled={twoFactorReset.processing} onClick={resetTwoFactor}>
+                                {twoFactorReset.processing ? <LoaderCircle data-icon="inline-start" className="animate-spin" /> : null}
+                                {twoFactorReset.processing ? 'Resetting' : 'Reset authentication'}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </AdminLayout>
     );

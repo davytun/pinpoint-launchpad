@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureAdminSide;
+use App\Http\Middleware\EnsureAdminTwoFactorConfigured;
 use App\Http\Middleware\EnsureFounderAuthenticated;
 use App\Http\Middleware\EnsureInvestorAuthenticated;
 use App\Http\Middleware\EnsureInvestorKycApproved;
@@ -39,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => EnsureUserHasRole::class,
             'require.role' => RequireRole::class,
             'admin.side' => EnsureAdminSide::class,
+            'admin.2fa.configured' => EnsureAdminTwoFactorConfigured::class,
             'payment.complete' => EnsurePaymentComplete::class,
             'signature.complete' => EnsureSignatureComplete::class,
             'auth.founder' => EnsureFounderAuthenticated::class,

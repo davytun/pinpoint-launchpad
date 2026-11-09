@@ -8,24 +8,24 @@ test('admin login screen can be rendered', function () {
         ->assertInertia(fn ($page) => $page->component('Admin/Login'));
 });
 
-test('investor desk staff can authenticate and land on investor dashboard', function () {
+test('investor desk staff are sent to two factor setup after authentication', function () {
     $compliance = User::factory()->create(['role' => 'compliance']);
 
     $this->post(route('admin.login.store'), [
         'email' => $compliance->email,
         'password' => 'password',
-    ])->assertRedirect(route('admin.investors.dashboard'));
+    ])->assertRedirect(route('admin.two-factor.setup'));
 
     $this->assertAuthenticatedAs($compliance);
 });
 
-test('investor relations staff land on investor dashboard', function () {
+test('investor relations staff are sent to two factor setup after authentication', function () {
     $ir = User::factory()->create(['role' => 'investor_relations']);
 
     $this->post(route('admin.login.store'), [
         'email' => $ir->email,
         'password' => 'password',
-    ])->assertRedirect(route('admin.investors.dashboard'));
+    ])->assertRedirect(route('admin.two-factor.setup'));
 
     $this->assertAuthenticatedAs($ir);
 });

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -34,6 +35,13 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = $request->user();
+
+        if ($user->canOperateAdmin() && ! $user->hasEnabledTwoFactorAuthentication()) {
+            app(EnableTwoFactorAuthentication::class)($user);
+
+            return redirect()->route('admin.two-factor.setup');
+        }
+
         $default = $user->canOperateAdmin()
             ? $user->defaultAdminHomeRoute()
             : route('home', absolute: false);

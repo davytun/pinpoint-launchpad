@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminDocumentController;
 use App\Http\Controllers\Admin\AdminFounderController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminTwoFactorSetupController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AssessmentApplicationController;
 use App\Http\Controllers\Admin\BlogImageController;
@@ -72,9 +73,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])
         ->name('login.store');
+
+    Route::middleware('auth:web')->prefix('two-factor')->name('two-factor.')->group(function () {
+        Route::get('/setup', [AdminTwoFactorSetupController::class, 'show'])->name('setup');
+        Route::post('/confirm', [AdminTwoFactorSetupController::class, 'confirm'])
+            ->middleware('throttle:6,1')
+            ->name('confirm');
+        Route::get('/recovery-codes', [AdminTwoFactorSetupController::class, 'recoveryCodes'])
+            ->name('recovery-codes');
+    });
 });
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('admin.2fa.configured')->group(function () {
 
     // Platform dashboard — superadmin only (wrong-desk staff redirected by admin.side)
     Route::get('/', [AdminDashboardController::class, 'index'])

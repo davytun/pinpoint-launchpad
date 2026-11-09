@@ -15,6 +15,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         Fortify::ignoreRoutes();
+        config([
+            'fortify.features' => [
+                Features::twoFactorAuthentication(['confirm' => true]),
+            ],
+        ]);
+
         $this->app->singleton(ScoringService::class);
         $this->app->singleton(PaystackService::class);
         $this->app->singleton(BoldSignService::class);

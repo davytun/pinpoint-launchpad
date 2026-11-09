@@ -6,6 +6,8 @@ use App\Models\User;
 
 return [
 
+    'admin_two_factor_enabled' => env('ADMIN_TWO_FACTOR_ENABLED', true),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults

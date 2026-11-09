@@ -66,3 +66,16 @@ test('a configured admin session without two factor verification is signed out',
 
     $this->assertGuest('web');
 });
+
+test('admin two factor enforcement can be paused without deleting setup', function () {
+    config()->set('auth.admin_two_factor_enabled', false);
+    $staff = configuredOperationsUser();
+
+    $this->post(route('admin.login.store'), [
+        'email' => $staff->email,
+        'password' => 'password',
+    ])->assertRedirect(route('admin.investors.dashboard'));
+
+    $this->assertAuthenticatedAs($staff, 'web');
+    expect($staff->fresh()->hasEnabledTwoFactorAuthentication())->toBeTrue();
+});

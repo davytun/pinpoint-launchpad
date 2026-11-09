@@ -48,3 +48,22 @@ test('a valid authenticator code confirms setup and reveals recovery codes once'
     $this->get(route('admin.two-factor.recovery-codes'))
         ->assertRedirect(route('admin.investors.dashboard'));
 });
+
+test('an invalid authenticator code shows a field error and does not confirm setup', function () {
+    $staff = User::factory()->create(['role' => 'compliance']);
+    app(EnableTwoFactorAuthentication::class)($staff);
+    $staff->refresh();
+
+    $secret = Fortify::currentEncrypter()->decrypt($staff->two_factor_secret);
+    $validCode = app(Google2FA::class)->getCurrentOtp($secret);
+    $invalidCode = ($validCode[0] === '9' ? '8' : '9').substr($validCode, 1);
+
+    $this->actingAs($staff)
+        ->from(route('admin.two-factor.setup'))
+        ->post(route('admin.two-factor.confirm'), ['code' => $invalidCode])
+        ->assertRedirect(route('admin.two-factor.setup'))
+        ->assertSessionHasErrors('code');
+
+    expect($staff->fresh()->two_factor_confirmed_at)->toBeNull()
+        ->and(session('admin.two_factor_verified_user'))->toBeNull();
+});

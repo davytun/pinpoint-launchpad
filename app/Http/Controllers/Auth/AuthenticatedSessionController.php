@@ -33,7 +33,9 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
         $user = $request->user();
 
-        if ($user->canOperateAdmin() && $user->hasEnabledTwoFactorAuthentication()) {
+        if (config('auth.admin_two_factor_enabled') &&
+            $user->canOperateAdmin() &&
+            $user->hasEnabledTwoFactorAuthentication()) {
             $request->session()->forget('admin.two_factor_verified_user');
             $request->session()->put([
                 'admin.two_factor_login.id' => $user->getKey(),
@@ -49,7 +51,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($user->canOperateAdmin() && ! $user->hasEnabledTwoFactorAuthentication()) {
+        if (config('auth.admin_two_factor_enabled') &&
+            $user->canOperateAdmin() &&
+            ! $user->hasEnabledTwoFactorAuthentication()) {
             app(EnableTwoFactorAuthentication::class)($user);
 
             return redirect()->route('admin.two-factor.setup');

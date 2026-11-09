@@ -18,6 +18,10 @@ class EnsureAdminTwoFactorConfigured
             return redirect()->route('admin.login');
         }
 
+        if (! config('auth.admin_two_factor_enabled')) {
+            return $next($request);
+        }
+
         if ($user->canOperateAdmin() && ! $user->hasEnabledTwoFactorAuthentication()) {
             return redirect()->route('admin.two-factor.setup');
         }

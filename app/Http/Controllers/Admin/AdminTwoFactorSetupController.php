@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
@@ -37,7 +38,12 @@ class AdminTwoFactorSetupController extends Controller
             'code' => ['required', 'digits:6'],
         ]);
 
-        app(ConfirmTwoFactorAuthentication::class)($user, $validated['code']);
+        try {
+            app(ConfirmTwoFactorAuthentication::class)($user, $validated['code']);
+        } catch (ValidationException $exception) {
+            throw ValidationException::withMessages($exception->errors());
+        }
+
         $request->session()->put('admin.two_factor_verified_user', $user->getKey());
         $request->session()->put('admin.two_factor_recovery_codes_visible', true);
 

@@ -1,5 +1,5 @@
-import { router } from '@inertiajs/react';
-import { LogOut, ShieldCheck } from 'lucide-react';
+import { Link, router } from '@inertiajs/react';
+import { ArrowLeft, LogOut, ShieldCheck } from 'lucide-react';
 import { type ReactNode } from 'react';
 
 import { PinpointLogo } from '@/components/pinpoint-logo';
@@ -11,18 +11,28 @@ interface TwoFactorShellProps {
     description: string;
     children: ReactNode;
     footer?: ReactNode;
+    authenticated?: boolean;
 }
 
-export function TwoFactorShell({ title, description, children, footer }: TwoFactorShellProps) {
+export function TwoFactorShell({ title, description, children, footer, authenticated = true }: TwoFactorShellProps) {
     return (
         <main className="flex min-h-svh items-center justify-center bg-muted/40 px-4 py-10 sm:px-6">
             <div className="flex w-full max-w-xl flex-col gap-6">
                 <div className="flex items-center justify-between gap-4 px-1">
                     <PinpointLogo height={24} />
-                    <Button variant="ghost" size="sm" onClick={() => router.post(route('logout'))}>
-                        <LogOut data-icon="inline-start" />
-                        Sign out
-                    </Button>
+                    {authenticated ? (
+                        <Button variant="ghost" size="sm" onClick={() => router.post(route('logout'))}>
+                            <LogOut data-icon="inline-start" />
+                            Sign out
+                        </Button>
+                    ) : (
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href={route('admin.login')}>
+                                <ArrowLeft data-icon="inline-start" />
+                                Back to sign in
+                            </Link>
+                        </Button>
+                    )}
                 </div>
 
                 <Card className="overflow-hidden rounded-2xl">

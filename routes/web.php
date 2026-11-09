@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdminDocumentController;
 use App\Http\Controllers\Admin\AdminFounderController;
 use App\Http\Controllers\Admin\AdminMessageController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AdminTwoFactorChallengeController;
 use App\Http\Controllers\Admin\AdminTwoFactorSetupController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AssessmentApplicationController;
@@ -73,6 +74,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])
         ->name('login.store');
+
+    Route::get('/two-factor-challenge', [AdminTwoFactorChallengeController::class, 'show'])
+        ->name('two-factor.challenge');
+    Route::post('/two-factor-challenge', [AdminTwoFactorChallengeController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('two-factor.challenge.store');
 
     Route::middleware('auth:web')->prefix('two-factor')->name('two-factor.')->group(function () {
         Route::get('/setup', [AdminTwoFactorSetupController::class, 'show'])->name('setup');

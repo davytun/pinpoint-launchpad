@@ -11,7 +11,6 @@ const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 interface LoginForm {
     email: string;
     password: string;
-    remember: boolean;
 }
 
 export default function AdminLogin({ status }: { status?: string }) {
@@ -20,7 +19,6 @@ export default function AdminLogin({ status }: { status?: string }) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
-        remember: false,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -157,20 +155,6 @@ export default function AdminLogin({ status }: { status?: string }) {
                                         {errors.password}
                                     </p>
                                 )}
-                            </div>
-
-                            {/* Remember */}
-                            <div className="flex items-center gap-2.5">
-                                <input
-                                    id="remember"
-                                    type="checkbox"
-                                    checked={data.remember}
-                                    onChange={(e) => setData('remember', e.target.checked)}
-                                    className="h-4 w-4 rounded border-zinc-200 bg-white accent-[#3A54A5]"
-                                />
-                                <label htmlFor="remember" className="cursor-pointer text-[12px] font-semibold text-zinc-500 select-none">
-                                    Keep me signed in
-                                </label>
                             </div>
 
                             <button

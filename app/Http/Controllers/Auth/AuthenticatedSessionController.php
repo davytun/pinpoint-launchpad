@@ -31,10 +31,23 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
+        $user = $request->user();
+
+        if ($user->canOperateAdmin() && $user->hasEnabledTwoFactorAuthentication()) {
+            $request->session()->forget('admin.two_factor_verified_user');
+            $request->session()->put([
+                'admin.two_factor_login.id' => $user->getKey(),
+                'admin.two_factor_login.password_hash' => $user->getAuthPassword(),
+                'admin.two_factor_login.started_at' => now()->timestamp,
+            ]);
+
+            Auth::guard('web')->logout();
+            $request->session()->regenerate();
+
+            return redirect()->route('admin.two-factor.challenge');
+        }
 
         $request->session()->regenerate();
-
-        $user = $request->user();
 
         if ($user->canOperateAdmin() && ! $user->hasEnabledTwoFactorAuthentication()) {
             app(EnableTwoFactorAuthentication::class)($user);

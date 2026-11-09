@@ -22,6 +22,15 @@ class EnsureAdminTwoFactorConfigured
             return redirect()->route('admin.two-factor.setup');
         }
 
+        if ($user->canOperateAdmin() &&
+            (int) $request->session()->get('admin.two_factor_verified_user') !== $user->getKey()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('admin.login')->with('status', 'Please sign in again to verify your authenticator code.');
+        }
+
         return $next($request);
     }
 }

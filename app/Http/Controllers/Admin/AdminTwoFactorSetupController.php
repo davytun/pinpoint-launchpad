@@ -38,6 +38,7 @@ class AdminTwoFactorSetupController extends Controller
         ]);
 
         app(ConfirmTwoFactorAuthentication::class)($user, $validated['code']);
+        $request->session()->put('admin.two_factor_verified_user', $user->getKey());
         $request->session()->put('admin.two_factor_recovery_codes_visible', true);
 
         return redirect()->route('admin.two-factor.recovery-codes');
